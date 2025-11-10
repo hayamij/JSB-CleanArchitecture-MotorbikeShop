@@ -29,6 +29,11 @@ com.motorbike/
 - **Actor**: Guest
 - **Status**: ✅ Completed
 
+### Use Case 4: Thêm vào giỏ hàng (Add to Cart)
+- **Endpoint**: `POST /api/cart/add`
+- **Actor**: Guest, Customer, Admin
+- **Status**: ✅ Completed
+
 ---
 
 ## 🏗️ Chi tiết từng tầng
@@ -597,6 +602,276 @@ public class SecurityConfig {
 
 ---
 
+## Use Case 4: Thêm vào giỏ hàng (Add to Cart)
+
+### Mô tả
+Cho phép người dùng (Guest/Customer/Admin) thêm sản phẩm vào giỏ hàng với số lượng mong muốn.
+
+### API Endpoint
+```
+POST /api/cart/add
+Content-Type: application/json
+```
+
+### Request Body
+```json
+{
+  "userId": 1,
+  "productId": 1,
+  "quantity": 2
+}
+```
+
+### Response Examples
+
+#### Success (200 OK)
+```json
+{
+  "cart": {
+    "id": 1,
+    "userId": 1,
+    "items": [
+      {
+        "id": 1,
+        "productId": 1,
+        "productName": "Honda Wave RSX",
+        "productPrice": 38000000,
+        "quantity": 2,
+        "subtotal": 76000000,
+        "addedAt": "2025-11-10T08:45:30"
+      }
+    ],
+    "totalAmount": 76000000,
+    "totalItems": 2,
+    "createdAt": "2025-11-10T08:45:30",
+    "updatedAt": "2025-11-10T08:45:30"
+  },
+  "message": "Added 2 x Honda Wave RSX to cart successfully",
+  "success": true
+}
+```
+
+#### Product Not Found (404)
+```json
+{
+  "success": false,
+  "message": "Product not found with ID: 999"
+}
+```
+
+#### Out of Stock (409)
+```json
+{
+  "success": false,
+  "message": "Product 'Honda Wave RSX' is out of stock. Requested: 100, Available: 15"
+}
+```
+
+#### Invalid Quantity (400)
+```json
+{
+  "success": false,
+  "message": "Quantity must be greater than 0"
+}
+```
+
+### Business Logic
+
+#### 1. Product Validation
+- Kiểm tra product có tồn tại không
+- Kiểm tra product có available không
+- Kiểm tra stock quantity đủ không
+
+#### 2. Cart Management
+- Nếu user chưa có cart → tạo cart mới
+- Nếu product đã có trong cart → tăng quantity
+- Nếu product chưa có → thêm cart item mới
+
+#### 3. Calculation
+- Tính subtotal cho mỗi item: `price × quantity`
+- Tính total amount của cart: `sum(all subtotals)`
+- Cập nhật total item count
+
+### Architecture Implementation
+
+#### Business Layer
+```
+business/
+├── entity/
+│   ├── Cart.java                    # Domain entity với business logic
+│   └── CartItem.java                # Domain entity cho item
+├── repository/
+│   └── CartRepository.java          # Interface (contract)
+├── exception/
+│   ├── ProductNotFoundException.java
+│   └── ProductOutOfStockException.java
+└── usecase/
+    ├── AddToCartUseCase.java        # Interface
+    └── impl/
+        └── AddToCartUseCaseImpl.java # Implementation
+```
+
+**Cart.java - Business Methods**:
+- `calculateTotalAmount()` - Tính tổng tiền
+- `getTotalItemCount()` - Đếm tổng số item
+- `isEmpty()` - Kiểm tra cart rỗng
+- `hasProduct(productId)` - Kiểm tra product đã có
+- `addItem(item)` - Thêm/merge item
+- `removeItem(productId)` - Xóa item
+- `clear()` - Xóa toàn bộ cart
+
+**CartItem.java - Business Methods**:
+- `calculateSubtotal()` - Tính subtotal
+- `hasValidQuantity()` - Validate quantity
+- `updateQuantity(newQuantity)` - Cập nhật số lượng
+- `increaseQuantity(amount)` - Tăng số lượng
+
+#### Interface Adapters Layer
+```
+interfaceadapters/
+├── controller/
+│   └── CartController.java           # REST API
+├── dto/
+│   ├── CartDTO.java
+│   ├── CartItemDTO.java
+│   ├── AddToCartRequestDTO.java
+│   └── AddToCartResponseDTO.java
+└── mapper/
+    └── CartDTOMapper.java            # Domain ↔ DTO
+```
+
+#### Persistence Layer
+```
+persistence/
+├── entity/
+│   ├── CartJpaEntity.java           # JPA entity
+│   └── CartItemJpaEntity.java       # JPA entity
+├── repository/
+│   └── CartJpaRepository.java       # Spring Data JPA
+├── mapper/
+│   └── CartMapper.java              # Domain ↔ JPA
+└── adapter/
+    └── CartRepositoryAdapter.java   # Repository implementation
+```
+
+#### Frameworks Layer
+```
+frameworks/
+└── config/
+    └── CartConfig.java              # Spring Bean configuration
+```
+
+### Database Design
+
+#### Table: carts
+```sql
+CREATE TABLE carts (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    user_id BIGINT NOT NULL UNIQUE,
+    total_amount DECIMAL(10,2) DEFAULT 0,
+    created_at DATETIME2 NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME2 NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+#### Table: cart_items
+```sql
+CREATE TABLE cart_items (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    cart_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    product_name NVARCHAR(255) NOT NULL,
+    product_price DECIMAL(10,2) NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    subtotal DECIMAL(10,2) NOT NULL,
+    added_at DATETIME2 NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    UNIQUE (cart_id, product_id)
+);
+```
+
+### Testing Commands
+
+```bash
+# Success - Add product to cart
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 1,
+    "quantity": 2
+  }'
+
+# Success - Add same product again (merge quantity)
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 1,
+    "quantity": 1
+  }'
+
+# Fail - Product not found
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 999,
+    "quantity": 1
+  }'
+
+# Fail - Out of stock
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 1,
+    "quantity": 1000
+  }'
+
+# Fail - Invalid quantity
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 1,
+    "quantity": 0
+  }'
+```
+
+### Business Rules
+
+1. **Guest Users**: 
+   - Spec yêu cầu redirect to login
+   - Implementation: Cần userId trong request (sau khi login)
+
+2. **Stock Validation**:
+   - Kiểm tra `product.canPurchase(quantity)`
+   - Throw `ProductOutOfStockException` nếu không đủ hàng
+
+3. **Cart Merging**:
+   - Nếu product đã có trong cart → `increaseQuantity()`
+   - Nếu chưa có → add new `CartItem`
+
+4. **Auto Calculation**:
+   - Subtotal tự động tính bằng `@PrePersist` và `@PreUpdate`
+   - Total amount tự động aggregate từ các items
+
+### Error Handling
+
+| Error | HTTP Code | Message |
+|-------|-----------|---------|
+| Missing userId | 400 | "User ID is required" |
+| Missing productId | 400 | "Product ID is required" |
+| Invalid quantity | 400 | "Quantity must be greater than 0" |
+| Product not found | 404 | "Product not found with ID: {id}" |
+| Out of stock | 409 | "Product '{name}' is out of stock. Requested: {req}, Available: {avail}" |
+| Server error | 500 | "An error occurred: {message}" |
+
+---
+
 ## 📊 Database Schema
 
 ### Table: `products`
@@ -709,23 +984,63 @@ curl -X POST http://localhost:8080/api/auth/register \
   }'
 ```
 
+### Use Case 4: Add to Cart
+```bash
+# Success - Add product to cart
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 1,
+    "quantity": 2
+  }'
+
+# Success - Add same product again (quantity merges)
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 1,
+    "quantity": 1
+  }'
+
+# Fail - Product not found
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 999,
+    "quantity": 1
+  }'
+
+# Fail - Out of stock
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 1,
+    "quantity": 1000
+  }'
+```
+
 ---
 
 ## 📈 Implementation Statistics
 
 | Metric | Count |
 |--------|-------|
-| **Use Cases Implemented** | 3 |
-| **Total Files** | 35+ |
-| **Business Layer Files** | 13 |
-| **Interface Adapters Files** | 10 |
-| **Persistence Layer Files** | 8 |
-| **Entities** | 2 (Product, User) |
-| **API Endpoints** | 3 |
-| **Database Tables** | 2 |
+| **Use Cases Implemented** | 4 |
+| **Total Files** | 55+ |
+| **Business Layer Files** | 19 |
+| **Interface Adapters Files** | 15 |
+| **Persistence Layer Files** | 13 |
+| **Frameworks Layer Files** | 4 |
+| **Entities** | 4 (Product, User, Cart, CartItem) |
+| **API Endpoints** | 4 |
+| **Database Tables** | 4 |
 
 ---
 
 Được tạo bởi: Refactoring Clean Architecture - 4 Layers
 Ngày: November 10, 2025
-Cập nhật: Use Cases 1, 2, 3 ✅ Completed
+Cập nhật: Use Cases 1, 2, 3, 4 ✅ Completed

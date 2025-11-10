@@ -1,11 +1,11 @@
 # Quick Start Guide
 
-## ✅ Implemented Use Cases (3/7)
+## ✅ Implemented Use Cases (4/7)
 
 1. ✅ **Get Product Detail** - `GET /api/products/{id}`
 2. ✅ **Login** - `POST /api/auth/login`
 3. ✅ **Register** - `POST /api/auth/register`
-4. ⏭️ Add to Cart
+4. ✅ **Add to Cart** - `POST /api/cart/add`
 5. ⏭️ Checkout
 6. ⏭️ View Cart
 7. ⏭️ Update Cart Quantity
@@ -56,6 +56,17 @@ curl -X POST http://localhost:8080/api/auth/login \
   }'
 ```
 
+### 4. Add to Cart
+```bash
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "productId": 1,
+    "quantity": 2
+  }'
+```
+
 ---
 
 ## 📚 Full Documentation
@@ -76,4 +87,4 @@ com.motorbike/
 
 ---
 
-**Status**: ✅ BUILD SUCCESS - 36 source files compiled
+**Status**: ✅ BUILD SUCCESS - 55 source files compiled

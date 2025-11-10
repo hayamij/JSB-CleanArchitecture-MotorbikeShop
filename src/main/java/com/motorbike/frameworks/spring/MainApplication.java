@@ -15,8 +15,23 @@ public class MainApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MainApplication.class, args);
 		System.out.println("Motorbike Shop Application is running...");
+
+        // GET: http://localhost:8080/api/products
 		System.out.println("API available at: http://localhost:8080/api/products");
-		System.out.println("H2 Console at: http://localhost:8080/h2-console");
+        
+
+        // POST: http://localhost:8080/api/auth/login
+        // Request Body: { "username": "customer1", "password": "password123" }
+        System.out.println("API available at: http://localhost:8080/api/auth/login");
+
+
+        // POST: http://localhost:8080/api/auth/register
+        // Request Body: { "email": "customer@motorbike.com", "username": "customer1", "password": "password123", "phoneNumber": "0901234567" }
+        System.out.println("API available at: http://localhost:8080/api/auth/register");
+        
+        // POST: http://localhost:8080/api/cart/add
+        // Request Body: { "userId": 1, "productId": 1, "quantity": 2 }
+        System.out.println("API available at: http://localhost:8080/api/cart/add");
 	}
 
 }
