@@ -115,3 +115,25 @@ GO
 PRINT 'Database setup completed successfully!';
 PRINT 'Total products inserted: 5';
 GO
+
+-- Update products table
+ALTER TABLE products
+ALTER COLUMN price DECIMAL(15, 2) NOT NULL;
+GO
+
+-- Update carts table
+ALTER TABLE carts
+ALTER COLUMN total_amount DECIMAL(15, 2);
+GO
+
+-- Update cart_items table
+ALTER TABLE cart_items
+ALTER COLUMN product_price DECIMAL(15, 2) NOT NULL;
+GO
+
+ALTER TABLE cart_items
+ALTER COLUMN subtotal DECIMAL(15, 2) NOT NULL;
+GO
+
+PRINT 'Successfully updated DECIMAL precision to (15,2) for all price columns';
+GO

@@ -27,13 +27,13 @@ public class CartItemJpaEntity {
     @Column(name = "product_name", nullable = false)
     private String productName;
     
-    @Column(name = "product_price", nullable = false, precision = 10, scale = 2)
+    @Column(name = "product_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal productPrice;
     
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
     
-    @Column(name = "subtotal", nullable = false, precision = 10, scale = 2)
+    @Column(name = "subtotal", nullable = false, precision = 15, scale = 2)
     private BigDecimal subtotal;
     
     @Column(name = "added_at")

@@ -1,11 +1,15 @@
 package com.motorbike.interfaceadapters.controller;
 
+import com.motorbike.business.exception.CartItemNotFoundException;
 import com.motorbike.business.exception.ProductNotFoundException;
 import com.motorbike.business.exception.ProductOutOfStockException;
 import com.motorbike.business.usecase.AddToCartUseCase;
+import com.motorbike.business.usecase.UpdateCartQuantityUseCase;
 import com.motorbike.business.usecase.ViewCartUseCase;
 import com.motorbike.interfaceadapters.dto.AddToCartRequestDTO;
 import com.motorbike.interfaceadapters.dto.AddToCartResponseDTO;
+import com.motorbike.interfaceadapters.dto.UpdateCartQuantityRequestDTO;
+import com.motorbike.interfaceadapters.dto.UpdateCartQuantityResponseDTO;
 import com.motorbike.interfaceadapters.dto.ViewCartResponseDTO;
 import com.motorbike.interfaceadapters.mapper.CartDTOMapper;
 import org.springframework.http.HttpStatus;
@@ -26,10 +30,14 @@ public class CartController {
     
     private final AddToCartUseCase addToCartUseCase;
     private final ViewCartUseCase viewCartUseCase;
+    private final UpdateCartQuantityUseCase updateCartQuantityUseCase;
     
-    public CartController(AddToCartUseCase addToCartUseCase, ViewCartUseCase viewCartUseCase) {
+    public CartController(AddToCartUseCase addToCartUseCase, 
+                         ViewCartUseCase viewCartUseCase,
+                         UpdateCartQuantityUseCase updateCartQuantityUseCase) {
         this.addToCartUseCase = addToCartUseCase;
         this.viewCartUseCase = viewCartUseCase;
+        this.updateCartQuantityUseCase = updateCartQuantityUseCase;
     }
     
     /**
@@ -121,6 +129,76 @@ public class CartController {
             
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
+                    .body(createErrorResponse(e.getMessage()));
+                    
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createErrorResponse("An error occurred: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Update cart item quantity
+     * PUT /api/cart/update
+     * @param requestDTO request containing userId, productId, and new quantity
+     * @return response with updated cart
+     */
+    @PutMapping("/update")
+    public ResponseEntity<?> updateCartQuantity(@RequestBody UpdateCartQuantityRequestDTO requestDTO) {
+        try {
+            // Validate request
+            if (requestDTO.getUserId() == null) {
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse("User ID is required"));
+            }
+            if (requestDTO.getProductId() == null) {
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse("Product ID is required"));
+            }
+            if (requestDTO.getNewQuantity() == null) {
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse("New quantity is required"));
+            }
+            if (requestDTO.getNewQuantity() < 0) {
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse("Quantity cannot be negative"));
+            }
+            
+            // Execute use case
+            UpdateCartQuantityUseCase.UpdateCartQuantityRequest request = 
+                    new UpdateCartQuantityUseCase.UpdateCartQuantityRequest(
+                            requestDTO.getUserId(),
+                            requestDTO.getProductId(),
+                            requestDTO.getNewQuantity()
+                    );
+            
+            UpdateCartQuantityUseCase.UpdateCartQuantityResponse response = 
+                    updateCartQuantityUseCase.execute(request);
+            
+            // Map to DTO
+            UpdateCartQuantityResponseDTO responseDTO = new UpdateCartQuantityResponseDTO(
+                    CartDTOMapper.toDTO(response.getCart()),
+                    response.getMessage(),
+                    response.isItemRemoved(),
+                    response.isSuccess()
+            );
+            
+            return ResponseEntity.ok(responseDTO);
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse(e.getMessage()));
+                    
+        } catch (CartItemNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(createErrorResponse(e.getMessage()));
+                    
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(createErrorResponse(e.getMessage()));
+                    
+        } catch (ProductOutOfStockException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(createErrorResponse(e.getMessage()));
                     
         } catch (Exception e) {

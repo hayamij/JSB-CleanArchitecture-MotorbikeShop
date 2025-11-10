@@ -17,7 +17,7 @@ public class MainApplication {
 		System.out.println("Motorbike Shop Application is running...");
 
         // GET: http://localhost:8080/api/products
-		System.out.println("API available at: http://localhost:8080/api/products");
+		System.out.println("API available at: http://localhost:8080/api/products/{id}");
         
 
         // POST: http://localhost:8080/api/auth/login
@@ -32,6 +32,13 @@ public class MainApplication {
         // POST: http://localhost:8080/api/cart/add
         // Request Body: { "userId": 1, "productId": 1, "quantity": 2 }
         System.out.println("API available at: http://localhost:8080/api/cart/add");
+
+        // GET: http://localhost:8080/api/cart/{userId}
+        System.out.println("API available at: http://localhost:8080/api/cart/{userId}");
+
+        // PUT: http://localhost:8080/api/cart/update
+        // Request Body: { "userId": 1, "productId": 1, "newQuantity": 3 }
+        System.out.println("API available at: http://localhost:8080/api/cart/update");
 	}
 
 }

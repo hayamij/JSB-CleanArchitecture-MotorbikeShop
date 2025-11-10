@@ -39,6 +39,11 @@ com.motorbike/
 - **Actor**: Guest, Customer, Admin
 - **Status**: ✅ Completed
 
+### Use Case 7: Chỉnh số lượng sản phẩm trong giỏ hàng (Update Cart Quantity)
+- **Endpoint**: `PUT /api/cart/update`
+- **Actor**: Guest, Customer, Admin
+- **Status**: ✅ Completed
+
 ---
 
 ## 🏗️ Chi tiết từng tầng
@@ -1068,6 +1073,292 @@ curl http://localhost:8080/api/cart/1
 - Add authentication/authorization
 - Verify requesting user owns the cart
 - Consider using session/token instead of userId in URL
+
+---
+
+## Use Case 7: Chỉnh số lượng sản phẩm trong giỏ hàng (Update Cart Quantity)
+
+### Mô tả
+Cho phép người dùng cập nhật số lượng sản phẩm trong giỏ hàng hoặc xóa sản phẩm (khi quantity = 0).
+
+### API Endpoint
+```
+PUT /api/cart/update
+```
+
+### Request Body
+```json
+{
+  "userId": 1,
+  "productId": 1,
+  "newQuantity": 3
+}
+```
+
+### Response Examples
+
+#### Success - Updated quantity (200 OK)
+```json
+{
+  "cart": {
+    "id": 1,
+    "userId": 1,
+    "items": [
+      {
+        "id": 1,
+        "productId": 1,
+        "productName": "Honda Wave RSX",
+        "productPrice": 38000000,
+        "quantity": 3,
+        "subtotal": 114000000,
+        "addedAt": "2025-11-10T09:00:00"
+      }
+    ],
+    "totalAmount": 114000000,
+    "totalItems": 3,
+    "createdAt": "2025-11-10T09:00:00",
+    "updatedAt": "2025-11-10T09:15:00"
+  },
+  "message": "Updated 'Honda Wave RSX' quantity to 3",
+  "itemRemoved": false,
+  "success": true
+}
+```
+
+#### Success - Item removed (quantity = 0) (200 OK)
+```json
+{
+  "cart": {
+    "id": 1,
+    "userId": 1,
+    "items": [],
+    "totalAmount": 0,
+    "totalItems": 0,
+    "createdAt": "2025-11-10T09:00:00",
+    "updatedAt": "2025-11-10T09:20:00"
+  },
+  "message": "Product 'Honda Wave RSX' removed from cart",
+  "itemRemoved": true,
+  "success": true
+}
+```
+
+#### Product not in cart (404)
+```json
+{
+  "success": false,
+  "message": "Product with ID 999 not found in cart of user 1"
+}
+```
+
+#### Out of stock (409)
+```json
+{
+  "success": false,
+  "message": "Product 'Honda Wave RSX' is out of stock. Requested: 100, Available: 50"
+}
+```
+
+#### Invalid quantity (400)
+```json
+{
+  "success": false,
+  "message": "Quantity cannot be negative"
+}
+```
+
+### Business Logic
+
+#### 1. Request Validation
+- Validate userId, productId không null
+- Validate newQuantity không null và >= 0
+- Reject negative quantities
+
+#### 2. Cart Retrieval
+- Tìm cart theo userId
+- Throw CartItemNotFoundException nếu cart không tồn tại
+
+#### 3. Find Cart Item
+- Tìm cart item theo productId trong cart
+- Throw CartItemNotFoundException nếu product không có trong cart
+
+#### 4. Quantity Update Logic
+**Case 1: newQuantity = 0**
+- Remove item khỏi cart
+- Set itemRemoved = true
+- Message: "Product '{name}' removed from cart"
+
+**Case 2: newQuantity > 0**
+- Validate product còn tồn tại
+- Check stock availability
+- Throw ProductOutOfStockException nếu vượt tồn kho
+- Update quantity của cart item
+- Recalculate subtotal automatically
+- Message: "Updated '{name}' quantity to {qty}"
+
+#### 5. Cart Persistence
+- Save updated cart to database
+- updatedAt timestamp tự động update
+- Recalculate totalAmount và totalItems
+
+### Architecture Implementation
+
+#### Business Layer
+```
+business/
+├── entity/
+│   ├── Cart.java                    # removeItem(), findItemByProductId()
+│   └── CartItem.java                # updateQuantity()
+├── exception/
+│   └── CartItemNotFoundException.java  # New exception
+├── repository/
+│   └── CartRepository.java          # findByUserId(), save()
+└── usecase/
+    ├── UpdateCartQuantityUseCase.java      # Interface
+    └── impl/
+        └── UpdateCartQuantityUseCaseImpl.java  # Implementation (7 steps)
+```
+
+**UpdateCartQuantityUseCaseImpl Logic**:
+1. Validate request (userId, productId, newQuantity)
+2. Find cart by userId (throw if not found)
+3. Find cart item by productId (throw if not found)
+4. Handle quantity update:
+   - If qty = 0: Remove item from cart
+   - If qty > 0: Validate stock and update quantity
+5. Save cart (timestamps updated automatically)
+6. Return UpdateCartQuantityResponse
+
+#### Interface Adapters Layer
+```
+interfaceadapters/
+├── controller/
+│   └── CartController.java                    # PUT /update endpoint
+└── dto/
+    ├── UpdateCartQuantityRequestDTO.java      # Request DTO
+    └── UpdateCartQuantityResponseDTO.java     # Response DTO
+```
+
+**CartController.updateCartQuantity()**:
+- Validate request body fields
+- Execute UpdateCartQuantityUseCase
+- Map response to DTO
+- Handle exceptions: 400, 404, 409, 500
+
+#### Reused Components
+- `CartRepository` - Find and save cart
+- `ProductRepository` - Validate product and check stock
+- `CartDTOMapper` - Convert Cart → CartDTO
+- `CartDTO`, `CartItemDTO` - Already created
+
+#### Frameworks Layer
+```
+frameworks/
+└── config/
+    └── CartConfig.java    # updateCartQuantityUseCase bean
+```
+
+### Testing Commands
+
+```bash
+# Add product to cart first
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1, "productId": 1, "quantity": 2}'
+
+# Update quantity to 5
+curl -X PUT http://localhost:8080/api/cart/update \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1, "productId": 1, "newQuantity": 5}'
+
+# Update quantity to 1
+curl -X PUT http://localhost:8080/api/cart/update \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1, "productId": 1, "newQuantity": 1}'
+
+# Remove item (set quantity to 0)
+curl -X PUT http://localhost:8080/api/cart/update \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1, "productId": 1, "newQuantity": 0}'
+
+# View cart after update
+curl http://localhost:8080/api/cart/1
+```
+
+### Business Rules
+
+1. **Quantity = 0 means Remove**:
+   - Setting quantity to 0 removes the item completely
+   - Cart automatically recalculates totals
+   - Returns itemRemoved = true flag
+
+2. **Stock Validation**:
+   - Always check product stock before increasing quantity
+   - Prevent overselling
+   - Clear error message with available stock
+
+3. **Automatic Calculations**:
+   - CartItem subtotal recalculated on quantity update
+   - Cart totalAmount recalculated when item changes
+   - updatedAt timestamp updated automatically
+
+4. **Item Must Exist**:
+   - Cannot update quantity of product not in cart
+   - Use Add to Cart endpoint to add new products
+
+5. **No Negative Quantities**:
+   - Reject negative values (< 0)
+   - Use 0 to remove, positive integers to update
+
+### Error Handling
+
+| Error | HTTP Code | Message |
+|-------|-----------|---------|
+| Missing userId | 400 | "User ID is required" |
+| Missing productId | 400 | "Product ID is required" |
+| Missing quantity | 400 | "New quantity is required" |
+| Negative quantity | 400 | "Quantity cannot be negative" |
+| Cart not found | 404 | "Cart not found for user {id}" |
+| Item not in cart | 404 | "Product with ID {id} not found in cart of user {userId}" |
+| Product deleted | 404 | "Product with ID {id} not found" |
+| Out of stock | 409 | "Product '{name}' is out of stock. Requested: {req}, Available: {avail}" |
+| Server error | 500 | "An error occurred: {message}" |
+
+### State Transitions
+
+```
+Cart with items → Update quantity > 0 → Cart with updated quantity
+Cart with items → Update quantity = 0 → Item removed, cart updated
+Cart with items → Update to invalid qty → Error, cart unchanged
+Single item cart → Remove item → Empty cart (not deleted)
+```
+
+### Performance Considerations
+
+- **Single Transaction**: All operations in one database transaction
+- **Eager Loading**: Cart items loaded with cart (one query)
+- **Automatic Calculation**: No manual recalculation needed
+- **Optimistic Updates**: Client can update UI before server response
+
+### Security Notes
+
+⚠️ **Current Implementation - Development Only:**
+- No authentication check
+- Anyone can update any cart with userId
+- No rate limiting
+
+🔒 **Production Requirements:**
+- Add authentication/authorization
+- Verify requesting user owns the cart
+- Rate limit update requests
+- Validate userId from session/token
+
+### Integration with Other Use Cases
+
+- **Use Case 4 (Add to Cart)**: Adds items that can be updated here
+- **Use Case 6 (View Cart)**: Shows updated quantities
+- **Use Case 5 (Checkout)**: Uses final quantities for order
+- **Frontend**: Can implement +/- buttons, direct input, or remove button
 
 ---
 
