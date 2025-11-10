@@ -1,7 +1,7 @@
 -- SQL Script to create Users table for Login Use Case
--- Database: MotorbikeShop
+-- Database: MotorcycleShop
 
-USE MotorbikeShop;
+USE MotorcycleShop;
 GO
 
 -- Create Users table

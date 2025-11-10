@@ -44,6 +44,11 @@ com.motorbike/
 - **Actor**: Guest, Customer, Admin
 - **Status**: ✅ Completed
 
+### Use Case 5: Thanh toán (Checkout)
+- **Endpoint**: `POST /api/orders/checkout`
+- **Actor**: Customer
+- **Status**: ✅ Completed
+
 ---
 
 ## 🏗️ Chi tiết từng tầng
@@ -1359,6 +1364,415 @@ Single item cart → Remove item → Empty cart (not deleted)
 - **Use Case 6 (View Cart)**: Shows updated quantities
 - **Use Case 5 (Checkout)**: Uses final quantities for order
 - **Frontend**: Can implement +/- buttons, direct input, or remove button
+
+---
+
+## Use Case 5: Thanh toán (Checkout)
+
+### Mô tả
+Cho phép khách hàng đặt hàng từ giỏ hàng hiện tại, cung cấp thông tin giao hàng và chọn phương thức thanh toán (COD/Online).
+
+### API Endpoint
+```
+POST /api/orders/checkout
+```
+
+### Request Body
+```json
+{
+  "userId": 1,
+  "shippingAddress": "123 Nguyen Trai Street, Thanh Xuan",
+  "shippingCity": "Hanoi",
+  "shippingPhone": "0901234567",
+  "paymentMethod": "COD"
+}
+```
+
+### Response Examples
+
+#### Success - Order created (201 CREATED)
+```json
+{
+  "order": {
+    "id": 1,
+    "userId": 1,
+    "items": [
+      {
+        "id": 1,
+        "productId": 1,
+        "productName": "Honda Wave RSX",
+        "productPrice": 38000000,
+        "quantity": 2,
+        "subtotal": 76000000
+      },
+      {
+        "id": 2,
+        "productId": 2,
+        "productName": "Yamaha Exciter 155",
+        "productPrice": 47000000,
+        "quantity": 1,
+        "subtotal": 47000000
+      }
+    ],
+    "totalAmount": 123000000,
+    "shippingAddress": "123 Nguyen Trai Street, Thanh Xuan",
+    "shippingCity": "Hanoi",
+    "shippingPhone": "0901234567",
+    "paymentMethod": "COD",
+    "status": "PENDING",
+    "orderDate": "2025-11-10T14:00:00",
+    "updatedAt": "2025-11-10T14:00:00"
+  },
+  "message": "Order placed successfully! Order ID: 1, Total: 123000000 VND, Payment: COD",
+  "success": true
+}
+```
+
+#### Empty cart (400)
+```json
+{
+  "success": false,
+  "message": "Cart is empty for user 1. Cannot proceed with checkout."
+}
+```
+
+#### Missing shipping info (400)
+```json
+{
+  "success": false,
+  "message": "Shipping address is required"
+}
+```
+
+#### Invalid payment method (400)
+```json
+{
+  "success": false,
+  "message": "Payment method must be COD or ONLINE"
+}
+```
+
+### Business Logic
+
+#### 1. Request Validation
+- Validate userId, shipping address, city, phone
+- Validate payment method (COD or ONLINE only)
+- Throw IllegalArgumentException for invalid data
+
+#### 2. Cart Retrieval & Validation
+- Find cart by userId
+- Throw EmptyCartException if cart not found or empty
+- Cannot checkout with empty cart
+
+#### 3. Convert Cart Items to Order Items
+- Map each CartItem to OrderItem
+- Preserve product info, quantity, price, subtotal
+- Use stream mapping for conversion
+
+#### 4. Create Order Entity
+- Build Order with shipping info
+- Set initial status as "PENDING"
+- Set order date and updated timestamp
+- Calculate total amount from items
+
+#### 5. Order Validation
+- Validate order has items
+- Validate all required fields present
+- Validate payment method format
+
+#### 6. Persist Order
+- Save order to database
+- JPA cascade saves order items automatically
+- Transaction ensures atomic operation
+
+#### 7. Clear Cart
+- Remove all items from cart after successful order
+- Save empty cart to database
+- Prevents duplicate orders
+
+#### 8. Generate Response
+- Include order ID, total amount, payment method
+- Provide user-friendly success message
+- Return created order details
+
+### Architecture Implementation
+
+#### Business Layer
+```
+business/
+├── entity/
+│   ├── Order.java                     # Domain entity with business logic
+│   └── OrderItem.java                 # Order line item entity
+├── exception/
+│   └── EmptyCartException.java        # Custom exception
+├── repository/
+│   └── OrderRepository.java           # Repository interface
+└── usecase/
+    ├── CheckoutUseCase.java           # Interface with Request/Response
+    └── impl/
+        └── CheckoutUseCaseImpl.java   # Implementation (10 steps)
+```
+
+**CheckoutUseCaseImpl Logic**:
+1. Validate request (userId, shipping info, payment method)
+2. Get cart by userId (throw if not found)
+3. Check if cart is empty (throw if empty)
+4. Convert cart items to order items
+5. Create order entity with shipping info
+6. Validate order entity
+7. Save order to database
+8. Clear cart after successful order
+9. Generate success message
+10. Return CheckoutResponse
+
+**Order Entity Business Methods**:
+- `calculateTotalAmount()` - Sum all item subtotals
+- `getTotalItemCount()` - Count total items
+- `isEmpty()` - Check if order has items
+- `addItem()` - Add order item
+- `validate()` - Validate all order data
+- `canBeCancelled()` - Check if order can be cancelled
+
+#### Persistence Layer
+```
+persistence/
+├── entity/
+│   ├── OrderJpaEntity.java            # JPA entity for orders table
+│   └── OrderItemJpaEntity.java        # JPA entity for order_items table
+├── repository/
+│   └── OrderJpaRepository.java        # Spring Data JPA repository
+├── mapper/
+│   └── OrderMapper.java               # Domain ↔ JPA entity mapping
+└── adapter/
+    └── OrderRepositoryAdapter.java    # Repository implementation
+```
+
+**OrderJpaEntity Features**:
+- `@OneToMany` relationship with OrderItemJpaEntity
+- `@PrePersist` auto-set timestamps and status
+- `@PreUpdate` auto-update timestamp and total
+- Cascade ALL operations to items
+- Orphan removal enabled
+
+**OrderItemJpaEntity Features**:
+- `@ManyToOne` relationship with OrderJpaEntity
+- `@PrePersist` auto-calculate subtotal
+- DECIMAL(15,2) for large price values
+- Bidirectional mapping with parent
+
+#### Interface Adapters Layer
+```
+interfaceadapters/
+├── controller/
+│   └── OrderController.java           # POST /checkout endpoint
+├── dto/
+│   ├── CheckoutRequestDTO.java        # Request DTO
+│   ├── CheckoutResponseDTO.java       # Response DTO
+│   ├── OrderDTO.java                  # Order presentation DTO
+│   └── OrderItemDTO.java              # Order item DTO
+└── mapper/
+    └── OrderDTOMapper.java            # Domain → DTO mapping
+```
+
+**OrderController.checkout()**:
+- Validate all request fields
+- Execute CheckoutUseCase
+- Map Order to OrderDTO
+- Return HTTP 201 CREATED on success
+- Handle exceptions: 400, 500
+
+#### Frameworks Layer
+```
+frameworks/
+└── config/
+    └── OrderConfig.java    # Spring beans configuration
+```
+
+**Beans Configured**:
+- `orderRepository` - OrderRepositoryAdapter
+- `checkoutUseCase` - CheckoutUseCaseImpl with dependencies
+
+### Testing Commands
+
+```bash
+# Step 1: Add items to cart
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1, "productId": 1, "quantity": 2}'
+
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1, "productId": 2, "quantity": 1}'
+
+# Step 2: View cart before checkout
+curl http://localhost:8080/api/cart/1
+
+# Step 3: Checkout with COD payment
+curl -X POST http://localhost:8080/api/orders/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "shippingAddress": "123 Nguyen Trai Street, Thanh Xuan",
+    "shippingCity": "Hanoi",
+    "shippingPhone": "0901234567",
+    "paymentMethod": "COD"
+  }'
+
+# Step 4: Verify cart is empty after checkout
+curl http://localhost:8080/api/cart/1
+
+# Checkout with ONLINE payment
+curl -X POST http://localhost:8080/api/orders/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 2,
+    "shippingAddress": "456 Le Duan, District 1",
+    "shippingCity": "Ho Chi Minh City",
+    "shippingPhone": "0987654321",
+    "paymentMethod": "ONLINE"
+  }'
+```
+
+### Business Rules
+
+1. **Cart Must Have Items**:
+   - Cannot checkout with empty cart
+   - Clear error message if cart is empty
+   - Prevents creating empty orders
+
+2. **Payment Methods**:
+   - Only COD (Cash On Delivery) and ONLINE supported
+   - Case-insensitive validation
+   - Stored in uppercase format
+
+3. **Order Status Lifecycle**:
+   - Initial status: PENDING
+   - Can progress: PROCESSING → SHIPPED → DELIVERED
+   - Can be cancelled: PENDING, PROCESSING only
+   - Status stored as string for flexibility
+
+4. **Cart Cleared After Order**:
+   - Cart automatically emptied on successful checkout
+   - Prevents accidental duplicate orders
+   - User must add new items for next order
+
+5. **Shipping Information Required**:
+   - Address, city, and phone are mandatory
+   - Validation at both controller and use case levels
+   - Used for order fulfillment
+
+6. **Atomic Transaction**:
+   - Order creation and cart clearing in one transaction
+   - Rollback if any step fails
+   - Data consistency guaranteed
+
+### Error Handling
+
+| Error | HTTP Code | Message |
+|-------|-----------|---------|
+| Missing userId | 400 | "User ID is required" |
+| Missing address | 400 | "Shipping address is required" |
+| Missing city | 400 | "Shipping city is required" |
+| Missing phone | 400 | "Shipping phone is required" |
+| Missing payment | 400 | "Payment method is required" |
+| Invalid payment | 400 | "Payment method must be COD or ONLINE" |
+| Empty cart | 400 | "Cart is empty for user {id}. Cannot proceed with checkout." |
+| Cart not found | 400 | "Cart is empty for user {id}. Cannot proceed with checkout." |
+| Server error | 500 | "An error occurred: {message}" |
+
+### Database Schema
+
+**Table: `orders`**
+```sql
+CREATE TABLE orders (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    user_id BIGINT NOT NULL,
+    total_amount DECIMAL(15,2) NOT NULL,
+    shipping_address NVARCHAR(500) NOT NULL,
+    shipping_city NVARCHAR(100) NOT NULL,
+    shipping_phone NVARCHAR(20) NOT NULL,
+    payment_method NVARCHAR(20) NOT NULL,
+    status NVARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    order_date DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+**Table: `order_items`**
+```sql
+CREATE TABLE order_items (
+    id BIGINT PRIMARY KEY IDENTITY(1,1),
+    order_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    product_name NVARCHAR(255) NOT NULL,
+    product_price DECIMAL(15,2) NOT NULL,
+    quantity INT NOT NULL,
+    subtotal DECIMAL(15,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+```
+
+### State Transitions
+
+```
+[Cart with items] 
+    → Checkout initiated
+    → Order validation
+    → Order created (PENDING)
+    → Cart cleared
+    → Success response
+
+[Empty cart]
+    → Checkout initiated
+    → EmptyCartException
+    → Error response (400)
+```
+
+### Performance Considerations
+
+- **Eager Loading**: Order items loaded with order (one query)
+- **Cascade Operations**: Items saved automatically with order
+- **Single Transaction**: Order creation + cart clearing atomic
+- **Calculated Fields**: Total amount computed automatically
+
+### Security Notes
+
+⚠️ **Current Implementation - Development Only:**
+- No authentication check
+- Anyone can checkout for any userId
+- No fraud prevention
+- No payment gateway integration
+
+🔒 **Production Requirements:**
+- Add authentication/authorization
+- Verify userId matches authenticated user
+- Integrate real payment gateway for ONLINE
+- Add order confirmation email
+- Implement fraud detection
+- Add rate limiting for checkout endpoint
+- Log all order transactions
+
+### Integration with Other Use Cases
+
+- **Use Case 4 (Add to Cart)**: Provides items for checkout
+- **Use Case 6 (View Cart)**: User reviews cart before checkout
+- **Use Case 7 (Update Cart)**: User adjusts quantities before checkout
+- **Future Use Cases**: Order tracking, order history, order cancellation
+
+### Future Enhancements
+
+1. **Payment Gateway Integration**: Stripe, PayPal, VNPay for ONLINE payments
+2. **Order History**: GET /api/orders/user/{userId} endpoint
+3. **Order Details**: GET /api/orders/{orderId} endpoint
+4. **Order Cancellation**: PUT /api/orders/{orderId}/cancel endpoint
+5. **Order Status Update**: PUT /api/orders/{orderId}/status (Admin only)
+6. **Email Notifications**: Send confirmation email after order
+7. **SMS Notifications**: Send order updates via SMS
+8. **Inventory Management**: Decrease product stock after order
+9. **Coupon/Discount**: Apply promotional codes at checkout
+10. **Multi-address**: Support multiple shipping addresses
 
 ---
 

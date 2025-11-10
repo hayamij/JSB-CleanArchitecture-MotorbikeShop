@@ -39,6 +39,10 @@ public class MainApplication {
         // PUT: http://localhost:8080/api/cart/update
         // Request Body: { "userId": 1, "productId": 1, "newQuantity": 3 }
         System.out.println("API available at: http://localhost:8080/api/cart/update");
+
+        // POST: http://localhost:8080/api/orders/checkout
+        // Request Body: { "userId": 1, "shippingAddress": "123 Main St", "shippingCity": "Hanoi", "shippingPhone": "0901234567", "paymentMethod": "COD" }
+        System.out.println("API available at: http://localhost:8080/api/orders/checkout");
 	}
 
 }
