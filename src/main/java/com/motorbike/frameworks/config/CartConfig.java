@@ -3,7 +3,9 @@ package com.motorbike.frameworks.config;
 import com.motorbike.business.repository.CartRepository;
 import com.motorbike.business.repository.ProductRepository;
 import com.motorbike.business.usecase.AddToCartUseCase;
+import com.motorbike.business.usecase.ViewCartUseCase;
 import com.motorbike.business.usecase.impl.AddToCartUseCaseImpl;
+import com.motorbike.business.usecase.impl.ViewCartUseCaseImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,5 +21,10 @@ public class CartConfig {
     public AddToCartUseCase addToCartUseCase(CartRepository cartRepository, 
                                              ProductRepository productRepository) {
         return new AddToCartUseCaseImpl(cartRepository, productRepository);
+    }
+    
+    @Bean
+    public ViewCartUseCase viewCartUseCase(CartRepository cartRepository) {
+        return new ViewCartUseCaseImpl(cartRepository);
     }
 }

@@ -34,6 +34,11 @@ com.motorbike/
 - **Actor**: Guest, Customer, Admin
 - **Status**: ✅ Completed
 
+### Use Case 6: Xem giỏ hàng (View Cart)
+- **Endpoint**: `GET /api/cart/{userId}`
+- **Actor**: Guest, Customer, Admin
+- **Status**: ✅ Completed
+
 ---
 
 ## 🏗️ Chi tiết từng tầng
@@ -869,6 +874,200 @@ curl -X POST http://localhost:8080/api/cart/add \
 | Product not found | 404 | "Product not found with ID: {id}" |
 | Out of stock | 409 | "Product '{name}' is out of stock. Requested: {req}, Available: {avail}" |
 | Server error | 500 | "An error occurred: {message}" |
+
+---
+
+## Use Case 6: Xem giỏ hàng (View Cart)
+
+### Mô tả
+Cho phép người dùng xem danh sách sản phẩm trong giỏ hàng của mình bao gồm thông tin chi tiết và tổng tiền.
+
+### API Endpoint
+```
+GET /api/cart/{userId}
+```
+
+### Request Parameters
+- **userId** (path parameter): ID của user cần xem giỏ hàng
+
+### Response Examples
+
+#### Success - Cart has items (200 OK)
+```json
+{
+  "cart": {
+    "id": 1,
+    "userId": 1,
+    "items": [
+      {
+        "id": 1,
+        "productId": 1,
+        "productName": "Honda Wave RSX",
+        "productPrice": 38000000,
+        "quantity": 2,
+        "subtotal": 76000000,
+        "addedAt": "2025-11-10T09:00:00"
+      },
+      {
+        "id": 2,
+        "productId": 2,
+        "productName": "Yamaha Exciter 155",
+        "productPrice": 47000000,
+        "quantity": 1,
+        "subtotal": 47000000,
+        "addedAt": "2025-11-10T09:05:00"
+      }
+    ],
+    "totalAmount": 123000000,
+    "totalItems": 3,
+    "createdAt": "2025-11-10T09:00:00",
+    "updatedAt": "2025-11-10T09:05:00"
+  },
+  "isEmpty": false,
+  "message": "Cart has 3 item(s), Total: 123000000 VND"
+}
+```
+
+#### Success - Empty cart (200 OK)
+```json
+{
+  "cart": {
+    "id": null,
+    "userId": 1,
+    "items": [],
+    "totalAmount": 0,
+    "totalItems": 0,
+    "createdAt": "2025-11-10T09:00:00",
+    "updatedAt": "2025-11-10T09:00:00"
+  },
+  "isEmpty": true,
+  "message": "Your cart is empty"
+}
+```
+
+#### Invalid User ID (400)
+```json
+{
+  "success": false,
+  "message": "User ID is required"
+}
+```
+
+### Business Logic
+
+#### 1. Cart Retrieval
+- Tìm cart theo userId
+- Nếu không tìm thấy → tạo empty cart mới
+- Load tất cả cart items với eager fetching
+
+#### 2. Cart Information
+- Tính tổng số lượng items
+- Tính tổng tiền (sum of all subtotals)
+- Kiểm tra cart rỗng hay không
+
+#### 3. Response Generation
+- Map Cart entity sang CartDTO
+- Thêm isEmpty flag
+- Thêm descriptive message
+
+### Architecture Implementation
+
+#### Business Layer
+```
+business/
+└── usecase/
+    ├── ViewCartUseCase.java          # Interface
+    └── impl/
+        └── ViewCartUseCaseImpl.java  # Implementation
+```
+
+**ViewCartUseCaseImpl Logic**:
+1. Find cart by userId from repository
+2. If not found → create empty cart in memory (not persisted)
+3. Check if cart isEmpty()
+4. Generate appropriate message
+5. Return ViewCartResponse with cart and metadata
+
+#### Interface Adapters Layer
+```
+interfaceadapters/
+├── controller/
+│   └── CartController.java           # GET /{userId} endpoint
+└── dto/
+    └── ViewCartResponseDTO.java      # Response DTO
+```
+
+**CartController.viewCart()**:
+- Validate userId path parameter
+- Execute ViewCartUseCase
+- Map response to DTO
+- Return HTTP 200 OK
+
+#### Reused Components
+- `CartRepository` - Find cart by userId
+- `CartDTOMapper` - Convert Cart → CartDTO
+- `CartDTO`, `CartItemDTO` - Already created for Use Case 4
+
+### Testing Commands
+
+```bash
+# View cart with items
+curl http://localhost:8080/api/cart/1
+
+# View empty cart (new user)
+curl http://localhost:8080/api/cart/999
+
+# After adding items (Use Case 4)
+curl -X POST http://localhost:8080/api/cart/add \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 1, "productId": 1, "quantity": 2}'
+
+# Then view cart
+curl http://localhost:8080/api/cart/1
+```
+
+### Business Rules
+
+1. **No Authentication Required**: 
+   - In current implementation, anyone can view any cart by userId
+   - Production: Should verify userId matches authenticated user
+
+2. **Empty Cart Handling**:
+   - Returns empty cart object (not 404)
+   - Client can distinguish via `isEmpty` flag
+
+3. **Eager Loading**:
+   - All cart items loaded in single query
+   - Good for small carts, consider pagination for large carts
+
+4. **Read-Only Operation**:
+   - No side effects
+   - No cart creation/modification
+   - Safe to call multiple times
+
+### Error Handling
+
+| Error | HTTP Code | Message |
+|-------|-----------|---------|
+| Missing userId | 400 | "User ID is required" |
+| Server error | 500 | "An error occurred: {message}" |
+
+### Performance Considerations
+
+- **Eager Fetching**: `@OneToMany(fetch = FetchType.EAGER)` loads all items
+- **No Pagination**: Loads entire cart in one query
+- **Calculated Fields**: totalAmount and totalItems computed on-the-fly
+
+### Security Notes
+
+⚠️ **Current Implementation - Development Only:**
+- No authentication check
+- Anyone can view any cart with userId
+
+🔒 **Production Requirements:**
+- Add authentication/authorization
+- Verify requesting user owns the cart
+- Consider using session/token instead of userId in URL
 
 ---
 

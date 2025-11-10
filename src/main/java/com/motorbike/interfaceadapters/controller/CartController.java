@@ -3,8 +3,10 @@ package com.motorbike.interfaceadapters.controller;
 import com.motorbike.business.exception.ProductNotFoundException;
 import com.motorbike.business.exception.ProductOutOfStockException;
 import com.motorbike.business.usecase.AddToCartUseCase;
+import com.motorbike.business.usecase.ViewCartUseCase;
 import com.motorbike.interfaceadapters.dto.AddToCartRequestDTO;
 import com.motorbike.interfaceadapters.dto.AddToCartResponseDTO;
+import com.motorbike.interfaceadapters.dto.ViewCartResponseDTO;
 import com.motorbike.interfaceadapters.mapper.CartDTOMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +25,11 @@ import java.util.Map;
 public class CartController {
     
     private final AddToCartUseCase addToCartUseCase;
+    private final ViewCartUseCase viewCartUseCase;
     
-    public CartController(AddToCartUseCase addToCartUseCase) {
+    public CartController(AddToCartUseCase addToCartUseCase, ViewCartUseCase viewCartUseCase) {
         this.addToCartUseCase = addToCartUseCase;
+        this.viewCartUseCase = viewCartUseCase;
     }
     
     /**
@@ -79,6 +83,44 @@ public class CartController {
                     
         } catch (ProductOutOfStockException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(createErrorResponse(e.getMessage()));
+                    
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createErrorResponse("An error occurred: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * View cart
+     * GET /api/cart/{userId}
+     * @param userId user ID
+     * @return response with cart contents
+     */
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> viewCart(@PathVariable Long userId) {
+        try {
+            // Validate user ID
+            if (userId == null) {
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse("User ID is required"));
+            }
+            
+            // Execute use case
+            ViewCartUseCase.ViewCartRequest request = new ViewCartUseCase.ViewCartRequest(userId);
+            ViewCartUseCase.ViewCartResponse response = viewCartUseCase.execute(request);
+            
+            // Map to DTO
+            ViewCartResponseDTO responseDTO = new ViewCartResponseDTO(
+                    CartDTOMapper.toDTO(response.getCart()),
+                    response.isEmpty(),
+                    response.getMessage()
+            );
+            
+            return ResponseEntity.ok(responseDTO);
+            
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
                     .body(createErrorResponse(e.getMessage()));
                     
         } catch (Exception e) {
