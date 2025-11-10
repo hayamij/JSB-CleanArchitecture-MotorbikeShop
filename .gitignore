@@ -38,7 +38,6 @@ commit-message.txt
 
 ### Custom - Sensitive Config ###
 src/main/resources/application.properties
-database-setup.sql
 database-setup.ps1
 
 ### Custom - Local Database ###

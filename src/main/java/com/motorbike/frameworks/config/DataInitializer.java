@@ -1,8 +1,11 @@
 package com.motorbike.frameworks.config;
 
 import com.motorbike.persistence.entity.ProductJpaEntity;
+import com.motorbike.persistence.entity.UserJpaEntity;
 import com.motorbike.persistence.repository.ProductJpaRepository;
+import com.motorbike.persistence.repository.UserJpaRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
@@ -10,13 +13,14 @@ import java.math.BigDecimal;
 /**
  * Data Initialization Configuration
  * Loads sample data into the database on startup
- * NOTE: Disabled because data is already in SQL Server database
+ * NOTE: Enable/disable @Bean as needed
  */
 @Configuration
 public class DataInitializer {
     
-    // @Bean - Commented out to avoid duplicate data
-    CommandLineRunner initDatabase(ProductJpaRepository repository) {
+    @Bean
+    CommandLineRunner initDatabase(ProductJpaRepository productRepository, 
+                                   UserJpaRepository userRepository) {
         return args -> {
             // Sample Motorcycle Products
             ProductJpaEntity honda = new ProductJpaEntity();
@@ -71,13 +75,46 @@ public class DataInitializer {
             gloves.setAvailable(true);
             
             // Save all products
-            repository.save(honda);
-            repository.save(yamaha);
-            repository.save(suzuki);
-            repository.save(helmet);
-            repository.save(gloves);
+            productRepository.save(honda);
+            productRepository.save(yamaha);
+            productRepository.save(suzuki);
+            productRepository.save(helmet);
+            productRepository.save(gloves);
             
-            System.out.println("Sample data initialized: " + repository.count() + " products");
+            System.out.println("Sample data initialized: " + productRepository.count() + " products");
+            
+            // Sample Users
+            // Note: In production, passwords should be hashed with BCrypt
+            UserJpaEntity customer = new UserJpaEntity();
+            customer.setEmail("customer@motorbike.com");
+            customer.setUsername("customer1");
+            customer.setPassword("password123"); // In production: BCrypt.hashpw("password123", BCrypt.gensalt())
+            customer.setPhoneNumber("0901234567");
+            customer.setRole("CUSTOMER");
+            customer.setActive(true);
+            
+            UserJpaEntity admin = new UserJpaEntity();
+            admin.setEmail("admin@motorbike.com");
+            admin.setUsername("admin");
+            admin.setPassword("admin123"); // In production: BCrypt.hashpw("admin123", BCrypt.gensalt())
+            admin.setPhoneNumber("0909999999");
+            admin.setRole("ADMIN");
+            admin.setActive(true);
+            
+            UserJpaEntity customer2 = new UserJpaEntity();
+            customer2.setEmail("john.doe@example.com");
+            customer2.setUsername("johndoe");
+            customer2.setPassword("john123"); // In production: BCrypt.hashpw("john123", BCrypt.gensalt())
+            customer2.setPhoneNumber("0912345678");
+            customer2.setRole("CUSTOMER");
+            customer2.setActive(true);
+            
+            // Save all users
+            userRepository.save(customer);
+            userRepository.save(admin);
+            userRepository.save(customer2);
+            
+            System.out.println("Sample users initialized: " + userRepository.count() + " users");
         };
     }
 }
