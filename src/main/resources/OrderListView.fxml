@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.motorbike.main.presentation.OrderListViewFX">
+    <center>
+        <TableView fx:id="tblOrders">
+            <columns>
+                <TableColumn text="Mã Đơn" fx:id="colId" />
+                <TableColumn text="Mã KH" fx:id="colCustomer" />
+                <TableColumn text="Ngày Đặt" fx:id="colDate" />
+                <TableColumn text="Trạng Thái" fx:id="colStatus" />
+            </columns>
+        </TableView>
+    </center>
+    <bottom>
+        <Button text="Xem danh sách" onAction="#onViewOrders" 
+                maxWidth="Infinity" />
+    </bottom>
+</BorderPane>
