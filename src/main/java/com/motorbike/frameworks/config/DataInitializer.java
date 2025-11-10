@@ -22,6 +22,14 @@ public class DataInitializer {
     CommandLineRunner initDatabase(ProductJpaRepository productRepository, 
                                    UserJpaRepository userRepository) {
         return args -> {
+            // Check if data already exists
+            if (productRepository.count() > 0) {
+                System.out.println("Sample data already exists. Skipping initialization.");
+                System.out.println("Products: " + productRepository.count());
+                System.out.println("Users: " + userRepository.count());
+                return;
+            }
+            
             // Sample Motorcycle Products
             ProductJpaEntity honda = new ProductJpaEntity();
             honda.setName("Honda Wave RSX");
