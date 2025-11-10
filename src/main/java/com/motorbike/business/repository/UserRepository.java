@@ -1,7 +1,9 @@
 package com.motorbike.business.repository;
 
-import com.motorbike.business.entity.User;
+import java.util.List;
 import java.util.Optional;
+
+import com.motorbike.business.entity.User;
 
 /**
  * Domain Repository Interface: UserRepository
@@ -10,7 +12,11 @@ import java.util.Optional;
  * Implementation will be in the persistence layer
  */
 public interface UserRepository {
-    
+    //update method user
+    boolean insert(User user);
+    boolean update(User user);   // 👈 thêm
+    boolean delete(int id);
+    List<User> findAll();
     /**
      * Find a user by email
      * @param email User email

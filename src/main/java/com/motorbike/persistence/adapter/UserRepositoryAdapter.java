@@ -1,13 +1,15 @@
 package com.motorbike.persistence.adapter;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
 import com.motorbike.business.entity.User;
 import com.motorbike.business.repository.UserRepository;
 import com.motorbike.persistence.entity.UserJpaEntity;
 import com.motorbike.persistence.mapper.UserEntityMapper;
 import com.motorbike.persistence.repository.UserJpaRepository;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * Adapter implementation of UserRepository
@@ -58,5 +60,29 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public boolean existsByUsername(String username) {
         return jpaRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean insert(User user) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'insert'");
+    }
+
+    @Override
+    public boolean update(User user) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public boolean delete(int id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public List<User> findAll() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
     }
 }

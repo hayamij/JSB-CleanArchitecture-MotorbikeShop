@@ -18,6 +18,8 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;
+    private String fullName;
+    private String phone;
 
     // Private constructor for builder pattern
     private User(Builder builder) {
@@ -32,6 +34,13 @@ public class User {
         this.updatedAt = builder.updatedAt;
         this.lastLoginAt = builder.lastLoginAt;
     }
+    // update User info
+    public void updateInfo(String email, String fullName, String phone, String role) {
+    this.email = email;
+    this.fullName = fullName;
+    this.phone = phone;
+    this.role = role;
+}
 
     // Default constructor for frameworks
     public User() {
@@ -210,5 +219,10 @@ public class User {
         public User build() {
             return new User(this);
         }
+        
     }
+
+   
+    
+    
 }
