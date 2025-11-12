@@ -161,4 +161,19 @@ public class ViewCartOutputData {
             return stockWarningMessage;
         }
     }
+    
+    // Simplified static factory methods for use cases
+    public static ViewCartOutputData forSuccess(Long cartId, List items, BigDecimal totalAmount) {
+        int totalItems = items.size();
+        return new ViewCartOutputData(cartId, null, totalItems, totalItems,
+                totalAmount, null, totalItems == 0, false);
+    }
+    
+    public static ViewCartOutputData forEmptyCart() {
+        return new ViewCartOutputData(null, null, 0, 0, BigDecimal.ZERO, null, true, false);
+    }
+    
+    public static ViewCartOutputData forError(String errorCode, String errorMessage) {
+        return new ViewCartOutputData(errorCode, errorMessage);
+    }
 }

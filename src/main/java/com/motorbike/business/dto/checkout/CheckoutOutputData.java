@@ -166,4 +166,14 @@ public class CheckoutOutputData {
             return subtotal;
         }
     }
+    
+    // Simplified static factory methods for use cases
+    public static CheckoutOutputData forSuccess(String orderId, BigDecimal totalAmount) {
+        return new CheckoutOutputData(null, null, null, null, null, null, "COMPLETED",
+                totalAmount, 0, 0, null, LocalDateTime.now());
+    }
+    
+    public static CheckoutOutputData forError(String errorCode, String errorMessage) {
+        return new CheckoutOutputData(errorCode, errorMessage);
+    }
 }

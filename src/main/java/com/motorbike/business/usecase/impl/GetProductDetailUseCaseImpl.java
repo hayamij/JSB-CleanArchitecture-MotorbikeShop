@@ -1,12 +1,13 @@
 package com.motorbike.business.usecase.impl;
 
-import com.motorbike.business.dto.productdetail.ProductDetailInputData;
-import com.motorbike.business.dto.productdetail.ProductDetailOutputData;
+import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
+import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.GetProductDetailInputBoundary;
 import com.motorbike.business.usecase.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 /**
@@ -26,11 +27,11 @@ public class GetProductDetailUseCaseImpl implements GetProductDetailInputBoundar
     }
     
     @Override
-    public void execute(ProductDetailInputData inputData) {
+    public void execute(GetProductDetailInputData inputData) {
         try {
             // 1. Validate input
-            if (inputData == null || inputData.getProductId() == null) {
-                ProductDetailOutputData outputData = ProductDetailOutputData.forError(
+            if (inputData == null || inputData.productId == null) {
+                GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(
                     "INVALID_INPUT",
                     "Mã sản phẩm không hợp lệ"
                 );
@@ -39,12 +40,12 @@ public class GetProductDetailUseCaseImpl implements GetProductDetailInputBoundar
             }
             
             // 2. Find product
-            Optional<SanPham> productOpt = productRepository.findById(inputData.getProductId());
+            Optional<SanPham> productOpt = productRepository.findById(inputData.productId);
             
             if (!productOpt.isPresent()) {
-                ProductDetailOutputData outputData = ProductDetailOutputData.forError(
+                GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(
                     "PRODUCT_NOT_FOUND",
-                    "Không tìm thấy sản phẩm với mã: " + inputData.getProductId()
+                    "Không tìm thấy sản phẩm với mã: " + inputData.productId
                 );
                 outputBoundary.present(outputData);
                 return;
@@ -56,15 +57,18 @@ public class GetProductDetailUseCaseImpl implements GetProductDetailInputBoundar
             String chiTiet = sanPham.layThongTinChiTiet();
             
             // 4. Calculate final price (with discount)
-            double giaGoc = sanPham.getGiaBan();
-            double giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
-            double phanTramGiam = ((giaGoc - giaSauKhuyenMai) / giaGoc) * 100;
+            BigDecimal giaGoc = sanPham.getGia();
+            BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
+            double phanTramGiam = giaGoc.subtract(giaSauKhuyenMai)
+                .divide(giaGoc, 4, BigDecimal.ROUND_HALF_UP)
+                .multiply(BigDecimal.valueOf(100))
+                .doubleValue();
             
             // 5. Check availability
-            boolean conHang = sanPham.getTonKho() > 0;
+            boolean conHang = sanPham.getSoLuongTonKho() > 0;
             
             // 6. Create success output
-            ProductDetailOutputData outputData = ProductDetailOutputData.forSuccess(
+            GetProductDetailOutputData outputData = GetProductDetailOutputData.forSuccess(
                 sanPham.getMaSanPham(),
                 sanPham.getTenSanPham(),
                 sanPham.getMoTa(),
@@ -72,14 +76,14 @@ public class GetProductDetailUseCaseImpl implements GetProductDetailInputBoundar
                 giaGoc,
                 giaSauKhuyenMai,
                 phanTramGiam,
-                sanPham.getTonKho(),
+                sanPham.getSoLuongTonKho(),
                 conHang
             );
             
             outputBoundary.present(outputData);
             
         } catch (Exception e) {
-            ProductDetailOutputData outputData = ProductDetailOutputData.forError(
+            GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(
                 "SYSTEM_ERROR",
                 "Đã xảy ra lỗi khi lấy thông tin sản phẩm: " + e.getMessage()
             );

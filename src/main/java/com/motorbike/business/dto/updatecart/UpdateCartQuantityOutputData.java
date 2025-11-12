@@ -165,4 +165,14 @@ public class UpdateCartQuantityOutputData {
             return subtotal;
         }
     }
+    
+    // Simplified static factory methods for use cases
+    public static UpdateCartQuantityOutputData forSuccess(Long cartId, int totalItems, BigDecimal totalAmount) {
+        return new UpdateCartQuantityOutputData(cartId, null, null, null, 0, 0, false,
+                totalItems, totalItems, totalAmount, BigDecimal.ZERO, null);
+    }
+    
+    public static UpdateCartQuantityOutputData forError(String errorCode, String errorMessage) {
+        return new UpdateCartQuantityOutputData(errorCode, errorMessage);
+    }
 }

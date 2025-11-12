@@ -124,4 +124,14 @@ public class AddToCartOutputData {
     public int getProductStock() {
         return productStock;
     }
+    
+    // Simplified static factory methods for use cases
+    public static AddToCartOutputData forSuccess(Long cartId, int totalItems, BigDecimal totalAmount) {
+        return new AddToCartOutputData(cartId, totalItems, totalItems, totalAmount,
+                null, null, 0, 0, false, BigDecimal.ZERO, 0);
+    }
+    
+    public static AddToCartOutputData forError(String errorCode, String errorMessage) {
+        return new AddToCartOutputData(errorCode, errorMessage);
+    }
 }
