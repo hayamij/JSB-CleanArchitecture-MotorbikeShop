@@ -103,4 +103,17 @@ public class LoginOutputData {
     public int getMergedItemsCount() {
         return mergedItemsCount;
     }
+    
+    // Static factory methods for easier creation
+    public static LoginOutputData forSuccess(
+            Long userId, String email, String username,
+            VaiTro role, LocalDateTime lastLoginAt,
+            String sessionToken, boolean cartMerged, int mergedItemsCount) {
+        return new LoginOutputData(userId, email, username, role, lastLoginAt,
+                sessionToken, cartMerged, mergedItemsCount);
+    }
+    
+    public static LoginOutputData forError(String errorCode, String errorMessage) {
+        return new LoginOutputData(errorCode, errorMessage);
+    }
 }

@@ -109,4 +109,15 @@ public class RegisterOutputData {
     public String getSessionToken() {
         return sessionToken;
     }
+    
+    // Static factory methods
+    public static RegisterOutputData forSuccess(
+            Long userId, String email, String username,
+            VaiTro role, LocalDateTime createdAt) {
+        return new RegisterOutputData(userId, email, username, role, createdAt);
+    }
+    
+    public static RegisterOutputData forError(String errorCode, String errorMessage) {
+        return new RegisterOutputData(errorCode, errorMessage);
+    }
 }
