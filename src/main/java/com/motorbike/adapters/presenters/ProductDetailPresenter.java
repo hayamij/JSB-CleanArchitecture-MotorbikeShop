@@ -2,7 +2,7 @@ package com.motorbike.adapters.presenters;
 
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
-import com.motorbike.business.usecase.GetProductDetailOutputBoundary;
+import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;

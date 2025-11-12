@@ -3,8 +3,8 @@ package com.motorbike.infrastructure.config;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.*;
-import com.motorbike.business.usecase.impl.*;
+import com.motorbike.business.usecase.output.*;
+import com.motorbike.business.usecase.control.*;
 import com.motorbike.adapters.presenters.*;
 import com.motorbike.adapters.viewmodels.*;
 import org.springframework.context.annotation.Bean;
@@ -45,11 +45,11 @@ public class UseCaseConfig {
     
     // Login Use Case
     @Bean
-    public LoginInputBoundary loginUseCase(
+    public LoginUseCaseControl loginUseCase(
             LoginOutputBoundary loginPresenter,
             UserRepository userRepository,
             CartRepository cartRepository) {
-        return new LoginUseCaseImpl(loginPresenter, userRepository, cartRepository);
+        return new LoginUseCaseControl(loginPresenter, userRepository, cartRepository);
     }
     
     @Bean
@@ -59,11 +59,11 @@ public class UseCaseConfig {
     
     // Register Use Case
     @Bean
-    public RegisterInputBoundary registerUseCase(
+    public RegisterUseCaseControl registerUseCase(
             RegisterOutputBoundary registerPresenter,
             UserRepository userRepository,
             CartRepository cartRepository) {
-        return new RegisterUseCaseImpl(registerPresenter, userRepository, cartRepository);
+        return new RegisterUseCaseControl(registerPresenter, userRepository, cartRepository);
     }
     
     @Bean
@@ -73,10 +73,10 @@ public class UseCaseConfig {
     
     // Get Product Detail Use Case
     @Bean
-    public GetProductDetailInputBoundary getProductDetailUseCase(
+    public GetProductDetailUseCaseControl getProductDetailUseCase(
             GetProductDetailOutputBoundary productDetailPresenter,
             ProductRepository productRepository) {
-        return new GetProductDetailUseCaseImpl(productDetailPresenter, productRepository);
+        return new GetProductDetailUseCaseControl(productDetailPresenter, productRepository);
     }
     
     @Bean
@@ -86,11 +86,11 @@ public class UseCaseConfig {
     
     // Add To Cart Use Case
     @Bean
-    public AddToCartInputBoundary addToCartUseCase(
+    public AddToCartUseCaseControl addToCartUseCase(
             AddToCartOutputBoundary addToCartPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        return new AddToCartUseCaseImpl(addToCartPresenter, cartRepository, productRepository);
+        return new AddToCartUseCaseControl(addToCartPresenter, cartRepository, productRepository);
     }
     
     @Bean
@@ -100,10 +100,10 @@ public class UseCaseConfig {
     
     // View Cart Use Case
     @Bean
-    public ViewCartInputBoundary viewCartUseCase(
+    public ViewCartUseCaseControl viewCartUseCase(
             ViewCartOutputBoundary viewCartPresenter,
             CartRepository cartRepository) {
-        return new ViewCartUseCaseImpl(viewCartPresenter, cartRepository);
+        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository);
     }
     
     @Bean
@@ -113,10 +113,10 @@ public class UseCaseConfig {
     
     // Update Cart Quantity Use Case
     @Bean
-    public UpdateCartQuantityInputBoundary updateCartQuantityUseCase(
+    public UpdateCartQuantityUseCaseControl updateCartQuantityUseCase(
             UpdateCartQuantityOutputBoundary updateCartQuantityPresenter,
             CartRepository cartRepository) {
-        return new UpdateCartQuantityUseCaseImpl(updateCartQuantityPresenter, cartRepository);
+        return new UpdateCartQuantityUseCaseControl(updateCartQuantityPresenter, cartRepository);
     }
     
     @Bean
@@ -126,11 +126,11 @@ public class UseCaseConfig {
     
     // Checkout Use Case
     @Bean
-    public CheckoutInputBoundary checkoutUseCase(
+    public CheckoutUseCaseControl checkoutUseCase(
             CheckoutOutputBoundary checkoutPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        return new CheckoutUseCaseImpl(checkoutPresenter, cartRepository, productRepository);
+        return new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository);
     }
     
     @Bean

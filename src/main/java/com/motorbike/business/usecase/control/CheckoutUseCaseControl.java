@@ -1,50 +1,39 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.checkout.CheckoutInputData;
 import com.motorbike.business.dto.checkout.CheckoutOutputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.business.usecase.CheckoutInputBoundary;
-import com.motorbike.business.usecase.CheckoutOutputBoundary;
+import com.motorbike.business.usecase.input.CheckoutInputBoundary;
+import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.exceptions.InvalidCartException;
-
 import java.util.Optional;
 
 /**
- * Checkout Use Case Implementation
+ * Checkout Use Case Control
+ * Extends AbstractUseCaseControl for common validation and error handling
  */
-public class CheckoutUseCaseImpl implements CheckoutInputBoundary {
+public class CheckoutUseCaseControl 
+        extends AbstractUseCaseControl<CheckoutInputData, CheckoutOutputBoundary> {
     
-    private final CheckoutOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     
-    public CheckoutUseCaseImpl(
+    public CheckoutUseCaseControl(
             CheckoutOutputBoundary outputBoundary,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        this.outputBoundary = outputBoundary;
+        super(outputBoundary);
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
     }
     
     @Override
-    public void execute(CheckoutInputData inputData) {
+    protected void executeBusinessLogic(CheckoutInputData inputData) throws Exception {
         try {
-            // 1. Validate input
-            if (inputData == null || inputData.getUserId() == null) {
-                CheckoutOutputData outputData = CheckoutOutputData.forError(
-                    "INVALID_INPUT",
-                    "User ID không hợp lệ"
-                );
-                outputBoundary.present(outputData);
-                return;
-            }
-            
-            // 2. Find cart
             Optional<GioHang> cartOpt = cartRepository.findByUserId(inputData.getUserId());
             
             if (!cartOpt.isPresent() || cartOpt.get().getDanhSachSanPham().isEmpty()) {
@@ -58,7 +47,6 @@ public class CheckoutUseCaseImpl implements CheckoutInputBoundary {
             
             GioHang gioHang = cartOpt.get();
             
-            // 3. Validate stock for all items
             for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
                 Optional<SanPham> productOpt = productRepository.findById(item.getMaSanPham());
                 
@@ -84,23 +72,19 @@ public class CheckoutUseCaseImpl implements CheckoutInputBoundary {
                 }
             }
             
-            // 4. Reduce stock for all items
             for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
                 Optional<SanPham> productOpt = productRepository.findById(item.getMaSanPham());
                 SanPham sanPham = productOpt.get();
                 
-                // Entity handles stock reduction business logic
                 sanPham.giamTonKho(item.getSoLuong());
                 productRepository.save(sanPham);
             }
             
-            // 5. Clear cart after successful checkout
             gioHang.xoaToanBoGioHang();
             cartRepository.save(gioHang);
             
-            // 6. Create success output
             CheckoutOutputData outputData = CheckoutOutputData.forSuccess(
-                "ORDER_" + System.currentTimeMillis(), // Simple order ID generation
+                "ORDER_" + System.currentTimeMillis(),
                 gioHang.getTongTien()
             );
             
@@ -112,13 +96,31 @@ public class CheckoutUseCaseImpl implements CheckoutInputBoundary {
                 e.getMessage()
             );
             outputBoundary.present(outputData);
-            
-        } catch (Exception e) {
-            CheckoutOutputData outputData = CheckoutOutputData.forError(
-                "SYSTEM_ERROR",
-                "Đã xảy ra lỗi: " + e.getMessage()
-            );
-            outputBoundary.present(outputData);
         }
+    }
+    
+    @Override
+    protected void validateInput(CheckoutInputData inputData) {
+        if (inputData == null || inputData.getUserId() == null) {
+            throw new IllegalArgumentException("User ID không hợp lệ");
+        }
+    }
+    
+    @Override
+    protected void handleValidationError(IllegalArgumentException e) {
+        CheckoutOutputData outputData = CheckoutOutputData.forError(
+            "INVALID_INPUT",
+            e.getMessage()
+        );
+        outputBoundary.present(outputData);
+    }
+    
+    @Override
+    protected void handleSystemError(Exception e) {
+        CheckoutOutputData outputData = CheckoutOutputData.forError(
+            "SYSTEM_ERROR",
+            "Đã xảy ra lỗi: " + e.getMessage()
+        );
+        outputBoundary.present(outputData);
     }
 }

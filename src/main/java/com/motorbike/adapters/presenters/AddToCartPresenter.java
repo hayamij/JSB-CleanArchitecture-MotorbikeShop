@@ -2,7 +2,7 @@ package com.motorbike.adapters.presenters;
 
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
 import com.motorbike.business.dto.addtocart.AddToCartOutputData;
-import com.motorbike.business.usecase.AddToCartOutputBoundary;
+import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;

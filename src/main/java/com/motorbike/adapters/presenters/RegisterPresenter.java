@@ -2,7 +2,7 @@ package com.motorbike.adapters.presenters;
 
 import com.motorbike.adapters.viewmodels.RegisterViewModel;
 import com.motorbike.business.dto.register.RegisterOutputData;
-import com.motorbike.business.usecase.RegisterOutputBoundary;
+import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.domain.entities.VaiTro;
 
 import java.time.LocalDateTime;

@@ -2,7 +2,7 @@ package com.motorbike.adapters.presenters;
 
 import com.motorbike.adapters.viewmodels.LoginViewModel;
 import com.motorbike.business.dto.login.LoginOutputData;
-import com.motorbike.business.usecase.LoginOutputBoundary;
+import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.domain.entities.VaiTro;
 
 import java.time.LocalDateTime;

@@ -1,10 +1,10 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.register.RegisterInputData;
 import com.motorbike.business.dto.register.RegisterOutputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.RegisterOutputBoundary;
+import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit Tests for RegisterUseCaseImpl
+ * Unit Tests for RegisterUseCaseControl
  * Tests all business rules for user registration
  */
 @DisplayName("Register Use Case Tests")
-class RegisterUseCaseImplTest {
+class RegisterUseCaseControlTest {
 
-    private RegisterUseCaseImpl registerUseCase;
+    private RegisterUseCaseControl registerUseCase;
     private UserRepository userRepository;
     private CartRepository cartRepository;
     private RegisterOutputBoundary outputBoundary;
@@ -33,7 +33,7 @@ class RegisterUseCaseImplTest {
         cartRepository = mock(CartRepository.class);
         outputBoundary = mock(RegisterOutputBoundary.class);
         
-        registerUseCase = new RegisterUseCaseImpl(outputBoundary, userRepository, cartRepository);
+        registerUseCase = new RegisterUseCaseControl(outputBoundary, userRepository, cartRepository);
     }
 
     @Test

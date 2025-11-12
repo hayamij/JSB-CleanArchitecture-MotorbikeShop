@@ -1,9 +1,9 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.business.usecase.GetProductDetailOutputBoundary;
+import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,9 +15,9 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Get Product Detail Use Case Tests")
-class GetProductDetailUseCaseImplTest {
+class GetProductDetailUseCaseControlTest {
 
-    private GetProductDetailUseCaseImpl useCase;
+    private GetProductDetailUseCaseControl useCase;
     private ProductRepository productRepository;
     private GetProductDetailOutputBoundary outputBoundary;
 
@@ -25,7 +25,7 @@ class GetProductDetailUseCaseImplTest {
     void setUp() {
         productRepository = mock(ProductRepository.class);
         outputBoundary = mock(GetProductDetailOutputBoundary.class);
-        useCase = new GetProductDetailUseCaseImpl(outputBoundary, productRepository);
+        useCase = new GetProductDetailUseCaseControl(outputBoundary, productRepository);
     }
 
     @Test

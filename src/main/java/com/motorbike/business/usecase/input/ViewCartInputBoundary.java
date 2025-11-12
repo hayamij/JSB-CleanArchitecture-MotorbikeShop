@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase;
+package com.motorbike.business.usecase.input;
 
 import com.motorbike.business.dto.viewcart.ViewCartInputData;
 

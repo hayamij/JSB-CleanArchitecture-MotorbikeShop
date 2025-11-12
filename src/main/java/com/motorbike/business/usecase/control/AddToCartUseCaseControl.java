@@ -1,54 +1,48 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.addtocart.AddToCartInputData;
 import com.motorbike.business.dto.addtocart.AddToCartOutputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.business.usecase.AddToCartInputBoundary;
-import com.motorbike.business.usecase.AddToCartOutputBoundary;
+import com.motorbike.business.usecase.input.AddToCartInputBoundary;
+import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.exceptions.InvalidCartException;
-
 import java.util.Optional;
 
 /**
- * Add To Cart Use Case Implementation
+ * Add To Cart Use Case Control
+ * Extends AbstractUseCaseControl for common validation and error handling
  */
-public class AddToCartUseCaseImpl implements AddToCartInputBoundary {
+public class AddToCartUseCaseControl 
+        extends AbstractUseCaseControl<AddToCartInputData, AddToCartOutputBoundary> {
     
-    private final AddToCartOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     
-    public AddToCartUseCaseImpl(
+    public AddToCartUseCaseControl(
             AddToCartOutputBoundary outputBoundary,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        this.outputBoundary = outputBoundary;
+        super(outputBoundary);
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
     }
     
     @Override
-    public void execute(AddToCartInputData inputData) {
+    protected void executeBusinessLogic(AddToCartInputData inputData) throws Exception {
         try {
-            // 1. Validate input
-            validateInput(inputData);
-            
-            // 2. Find or create cart
             GioHang gioHang;
             Optional<GioHang> cartOpt = cartRepository.findByUserId(inputData.getUserId());
             
             if (cartOpt.isPresent()) {
                 gioHang = cartOpt.get();
             } else {
-                // Create new cart for user
                 gioHang = new GioHang(inputData.getUserId());
             }
             
-            // 3. Find product
             Optional<SanPham> productOpt = productRepository.findById(inputData.getProductId());
             if (!productOpt.isPresent()) {
                 AddToCartOutputData outputData = AddToCartOutputData.forError(
@@ -61,7 +55,6 @@ public class AddToCartUseCaseImpl implements AddToCartInputBoundary {
             
             SanPham sanPham = productOpt.get();
             
-            // 4. Check stock availability
             if (sanPham.getSoLuongTonKho() < inputData.getQuantity()) {
                 AddToCartOutputData outputData = AddToCartOutputData.forError(
                     "INSUFFICIENT_STOCK",
@@ -71,7 +64,6 @@ public class AddToCartUseCaseImpl implements AddToCartInputBoundary {
                 return;
             }
             
-            // 5. Create cart item and add to cart - entity handles business logic
             ChiTietGioHang chiTiet = new ChiTietGioHang(
                 sanPham.getMaSanPham(),
                 sanPham.getTenSanPham(),
@@ -80,11 +72,8 @@ public class AddToCartUseCaseImpl implements AddToCartInputBoundary {
             );
             
             gioHang.themSanPham(chiTiet);
-            
-            // 6. Save cart
             GioHang savedCart = cartRepository.save(gioHang);
             
-            // 7. Create success output
             AddToCartOutputData outputData = AddToCartOutputData.forSuccess(
                 savedCart.getMaGioHang(),
                 savedCart.getDanhSachSanPham().size(),
@@ -99,27 +88,12 @@ public class AddToCartUseCaseImpl implements AddToCartInputBoundary {
                 e.getMessage()
             );
             outputBoundary.present(outputData);
-            
-        } catch (IllegalArgumentException e) {
-            AddToCartOutputData outputData = AddToCartOutputData.forError(
-                "INVALID_INPUT",
-                e.getMessage()
-            );
-            outputBoundary.present(outputData);
-            
-        } catch (Exception e) {
-            AddToCartOutputData outputData = AddToCartOutputData.forError(
-                "SYSTEM_ERROR",
-                "Đã xảy ra lỗi: " + e.getMessage()
-            );
-            outputBoundary.present(outputData);
         }
     }
     
-    private void validateInput(AddToCartInputData inputData) {
-        if (inputData == null) {
-            throw new IllegalArgumentException("Input data không được null");
-        }
+    @Override
+    protected void validateInput(AddToCartInputData inputData) {
+        checkInputNotNull(inputData);
         
         if (inputData.getUserId() == null) {
             throw new IllegalArgumentException("User ID không được null");
@@ -132,5 +106,23 @@ public class AddToCartUseCaseImpl implements AddToCartInputBoundary {
         if (inputData.getQuantity() <= 0) {
             throw new IllegalArgumentException("Số lượng phải > 0");
         }
+    }
+    
+    @Override
+    protected void handleValidationError(IllegalArgumentException e) {
+        AddToCartOutputData outputData = AddToCartOutputData.forError(
+            "INVALID_INPUT",
+            e.getMessage()
+        );
+        outputBoundary.present(outputData);
+    }
+    
+    @Override
+    protected void handleSystemError(Exception e) {
+        AddToCartOutputData outputData = AddToCartOutputData.forError(
+            "SYSTEM_ERROR",
+            "Đã xảy ra lỗi: " + e.getMessage()
+        );
+        outputBoundary.present(outputData);
     }
 }

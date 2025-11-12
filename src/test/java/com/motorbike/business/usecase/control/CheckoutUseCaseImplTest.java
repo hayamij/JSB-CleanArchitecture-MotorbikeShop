@@ -1,10 +1,10 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.checkout.CheckoutInputData;
 import com.motorbike.business.dto.checkout.CheckoutOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.CheckoutOutputBoundary;
+import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.XeMay;
@@ -18,9 +18,9 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Checkout Use Case Tests")
-class CheckoutUseCaseImplTest {
+class CheckoutUseCaseControlTest {
 
-    private CheckoutUseCaseImpl useCase;
+    private CheckoutUseCaseControl useCase;
     private ProductRepository productRepository;
     private CartRepository cartRepository;
     private CheckoutOutputBoundary outputBoundary;
@@ -30,7 +30,7 @@ class CheckoutUseCaseImplTest {
         productRepository = mock(ProductRepository.class);
         cartRepository = mock(CartRepository.class);
         outputBoundary = mock(CheckoutOutputBoundary.class);
-        useCase = new CheckoutUseCaseImpl(outputBoundary, cartRepository, productRepository);
+        useCase = new CheckoutUseCaseControl(outputBoundary, cartRepository, productRepository);
     }
 
     @Test

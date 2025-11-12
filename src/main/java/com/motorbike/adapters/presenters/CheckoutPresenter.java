@@ -3,7 +3,7 @@ package com.motorbike.adapters.presenters;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel.OrderItemViewModel;
 import com.motorbike.business.dto.checkout.CheckoutOutputData;
-import com.motorbike.business.usecase.CheckoutOutputBoundary;
+import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
 
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;

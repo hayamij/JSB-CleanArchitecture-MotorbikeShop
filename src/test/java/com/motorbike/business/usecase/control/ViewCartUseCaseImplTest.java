@@ -1,9 +1,9 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.viewcart.ViewCartInputData;
 import com.motorbike.business.dto.viewcart.ViewCartOutputData;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.ViewCartOutputBoundary;
+import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,9 +16,9 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 @DisplayName("View Cart Use Case Tests")
-class ViewCartUseCaseImplTest {
+class ViewCartUseCaseControlTest {
 
-    private ViewCartUseCaseImpl useCase;
+    private ViewCartUseCaseControl useCase;
     private CartRepository cartRepository;
     private ViewCartOutputBoundary outputBoundary;
 
@@ -26,7 +26,7 @@ class ViewCartUseCaseImplTest {
     void setUp() {
         cartRepository = mock(CartRepository.class);
         outputBoundary = mock(ViewCartOutputBoundary.class);
-        useCase = new ViewCartUseCaseImpl(outputBoundary, cartRepository);
+        useCase = new ViewCartUseCaseControl(outputBoundary, cartRepository);
     }
 
     @Test

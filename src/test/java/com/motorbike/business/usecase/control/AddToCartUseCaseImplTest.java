@@ -1,10 +1,10 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.addtocart.AddToCartInputData;
 import com.motorbike.business.dto.addtocart.AddToCartOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.AddToCartOutputBoundary;
+import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
 import com.motorbike.domain.entities.GioHang;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +17,9 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Add To Cart Use Case Tests")
-class AddToCartUseCaseImplTest {
+class AddToCartUseCaseControlTest {
 
-    private AddToCartUseCaseImpl useCase;
+    private AddToCartUseCaseControl useCase;
     private ProductRepository productRepository;
     private CartRepository cartRepository;
     private AddToCartOutputBoundary outputBoundary;
@@ -29,7 +29,7 @@ class AddToCartUseCaseImplTest {
         productRepository = mock(ProductRepository.class);
         cartRepository = mock(CartRepository.class);
         outputBoundary = mock(AddToCartOutputBoundary.class);
-        useCase = new AddToCartUseCaseImpl(outputBoundary, cartRepository, productRepository);
+        useCase = new AddToCartUseCaseControl(outputBoundary, cartRepository, productRepository);
     }
 
     @Test

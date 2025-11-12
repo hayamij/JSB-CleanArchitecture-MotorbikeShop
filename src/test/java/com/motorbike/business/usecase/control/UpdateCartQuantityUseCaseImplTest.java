@@ -1,9 +1,9 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityInputData;
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityOutputData;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.UpdateCartQuantityOutputBoundary;
+import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,9 +16,9 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Update Cart Quantity Use Case Tests")
-class UpdateCartQuantityUseCaseImplTest {
+class UpdateCartQuantityUseCaseControlTest {
 
-    private UpdateCartQuantityUseCaseImpl useCase;
+    private UpdateCartQuantityUseCaseControl useCase;
     private CartRepository cartRepository;
     private UpdateCartQuantityOutputBoundary outputBoundary;
 
@@ -26,7 +26,7 @@ class UpdateCartQuantityUseCaseImplTest {
     void setUp() {
         cartRepository = mock(CartRepository.class);
         outputBoundary = mock(UpdateCartQuantityOutputBoundary.class);
-        useCase = new UpdateCartQuantityUseCaseImpl(outputBoundary, cartRepository);
+        useCase = new UpdateCartQuantityUseCaseControl(outputBoundary, cartRepository);
     }
 
     @Test

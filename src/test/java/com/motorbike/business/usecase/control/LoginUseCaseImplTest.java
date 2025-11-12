@@ -1,10 +1,10 @@
-package com.motorbike.business.usecase.impl;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.login.LoginInputData;
 import com.motorbike.business.dto.login.LoginOutputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.LoginOutputBoundary;
+import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.VaiTro;
@@ -20,13 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit Tests for LoginUseCaseImpl
+ * Unit Tests for LoginUseCaseControl
  * Tests all business rules for login functionality
  */
 @DisplayName("Login Use Case Tests")
-class LoginUseCaseImplTest {
+class LoginUseCaseControlTest {
 
-    private LoginUseCaseImpl loginUseCase;
+    private LoginUseCaseControl loginUseCase;
     private UserRepository userRepository;
     private CartRepository cartRepository;
     private LoginOutputBoundary outputBoundary;
@@ -38,7 +38,7 @@ class LoginUseCaseImplTest {
         cartRepository = mock(CartRepository.class);
         outputBoundary = mock(LoginOutputBoundary.class);
         
-        loginUseCase = new LoginUseCaseImpl(outputBoundary, userRepository, cartRepository);
+        loginUseCase = new LoginUseCaseControl(outputBoundary, userRepository, cartRepository);
         
         // Create valid test user
         validUser = new TaiKhoan(

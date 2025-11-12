@@ -3,7 +3,7 @@ package com.motorbike.adapters.presenters;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel.CartItemViewModel;
 import com.motorbike.business.dto.viewcart.ViewCartOutputData;
-import com.motorbike.business.usecase.ViewCartOutputBoundary;
+import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
