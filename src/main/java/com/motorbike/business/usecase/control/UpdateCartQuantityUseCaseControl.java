@@ -3,7 +3,6 @@ package com.motorbike.business.usecase.control;
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityInputData;
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityOutputData;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.exceptions.InvalidCartException;

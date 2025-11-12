@@ -4,7 +4,6 @@ import com.motorbike.business.dto.checkout.CheckoutInputData;
 import com.motorbike.business.dto.checkout.CheckoutOutputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.business.usecase.input.CheckoutInputBoundary;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;

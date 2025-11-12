@@ -3,7 +3,6 @@ package com.motorbike.business.usecase.control;
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
 import java.math.BigDecimal;
