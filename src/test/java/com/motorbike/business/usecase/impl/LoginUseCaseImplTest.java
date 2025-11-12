@@ -10,7 +10,6 @@ import com.motorbike.business.usecase.LoginInputBoundary;
 import com.motorbike.business.usecase.LoginOutputBoundary;
 import com.motorbike.domain.entities.Cart;
 import com.motorbike.domain.entities.User;
-import com.motorbike.domain.entities.UserRole;
 import com.motorbike.domain.entities.UserRoleRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

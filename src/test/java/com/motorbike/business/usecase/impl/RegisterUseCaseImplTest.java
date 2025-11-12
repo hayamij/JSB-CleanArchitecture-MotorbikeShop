@@ -10,7 +10,6 @@ import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.RegisterInputBoundary;
 import com.motorbike.business.usecase.RegisterOutputBoundary;
 import com.motorbike.domain.entities.User;
-import com.motorbike.domain.entities.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

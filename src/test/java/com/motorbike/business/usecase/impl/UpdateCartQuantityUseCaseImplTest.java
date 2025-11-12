@@ -10,7 +10,6 @@ import com.motorbike.business.usecase.UpdateCartQuantityOutputBoundary;
 import com.motorbike.domain.entities.Cart;
 import com.motorbike.domain.entities.CartItem;
 import com.motorbike.domain.entities.Product;
-import com.motorbike.domain.entities.ProductCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;

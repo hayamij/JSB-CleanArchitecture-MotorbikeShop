@@ -10,7 +10,6 @@ import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.GetProductDetailInputBoundary;
 import com.motorbike.business.usecase.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.Product;
-import com.motorbike.domain.entities.ProductCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
