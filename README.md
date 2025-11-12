@@ -1,245 +1,290 @@
-# Clean Architecture - Motorbike Shop
+# 🏍️ Motorbike Shop - Clean Architecture
 
-## 📋 Tổng quan đề tài
+> Website giới thiệu, bán xe máy và phụ kiện trực tuyến
 
-Website bán xe máy và phụ kiện trực tuyến được xây dựng theo kiến trúc Clean Architecture, đảm bảo tính module hóa, dễ bảo trì và mở rộng.
+**Tác giả:** [hayamij](https://github.com/hayamij) (Nguyen Quang Tuan Phuong)
 
-### 🎯 Mục tiêu
+## 📋 Tổng quan
 
-Xây dựng hệ thống thương mại điện tử cho phép:
-- Khách hàng xem, tìm kiếm và mua xe máy, phụ kiện xe máy
-- Quản lý giỏ hàng và thanh toán trực tuyến
-- Quản trị viên quản lý sản phẩm, đơn hàng và tài khoản
+Dự án xây dựng hệ thống website bán xe máy và phụ kiện trực tuyến, áp dụng kiến trúc **Clean Architecture** để đảm bảo code dễ bảo trì, mở rộng và kiểm thử.
 
-### 👥 Người dùng hệ thống
+### Đặc điểm nổi bật
+- ✅ Phân tách rõ ràng các tầng logic nghiệp vụ
+- ✅ Độc lập với framework và database
+- ✅ Dễ dàng kiểm thử (Testable)
+- ✅ Tuân thủ SOLID principles
+- ✅ Dependency Rule được áp dụng nghiêm ngặt
 
-1. **Guest (Khách không đăng nhập)**
-   - Xem danh sách sản phẩm
-   - Xem chi tiết sản phẩm
-   - Thêm sản phẩm vào giỏ hàng
-   - Chỉnh sửa giỏ hàng
-   - Đăng ký tài khoản
+---
 
-2. **Customer (Khách hàng đã đăng nhập)**
-   - Tất cả chức năng của Guest
-   - Đăng nhập/Đăng xuất
-   - Thanh toán đơn hàng
-   - Xem lịch sử đơn hàng
+## 🛠️ Công nghệ sử dụng
 
-3. **Admin (Quản trị viên)**
-   - Tất cả chức năng của Customer
-   - Quản lý sản phẩm (CRUD)
-   - Quản lý tài khoản người dùng
-   - Quản lý đơn hàng
-   - Tìm kiếm và báo cáo
+| Công nghệ | Phiên bản | Mục đích |
+|-----------|-----------|----------|
+| **Java** | 17 | Ngôn ngữ lập trình |
+| **Spring Boot** | 3.5.6 | Framework backend |
+| **Spring Data JPA** | 3.5.6 | ORM và database access |
+| **Thymeleaf** | 3.5.6 | Template engine |
+| **SQL Server** | - | Database chính |
+| **H2 Database** | - | Database cho testing |
+| **Maven** | - | Build tool |
+| **JUnit 5** | - | Unit testing |
 
-## 🏗️ Kiến trúc Clean Architecture
+---
 
-### Cấu trúc dự án
+## 🏗️ Kiến trúc
+
+Dự án tuân thủ **Clean Architecture** của Uncle Bob với 4 tầng:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Frameworks & Drivers (Adapters)                    │
+│  - Web Controllers                                   │
+│  - Database Repositories                             │
+│  - External Services                                 │
+├─────────────────────────────────────────────────────┤
+│  Interface Adapters (Infrastructure)                │
+│  - Gateways                                          │
+│  - Presenters                                        │
+│  - DTO Converters                                    │
+├─────────────────────────────────────────────────────┤
+│  Use Cases (Business Logic)                         │
+│  - Application Services                              │
+│  - Interactors                                       │
+│  - Input/Output Boundaries                           │
+├─────────────────────────────────────────────────────┤
+│  Entities (Domain)                                   │
+│  - Business Rules                                    │
+│  - Domain Models                                     │
+└─────────────────────────────────────────────────────┘
+     Inner Layers ← Dependency Rule ← Outer Layers
+```
+
+### Cấu trúc thư mục
 
 ```
 src/main/java/com/motorbike/
-├── domain/                    # Enterprise Business Rules
-│   ├── entities/             # Domain Entities
-│   │   ├── TaiKhoan.java    # User Account
-│   │   ├── GioHang.java     # Shopping Cart
-│   │   ├── SanPham.java     # Product (Abstract)
-│   │   ├── XeMay.java       # Motorbike
-│   │   ├── PhuKienXeMay.java # Accessory
-│   │   └── Order.java       # Order
-│   └── exceptions/           # Domain Exceptions
-│
-├── business/                  # Application Business Rules
-│   ├── usecase/              # Use Case Interfaces & Implementations
-│   │   ├── impl/            # Use Case Implementations
-│   │   │   ├── LoginUseCaseImpl.java
-│   │   │   ├── RegisterUseCaseImpl.java
-│   │   │   ├── GetProductDetailUseCaseImpl.java
-│   │   │   ├── AddToCartUseCaseImpl.java
-│   │   │   ├── ViewCartUseCaseImpl.java
-│   │   │   ├── UpdateCartQuantityUseCaseImpl.java
-│   │   │   └── CheckoutUseCaseImpl.java
-│   ├── dto/                  # Data Transfer Objects (Input/Output)
-│   └── ports/repository/     # Repository Interfaces (Ports)
-│
-├── adapters/                  # Interface Adapters
-│   ├── controllers/          # Web & API Controllers
-│   ├── presenters/           # Output Data Presenters
-│   ├── viewmodels/          # View Models
-│   └── repositories/         # Repository Adapters (Implementations)
-│
-└── infrastructure/           # Frameworks & Drivers
-    ├── persistence/         # JPA Entities & Repositories
-    │   └── jpa/
-    │       ├── entities/    # JPA Entity Classes
-    │       └── repositories/ # Spring JPA Repositories
-    └── config/              # Spring Configuration
+├── domain/              # Layer 1: Entities
+│   ├── entities/        # Domain models
+│   └── exceptions/      # Business exceptions
+├── business/            # Layer 2: Use Cases
+│   └── usecase/
+│       ├── control/     # Use case implementations
+│       ├── entity/      # Input/Output boundaries
+│       └── boundary/    # Repository interfaces
+├── infrastructure/      # Layer 3: Interface Adapters
+│   ├── gateway/         # Repository implementations
+│   └── presenter/       # Data transformers
+└── adapters/            # Layer 4: Frameworks & Drivers
+    ├── web/             # Web controllers
+    └── persistence/     # Database entities
 ```
 
-### Nguyên tắc Clean Architecture
+---
 
-1. **Dependency Rule**: Dependencies chỉ hướng vào trong (Domain ← Business ← Adapters ← Infrastructure)
-2. **Independence**: Business logic không phụ thuộc framework, UI, database
-3. **Testability**: Mỗi layer có thể test độc lập
-4. **Separation of Concerns**: Mỗi layer có trách nhiệm riêng biệt
+## 📚 Thu thập yêu cầu
 
-## 🔧 Công nghệ sử dụng
+### Actors (Người dùng hệ thống)
 
-### Backend
-- **Java 17**
-- **Spring Boot 3.5.6**
-- **Spring Data JPA** - ORM
-- **Hibernate** - JPA Implementation
-- **SQL Server** - Database
-- **Maven** - Build tool
+1. **Guest** - Khách vãng lai (chưa đăng nhập)
+2. **Customer** - Khách hàng đã đăng ký
+3. **Admin** - Quản trị viên
 
-### Frontend
-- **Thymeleaf** - Template engine
-- **HTML/CSS/JavaScript** - UI
+### Use Cases chính
 
-### Testing
-- **JUnit 5** - Unit testing framework
-- **Mockito** - Mocking framework
-- **Spring Boot Test** - Integration testing
+#### 🔹 Guest Features
+- Xem danh sách sản phẩm
+- Xem chi tiết sản phẩm
+- Thêm sản phẩm vào giỏ hàng
+- Xem và chỉnh sửa giỏ hàng
+- Đăng ký tài khoản
 
-## 📊 Cơ sở dữ liệu
+#### 🔹 Customer Features
+- Tất cả chức năng của Guest
+- Đăng nhập/Đăng xuất
+- Thanh toán đơn hàng
+- Xem lịch sử đơn hàng
 
-### Schema chính
+#### 🔹 Admin Features
+- Tất cả chức năng của Customer
+- Quản lý sản phẩm (CRUD)
+- Quản lý loại sản phẩm
+- Quản lý tài khoản người dùng
+- Quản lý đơn hàng
 
-```sql
--- User Account
-tai_khoan (ma_tai_khoan, email, ten_dang_nhap, mat_khau, 
-           so_dien_thoai, dia_chi, vai_tro, hoat_dong, ...)
+### Business Rules chính
 
--- Product (Inheritance: JOINED strategy)
-san_pham (ma_san_pham, ten_san_pham, mo_ta, gia, hinh_anh, ...)
-xe_may (ma_san_pham, hang_xe, dong_xe, mau_sac, nam_san_xuat, ...)
-phu_kien_xe_may (ma_san_pham, loai_phu_kien, hang_san_xuat, ...)
+1. **Sản phẩm:**
+   - Giá > 0
+   - Số lượng tồn kho ≥ 0
+   - Phải thuộc một loại sản phẩm
 
--- Shopping Cart
-gio_hang (ma_gio_hang, ma_tai_khoan, tong_tien, ...)
-chi_tiet_gio_hang (ma_chi_tiet, ma_gio_hang, ma_san_pham, so_luong, ...)
+2. **Giỏ hàng:**
+   - Số lượng thêm vào phải > 0
+   - Không vượt quá tồn kho
+   - Guest: lưu trong session
+   - Customer: lưu trong database
 
--- Order
-don_hang (ma_don_hang, ma_tai_khoan, trang_thai, tong_tien, ...)
-chi_tiet_don_hang (ma_chi_tiet, ma_don_hang, ma_san_pham, so_luong, ...)
+3. **Thanh toán:**
+   - Bắt buộc đăng nhập
+   - Giỏ hàng phải có sản phẩm
+   - Kiểm tra tồn kho trước khi thanh toán
+   - Trừ tồn kho sau khi đặt hàng thành công
+
+4. **Tài khoản:**
+   - Email phải unique
+   - Mật khẩu được mã hóa
+   - Phân quyền: Customer/Admin
+
+---
+
+## 🎯 Nguyên tắc thiết kế (SOLID)
+
+| Nguyên tắc | Áp dụng trong dự án |
+|------------|---------------------|
+| **S**RP | Mỗi Use Case chỉ xử lý một nghiệp vụ cụ thể |
+| **O**CP | Mở rộng qua interfaces, không sửa code cũ |
+| **L**SP | Các implementation tuân thủ contract của interface |
+| **I**SP | Interfaces nhỏ, chỉ chứa methods cần thiết |
+| **D**IP | Use Cases phụ thuộc vào abstractions, không phụ thuộc vào implementations cụ thể |
+
+### Dependency Rule
+```
+❌ Entities không phụ thuộc Use Cases
+❌ Use Cases không phụ thuộc Frameworks
+✅ Outer Layers → Inner Layers (qua Interfaces)
 ```
 
-## ✨ Tính năng chính
-
-### 7 Use Cases đã implement
-
-1. **Đăng nhập** - Authentication với password hashing, merge guest cart
-2. **Đăng ký** - Registration với email validation
-3. **Xem chi tiết sản phẩm** - Product detail với inheritance (XeMay/PhuKienXeMay)
-4. **Thêm vào giỏ hàng** - Add to cart cho cả guest và customer
-5. **Xem giỏ hàng** - View cart với total calculation
-6. **Cập nhật số lượng** - Update cart quantity, remove if quantity = 0
-7. **Thanh toán** - Checkout với stock validation, order creation
-
-### Business Rules được enforce
-
-- Email phải unique khi đăng ký
-- Mật khẩu được hash trước khi lưu (BCrypt)
-- Số lượng thêm vào giỏ không vượt quá tồn kho
-- Giỏ hàng guest được merge khi login
-- Thanh toán chỉ cho user đã login
-- Trừ số lượng tồn kho sau checkout
-- Xóa giỏ hàng sau checkout thành công
-
-## 🧪 Testing
-
-### Test Coverage
-
-```
-Total Tests: 85
-├── Domain Entity Tests: 56 ✅
-│   ├── TaiKhoanTest: 16 tests
-│   ├── GioHangTest: 15 tests
-│   ├── XeMayTest: 12 tests
-│   └── PhuKienXeMayTest: 13 tests
-│
-└── Use Case Tests: 29 ✅
-    ├── LoginUseCaseImplTest: 8 tests
-    ├── RegisterUseCaseImplTest: 5 tests
-    ├── GetProductDetailUseCaseImplTest: 3 tests
-    ├── AddToCartUseCaseImplTest: 3 tests
-    ├── ViewCartUseCaseImplTest: 3 tests
-    ├── UpdateCartQuantityUseCaseImplTest: 3 tests
-    └── CheckoutUseCaseImplTest: 4 tests
-
-Pass Rate: 100% (85/85 tests)
-```
-
-### Chạy tests
-
-```bash
-# Chạy tất cả tests
-mvn test
-
-# Chạy test specific class
-mvn test -Dtest=LoginUseCaseImplTest
-
-# Compile và skip tests
-mvn clean compile -DskipTests
-```
+---
 
 ## 🚀 Cài đặt và chạy
 
-### Yêu cầu
-
-- JDK 17+
+### Yêu cầu hệ thống
+- Java 17+
 - Maven 3.6+
-- SQL Server 2019+
+- SQL Server 2019+ (hoặc bất kỳ phiên bản tương thích)
 
-### Cấu hình Database
+### Bước 1: Clone repository
+```bash
+git clone https://github.com/hayamij/JSB-CleanArchitecture-MotorbikeShop.git
+cd JSB-CleanArchitecture-MotorbikeShop
+```
 
-1. Tạo database `MotorcycleShop` trong SQL Server
-2. Chạy script `database-setup-new.sql` để tạo schema
-3. Cấu hình trong `application.properties`:
+### Bước 2: Cấu hình Database
 
+1. Tạo database trong SQL Server:
+```sql
+CREATE DATABASE MotorcycleShop;
+```
+
+2. Chạy script khởi tạo:
+```bash
+sqlcmd -S localhost -d MotorcycleShop -i database-setup.sql
+```
+
+3. Cấu hình kết nối trong `application.properties`:
 ```properties
 spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=MotorcycleShop
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
 
-### Chạy ứng dụng
+### Bước 3: Build và chạy
 
+#### Sử dụng Maven Wrapper (khuyên dùng)
 ```bash
-# Build project
-mvn clean install
+# Windows
+.\mvnw.cmd clean install
+.\mvnw.cmd spring-boot:run
 
-# Run Spring Boot
+# Linux/Mac
+./mvnw clean install
+./mvnw spring-boot:run
+```
+
+#### Hoặc sử dụng Maven
+```bash
+mvn clean install
 mvn spring-boot:run
 ```
 
-Truy cập: `http://localhost:8080`
+### Bước 4: Truy cập ứng dụng
+Mở trình duyệt và truy cập: **http://localhost:8080**
 
-## 📁 File quan trọng
+---
 
-- `database-setup.sql` - SQL Server schema setup
-- `ARCHITECTURE.md` - Chi tiết kiến trúc Clean Architecture
-- `usecases.md` - Đặc tả use cases và business rules
-- `pom.xml` - Maven dependencies
+## 🧪 Chạy Tests
 
-## 🎓 Điểm nổi bật
+### Chạy tất cả tests
+```bash
+mvnw test
+```
 
-### Clean Architecture Benefits
+### Chạy test với coverage
+```bash
+mvnw test jacoco:report
+```
 
-1. **Testability**: 85 unit tests với 100% pass rate, không cần database/UI
-2. **Independence**: Business logic tách biệt hoàn toàn khỏi framework
-3. **Maintainability**: Dễ sửa đổi, mở rộng từng layer
-4. **Flexibility**: Có thể thay đổi database/UI mà không ảnh hưởng business logic
+### Test structure
+```
+src/test/java/com/motorbike/
+├── business/usecase/control/    # Use case tests
+├── domain/entities/              # Entity tests
+└── infrastructure/               # Gateway tests
+```
 
-### Design Patterns
+---
 
-- **Dependency Injection** (Spring)
-- **Repository Pattern** (Data access abstraction)
-- **Adapter Pattern** (Infrastructure adapters)
-- **Factory Pattern** (Entity creation)
-- **Strategy Pattern** (Business rules)
+## 📖 API Documentation
+
+### Endpoints chính
+
+#### Products
+- `GET /` - Trang chủ, danh sách sản phẩm
+- `GET /product/{id}` - Chi tiết sản phẩm
+
+#### Cart
+- `POST /cart/add` - Thêm vào giỏ hàng
+- `GET /cart` - Xem giỏ hàng
+- `POST /cart/update` - Cập nhật số lượng
+
+#### Authentication
+- `GET /login` - Trang đăng nhập
+- `POST /login` - Xử lý đăng nhập
+- `GET /register` - Trang đăng ký
+- `POST /register` - Xử lý đăng ký
+
+#### Checkout
+- `POST /checkout` - Thanh toán đơn hàng
+
+---
+
+## 📂 Tài liệu tham khảo
+
+- [clean_arch_summary.md](clean_arch_summary.md) - Hướng dẫn chi tiết về Clean Architecture
+- [database-setup.sql](database-setup.sql) - Script khởi tạo database
+
+---
 
 ## 📝 License
 
-MIT License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👤 Tác giả
+
+**Nguyen Quang Tuan Phuong** (hayamij)
+- GitHub: [@hayamij](https://github.com/hayamij)
+
+---
+
+## 🙏 Acknowledgments
+
+- Clean Architecture by Robert C. Martin (Uncle Bob)
+- Spring Boot Documentation
+- Java Clean Architecture Community
+
+---
+
+*Last updated: November 2025*
