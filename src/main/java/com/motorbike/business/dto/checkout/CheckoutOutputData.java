@@ -168,9 +168,14 @@ public class CheckoutOutputData {
     }
     
     // Simplified static factory methods for use cases
-    public static CheckoutOutputData forSuccess(String orderId, BigDecimal totalAmount) {
-        return new CheckoutOutputData(null, null, null, null, null, null, "COMPLETED",
-                totalAmount, 0, 0, null, LocalDateTime.now());
+    public static CheckoutOutputData forSuccess(Long orderId, Long customerId, String customerName,
+                                               String customerPhone, String shippingAddress,
+                                               String orderStatus, BigDecimal totalAmount, 
+                                               int totalItems, List<OrderItemData> items) {
+        return new CheckoutOutputData(orderId, customerId, customerName, null, customerPhone, 
+                shippingAddress, orderStatus, totalAmount, totalItems, 
+                items.stream().mapToInt(OrderItemData::getQuantity).sum(), 
+                items, LocalDateTime.now());
     }
     
     public static CheckoutOutputData forError(String errorCode, String errorMessage) {
