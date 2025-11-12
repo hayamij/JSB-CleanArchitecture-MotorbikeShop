@@ -6,7 +6,7 @@ import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.exceptions.InvalidCartException;
-import java.util.Optional;
+import com.motorbike.domain.exceptions.CartNotFoundException;
 
 /**
  * Update Cart Quantity Use Case Control
@@ -27,18 +27,8 @@ public class UpdateCartQuantityUseCaseControl
     @Override
     protected void executeBusinessLogic(UpdateCartQuantityInputData inputData) throws Exception {
         try {
-            Optional<GioHang> cartOpt = cartRepository.findByUserId(inputData.getUserId());
-            
-            if (!cartOpt.isPresent()) {
-                UpdateCartQuantityOutputData outputData = UpdateCartQuantityOutputData.forError(
-                    "CART_NOT_FOUND",
-                    "Không tìm thấy giỏ hàng"
-                );
-                outputBoundary.present(outputData);
-                return;
-            }
-            
-            GioHang gioHang = cartOpt.get();
+            GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
+                .orElseThrow(() -> new CartNotFoundException());
             
             if (inputData.getNewQuantity() == 0) {
                 gioHang.xoaSanPham(inputData.getProductId());
@@ -56,12 +46,8 @@ public class UpdateCartQuantityUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidCartException e) {
-            UpdateCartQuantityOutputData outputData = UpdateCartQuantityOutputData.forError(
-                e.getErrorCode(),
-                e.getMessage()
-            );
-            outputBoundary.present(outputData);
+        } catch (InvalidCartException | CartNotFoundException e) {
+            throw e;
         }
     }
     
@@ -93,10 +79,22 @@ public class UpdateCartQuantityUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
-        UpdateCartQuantityOutputData outputData = UpdateCartQuantityOutputData.forError(
-            "SYSTEM_ERROR",
-            "Đã xảy ra lỗi: " + e.getMessage()
-        );
+        String errorCode = "SYSTEM_ERROR";
+        String message = "Đã xảy ra lỗi: " + e.getMessage();
+        
+        try {
+            throw e;
+        } catch (InvalidCartException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (CartNotFoundException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (Exception ex) {
+            // Keep default
+        }
+        
+        UpdateCartQuantityOutputData outputData = UpdateCartQuantityOutputData.forError(errorCode, message);
         outputBoundary.present(outputData);
     }
 }

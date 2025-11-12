@@ -7,6 +7,9 @@ import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.exceptions.UserNotFoundException;
+import com.motorbike.domain.exceptions.WrongPasswordException;
+import com.motorbike.domain.exceptions.AccountLockedException;
 import java.util.Optional;
 
 /**
@@ -30,35 +33,16 @@ public class LoginUseCaseControl
     
     @Override
     protected void executeBusinessLogic(LoginInputData inputData) throws Exception {
-        Optional<TaiKhoan> userOptional = userRepository.findByEmail(inputData.getEmail());
+        TaiKhoan taiKhoan = userRepository.findByEmail(inputData.getEmail())
+            .orElseThrow(() -> new UserNotFoundException(inputData.getEmail()));
         
-        if (!userOptional.isPresent()) {
-            LoginOutputData outputData = LoginOutputData.forError(
-                "USER_NOT_FOUND",
-                "Không tìm thấy tài khoản với email: " + inputData.getEmail()
-            );
-            outputBoundary.present(outputData);
-            return;
-        }
-        
-        TaiKhoan taiKhoan = userOptional.get();
-        
+        // Simple if-checks with throw - cleaner than nested try-catch
         if (!taiKhoan.kiemTraMatKhau(inputData.getPassword())) {
-            LoginOutputData outputData = LoginOutputData.forError(
-                "WRONG_PASSWORD",
-                "Mật khẩu không đúng"
-            );
-            outputBoundary.present(outputData);
-            return;
+            throw new WrongPasswordException();
         }
         
         if (!taiKhoan.isHoatDong()) {
-            LoginOutputData outputData = LoginOutputData.forError(
-                "ACCOUNT_LOCKED",
-                "Tài khoản đã bị khóa. Vui lòng liên hệ admin."
-            );
-            outputBoundary.present(outputData);
-            return;
+            throw new AccountLockedException();
         }
         
         taiKhoan.dangNhapThanhCong();
@@ -136,10 +120,25 @@ public class LoginUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
-        LoginOutputData outputData = LoginOutputData.forError(
-            "SYSTEM_ERROR",
-            "Đã xảy ra lỗi hệ thống: " + e.getMessage()
-        );
+        String errorCode = "SYSTEM_ERROR";
+        String message = "Đã xảy ra lỗi hệ thống: " + e.getMessage();
+        
+        try {
+            throw e;
+        } catch (UserNotFoundException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (WrongPasswordException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (AccountLockedException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (Exception ex) {
+            // Keep default SYSTEM_ERROR
+        }
+        
+        LoginOutputData outputData = LoginOutputData.forError(errorCode, message);
         outputBoundary.present(outputData);
     }
 }

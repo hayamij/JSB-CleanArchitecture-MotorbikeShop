@@ -5,9 +5,9 @@ import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.exceptions.ProductNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Optional;
 
 /**
  * Get Product Detail Use Case Control
@@ -27,18 +27,8 @@ public class GetProductDetailUseCaseControl
     
     @Override
     protected void executeBusinessLogic(GetProductDetailInputData inputData) throws Exception {
-        Optional<SanPham> productOpt = productRepository.findById(inputData.productId);
-        
-        if (!productOpt.isPresent()) {
-            GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(
-                "PRODUCT_NOT_FOUND",
-                "Không tìm thấy sản phẩm với mã: " + inputData.productId
-            );
-            outputBoundary.present(outputData);
-            return;
-        }
-        
-        SanPham sanPham = productOpt.get();
+        SanPham sanPham = productRepository.findById(inputData.productId)
+            .orElseThrow(() -> new ProductNotFoundException(String.valueOf(inputData.productId)));
         String chiTiet = sanPham.layThongTinChiTiet();
         BigDecimal giaGoc = sanPham.getGia();
         BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
@@ -81,10 +71,19 @@ public class GetProductDetailUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
-        GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(
-            "SYSTEM_ERROR",
-            "Đã xảy ra lỗi khi lấy thông tin sản phẩm: " + e.getMessage()
-        );
+        String errorCode = "SYSTEM_ERROR";
+        String message = "Đã xảy ra lỗi khi lấy thông tin sản phẩm: " + e.getMessage();
+        
+        try {
+            throw e;
+        } catch (ProductNotFoundException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (Exception ex) {
+            // Keep default
+        }
+        
+        GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(errorCode, message);
         outputBoundary.present(outputData);
     }
 }

@@ -9,7 +9,8 @@ import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.exceptions.InvalidCartException;
-import java.util.Optional;
+import com.motorbike.domain.exceptions.ProductNotFoundException;
+import com.motorbike.domain.exceptions.InsufficientStockException;
 
 /**
  * Add To Cart Use Case Control
@@ -33,34 +34,15 @@ public class AddToCartUseCaseControl
     @Override
     protected void executeBusinessLogic(AddToCartInputData inputData) throws Exception {
         try {
-            GioHang gioHang;
-            Optional<GioHang> cartOpt = cartRepository.findByUserId(inputData.getUserId());
+            GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
+                .orElse(new GioHang(inputData.getUserId()));
             
-            if (cartOpt.isPresent()) {
-                gioHang = cartOpt.get();
-            } else {
-                gioHang = new GioHang(inputData.getUserId());
-            }
+            SanPham sanPham = productRepository.findById(inputData.getProductId())
+                .orElseThrow(() -> new ProductNotFoundException(String.valueOf(inputData.getProductId()), "Không tìm thấy sản phẩm"));
             
-            Optional<SanPham> productOpt = productRepository.findById(inputData.getProductId());
-            if (!productOpt.isPresent()) {
-                AddToCartOutputData outputData = AddToCartOutputData.forError(
-                    "PRODUCT_NOT_FOUND",
-                    "Không tìm thấy sản phẩm"
-                );
-                outputBoundary.present(outputData);
-                return;
-            }
-            
-            SanPham sanPham = productOpt.get();
-            
+            // Simple if-check with throw
             if (sanPham.getSoLuongTonKho() < inputData.getQuantity()) {
-                AddToCartOutputData outputData = AddToCartOutputData.forError(
-                    "INSUFFICIENT_STOCK",
-                    "Không đủ hàng trong kho. Còn lại: " + sanPham.getSoLuongTonKho()
-                );
-                outputBoundary.present(outputData);
-                return;
+                throw new InsufficientStockException(sanPham.getSoLuongTonKho());
             }
             
             ChiTietGioHang chiTiet = new ChiTietGioHang(
@@ -81,12 +63,8 @@ public class AddToCartUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidCartException e) {
-            AddToCartOutputData outputData = AddToCartOutputData.forError(
-                e.getErrorCode(),
-                e.getMessage()
-            );
-            outputBoundary.present(outputData);
+        } catch (InvalidCartException | ProductNotFoundException | InsufficientStockException e) {
+            throw e;
         }
     }
     
@@ -118,10 +96,25 @@ public class AddToCartUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
-        AddToCartOutputData outputData = AddToCartOutputData.forError(
-            "SYSTEM_ERROR",
-            "Đã xảy ra lỗi: " + e.getMessage()
-        );
+        String errorCode = "SYSTEM_ERROR";
+        String message = "Đã xảy ra lỗi: " + e.getMessage();
+        
+        try {
+            throw e;
+        } catch (InvalidCartException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (ProductNotFoundException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (InsufficientStockException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (Exception ex) {
+            // Keep default
+        }
+        
+        AddToCartOutputData outputData = AddToCartOutputData.forError(errorCode, message);
         outputBoundary.present(outputData);
     }
 }

@@ -5,9 +5,9 @@ import com.motorbike.business.dto.viewcart.ViewCartOutputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.exceptions.EmptyCartException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Optional;
 
 /**
  * View Cart Use Case Control
@@ -27,20 +27,12 @@ public class ViewCartUseCaseControl
     
     @Override
     protected void executeBusinessLogic(ViewCartInputData inputData) throws Exception {
-        Optional<GioHang> cartOpt = cartRepository.findByUserId(inputData.getUserId());
+        GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
+            .orElseThrow(() -> new EmptyCartException());
         
-        if (!cartOpt.isPresent()) {
-            ViewCartOutputData outputData = ViewCartOutputData.forEmptyCart();
-            outputBoundary.present(outputData);
-            return;
-        }
-        
-        GioHang gioHang = cartOpt.get();
-        
+        // Simple if-check with throw
         if (gioHang.getDanhSachSanPham().isEmpty()) {
-            ViewCartOutputData outputData = ViewCartOutputData.forEmptyCart();
-            outputBoundary.present(outputData);
-            return;
+            throw new EmptyCartException();
         }
         
         List<ViewCartOutputData.CartItemData> itemList = new ArrayList<>();
@@ -77,6 +69,16 @@ public class ViewCartUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
+        try {
+            throw e;
+        } catch (EmptyCartException ex) {
+            ViewCartOutputData outputData = ViewCartOutputData.forEmptyCart();
+            outputBoundary.present(outputData);
+            return;
+        } catch (Exception ex) {
+            // System error
+        }
+        
         ViewCartOutputData outputData = ViewCartOutputData.forError(
             "SYSTEM_ERROR",
             "Đã xảy ra lỗi: " + e.getMessage()

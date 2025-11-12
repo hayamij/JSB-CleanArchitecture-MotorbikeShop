@@ -8,6 +8,7 @@ import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.exceptions.InvalidUserException;
+import com.motorbike.domain.exceptions.EmailAlreadyExistsException;
 
 /**
  * Register Use Case Control
@@ -31,13 +32,9 @@ public class RegisterUseCaseControl
     @Override
     protected void executeBusinessLogic(RegisterInputData inputData) throws Exception {
         try {
+            // Simple if-check with throw
             if (userRepository.existsByEmail(inputData.getEmail())) {
-                RegisterOutputData outputData = RegisterOutputData.forError(
-                    "EMAIL_EXISTS",
-                    "Email đã được sử dụng: " + inputData.getEmail()
-                );
-                outputBoundary.present(outputData);
-                return;
+                throw new EmailAlreadyExistsException(inputData.getEmail());
             }
             
             TaiKhoan taiKhoan = new TaiKhoan(
@@ -63,12 +60,8 @@ public class RegisterUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidUserException e) {
-            RegisterOutputData outputData = RegisterOutputData.forError(
-                e.getErrorCode(),
-                e.getMessage()
-            );
-            outputBoundary.present(outputData);
+        } catch (InvalidUserException | EmailAlreadyExistsException e) {
+            throw e;
         }
     }
     
@@ -96,10 +89,22 @@ public class RegisterUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
-        RegisterOutputData outputData = RegisterOutputData.forError(
-            "SYSTEM_ERROR",
-            "Đã xảy ra lỗi hệ thống: " + e.getMessage()
-        );
+        String errorCode = "SYSTEM_ERROR";
+        String message = "Đã xảy ra lỗi hệ thống: " + e.getMessage();
+        
+        try {
+            throw e;
+        } catch (InvalidUserException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (EmailAlreadyExistsException ex) {
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } catch (Exception ex) {
+            // Keep default
+        }
+        
+        RegisterOutputData outputData = RegisterOutputData.forError(errorCode, message);
         outputBoundary.present(outputData);
     }
 }
