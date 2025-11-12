@@ -1,122 +1,199 @@
 package com.motorbike.business.usecase.impl;
 
-import com.motorbike.business.entity.Cart;
-import com.motorbike.business.entity.CartItem;
-import com.motorbike.business.entity.Order;
-import com.motorbike.business.entity.OrderItem;
-import com.motorbike.business.exception.EmptyCartException;
-import com.motorbike.business.repository.CartRepository;
-import com.motorbike.business.repository.OrderRepository;
-import com.motorbike.business.usecase.CheckoutUseCase;
+import com.motorbike.business.dto.checkout.CheckoutInputData;
+import com.motorbike.business.dto.checkout.CheckoutOutputData;
+import com.motorbike.business.dto.checkout.CheckoutOutputData.OrderItemData;
+import com.motorbike.business.usecase.CheckoutInputBoundary;
+import com.motorbike.business.usecase.CheckoutOutputBoundary;
+import com.motorbike.domain.entities.*;
+import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.business.ports.repository.UserRepository;
+import com.motorbike.domain.repositories.OrderRepository;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
- * CheckoutUseCaseImpl - Business Layer
- * Implementation of checkout use case
- * Part of Clean Architecture - Business Layer
+ * Use Case Implementation: CheckoutUseCaseImpl
+ * Handles the checkout/payment process
+ * 
+ * Business Rules:
+ * - User must be logged in (userId required)
+ * - Cart must have at least 1 product
+ * - Check stock availability for all products in cart
+ * - Calculate total amount
+ * - Create Order with PENDING status
+ * - Create OrderItems from CartItems
+ * - Deduct stock quantity for each product
+ * - Clear cart after successful checkout
  */
-public class CheckoutUseCaseImpl implements CheckoutUseCase {
-    
-    private final OrderRepository orderRepository;
+public class CheckoutUseCaseImpl implements CheckoutInputBoundary {
+    private final CheckoutOutputBoundary outputBoundary;
+    private final UserRepository userRepository;
     private final CartRepository cartRepository;
-    
-    public CheckoutUseCaseImpl(OrderRepository orderRepository, CartRepository cartRepository) {
-        this.orderRepository = orderRepository;
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
+
+    public CheckoutUseCaseImpl(CheckoutOutputBoundary outputBoundary,
+                              UserRepository userRepository,
+                              CartRepository cartRepository,
+                              ProductRepository productRepository,
+                              OrderRepository orderRepository) {
+        this.outputBoundary = outputBoundary;
+        this.userRepository = userRepository;
         this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
     }
-    
+
     @Override
-    public CheckoutResponse execute(CheckoutRequest request) {
-        // Step 1: Validate request
-        validateRequest(request);
-        
-        // Step 2: Get cart by userId
-        Cart cart = cartRepository.findByUserId(request.getUserId())
-                .orElseThrow(() -> new EmptyCartException(request.getUserId()));
-        
-        // Step 3: Check if cart is empty
-        if (cart.isEmpty()) {
-            throw new EmptyCartException(request.getUserId());
+    public void execute(CheckoutInputData inputData) {
+        // Business Rule: User must be logged in
+        if (inputData.getUserId() == null) {
+            CheckoutOutputData outputData = new CheckoutOutputData(
+                "USER_NOT_LOGGED_IN",
+                "Bạn phải đăng nhập để thực hiện thanh toán"
+            );
+            outputBoundary.present(outputData);
+            return;
+        }
+
+        // Get user information
+        Optional<User> userOptional = userRepository.findById(inputData.getUserId());
+        if (userOptional.isEmpty()) {
+            CheckoutOutputData outputData = new CheckoutOutputData(
+                "USER_NOT_FOUND",
+                "Không tìm thấy thông tin người dùng"
+            );
+            outputBoundary.present(outputData);
+            return;
+        }
+        User user = userOptional.get();
+
+        // Business Rule: Cart must have at least 1 product
+        Optional<Cart> cartOptional = cartRepository.findByUserId(inputData.getUserId());
+        if (cartOptional.isEmpty() || cartOptional.get().getItems().isEmpty()) {
+            CheckoutOutputData outputData = new CheckoutOutputData(
+                "CART_EMPTY",
+                "Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán"
+            );
+            outputBoundary.present(outputData);
+            return;
+        }
+        Cart cart = cartOptional.get();
+
+        // Business Rule: Check stock availability for all products
+        for (CartItem cartItem : cart.getItems()) {
+            Optional<Product> productOptional = productRepository.findById(cartItem.getProductId());
+            if (productOptional.isEmpty()) {
+                CheckoutOutputData outputData = new CheckoutOutputData(
+                    "PRODUCT_NOT_FOUND",
+                    "Sản phẩm '" + cartItem.getProductName() + "' không còn tồn tại"
+                );
+                outputBoundary.present(outputData);
+                return;
+            }
+
+            Product product = productOptional.get();
+            
+            // Check if product is available
+            if (!product.isAvailable()) {
+                CheckoutOutputData outputData = new CheckoutOutputData(
+                    "PRODUCT_NOT_AVAILABLE",
+                    "Sản phẩm '" + product.getName() + "' hiện không còn bán"
+                );
+                outputBoundary.present(outputData);
+                return;
+            }
+
+            // Check stock quantity
+            if (product.getStockQuantity() < cartItem.getQuantity()) {
+                CheckoutOutputData outputData = new CheckoutOutputData(
+                    "INSUFFICIENT_STOCK",
+                    "Sản phẩm '" + product.getName() + "' chỉ còn " + 
+                    product.getStockQuantity() + " sản phẩm trong kho"
+                );
+                outputBoundary.present(outputData);
+                return;
+            }
+        }
+
+        // Create Order
+        // Use provided address or require it (user entity doesn't have default address)
+        if (inputData.getShippingAddress() == null || inputData.getShippingAddress().trim().isEmpty()) {
+            CheckoutOutputData outputData = new CheckoutOutputData(
+                "SHIPPING_ADDRESS_REQUIRED",
+                "Vui lòng cung cấp địa chỉ giao hàng"
+            );
+            outputBoundary.present(outputData);
+            return;
         }
         
-        // Step 4: Convert cart items to order items
-        List<OrderItem> orderItems = cart.getItems().stream()
-                .map(this::convertCartItemToOrderItem)
-                .collect(Collectors.toList());
-        
-        // Step 5: Create order entity
-        Order order = Order.builder()
-                .userId(request.getUserId())
-                .items(orderItems)
-                .shippingAddress(request.getShippingAddress())
-                .shippingCity(request.getShippingCity())
-                .shippingPhone(request.getShippingPhone())
-                .paymentMethod(request.getPaymentMethod().toUpperCase())
-                .status("PENDING")
-                .orderDate(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-        
-        // Step 6: Validate order
-        order.validate();
-        
-        // Step 7: Save order
-        Order savedOrder = orderRepository.save(order);
-        
-        // Step 8: Clear cart after successful order
-        cart.clear();
-        cartRepository.save(cart);
-        
-        // Step 9: Generate success message
-        String message = String.format(
-                "Order placed successfully! Order ID: %d, Total: %s VND, Payment: %s",
-                savedOrder.getId(),
-                savedOrder.getTotalAmount(),
-                savedOrder.getPaymentMethod()
+        String shippingAddress = inputData.getShippingAddress();
+        String customerPhone = inputData.getCustomerPhone() != null ?
+                              inputData.getCustomerPhone() : user.getPhoneNumber();
+
+        Order order = new Order(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            customerPhone,
+            shippingAddress
         );
-        
-        // Step 10: Return response
-        return new CheckoutResponse(savedOrder, message, true);
-    }
-    
-    /**
-     * Validate checkout request
-     */
-    private void validateRequest(CheckoutRequest request) {
-        if (request.getUserId() == null) {
-            throw new IllegalArgumentException("User ID cannot be null");
+
+        // Create OrderItems from CartItems and deduct stock
+        List<OrderItemData> orderItemDataList = new ArrayList<>();
+        for (CartItem cartItem : cart.getItems()) {
+            Product product = productRepository.findById(cartItem.getProductId()).get();
+            
+            // Create OrderItem
+            OrderItem orderItem = new OrderItem(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                cartItem.getQuantity()
+            );
+            order.addItem(orderItem);
+
+            // Deduct stock quantity
+            int newStock = product.getStockQuantity() - cartItem.getQuantity();
+            product.setStockQuantity(newStock);
+            productRepository.save(product);
+
+            // Prepare data for output
+            orderItemDataList.add(new OrderItemData(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                cartItem.getQuantity(),
+                orderItem.getSubtotal()
+            ));
         }
-        if (request.getShippingAddress() == null || request.getShippingAddress().trim().isEmpty()) {
-            throw new IllegalArgumentException("Shipping address is required");
-        }
-        if (request.getShippingCity() == null || request.getShippingCity().trim().isEmpty()) {
-            throw new IllegalArgumentException("Shipping city is required");
-        }
-        if (request.getShippingPhone() == null || request.getShippingPhone().trim().isEmpty()) {
-            throw new IllegalArgumentException("Shipping phone is required");
-        }
-        if (request.getPaymentMethod() == null || request.getPaymentMethod().trim().isEmpty()) {
-            throw new IllegalArgumentException("Payment method is required");
-        }
-        String method = request.getPaymentMethod().toUpperCase();
-        if (!method.equals("COD") && !method.equals("ONLINE")) {
-            throw new IllegalArgumentException("Payment method must be COD or ONLINE");
-        }
-    }
-    
-    /**
-     * Convert cart item to order item
-     */
-    private OrderItem convertCartItemToOrderItem(CartItem cartItem) {
-        return OrderItem.builder()
-                .productId(cartItem.getProductId())
-                .productName(cartItem.getProductName())
-                .productPrice(cartItem.getProductPrice())
-                .quantity(cartItem.getQuantity())
-                .subtotal(cartItem.getSubtotal())
-                .build();
+
+        // Save order
+        Order savedOrder = orderRepository.save(order);
+
+        // Clear cart after successful checkout
+        cartRepository.delete(cart.getId());
+
+        // Prepare success output
+        CheckoutOutputData outputData = new CheckoutOutputData(
+            savedOrder.getId(),
+            savedOrder.getCustomerId(),
+            savedOrder.getCustomerName(),
+            savedOrder.getCustomerEmail(),
+            savedOrder.getCustomerPhone(),
+            savedOrder.getShippingAddress(),
+            savedOrder.getStatus().name(),
+            savedOrder.getTotalAmount(),
+            savedOrder.getTotalItems(),
+            savedOrder.getTotalQuantity(),
+            orderItemDataList,
+            savedOrder.getCreatedAt()
+        );
+
+        outputBoundary.present(outputData);
     }
 }
