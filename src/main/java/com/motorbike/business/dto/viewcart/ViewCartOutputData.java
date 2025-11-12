@@ -163,10 +163,16 @@ public class ViewCartOutputData {
     }
     
     // Simplified static factory methods for use cases
-    public static ViewCartOutputData forSuccess(Long cartId, List items, BigDecimal totalAmount) {
-        int totalItems = items.size();
-        return new ViewCartOutputData(cartId, null, totalItems, totalItems,
-                totalAmount, null, totalItems == 0, false);
+    public static ViewCartOutputData forSuccess(Long cartId, List<CartItemData> items, BigDecimal totalAmount) {
+        int totalItems = (items == null) ? 0 : items.size();
+        int totalQuantity = 0;
+        if (items != null) {
+            for (CartItemData item : items) {
+                totalQuantity += (item == null) ? 0 : item.getQuantity();
+            }
+        }
+        return new ViewCartOutputData(cartId, null, totalItems, totalQuantity,
+                totalAmount, items, totalItems == 0, false);
     }
     
     public static ViewCartOutputData forEmptyCart() {

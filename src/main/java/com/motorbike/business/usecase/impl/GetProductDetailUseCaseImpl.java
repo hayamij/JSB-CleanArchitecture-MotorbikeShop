@@ -8,6 +8,7 @@ import com.motorbike.business.usecase.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 /**
@@ -56,11 +57,10 @@ public class GetProductDetailUseCaseImpl implements GetProductDetailInputBoundar
             // 3. Get product details using entity's method
             String chiTiet = sanPham.layThongTinChiTiet();
             
-            // 4. Calculate final price (with discount)
             BigDecimal giaGoc = sanPham.getGia();
             BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
             double phanTramGiam = giaGoc.subtract(giaSauKhuyenMai)
-                .divide(giaGoc, 4, BigDecimal.ROUND_HALF_UP)
+                .divide(giaGoc, 4, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100))
                 .doubleValue();
             

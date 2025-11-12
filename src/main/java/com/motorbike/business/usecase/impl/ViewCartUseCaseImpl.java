@@ -7,6 +7,8 @@ import com.motorbike.business.usecase.ViewCartInputBoundary;
 import com.motorbike.business.usecase.ViewCartOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -55,15 +57,20 @@ public class ViewCartUseCaseImpl implements ViewCartInputBoundary {
                 outputBoundary.present(outputData);
                 return;
             }
-            
             // 4. Create success output with cart data
-            ViewCartOutputData outputData = ViewCartOutputData.forSuccess(
+            List<ViewCartOutputData.CartItemData> itemList = new ArrayList<>();
+            for (Object obj : gioHang.getDanhSachSanPham()) {
+                if (obj instanceof ViewCartOutputData.CartItemData) {
+                    itemList.add((ViewCartOutputData.CartItemData) obj);
+                }
+            }
+            ViewCartOutputData successOutput = ViewCartOutputData.forSuccess(
                 gioHang.getMaGioHang(),
-                gioHang.getDanhSachSanPham(),
+                itemList,
                 gioHang.getTongTien()
             );
             
-            outputBoundary.present(outputData);
+            outputBoundary.present(successOutput);
             
         } catch (Exception e) {
             ViewCartOutputData outputData = ViewCartOutputData.forError(
