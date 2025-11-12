@@ -3,7 +3,7 @@ package com.motorbike.adapters.presenters;
 import com.motorbike.adapters.viewmodels.RegisterViewModel;
 import com.motorbike.business.dto.register.RegisterOutputData;
 import com.motorbike.business.usecase.RegisterOutputBoundary;
-import com.motorbike.domain.entities.UserRole;
+import com.motorbike.domain.entities.VaiTro;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -160,11 +160,11 @@ public class RegisterPresenter implements RegisterOutputBoundary {
      * @param role User role enum
      * @return Formatted role string in Vietnamese
      */
-    private String formatRoleDisplay(UserRole role) {
+    private String formatRoleDisplay(VaiTro role) {
         if (role == null) {
-            return "ko xác định";
+            return "không xác định";
         }
-        return role.getRoleName();
+        return role.getMoTa();
     }
 
     /**

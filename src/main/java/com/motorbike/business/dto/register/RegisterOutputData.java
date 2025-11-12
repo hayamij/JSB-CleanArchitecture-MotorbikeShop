@@ -1,6 +1,6 @@
 package com.motorbike.business.dto.register;
 
-import com.motorbike.domain.entities.UserRole;
+import com.motorbike.domain.entities.VaiTro;
 import java.time.LocalDateTime;
 
 /**
@@ -17,7 +17,7 @@ public class RegisterOutputData {
     private final Long userId;
     private final String email;
     private final String username;
-    private final UserRole role;
+    private final VaiTro role;
     private final LocalDateTime createdAt;
     
     // Auto-login info (optional)
@@ -26,7 +26,7 @@ public class RegisterOutputData {
 
     // Constructor for success case
     public RegisterOutputData(Long userId, String email, String username, 
-                             UserRole role, LocalDateTime createdAt,
+                             VaiTro role, LocalDateTime createdAt,
                              boolean autoLoginEnabled, String sessionToken) {
         this.success = true;
         this.errorCode = null;
@@ -42,7 +42,7 @@ public class RegisterOutputData {
 
     // Constructor for success case without auto-login
     public RegisterOutputData(Long userId, String email, String username, 
-                             UserRole role, LocalDateTime createdAt) {
+                             VaiTro role, LocalDateTime createdAt) {
         this.success = true;
         this.errorCode = null;
         this.errorMessage = null;
@@ -94,7 +94,7 @@ public class RegisterOutputData {
         return username;
     }
 
-    public UserRole getRole() {
+    public VaiTro getRole() {
         return role;
     }
 

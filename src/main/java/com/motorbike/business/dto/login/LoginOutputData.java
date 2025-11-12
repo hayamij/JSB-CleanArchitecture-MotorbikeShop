@@ -1,6 +1,6 @@
 package com.motorbike.business.dto.login;
 
-import com.motorbike.domain.entities.UserRole;
+import com.motorbike.domain.entities.VaiTro;
 import java.time.LocalDateTime;
 
 /**
@@ -17,7 +17,7 @@ public class LoginOutputData {
     private final Long userId;
     private final String email;
     private final String username;
-    private final UserRole role;
+    private final VaiTro role;
     private final LocalDateTime lastLoginAt;
     
     // Session/token info
@@ -29,7 +29,7 @@ public class LoginOutputData {
 
     // Constructor for success case
     public LoginOutputData(Long userId, String email, String username, 
-                          UserRole role, LocalDateTime lastLoginAt,
+                          VaiTro role, LocalDateTime lastLoginAt,
                           String sessionToken, boolean cartMerged, int mergedItemsCount) {
         this.success = true;
         this.errorCode = null;
@@ -84,7 +84,7 @@ public class LoginOutputData {
         return username;
     }
 
-    public UserRole getRole() {
+    public VaiTro getRole() {
         return role;
     }
 

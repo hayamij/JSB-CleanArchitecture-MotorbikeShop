@@ -1,10 +1,10 @@
 package com.motorbike.business.ports.repository;
 
-import com.motorbike.domain.entities.Product;
+import com.motorbike.domain.entities.SanPham;
 import java.util.Optional;
 
 /**
- * Repository interface for Product entity
+ * Repository interface for SanPham (Product) entity
  * Port in the Use Case layer - implementation will be in Adapter layer
  */
 public interface ProductRepository {
@@ -14,14 +14,14 @@ public interface ProductRepository {
      * @param productId the product ID
      * @return Optional containing the product if found, empty otherwise
      */
-    Optional<Product> findById(Long productId);
+    Optional<SanPham> findById(Long productId);
     
     /**
      * Save a product
-     * @param product the product to save
+     * @param sanPham the product to save
      * @return the saved product with ID
      */
-    Product save(Product product);
+    SanPham save(SanPham sanPham);
     
     /**
      * Check if product exists by ID

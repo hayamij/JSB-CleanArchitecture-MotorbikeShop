@@ -3,7 +3,7 @@ package com.motorbike.adapters.presenters;
 import com.motorbike.adapters.viewmodels.LoginViewModel;
 import com.motorbike.business.dto.login.LoginOutputData;
 import com.motorbike.business.usecase.LoginOutputBoundary;
-import com.motorbike.domain.entities.UserRole;
+import com.motorbike.domain.entities.VaiTro;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -116,11 +116,11 @@ public class LoginPresenter implements LoginOutputBoundary {
     /**
      * format role để hiển thị
      */
-    private String formatRoleDisplay(UserRole role) {
+    private String formatRoleDisplay(VaiTro role) {
         if (role == null) {
-            return "ko xác định";
+            return "không xác định";
         }
-        return role.getRoleName();
+        return role.getMoTa();
     }
 
     /**
