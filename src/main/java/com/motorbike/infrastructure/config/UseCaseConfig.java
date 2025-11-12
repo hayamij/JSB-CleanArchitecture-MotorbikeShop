@@ -3,6 +3,7 @@ package com.motorbike.infrastructure.config;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.*;
 import com.motorbike.business.usecase.control.*;
 import com.motorbike.adapters.presenters.*;
@@ -129,8 +130,9 @@ public class UseCaseConfig {
     public CheckoutUseCaseControl checkoutUseCase(
             CheckoutOutputBoundary checkoutPresenter,
             CartRepository cartRepository,
-            ProductRepository productRepository) {
-        return new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository);
+            ProductRepository productRepository,
+            OrderRepository orderRepository) {
+        return new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository, orderRepository);
     }
     
     @Bean

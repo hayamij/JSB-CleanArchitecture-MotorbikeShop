@@ -4,9 +4,11 @@ import com.motorbike.business.dto.checkout.CheckoutInputData;
 import com.motorbike.business.dto.checkout.CheckoutOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
+import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.XeMay;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,14 +25,16 @@ class CheckoutUseCaseControlTest {
     private CheckoutUseCaseControl useCase;
     private ProductRepository productRepository;
     private CartRepository cartRepository;
+    private OrderRepository orderRepository;
     private CheckoutOutputBoundary outputBoundary;
 
     @BeforeEach
     void setUp() {
         productRepository = mock(ProductRepository.class);
         cartRepository = mock(CartRepository.class);
+        orderRepository = mock(OrderRepository.class);
         outputBoundary = mock(CheckoutOutputBoundary.class);
-        useCase = new CheckoutUseCaseControl(outputBoundary, cartRepository, productRepository);
+        useCase = new CheckoutUseCaseControl(outputBoundary, cartRepository, productRepository, orderRepository);
     }
 
     @Test
@@ -55,15 +59,21 @@ class CheckoutUseCaseControlTest {
         when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(cart));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(productRepository.save(any())).thenReturn(product);
+        when(orderRepository.save(any(DonHang.class))).thenAnswer(invocation -> {
+            DonHang order = invocation.getArgument(0);
+            order.setMaDonHang(1L);
+            return order;
+        });
         
         // Act
-        CheckoutInputData inputData = new CheckoutInputData(userId, "123 Test St", "0123456789");
+        CheckoutInputData inputData = new CheckoutInputData(userId, "Nguyen Van A", "0123456789", "123 Test St", "Test note");
         useCase.execute(inputData);
         
         // Assert
         verify(cartRepository).findByUserId(userId);
         verify(productRepository, times(2)).findById(productId); // Called twice: validation + stock reduction
         verify(productRepository).save(any());
+        verify(orderRepository).save(any(DonHang.class));
         verify(cartRepository).save(any(GioHang.class));
         verify(outputBoundary).present(any(CheckoutOutputData.class));
     }
@@ -78,7 +88,7 @@ class CheckoutUseCaseControlTest {
         when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(cart));
         
         // Act
-        CheckoutInputData inputData = new CheckoutInputData(userId, "123 Test St", "0123456789");
+        CheckoutInputData inputData = new CheckoutInputData(userId, "Nguyen Van A", "0123456789", "123 Test St", "Test note");
         useCase.execute(inputData);
         
         // Assert
@@ -109,7 +119,7 @@ class CheckoutUseCaseControlTest {
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         
         // Act
-        CheckoutInputData inputData = new CheckoutInputData(userId, "123 Test St", "0123456789");
+        CheckoutInputData inputData = new CheckoutInputData(userId, "Nguyen Van A", "0123456789", "123 Test St", "Test note");
         useCase.execute(inputData);
         
         // Assert
