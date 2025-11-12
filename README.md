@@ -389,7 +389,7 @@ mvn package
 
 ## 👨‍💻 Author
 
-**Your Name**  
+**Hayamij (Nguyen Quang Tuan Phuong)**  
 Clean Architecture Implementation - Motorbike Shop System
 
 ## 📄 License
