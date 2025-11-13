@@ -1,0 +1,159 @@
+package com.motorbike.adapters.controllers;
+
+import com.motorbike.business.dto.login.LoginInputData;
+import com.motorbike.business.dto.register.RegisterInputData;
+import com.motorbike.business.usecase.control.LoginUseCaseControl;
+import com.motorbike.business.usecase.control.RegisterUseCaseControl;
+import com.motorbike.adapters.viewmodels.LoginViewModel;
+import com.motorbike.adapters.viewmodels.RegisterViewModel;
+import com.motorbike.adapters.dto.request.RegisterRequest;
+import com.motorbike.adapters.dto.request.LoginRequest;
+import com.motorbike.adapters.dto.response.RegisterResponse;
+import com.motorbike.adapters.dto.response.LoginResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * REST Controller for Authentication
+ * Handles login and registration
+ */
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
+public class AuthController {
+
+    private final LoginUseCaseControl loginUseCase;
+    private final RegisterUseCaseControl registerUseCase;
+    private final LoginViewModel loginViewModel;
+    private final RegisterViewModel registerViewModel;
+
+    @Autowired
+    public AuthController(LoginUseCaseControl loginUseCase, 
+                         RegisterUseCaseControl registerUseCase,
+                         LoginViewModel loginViewModel,
+                         RegisterViewModel registerViewModel) {
+        this.loginUseCase = loginUseCase;
+        this.registerUseCase = registerUseCase;
+        this.loginViewModel = loginViewModel;
+        this.registerViewModel = registerViewModel;
+    }
+
+    /**
+     * POST /api/auth/register
+     * Đăng ký tài khoản mới
+     * 
+     * Request Body:
+     * {
+     *   "email": "user@example.com",
+     *   "password": "password123",
+     *   "confirmPassword": "password123",
+     *   "name": "Nguyen Van A",
+     *   "phone": "0123456789",
+     *   "address": "123 Street, City"
+     * }
+     * 
+     * Success Response (201):
+     * {
+     *   "success": true,
+     *   "userId": 1,
+     *   "email": "user@example.com",
+     *   "name": "Nguyen Van A",
+     *   "role": "CUSTOMER",
+     *   "message": "Đăng ký thành công"
+     * }
+     */
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+        // Validate confirmPassword matches password
+        if (request.getPassword() == null || request.getConfirmPassword() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new RegisterResponse(false, null, null, null, null, null, 
+                    "VALIDATION_ERROR", "Mật khẩu không được để trống")
+            );
+        }
+        
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new RegisterResponse(false, null, null, null, null, null, 
+                    "PASSWORD_MISMATCH", "Mật khẩu xác nhận không khớp")
+            );
+        }
+        
+        // Constructor: (email, username, password, confirmPassword, phoneNumber, address)
+        RegisterInputData inputData = new RegisterInputData(
+            request.getEmail(),
+            request.getName(),         // name -> username
+            request.getPassword(),
+            request.getConfirmPassword(),
+            request.getPhone(),        // phone -> phoneNumber
+            request.getAddress()
+        );
+        
+        registerUseCase.execute(inputData);
+        
+        // Convert ViewModel to Response DTO
+        if (registerViewModel.success) {
+            RegisterResponse response = new RegisterResponse(
+                true, registerViewModel.userId, registerViewModel.email,
+                registerViewModel.username, registerViewModel.roleDisplay,
+                registerViewModel.message, null, null
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } else {
+            RegisterResponse response = new RegisterResponse(
+                false, null, null, null, null, null,
+                registerViewModel.errorCode, registerViewModel.errorMessage
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    /**
+     * POST /api/auth/login
+     * Đăng nhập vào hệ thống
+     * 
+     * Request Body:
+     * {
+     *   "email": "user@example.com",
+     *   "password": "password123"
+     * }
+     * 
+     * Success Response (200):
+     * {
+     *   "success": true,
+     *   "userId": 1,
+     *   "email": "user@example.com",
+     *   "name": "Nguyen Van A",
+     *   "role": "CUSTOMER",
+     *   "cartId": 1,
+     *   "message": "Đăng nhập thành công"
+     * }
+     */
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginInputData inputData = new LoginInputData(
+            request.getEmail(),
+            request.getPassword()
+        );
+        
+        loginUseCase.execute(inputData);
+        
+        // Convert ViewModel to Response DTO
+        if (loginViewModel.success) {
+            LoginResponse response = new LoginResponse(
+                true, loginViewModel.userId, loginViewModel.email,
+                loginViewModel.username, loginViewModel.roleDisplay,
+                null, loginViewModel.message, null, null
+            );
+            return ResponseEntity.ok(response);
+        } else {
+            LoginResponse response = new LoginResponse(
+                false, null, null, null, null, null, null,
+                loginViewModel.errorCode, loginViewModel.errorMessage
+            );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+    }
+}
