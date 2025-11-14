@@ -1,219 +1,290 @@
-# JSB-CleanArchitecture-MotorbikeShop
+# 🏍️ Motorbike Shop - Clean Architecture
 
-🏍️ **Motorbike Shop E-Commerce Application** built with **Clean Architecture** and **Spring Boot**
+> Website giới thiệu, bán xe máy và phụ kiện trực tuyến
 
-# Getting Started
+**Tác giả:** [hayamij](https://github.com/hayamij) (Nguyen Quang Tuan Phuong)
 
-### Reference Documentation
-For further reference, please consider the following sections:
+## 📋 Tổng quan
 
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/3.5.6/maven-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/3.5.6/maven-plugin/build-image.html)
-* [Spring Web](https://docs.spring.io/spring-boot/3.5.6/reference/web/servlet.html)
-* [Thymeleaf](https://docs.spring.io/spring-boot/3.5.6/reference/web/servlet.html#web.servlet.spring-mvc.template-engines)
+Dự án xây dựng hệ thống website bán xe máy và phụ kiện trực tuyến, áp dụng kiến trúc **Clean Architecture** để đảm bảo code dễ bảo trì, mở rộng và kiểm thử.
 
-### Guides
-The following guides illustrate how to use some features concretely:
+### Đặc điểm nổi bật
+- ✅ Phân tách rõ ràng các tầng logic nghiệp vụ
+- ✅ Độc lập với framework và database
+- ✅ Dễ dàng kiểm thử (Testable)
+- ✅ Tuân thủ SOLID principles
+- ✅ Dependency Rule được áp dụng nghiêm ngặt
 
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Handling Form Submission](https://spring.io/guides/gs/handling-form-submission/)
+---
 
-### Maven Parent overrides
+## 🛠️ Công nghệ sử dụng
 
-Due to Maven's design, elements are inherited from the parent POM to the project POM.
-While most of the inheritance is fine, it also inherits unwanted elements like `<license>` and `<developers>` from the parent.
-To prevent this, the project POM contains empty overrides for these elements.
-If you manually switch to a different parent and actually want the inheritance, you need to remove those overrides.
+| Công nghệ | Phiên bản | Mục đích |
+|-----------|-----------|----------|
+| **Java** | 17 | Ngôn ngữ lập trình |
+| **Spring Boot** | 3.5.6 | Framework backend |
+| **Spring Data JPA** | 3.5.6 | ORM và database access |
+| **Thymeleaf** | 3.5.6 | Template engine |
+| **SQL Server** | - | Database chính |
+| **H2 Database** | - | Database cho testing |
+| **Maven** | - | Build tool |
+| **JUnit 5** | - | Unit testing |
 
-## 📋 Project Overview
+---
 
-An e-commerce web application for motorbike and accessories shop with three user roles:
-- **Guest**: Browse products and view details
-- **Customer**: Shopping cart, checkout, order management
-- **Admin**: Product management, inventory control
+## 🏗️ Kiến trúc
 
-Built following Clean Architecture principles for maintainability, testability, and independence from frameworks.
-
-## 🏗️ Architecture
+Dự án tuân thủ **Clean Architecture** của Uncle Bob với 4 tầng:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     PRESENTATION LAYER                      │
-│           (Controllers, DTOs, Mappers, Views)               │
-├─────────────────────────────────────────────────────────────┤
-│                     APPLICATION LAYER                       │
-│              (Use Cases, Input/Output Ports)                │
-├─────────────────────────────────────────────────────────────┤
-│                       DOMAIN LAYER                          │
-│          (Entities, Repository Interfaces, Rules)           │
-├─────────────────────────────────────────────────────────────┤
-│                   INFRASTRUCTURE LAYER                      │
-│    (JPA Entities, Repository Impl, Database, Adapters)      │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│  Frameworks & Drivers (Adapters)                    │
+│  - Web Controllers                                   │
+│  - Database Repositories                             │
+│  - External Services                                 │
+├─────────────────────────────────────────────────────┤
+│  Interface Adapters (Infrastructure)                │
+│  - Gateways                                          │
+│  - Presenters                                        │
+│  - DTO Converters                                    │
+├─────────────────────────────────────────────────────┤
+│  Use Cases (Business Logic)                         │
+│  - Application Services                              │
+│  - Interactors                                       │
+│  - Input/Output Boundaries                           │
+├─────────────────────────────────────────────────────┤
+│  Entities (Domain)                                   │
+│  - Business Rules                                    │
+│  - Domain Models                                     │
+└─────────────────────────────────────────────────────┘
+     Inner Layers ← Dependency Rule ← Outer Layers
 ```
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Java 17 or higher
-- Maven 3.6+
-- SQL Server 2019+ (or SQL Server Express)
-- IDE: IntelliJ IDEA, Eclipse, or VS Code with Java extensions
-
-### Setup Instructions
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/hayamij/JSB-CleanArchitecture-MotorbikeShop.git
-   cd JSB-CleanArchitecture-MotorbikeShop
-   ```
-
-2. **Configure Database**
-   - Copy `src/main/resources/application.properties.example` to `application.properties`
-   - Update database credentials:
-     ```properties
-     spring.datasource.username=YOUR_USERNAME
-     spring.datasource.password=YOUR_PASSWORD
-     ```
-
-3. **Setup Database Schema**
-   ```bash
-   # Run database setup script (PowerShell recommended for UTF-8 support)
-   ./database-setup.ps1
-   
-   # Or use SQL script directly
-   sqlcmd -S localhost -U your_user -P your_password -i database-setup.sql
-   ```
-
-4. **Build the project**
-   ```bash
-   ./mvnw clean install
-   ```
-
-5. **Run the application**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-6. **Access the application**
-   - API: http://localhost:8080/api/products
-   - H2 Console: http://localhost:8080/h2-console
-
-## 📁 Project Structure
+### Cấu trúc thư mục
 
 ```
 src/main/java/com/motorbike/
-├── domain/                          # Domain Layer
-│   ├── entity/                      # Business entities
-│   │   └── Product.java
-│   └── repository/                  # Repository interfaces
-│       └── ProductRepository.java
-│
-├── application/                     # Application Layer
-│   └── usecase/                     # Use cases
-│       ├── GetProductDetailUseCase.java
-│       └── impl/
-│           ├── GetProductDetailUseCaseImpl.java
-│           └── ProductNotFoundException.java
-│
-├── infrastructure/                  # Infrastructure Layer
-│   ├── persistence/
-│   │   ├── entity/                  # JPA entities
-│   │   │   └── ProductJpaEntity.java
-│   │   ├── repository/              # Spring Data JPA
-│   │   │   └── ProductJpaRepository.java
-│   │   ├── mapper/                  # Domain ↔ JPA mapping
-│   │   │   └── ProductEntityMapper.java
-│   │   └── adapter/                 # Repository implementations
-│   │       └── ProductRepositoryAdapter.java
-│   └── config/
-│       └── DataInitializer.java
-│
-├── presentation/                    # Presentation Layer
-│   ├── controller/                  # REST controllers
-│   │   └── ProductController.java
-│   ├── dto/                         # API DTOs
-│   │   └── ProductDTO.java
-│   └── mapper/                      # Use case ↔ DTO mapping
-│       └── ProductMapper.java
-│
-└── main/
-    └── MainApplication.java         # Spring Boot entry point
+├── domain/              # Layer 1: Entities
+│   ├── entities/        # Domain models
+│   └── exceptions/      # Business exceptions
+├── business/            # Layer 2: Use Cases
+│   └── usecase/
+│       ├── control/     # Use case implementations
+│       ├── entity/      # Input/Output boundaries
+│       └── boundary/    # Repository interfaces
+├── infrastructure/      # Layer 3: Interface Adapters
+│   ├── gateway/         # Repository implementations
+│   └── presenter/       # Data transformers
+└── adapters/            # Layer 4: Frameworks & Drivers
+    ├── web/             # Web controllers
+    └── persistence/     # Database entities
 ```
 
-## 🎯 Implemented Use Cases
+---
 
-### ✅ Use Case 1: View Product Detail
-- **Endpoint**: `GET /api/products/{id}`
-- **Actors**: Guest, Customer, Admin
-- **Flow**: User requests product details → System retrieves from database → Returns product information
+## 📚 Thu thập yêu cầu
 
-**Example Request:**
+### Actors (Người dùng hệ thống)
+
+1. **Guest** - Khách vãng lai (chưa đăng nhập)
+2. **Customer** - Khách hàng đã đăng ký
+3. **Admin** - Quản trị viên
+
+### Use Cases chính
+
+#### 🔹 Guest Features
+- Xem danh sách sản phẩm
+- Xem chi tiết sản phẩm
+- Thêm sản phẩm vào giỏ hàng
+- Xem và chỉnh sửa giỏ hàng
+- Đăng ký tài khoản
+
+#### 🔹 Customer Features
+- Tất cả chức năng của Guest
+- Đăng nhập/Đăng xuất
+- Thanh toán đơn hàng
+- Xem lịch sử đơn hàng
+
+#### 🔹 Admin Features
+- Tất cả chức năng của Customer
+- Quản lý sản phẩm (CRUD)
+- Quản lý loại sản phẩm
+- Quản lý tài khoản người dùng
+- Quản lý đơn hàng
+
+### Business Rules chính
+
+1. **Sản phẩm:**
+   - Giá > 0
+   - Số lượng tồn kho ≥ 0
+   - Phải thuộc một loại sản phẩm
+
+2. **Giỏ hàng:**
+   - Số lượng thêm vào phải > 0
+   - Không vượt quá tồn kho
+   - Guest: lưu trong session
+   - Customer: lưu trong database
+
+3. **Thanh toán:**
+   - Bắt buộc đăng nhập
+   - Giỏ hàng phải có sản phẩm
+   - Kiểm tra tồn kho trước khi thanh toán
+   - Trừ tồn kho sau khi đặt hàng thành công
+
+4. **Tài khoản:**
+   - Email phải unique
+   - Mật khẩu được mã hóa
+   - Phân quyền: Customer/Admin
+
+---
+
+## 🎯 Nguyên tắc thiết kế (SOLID)
+
+| Nguyên tắc | Áp dụng trong dự án |
+|------------|---------------------|
+| **S**RP | Mỗi Use Case chỉ xử lý một nghiệp vụ cụ thể |
+| **O**CP | Mở rộng qua interfaces, không sửa code cũ |
+| **L**SP | Các implementation tuân thủ contract của interface |
+| **I**SP | Interfaces nhỏ, chỉ chứa methods cần thiết |
+| **D**IP | Use Cases phụ thuộc vào abstractions, không phụ thuộc vào implementations cụ thể |
+
+### Dependency Rule
+```
+❌ Entities không phụ thuộc Use Cases
+❌ Use Cases không phụ thuộc Frameworks
+✅ Outer Layers → Inner Layers (qua Interfaces)
+```
+
+---
+
+## 🚀 Cài đặt và chạy
+
+### Yêu cầu hệ thống
+- Java 17+
+- Maven 3.6+
+- SQL Server 2019+ (hoặc bất kỳ phiên bản tương thích)
+
+### Bước 1: Clone repository
 ```bash
-curl http://localhost:8080/api/products/1
+git clone https://github.com/hayamij/JSB-CleanArchitecture-MotorbikeShop.git
+cd JSB-CleanArchitecture-MotorbikeShop
 ```
 
-**Example Response:**
-```json
-{
-  "id": 1,
-  "name": "Honda Wave RSX",
-  "description": "Xe số tiết kiệm nhiên liệu, phù hợp cho di chuyển trong thành phố",
-  "price": 38000000.00,
-  "imageUrl": "/images/honda-wave-rsx.jpg",
-  "specifications": "{\"engine\":\"110cc\",\"fuelCapacity\":\"3.5L\",\"weight\":\"98kg\"}",
-  "category": "MOTORCYCLE",
-  "stockQuantity": 15,
-  "available": true,
-  "inStock": true
-}
+### Bước 2: Cấu hình Database
+
+1. Tạo database trong SQL Server:
+```sql
+CREATE DATABASE MotorcycleShop;
 ```
 
-## 🔧 Development
-
-### Commit Changes
+2. Chạy script khởi tạo:
 ```bash
-# Edit commit-message.txt with your message
-# Then run:
-commit.cmd
+sqlcmd -S localhost -d MotorcycleShop -i database-setup.sql
 ```
 
-### Running Tests
+3. Cấu hình kết nối trong `application.properties`:
+```properties
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=MotorcycleShop
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+```
+
+### Bước 3: Build và chạy
+
+#### Sử dụng Maven Wrapper (khuyên dùng)
 ```bash
-./mvnw test
+# Windows
+.\mvnw.cmd clean install
+.\mvnw.cmd spring-boot:run
+
+# Linux/Mac
+./mvnw clean install
+./mvnw spring-boot:run
 ```
 
-### Build for Production
+#### Hoặc sử dụng Maven
 ```bash
-./mvnw clean package -DskipTests
+mvn clean install
+mvn spring-boot:run
 ```
 
-## 📚 Documentation
+### Bước 4: Truy cập ứng dụng
+Mở trình duyệt và truy cập: **http://localhost:8080**
 
-- [Implementation Details](IMPLEMENTATION.md) - Detailed architecture and flow documentation
-- [Use Cases](usecases.md) - Complete use case specifications
+---
 
-## 🛠️ Technologies
+## 🧪 Chạy Tests
 
-- **Framework**: Spring Boot 3.5.6
-- **Architecture**: Clean Architecture
-- **Database**: SQL Server 2022
-- **ORM**: Hibernate / Spring Data JPA
-- **Build Tool**: Maven
-- **Java Version**: 17
+### Chạy tất cả tests
+```bash
+mvnw test
+```
 
-## 👥 Team
+### Chạy test với coverage
+```bash
+mvnw test jacoco:report
+```
 
-- Project Owner: hayamij
-- Contributors: Welcome!
+### Test structure
+```
+src/test/java/com/motorbike/
+├── business/usecase/control/    # Use case tests
+├── domain/entities/              # Entity tests
+└── infrastructure/               # Gateway tests
+```
 
-## 📄 License
+---
 
-See [LICENSE](LICENSE) file for details.
+## 📖 API Documentation
 
-## 🤝 Contributing
+### Endpoints chính
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+#### Products
+- `GET /` - Trang chủ, danh sách sản phẩm
+- `GET /product/{id}` - Chi tiết sản phẩm
+
+#### Cart
+- `POST /cart/add` - Thêm vào giỏ hàng
+- `GET /cart` - Xem giỏ hàng
+- `POST /cart/update` - Cập nhật số lượng
+
+#### Authentication
+- `GET /login` - Trang đăng nhập
+- `POST /login` - Xử lý đăng nhập
+- `GET /register` - Trang đăng ký
+- `POST /register` - Xử lý đăng ký
+
+#### Checkout
+- `POST /checkout` - Thanh toán đơn hàng
+
+---
+
+## 📂 Tài liệu tham khảo
+
+- [clean_arch_summary.md](clean_arch_summary.md) - Hướng dẫn chi tiết về Clean Architecture
+- [database-setup.sql](database-setup.sql) - Script khởi tạo database
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👤 Tác giả
+
+**Nguyen Quang Tuan Phuong** (hayamij)
+- GitHub: [@hayamij](https://github.com/hayamij)
+
+---
+
+## 🙏 Acknowledgments
+
+- Clean Architecture by Robert C. Martin (Uncle Bob)
+- Spring Boot Documentation
+- Java Clean Architecture Community
+
+---
+
+*Last updated: November 2025*
