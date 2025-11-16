@@ -12,6 +12,7 @@ public class UpdateCartQuantityViewModel {
     public boolean success;
     public String message;
     public String errorCode;
+    public String errorMessage;
     public String messageColor;
     
     // Cart and product details

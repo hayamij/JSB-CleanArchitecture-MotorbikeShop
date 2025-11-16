@@ -180,7 +180,7 @@ public class CartController {
             return ResponseEntity.ok(response);
         } else {
             UpdateCartResponse response = new UpdateCartResponse(
-                false, null, updateCartQuantityViewModel.getErrorCode(), updateCartQuantityViewModel.getMessage()
+                false, null, updateCartQuantityViewModel.errorCode, updateCartQuantityViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }

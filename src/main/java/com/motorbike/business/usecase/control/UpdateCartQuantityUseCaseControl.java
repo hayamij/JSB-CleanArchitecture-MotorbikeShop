@@ -8,6 +8,7 @@ import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.exceptions.InvalidCartException;
 import com.motorbike.domain.exceptions.CartNotFoundException;
+import com.motorbike.domain.exceptions.ProductNotInCartException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class UpdateCartQuantityUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidCartException | CartNotFoundException e) {
+        } catch (InvalidCartException | CartNotFoundException | ProductNotInCartException e) {
             throw e;
         }
     }
@@ -113,6 +114,10 @@ public class UpdateCartQuantityUseCaseControl
             message = ex.getMessage();
         } else if (e instanceof CartNotFoundException) {
             CartNotFoundException ex = (CartNotFoundException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else if (e instanceof ProductNotInCartException) {
+            ProductNotInCartException ex = (ProductNotInCartException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
