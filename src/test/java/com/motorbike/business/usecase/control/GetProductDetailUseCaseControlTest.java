@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import com.motorbike.adapters.presenters.ProductDetailPresenter;
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
-import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
