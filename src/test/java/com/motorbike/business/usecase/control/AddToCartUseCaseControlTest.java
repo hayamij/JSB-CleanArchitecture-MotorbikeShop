@@ -10,10 +10,12 @@ import com.motorbike.domain.entities.GioHang;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Add To Cart Use Case Tests")
@@ -23,12 +25,14 @@ class AddToCartUseCaseControlTest {
     private ProductRepository productRepository;
     private CartRepository cartRepository;
     private AddToCartOutputBoundary outputBoundary;
+    private ArgumentCaptor<AddToCartOutputData> outputCaptor;
 
     @BeforeEach
     void setUp() {
         productRepository = mock(ProductRepository.class);
         cartRepository = mock(CartRepository.class);
         outputBoundary = mock(AddToCartOutputBoundary.class);
+        outputCaptor = ArgumentCaptor.forClass(AddToCartOutputData.class);
         useCase = new AddToCartUseCaseControl(outputBoundary, cartRepository, productRepository);
     }
 
@@ -38,6 +42,7 @@ class AddToCartUseCaseControlTest {
         // Arrange
         Long userId = 1L;
         Long productId = 1L;
+        int quantity = 2;
         
         XeMay product = new XeMay(
             productId, "Honda Wave", "Xe số",
@@ -47,35 +52,44 @@ class AddToCartUseCaseControlTest {
         );
         
         GioHang cart = new GioHang(userId);
+        cart.setMaGioHang(1L);
         
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(cart));
         when(cartRepository.save(any(GioHang.class))).thenReturn(cart);
         
         // Act
-        AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(productId, 2, userId);
+        AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(productId, quantity, userId);
         useCase.execute(inputData);
         
         // Assert
-        verify(productRepository).findById(productId);
-        verify(cartRepository).findByUserId(userId);
-        verify(cartRepository).save(any(GioHang.class));
-        verify(outputBoundary).present(any(AddToCartOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        AddToCartOutputData output = outputCaptor.getValue();
+        
+        assertEquals(true, output.isSuccess());
+        assertEquals(true, output.getCartId() != null);
+        assertNotEquals(0, output.getTotalItems());
     }
 
     @Test
     @DisplayName("Should fail when product not found")
     void testAddToCartFailProductNotFound() {
         // Arrange
-        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Long productId = 999L;
+        
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
         
         // Act
-        AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(999L, 1, 1L);
+        AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(productId, 1, 1L);
         useCase.execute(inputData);
         
         // Assert
-        verify(cartRepository, never()).save(any());
-        verify(outputBoundary).present(any(AddToCartOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        AddToCartOutputData output = outputCaptor.getValue();
+        
+        assertEquals(false, output.isSuccess());
+        assertEquals("PRODUCT_NOT_FOUND", output.getErrorCode());
+        assertNotEquals(null, output.getErrorMessage());
     }
 
     @Test
@@ -85,7 +99,25 @@ class AddToCartUseCaseControlTest {
         useCase.execute(null);
         
         // Assert
-        verify(productRepository, never()).findById(any());
-        verify(outputBoundary).present(any(AddToCartOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        AddToCartOutputData output = outputCaptor.getValue();
+        
+        assertEquals(false, output.isSuccess());
+        assertNotEquals(null, output.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("Should fail with invalid quantity")
+    void testAddToCartFailInvalidQuantity() {
+        // Act
+        AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 0, 1L);
+        useCase.execute(inputData);
+        
+        // Assert
+        verify(outputBoundary).present(outputCaptor.capture());
+        AddToCartOutputData output = outputCaptor.getValue();
+        
+        assertEquals(false, output.isSuccess());
+        assertEquals("INVALID_QUANTITY", output.getErrorCode());
     }
 }

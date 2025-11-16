@@ -9,6 +9,7 @@ import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.exceptions.InvalidCartException;
 import com.motorbike.domain.exceptions.CartNotFoundException;
 import com.motorbike.domain.exceptions.ProductNotInCartException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +32,17 @@ public class UpdateCartQuantityUseCaseControl
     @Override
     protected void executeBusinessLogic(UpdateCartQuantityInputData inputData) throws Exception {
         try {
-            GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
+            GioHang gioHang = cartRepository.findById(inputData.getCartId())
                 .orElseThrow(() -> new CartNotFoundException());
+            
+            // Find product in cart to get old quantity and productName
+            ChiTietGioHang existingItem = gioHang.getDanhSachSanPham().stream()
+                .filter(item -> item.getMaSanPham().equals(inputData.getProductId()))
+                .findFirst()
+                .orElse(null);
+            
+            int oldQuantity = existingItem != null ? existingItem.getSoLuong() : 0;
+            String productName = existingItem != null ? existingItem.getTenSanPham() : null;
             
             if (inputData.getNewQuantity() == 0) {
                 gioHang.xoaSanPham(inputData.getProductId());
@@ -44,6 +54,7 @@ public class UpdateCartQuantityUseCaseControl
             
             // Build cart items list
             List<UpdateCartQuantityOutputData.CartItemData> allItems = new ArrayList<>();
+            BigDecimal newSubtotal = BigDecimal.ZERO;
             for (ChiTietGioHang item : savedCart.getDanhSachSanPham()) {
                 allItems.add(new UpdateCartQuantityOutputData.CartItemData(
                     item.getMaSanPham(),
@@ -52,20 +63,23 @@ public class UpdateCartQuantityUseCaseControl
                     item.getSoLuong(),
                     item.getTamTinh()
                 ));
+                if (item.getMaSanPham().equals(inputData.getProductId())) {
+                    newSubtotal = item.getTamTinh();
+                }
             }
             
             UpdateCartQuantityOutputData outputData = new UpdateCartQuantityOutputData(
                 savedCart.getMaGioHang(),
                 savedCart.getMaTaiKhoan(),
                 inputData.getProductId(),
-                null, // productName will be populated if needed
-                0, // oldQuantity
+                productName,
+                oldQuantity,
                 inputData.getNewQuantity(),
                 inputData.getNewQuantity() == 0,
                 savedCart.getDanhSachSanPham().size(),
                 savedCart.getDanhSachSanPham().stream().mapToInt(ChiTietGioHang::getSoLuong).sum(),
                 savedCart.getTongTien(),
-                null, // itemSubtotal
+                newSubtotal,
                 allItems
             );
             
@@ -80,8 +94,8 @@ public class UpdateCartQuantityUseCaseControl
     protected void validateInput(UpdateCartQuantityInputData inputData) {
         checkInputNotNull(inputData);
         
-        if (inputData.getUserId() == null) {
-            throw new com.motorbike.domain.exceptions.InvalidUserIdException();
+        if (inputData.getCartId() == null) {
+            throw new InvalidCartException("INVALID_CART_ID", "Cart ID không được để trống");
         }
         
         if (inputData.getProductId() == null) {
@@ -105,8 +119,8 @@ public class UpdateCartQuantityUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
-        String errorCode;
-        String message;
+        String errorCode = null;
+        String message = e.getMessage();
         
         if (e instanceof InvalidCartException) {
             InvalidCartException ex = (InvalidCartException) e;
@@ -125,7 +139,9 @@ public class UpdateCartQuantityUseCaseControl
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else {
-            throw new com.motorbike.domain.exceptions.SystemException(e);
+            // Unknown exception - use generic error code
+            errorCode = "SYSTEM_ERROR";
+            message = e.getMessage() != null ? e.getMessage() : "Đã xảy ra lỗi hệ thống";
         }
         
         UpdateCartQuantityOutputData outputData = UpdateCartQuantityOutputData.forError(errorCode, message);

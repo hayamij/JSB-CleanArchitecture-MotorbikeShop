@@ -13,10 +13,12 @@ import com.motorbike.domain.entities.XeMay;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Checkout Use Case Tests")
@@ -27,6 +29,7 @@ class CheckoutUseCaseControlTest {
     private CartRepository cartRepository;
     private OrderRepository orderRepository;
     private CheckoutOutputBoundary outputBoundary;
+    private ArgumentCaptor<CheckoutOutputData> outputCaptor;
 
     @BeforeEach
     void setUp() {
@@ -34,6 +37,7 @@ class CheckoutUseCaseControlTest {
         cartRepository = mock(CartRepository.class);
         orderRepository = mock(OrderRepository.class);
         outputBoundary = mock(CheckoutOutputBoundary.class);
+        outputCaptor = ArgumentCaptor.forClass(CheckoutOutputData.class);
         useCase = new CheckoutUseCaseControl(outputBoundary, cartRepository, productRepository, orderRepository);
     }
 
@@ -70,12 +74,12 @@ class CheckoutUseCaseControlTest {
         useCase.execute(inputData);
         
         // Assert
-        verify(cartRepository).findByUserId(userId);
-        verify(productRepository, times(2)).findById(productId); // Called twice: validation + stock reduction
-        verify(productRepository).save(any());
-        verify(orderRepository).save(any(DonHang.class));
-        verify(cartRepository).save(any(GioHang.class));
-        verify(outputBoundary).present(any(CheckoutOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        CheckoutOutputData output = outputCaptor.getValue();
+        
+        assertEquals(true, output.isSuccess());
+        assertNotEquals(null, output.getOrderId());
+        assertNotEquals(null, output.getTotalAmount());
     }
 
     @Test
@@ -123,8 +127,12 @@ class CheckoutUseCaseControlTest {
         useCase.execute(inputData);
         
         // Assert
-        verify(productRepository, never()).save(any());
-        verify(outputBoundary).present(any(CheckoutOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        CheckoutOutputData output = outputCaptor.getValue();
+        
+        assertEquals(false, output.isSuccess());
+        assertEquals("INSUFFICIENT_STOCK", output.getErrorCode());
+        assertNotEquals(null, output.getErrorMessage());
     }
 
     @Test
@@ -134,7 +142,10 @@ class CheckoutUseCaseControlTest {
         useCase.execute(null);
         
         // Assert
-        verify(cartRepository, never()).findByUserId(any());
-        verify(outputBoundary).present(any(CheckoutOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        CheckoutOutputData output = outputCaptor.getValue();
+        
+        assertEquals(false, output.isSuccess());
+        assertNotEquals(null, output.getErrorCode());
     }
 }

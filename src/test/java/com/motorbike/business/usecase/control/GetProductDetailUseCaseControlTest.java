@@ -8,10 +8,12 @@ import com.motorbike.domain.entities.XeMay;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Get Product Detail Use Case Tests")
@@ -20,11 +22,13 @@ class GetProductDetailUseCaseControlTest {
     private GetProductDetailUseCaseControl useCase;
     private ProductRepository productRepository;
     private GetProductDetailOutputBoundary outputBoundary;
+    private ArgumentCaptor<GetProductDetailOutputData> outputCaptor;
 
     @BeforeEach
     void setUp() {
         productRepository = mock(ProductRepository.class);
         outputBoundary = mock(GetProductDetailOutputBoundary.class);
+        outputCaptor = ArgumentCaptor.forClass(GetProductDetailOutputData.class);
         useCase = new GetProductDetailUseCaseControl(outputBoundary, productRepository);
     }
 
@@ -46,8 +50,13 @@ class GetProductDetailUseCaseControlTest {
         useCase.execute(new GetProductDetailInputData(productId));
         
         // Assert
-        verify(productRepository).findById(productId);
-        verify(outputBoundary).present(any(GetProductDetailOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        GetProductDetailOutputData output = outputCaptor.getValue();
+        
+        assertEquals(true, output.success);
+        assertEquals(productId, output.productId);
+        assertEquals("Honda Wave", output.name);
+        assertNotEquals(null, output.price);
     }
 
     @Test
@@ -61,8 +70,12 @@ class GetProductDetailUseCaseControlTest {
         useCase.execute(new GetProductDetailInputData(productId));
         
         // Assert
-        verify(productRepository).findById(productId);
-        verify(outputBoundary).present(any(GetProductDetailOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        GetProductDetailOutputData output = outputCaptor.getValue();
+        
+        assertEquals(false, output.success);
+        assertEquals("PRODUCT_NOT_FOUND", output.errorCode);
+        assertNotEquals(null, output.errorMessage);
     }
 
     @Test
@@ -72,7 +85,10 @@ class GetProductDetailUseCaseControlTest {
         useCase.execute(null);
         
         // Assert
-        verify(productRepository, never()).findById(any());
-        verify(outputBoundary).present(any(GetProductDetailOutputData.class));
+        verify(outputBoundary).present(outputCaptor.capture());
+        GetProductDetailOutputData output = outputCaptor.getValue();
+        
+        assertEquals(false, output.success);
+        assertNotEquals(null, output.errorCode);
     }
 }

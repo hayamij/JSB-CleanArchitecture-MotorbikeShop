@@ -73,6 +73,7 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
         viewModel.success = true;
         viewModel.message = message;
         viewModel.errorCode = null;
+        viewModel.errorMessage = null;
         viewModel.messageColor = "#28a745"; // Green for success
         viewModel.cartId = outputData.getCartId();
         viewModel.userId = outputData.getUserId();

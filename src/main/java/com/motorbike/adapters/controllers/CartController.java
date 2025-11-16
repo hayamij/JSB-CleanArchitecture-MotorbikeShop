@@ -144,7 +144,7 @@ public class CartController {
      * 
      * Request Body:
      * {
-     *   "userId": 1,
+     *   "cartId": 3,
      *   "productId": 1,
      *   "newQuantity": 5
      * }
@@ -154,7 +154,7 @@ public class CartController {
      * Success Response (200):
      * {
      *   "success": true,
-     *   "cartId": 1,
+     *   "cartId": 3,
      *   "productId": 1,
      *   "newQuantity": 5,
      *   "newSubtotal": 150000000,
@@ -164,18 +164,24 @@ public class CartController {
      */
     @PutMapping("/update")
     public ResponseEntity<UpdateCartResponse> updateCartQuantity(@RequestBody UpdateCartRequest request) {
-        UpdateCartQuantityInputData inputData = UpdateCartQuantityInputData.forLoggedInUser(
-            request.getUserId(),
+        // Reset ViewModel to initial state before use
+        updateCartQuantityViewModel.success = false;
+        updateCartQuantityViewModel.message = null;
+        updateCartQuantityViewModel.errorCode = null;
+        updateCartQuantityViewModel.errorMessage = null;
+        
+        UpdateCartQuantityInputData inputData = new UpdateCartQuantityInputData(
+            request.getCartId(),
             request.getProductId(),
             request.getNewQuantity()
         );
         
         updateCartQuantityUseCase.execute(inputData);
         
-        // Get data from ViewModel populated by Presenter
-        if (updateCartQuantityViewModel.isSuccess()) {
+        // Use direct field access instead of getter to avoid potential AOP/proxy issues
+        if (updateCartQuantityViewModel.success) {
             UpdateCartResponse response = new UpdateCartResponse(
-                true, updateCartQuantityViewModel.getMessage(), null, null
+                true, updateCartQuantityViewModel.message, null, null
             );
             return ResponseEntity.ok(response);
         } else {

@@ -81,7 +81,7 @@ class RegisterUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         RegisterOutputData output = captor.getValue();
-        assertTrue(output.isSuccess());
+        assertEquals(true, output.isSuccess());
         assertEquals("newuser@example.com", output.getEmail());
     }
 
@@ -112,7 +112,7 @@ class RegisterUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("EMAIL_EXISTS", output.getErrorCode());
     }
 
@@ -130,7 +130,7 @@ class RegisterUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("INVALID_INPUT", output.getErrorCode());
     }
 
@@ -157,7 +157,7 @@ class RegisterUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("EMPTY_EMAIL", output.getErrorCode());
     }
 
@@ -184,7 +184,7 @@ class RegisterUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("EMPTY_USERNAME", output.getErrorCode());
     }
 }

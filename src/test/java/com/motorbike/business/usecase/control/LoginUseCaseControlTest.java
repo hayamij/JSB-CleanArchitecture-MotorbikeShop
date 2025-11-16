@@ -75,7 +75,7 @@ class LoginUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         LoginOutputData output = captor.getValue();
-        assertTrue(output.isSuccess());
+        assertEquals(true, output.isSuccess());
         assertEquals(1L, output.getUserId());
         assertEquals("test@example.com", output.getEmail());
     }
@@ -103,7 +103,7 @@ class LoginUseCaseControlTest {
         ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
-        assertTrue(captor.getValue().isSuccess());
+        assertEquals(true, captor.getValue().isSuccess());
     }
 
     @Test
@@ -124,7 +124,7 @@ class LoginUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         LoginOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("USER_NOT_FOUND", output.getErrorCode());
     }
 
@@ -146,7 +146,7 @@ class LoginUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         LoginOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("WRONG_PASSWORD", output.getErrorCode());
     }
 
@@ -182,7 +182,7 @@ class LoginUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         LoginOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("ACCOUNT_LOCKED", output.getErrorCode());
     }
 
@@ -199,7 +199,7 @@ class LoginUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         LoginOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("INVALID_INPUT", output.getErrorCode());
     }
 
@@ -219,7 +219,7 @@ class LoginUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         LoginOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("EMPTY_EMAIL", output.getErrorCode());
     }
 
@@ -239,7 +239,7 @@ class LoginUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         LoginOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
+        assertEquals(false, output.isSuccess());
         assertEquals("EMPTY_PASSWORD", output.getErrorCode());
     }
 }
