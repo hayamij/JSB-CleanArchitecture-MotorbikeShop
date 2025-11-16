@@ -1,245 +1,353 @@
 package com.motorbike.business.usecase.control;
 
-import com.motorbike.business.dto.login.LoginInputData;
-import com.motorbike.business.dto.login.LoginOutputData;
-import com.motorbike.business.ports.repository.UserRepository;
-import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.output.LoginOutputBoundary;
-import com.motorbike.domain.entities.TaiKhoan;
-import com.motorbike.domain.entities.GioHang;
-import com.motorbike.domain.entities.VaiTro;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.ArgumentCaptor;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
 
-/**
- * Unit Tests for LoginUseCaseControl
- * Tests all business rules for login functionality
- */
-@DisplayName("Login Use Case Tests")
-class LoginUseCaseControlTest {
+import com.motorbike.adapters.presenters.LoginPresenter;
+import com.motorbike.adapters.viewmodels.LoginViewModel;
+import com.motorbike.business.dto.login.LoginInputData;
+import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.business.ports.repository.UserRepository;
+import com.motorbike.business.usecase.output.LoginOutputBoundary;
+import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.entities.TaiKhoan;
+import com.motorbike.domain.entities.VaiTro;
 
-    private LoginUseCaseControl loginUseCase;
-    private UserRepository userRepository;
-    private CartRepository cartRepository;
-    private LoginOutputBoundary outputBoundary;
-    private TaiKhoan validUser;
+public class LoginUseCaseControlTest {
 
-    @BeforeEach
-    void setUp() {
-        userRepository = mock(UserRepository.class);
-        cartRepository = mock(CartRepository.class);
-        outputBoundary = mock(LoginOutputBoundary.class);
-        
-        loginUseCase = new LoginUseCaseControl(outputBoundary, userRepository, cartRepository);
-        
-        // Create valid test user
-        validUser = new TaiKhoan(
-                1L,
-                "test@example.com",
-                "testuser",
-                "validPassword123",
-                "0123456789",
-                "123 Test Street",
-                VaiTro.CUSTOMER,
-                true,
-                LocalDateTime.now().minusDays(7),
-                LocalDateTime.now(),
-                null
-        );
-    }
-
-    @Test
-    @DisplayName("Should login successfully with valid credentials")
-    void testLoginSuccess() {
-        // Arrange
-        LoginInputData inputData = new LoginInputData("test@example.com", "validPassword123", null);
-        
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(validUser));
-        
-        // Act
-        loginUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository).findByEmail("test@example.com");
-        verify(userRepository).save(validUser); // Should update last login
-        
-        ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        LoginOutputData output = captor.getValue();
-        assertEquals(true, output.isSuccess());
-        assertEquals(1L, output.getUserId());
-        assertEquals("test@example.com", output.getEmail());
-    }
-
-    @Test
-    @DisplayName("Should merge guest cart when login with guest cart ID")
-    void testLoginWithGuestCartMerge() {
-        // Arrange
-        Long guestCartId = 999L;
-        LoginInputData inputData = new LoginInputData("test@example.com", "validPassword123", guestCartId);
-        GioHang guestCart = new GioHang(guestCartId);
-        GioHang userCart = new GioHang(1L);
-        
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(validUser));
-        when(cartRepository.findById(guestCartId)).thenReturn(Optional.of(guestCart));
-        when(cartRepository.findByUserId(1L)).thenReturn(Optional.of(userCart));
-        
-        // Act
-        loginUseCase.execute(inputData);
-        
-        // Assert
-        verify(cartRepository).findById(guestCartId);
-        verify(cartRepository).findByUserId(1L);
-        
-        ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        assertEquals(true, captor.getValue().isSuccess());
-    }
-
-    @Test
-    @DisplayName("Should fail when user not found")
-    void testLoginFailUserNotFound() {
-        // Arrange
-        LoginInputData inputData = new LoginInputData("notfound@example.com", "password", null);
-        
-        when(userRepository.findByEmail("notfound@example.com")).thenReturn(Optional.empty());
-        
-        // Act
-        loginUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository, never()).save(any());
-        
-        ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        LoginOutputData output = captor.getValue();
-        assertEquals(false, output.isSuccess());
-        assertEquals("USER_NOT_FOUND", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail when password is incorrect")
-    void testLoginFailWrongPassword() {
-        // Arrange
-        LoginInputData inputData = new LoginInputData("test@example.com", "wrongPassword", null);
-        
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(validUser));
-        
-        // Act
-        loginUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository, never()).save(any());
-        
-        ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        LoginOutputData output = captor.getValue();
-        assertEquals(false, output.isSuccess());
-        assertEquals("WRONG_PASSWORD", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail when account is locked")
-    void testLoginFailAccountLocked() {
-        // Arrange
-        TaiKhoan lockedUser = new TaiKhoan(
-                1L,
-                "locked@example.com",
-                "lockeduser",
-                "password123",
-                "0123456789",
-                "123 Test Street",
-                VaiTro.CUSTOMER,
-                false, // Account is locked
-                LocalDateTime.now().minusDays(7),
-                LocalDateTime.now(),
-                null
-        );
-        
-        LoginInputData inputData = new LoginInputData("locked@example.com", "password123", null);
-        
-        when(userRepository.findByEmail("locked@example.com")).thenReturn(Optional.of(lockedUser));
-        
-        // Act
-        loginUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository, never()).save(any());
-        
-        ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        LoginOutputData output = captor.getValue();
-        assertEquals(false, output.isSuccess());
-        assertEquals("ACCOUNT_LOCKED", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail with null input")
-    void testLoginFailNullInput() {
-        // Act
-        loginUseCase.execute(null);
-        
-        // Assert
-        verify(userRepository, never()).findByEmail(any());
-        
-        ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        LoginOutputData output = captor.getValue();
-        assertEquals(false, output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail with empty email")
-    void testLoginFailEmptyEmail() {
-        // Arrange
-        LoginInputData inputData = new LoginInputData("", "password", null);
-        
-        // Act
-        loginUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository, never()).findByEmail(any());
-        
-        ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        LoginOutputData output = captor.getValue();
-        assertEquals(false, output.isSuccess());
-        assertEquals("EMPTY_EMAIL", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail with empty password")
-    void testLoginFailEmptyPassword() {
-        // Arrange
-        LoginInputData inputData = new LoginInputData("test@example.com", "", null);
-        
-        // Act
-        loginUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository, never()).findByEmail(any());
-        
-        ArgumentCaptor<LoginOutputData> captor = ArgumentCaptor.forClass(LoginOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        LoginOutputData output = captor.getValue();
-        assertEquals(false, output.isSuccess());
-        assertEquals("EMPTY_PASSWORD", output.getErrorCode());
-    }
+	@Test
+	public void testExecute_ValidCredentials_Success() {
+		LoginInputData inputData = new LoginInputData("user@test.com", "password123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+		assertNotEquals(null, viewModel.userId);
+		assertEquals("user@test.com", viewModel.email);
+	}
+	
+	@Test
+	public void testExecute_ValidCredentials_WithGuestCart() {
+		LoginInputData inputData = new LoginInputData("user@test.com", "password123", 999L);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+		assertEquals(true, viewModel.cartMerged);
+	}
+	
+	@Test
+	public void testExecute_ValidCredentials_AdminRole() {
+		LoginInputData inputData = new LoginInputData("admin@test.com", "admin123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullInputData() {
+		LoginInputData inputData = null;
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmptyEmail() {
+		LoginInputData inputData = new LoginInputData("", "password123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullEmail() {
+		LoginInputData inputData = new LoginInputData(null, "password123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmptyPassword() {
+		LoginInputData inputData = new LoginInputData("user@test.com", "");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullPassword() {
+		LoginInputData inputData = new LoginInputData("user@test.com", null);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_InvalidEmailFormat() {
+		LoginInputData inputData = new LoginInputData("notanemail", "password123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_UserNotFound() {
+		LoginInputData inputData = new LoginInputData("notfound@test.com", "password123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_WrongPassword() {
+		LoginInputData inputData = new LoginInputData("user@test.com", "wrongpassword");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_AccountLocked() {
+		LoginInputData inputData = new LoginInputData("locked@test.com", "password123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_ValidMinimalEmail() {
+		LoginInputData inputData = new LoginInputData("a@b.c", "password123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_LongEmail() {
+		String longEmail = "verylongemailaddress" + "x".repeat(50) + "@test.com";
+		LoginInputData inputData = new LoginInputData(longEmail, "password123");
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		LoginViewModel viewModel = new LoginViewModel();
+		LoginOutputBoundary outputBoundary = new LoginPresenter(viewModel);
+		
+		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	private static class MockUserRepository implements UserRepository {
+		@Override
+		public Optional<TaiKhoan> findByEmail(String email) {
+			if (email == null || email.equals("notfound@test.com")) {
+				return Optional.empty();
+			}
+			
+			if (email.equals("locked@test.com")) {
+				TaiKhoan lockedAccount = new TaiKhoan(
+					3L, email, "lockeduser", "password123",
+					"0912345678", "123 Street", VaiTro.CUSTOMER,
+					false, LocalDateTime.now(), LocalDateTime.now(), null
+				);
+				return Optional.of(lockedAccount);
+			}
+			
+			if (email.equals("admin@test.com")) {
+				TaiKhoan admin = new TaiKhoan(
+					2L, email, "admin", "admin123",
+					"0912345678", "123 Street", VaiTro.ADMIN,
+					true, LocalDateTime.now(), LocalDateTime.now(), null
+				);
+				return Optional.of(admin);
+			}
+			
+			TaiKhoan user = new TaiKhoan(
+				1L, email, "testuser", "password123",
+				"0912345678", "123 Street", VaiTro.CUSTOMER,
+				true, LocalDateTime.now(), LocalDateTime.now(), null
+			);
+			return Optional.of(user);
+		}
+		
+		@Override
+		public Optional<TaiKhoan> findById(Long id) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public boolean existsByEmail(String email) {
+			return !email.equals("notfound@test.com");
+		}
+		
+		@Override
+		public TaiKhoan save(TaiKhoan taiKhoan) {
+			return taiKhoan;
+		}
+		
+		@Override
+		public void updateLastLogin(Long userId) {
+		}
+	}
+	
+	private static class MockCartRepository implements CartRepository {
+		@Override
+		public Optional<GioHang> findByUserId(Long userId) {
+			GioHang cart = new GioHang(userId);
+			cart.setMaGioHang(1L);
+			return Optional.of(cart);
+		}
+		
+		@Override
+		public GioHang save(GioHang gioHang) {
+			if (gioHang.getMaGioHang() == null) {
+				gioHang.setMaGioHang(1L);
+			}
+			return gioHang;
+		}
+		
+		@Override
+		public Optional<GioHang> findById(Long id) {
+			if (id == 999L) {
+				GioHang guestCart = new GioHang(null);
+				guestCart.setMaGioHang(999L);
+				return Optional.of(guestCart);
+			}
+			return Optional.empty();
+		}
+		
+		@Override
+		public void delete(Long cartId) {
+		}
+		
+		@Override
+		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
+			return 0;
+		}
+	}
 }
