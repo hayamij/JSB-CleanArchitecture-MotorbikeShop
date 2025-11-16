@@ -111,11 +111,11 @@ public class OrderController {
         // Get data from ViewModel populated by Presenter
         if (checkoutViewModel.success) {
             return ResponseEntity.status(HttpStatus.CREATED).body(
-                new CheckoutResponse(true, checkoutViewModel.message)
+                new CheckoutResponse(true, checkoutViewModel.message, null, null)
             );
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new CheckoutResponse(false, checkoutViewModel.message)
+                new CheckoutResponse(false, null, checkoutViewModel.errorCode, checkoutViewModel.errorMessage)
             );
         }
     }

@@ -44,6 +44,7 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
             viewModel.formattedOrderDate = null;
             viewModel.hasError = true;
             viewModel.errorCode = outputData.getErrorCode();
+            viewModel.errorMessage = outputData.getErrorMessage();
             viewModel.message = outputData.getErrorMessage();
             viewModel.messageColor = getErrorColor(outputData.getErrorCode());
             return;
@@ -95,6 +96,7 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
         viewModel.formattedOrderDate = formattedOrderDate;
         viewModel.hasError = false;
         viewModel.errorCode = null;
+        viewModel.errorMessage = null;
         viewModel.message = successMessage;
         viewModel.messageColor = "#28a745"; // Green color for success
     }

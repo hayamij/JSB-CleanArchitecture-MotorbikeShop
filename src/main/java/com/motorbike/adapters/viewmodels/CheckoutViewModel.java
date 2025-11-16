@@ -23,6 +23,7 @@ public class CheckoutViewModel {
     public String formattedOrderDate;
     public boolean hasError;
     public String errorCode;
+    public String errorMessage;
     public String message;
     public String messageColor;
 
