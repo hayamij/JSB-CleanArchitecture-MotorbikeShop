@@ -220,7 +220,7 @@ class LoginUseCaseControlTest {
         
         LoginOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
+        assertEquals("EMPTY_EMAIL", output.getErrorCode());
     }
 
     @Test
@@ -240,6 +240,6 @@ class LoginUseCaseControlTest {
         
         LoginOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
+        assertEquals("EMPTY_PASSWORD", output.getErrorCode());
     }
 }

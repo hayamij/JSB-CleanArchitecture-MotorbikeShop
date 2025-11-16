@@ -142,31 +142,6 @@ class RegisterUseCaseControlTest {
             "",
             "testuser",
             "Password123!",
-            "0123456789",
-            "123 Test Street"
-        );
-        
-        // Act
-        registerUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository, never()).existsByEmail(any());
-        
-        ArgumentCaptor<RegisterOutputData> captor = ArgumentCaptor.forClass(RegisterOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail with empty username")
-    void testRegisterFailEmptyUsername() {
-        // Arrange
-        RegisterInputData inputData = new RegisterInputData(
-            "test@example.com",
-            "",
             "Password123!",
             "0123456789",
             "123 Test Street"
@@ -183,6 +158,33 @@ class RegisterUseCaseControlTest {
         
         RegisterOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
+        assertEquals("EMPTY_EMAIL", output.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("Should fail with empty username")
+    void testRegisterFailEmptyUsername() {
+        // Arrange
+        RegisterInputData inputData = new RegisterInputData(
+            "test@example.com",
+            "",
+            "Password123!",
+            "Password123!",
+            "0123456789",
+            "123 Test Street"
+        );
+        
+        // Act
+        registerUseCase.execute(inputData);
+        
+        // Assert
+        verify(userRepository, never()).existsByEmail(any());
+        
+        ArgumentCaptor<RegisterOutputData> captor = ArgumentCaptor.forClass(RegisterOutputData.class);
+        verify(outputBoundary).present(captor.capture());
+        
+        RegisterOutputData output = captor.getValue();
+        assertFalse(output.isSuccess());
+        assertEquals("EMPTY_USERNAME", output.getErrorCode());
     }
 }

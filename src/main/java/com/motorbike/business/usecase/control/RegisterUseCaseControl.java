@@ -69,6 +69,14 @@ public class RegisterUseCaseControl
     protected void validateInput(RegisterInputData inputData) {
         checkInputNotNull(inputData);
         
+        if (inputData.getEmail() == null || inputData.getEmail().trim().isEmpty()) {
+            throw new com.motorbike.domain.exceptions.EmptyEmailException();
+        }
+        
+        if (inputData.getUsername() == null || inputData.getUsername().trim().isEmpty()) {
+            throw new com.motorbike.domain.exceptions.InvalidUserException("EMPTY_USERNAME", "Tên đăng nhập không được để trống");
+        }
+        
         if (inputData.getPassword() == null || inputData.getConfirmPassword() == null) {
             throw new com.motorbike.domain.exceptions.EmptyPasswordException();
         }
