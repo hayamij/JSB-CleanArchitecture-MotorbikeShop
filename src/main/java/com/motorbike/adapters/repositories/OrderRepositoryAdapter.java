@@ -47,6 +47,13 @@ public class OrderRepositoryAdapter implements OrderRepository {
                 .map(this::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<DonHang> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
     
     @Override
     public List<DonHang> findByStatus(TrangThaiDonHang trangThai) {

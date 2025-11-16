@@ -9,6 +9,8 @@ IF OBJECT_ID('dbo.phu_kien_xe_may', 'U') IS NOT NULL DROP TABLE dbo.phu_kien_xe_
 IF OBJECT_ID('dbo.xe_may', 'U') IS NOT NULL DROP TABLE dbo.xe_may;
 IF OBJECT_ID('dbo.san_pham', 'U') IS NOT NULL DROP TABLE dbo.san_pham;
 IF OBJECT_ID('dbo.tai_khoan', 'U') IS NOT NULL DROP TABLE dbo.tai_khoan;
+IF OBJECT_ID('dbo.chi_tiet_don_hang', 'U') IS NOT NULL DROP TABLE dbo.chi_tiet_don_hang;
+IF OBJECT_ID('dbo.don_hang', 'U') IS NOT NULL DROP TABLE dbo.don_hang;
 GO
 
 -- Bảng tai_khoan (User Account)
@@ -148,6 +150,49 @@ CREATE TABLE chi_tiet_gio_hang (
     INDEX idx_ma_san_pham (ma_san_pham)
 );
 GO
+-- ===== TẠO BẢNG DON_HANG (Order) =====
+CREATE TABLE don_hang (
+    ma_don_hang BIGINT IDENTITY(1,1) PRIMARY KEY,
+    ma_tai_khoan BIGINT NOT NULL,
+    tong_tien DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    trang_thai NVARCHAR(50) NOT NULL DEFAULT 'CHO_XAC_NHAN',
+    ten_nguoi_nhan NVARCHAR(255) NOT NULL,
+    so_dien_thoai NVARCHAR(20) NOT NULL,
+    dia_chi_giao_hang NVARCHAR(MAX) NOT NULL,
+    ghi_chu NVARCHAR(MAX),
+    ngay_dat DATETIME2 NOT NULL DEFAULT GETDATE(),
+    ngay_cap_nhat DATETIME2 NOT NULL DEFAULT GETDATE(),
+    
+    -- Foreign Key
+    CONSTRAINT FK_don_hang_tai_khoan 
+        FOREIGN KEY (ma_tai_khoan) 
+        REFERENCES tai_khoan(ma_tai_khoan)
+        ON DELETE CASCADE,
+    
+    -- Constraint kiểm tra trạng thái hợp lệ
+    CONSTRAINT CHK_trang_thai_don_hang 
+        CHECK (trang_thai IN ('CHO_XAC_NHAN', 'DA_XAC_NHAN', 'DANG_GIAO', 'DA_GIAO', 'DA_HUY')),
+    
+    -- Indexes
+    INDEX idx_don_hang_ma_tai_khoan (ma_tai_khoan),
+    INDEX idx_don_hang_trang_thai (trang_thai),
+    INDEX idx_don_hang_ngay_dat (ngay_dat DESC),
+    INDEX idx_don_hang_ma_tai_khoan_trang_thai (ma_tai_khoan, trang_thai)
+);
+GO
+-- ===== TRIGGER AUTO-UPDATE ngay_cap_nhat =====
+CREATE TRIGGER trg_don_hang_update
+ON don_hang
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE don_hang
+    SET ngay_cap_nhat = GETDATE()
+    FROM don_hang t
+    INNER JOIN inserted i ON t.ma_don_hang = i.ma_don_hang;
+END;
+GO
 
 -- Insert sample data
 
@@ -196,6 +241,122 @@ INSERT INTO phu_kien_xe_may (ma_san_pham, loai_phu_kien, thuong_hieu, chat_lieu,
 (8, N'Áo mưa', N'Givi', N'Vải PVC', N'L'),
 (9, N'Kính mũ bảo hiểm', N'Bulldog', N'Polycarbonate', N'Universal'),
 (10, N'Khóa đĩa', N'Kinbar', N'Thép hợp kim', N'Universal');
+GO
+
+-- ===== INSERT SAMPLE DATA - ĐƠN HÀNG =====
+
+-- Đơn hàng 1: Đã giao hàng
+INSERT INTO don_hang (
+    ma_tai_khoan, tong_tien, trang_thai,
+    ten_nguoi_nhan, so_dien_thoai, dia_chi_giao_hang, ghi_chu,
+    ngay_dat
+) VALUES (
+    2,                                  -- User 2 (customer1)
+    60000000.00,                        -- Total
+    N'DA_GIAO',                         -- Status: Delivered
+    N'Nguyễn Văn A',                    -- Receiver
+    N'0912345678',                      -- Phone
+    N'123 Nguyễn Trãi, Q1, TP.HCM',    -- Address
+    N'Giao buổi sáng',                 -- Note
+    DATEADD(DAY, -5, GETDATE())         -- 5 days ago
+);
+
+-- Đơn hàng 2: Chờ xác nhận
+INSERT INTO don_hang (
+    ma_tai_khoan, tong_tien, trang_thai,
+    ten_nguoi_nhan, so_dien_thoai, dia_chi_giao_hang, ghi_chu,
+    ngay_dat
+) VALUES (
+    2,                                  -- User 2
+    130000000.00,                       -- Total
+    N'CHO_XAC_NHAN',                    -- Status: Pending
+    N'Nguyễn Văn A',                    -- Receiver
+    N'0912345678',                      -- Phone
+    N'456 Lê Lợi, Q1, TP.HCM',         -- Address
+    N'Giao buổi chiều',                -- Note
+    DATEADD(DAY, -3, GETDATE())         -- 3 days ago
+);
+
+-- Đơn hàng 3: Đang giao hàng
+INSERT INTO don_hang (
+    ma_tai_khoan, tong_tien, trang_thai,
+    ten_nguoi_nhan, so_dien_thoai, dia_chi_giao_hang, ghi_chu,
+    ngay_dat
+) VALUES (
+    2,                                  -- User 2
+    50000000.00,                        -- Total
+    N'DANG_GIAO',                       -- Status: Shipping
+    N'Nguyễn Văn A',                    -- Receiver
+    N'0912345678',                      -- Phone
+    N'789 Cách Mạng Tháng 8, Q10, TP.HCM', -- Address
+    NULL,                               -- No note
+    DATEADD(DAY, -1, GETDATE())         -- 1 day ago
+);
+
+-- Đơn hàng 4: Đã xác nhận
+INSERT INTO don_hang (
+    ma_tai_khoan, tong_tien, trang_thai,
+    ten_nguoi_nhan, so_dien_thoai, dia_chi_giao_hang, ghi_chu,
+    ngay_dat
+) VALUES (
+    2,                                  -- User 2
+    30000000.00,                        -- Total
+    N'DA_XAC_NHAN',                     -- Status: Confirmed
+    N'Nguyễn Văn A',                    -- Receiver
+    N'0912345678',                      -- Phone
+    N'321 Trần Hưng Đạo, Q5, TP.HCM',  -- Address
+    N'Cần giao khẩn',                  -- Note
+    DATEADD(HOUR, -6, GETDATE())        -- 6 hours ago
+);
+
+-- Đơn hàng 5: Đã hủy
+INSERT INTO don_hang (
+    ma_tai_khoan, tong_tien, trang_thai,
+    ten_nguoi_nhan, so_dien_thoai, dia_chi_giao_hang, ghi_chu,
+    ngay_dat
+) VALUES (
+    2,                                  -- User 2
+    100000000.00,                       -- Total
+    N'DA_HUY',                          -- Status: Cancelled
+    N'Nguyễn Văn A',                    -- Receiver
+    N'0912345678',                      -- Phone
+    N'654 Phạm Văn Đồng, Q. Thủ Đức, TP.HCM', -- Address
+    N'Khách hủy',                       -- Note
+    DATEADD(DAY, -10, GETDATE())        -- 10 days ago
+);
+
+-- Đơn hàng 6: Chờ xác nhận (User 3)
+INSERT INTO don_hang (
+    ma_tai_khoan, tong_tien, trang_thai,
+    ten_nguoi_nhan, so_dien_thoai, dia_chi_giao_hang, ghi_chu,
+    ngay_dat
+) VALUES (
+    3,                                  -- User 3 (customer2)
+    96000000.00,                        -- Total
+    N'CHO_XAC_NHAN',                    -- Status: Pending
+    N'Trần Thị B',                      -- Receiver
+    N'0923456789',                      -- Phone
+    N'100 Tôn Đức Thắng, Đà Nẵng',     -- Address
+    NULL,                               -- No note
+    DATEADD(HOUR, -2, GETDATE())        -- 2 hours ago
+);
+
+-- Đơn hàng 7: Đã giao (User 3)
+INSERT INTO don_hang (
+    ma_tai_khoan, tong_tien, trang_thai,
+    ten_nguoi_nhan, so_dien_thoai, dia_chi_giao_hang, ghi_chu,
+    ngay_dat
+) VALUES (
+    3,                                  -- User 3
+    47000000.00,                        -- Total
+    N'DA_GIAO',                         -- Status: Delivered
+    N'Trần Thị B',                      -- Receiver
+    N'0923456789',                      -- Phone
+    N'200 Hùng Vương, Đà Nẵng',        -- Address
+    NULL,                               -- No note
+    DATEADD(DAY, -7, GETDATE())         -- 7 days ago
+);
+
 GO
 
 -- Sample carts
