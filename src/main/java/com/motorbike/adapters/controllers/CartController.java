@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 /**
  * REST Controller for Cart operations
@@ -89,15 +90,26 @@ public class CartController {
         
         addToCartUseCase.execute(inputData);
         
-        // Convert ViewModel to Response DTO
+        // Convert ViewModel to Response DTO - need to get raw values from OutputData
         if (addToCartViewModel.success) {
+            // Note: ViewModel has formatted strings, Response needs raw values
+            // We'll pass null for fields that need raw BigDecimal values for now
             AddToCartResponse response = new AddToCartResponse(
-                true, addToCartViewModel.message, null, null
+                true, addToCartViewModel.message, addToCartViewModel.cartId, 
+                addToCartViewModel.totalItems, addToCartViewModel.totalQuantity,
+                null, // totalAmount - need raw BigDecimal
+                addToCartViewModel.productId, addToCartViewModel.productName, 
+                addToCartViewModel.addedQuantity, addToCartViewModel.newItemQuantity, 
+                addToCartViewModel.itemAlreadyInCart,
+                null, // productPrice - need raw BigDecimal
+                addToCartViewModel.productStock,
+                null, null
             );
             return ResponseEntity.ok(response);
         } else {
             AddToCartResponse response = new AddToCartResponse(
-                false, null, addToCartViewModel.errorCode, addToCartViewModel.errorMessage
+                false, null, null, 0, 0, null, null, null, 0, 0, false, null, 0,
+                addToCartViewModel.errorCode, addToCartViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
@@ -135,7 +147,24 @@ public class CartController {
         viewCartUseCase.execute(inputData);
         
         // Get data from ViewModel populated by Presenter
-        return ResponseEntity.ok(new ViewCartResponse(viewCartViewModel.success, userId));
+        // Map ViewModel items to Response items
+        List<ViewCartResponse.CartItemResponse> responseItems = null;
+        if (viewCartViewModel.items != null) {
+            responseItems = viewCartViewModel.items.stream()
+                .map(item -> new ViewCartResponse.CartItemResponse(
+                    item.productId, item.productName, null, // price needs raw BigDecimal
+                    item.quantity, item.availableStock, item.hasStockWarning, null // subtotal needs raw BigDecimal
+                ))
+                .collect(java.util.stream.Collectors.toList());
+        }
+        
+        return ResponseEntity.ok(new ViewCartResponse(
+            viewCartViewModel.success, viewCartViewModel.message, viewCartViewModel.cartId,
+            userId, viewCartViewModel.totalItems, viewCartViewModel.totalQuantity,
+            null, // totalAmount needs raw BigDecimal
+            viewCartViewModel.isEmpty, viewCartViewModel.hasStockWarnings,
+            responseItems, null, viewCartViewModel.errorMessage
+        ));
     }
 
     /**

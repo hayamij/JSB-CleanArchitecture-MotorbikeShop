@@ -25,13 +25,13 @@ public class ChiTietDonHangJpaEntity {
     @Column(name = "ten_san_pham", length = 255)
     private String tenSanPham;
 
-    @Column(name = "gia_ban", precision = 15, scale = 2, nullable = false)
+    @Column(name = "gia_san_pham", precision = 15, scale = 2, nullable = false)
     private BigDecimal giaBan;
 
     @Column(name = "so_luong", nullable = false)
     private int soLuong;
 
-    @Column(name = "thanh_tien", precision = 15, scale = 2, nullable = false)
+    @Column(name = "tam_tinh", precision = 15, scale = 2, nullable = false)
     private BigDecimal thanhTien;
 
     // Constructors

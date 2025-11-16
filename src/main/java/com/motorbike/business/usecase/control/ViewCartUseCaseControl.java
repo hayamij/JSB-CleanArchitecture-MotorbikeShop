@@ -36,10 +36,19 @@ public class ViewCartUseCaseControl
         }
         
         List<ViewCartOutputData.CartItemData> itemList = new ArrayList<>();
-        for (Object obj : gioHang.getDanhSachSanPham()) {
-            if (obj instanceof ViewCartOutputData.CartItemData) {
-                itemList.add((ViewCartOutputData.CartItemData) obj);
-            }
+        for (com.motorbike.domain.entities.ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
+            ViewCartOutputData.CartItemData cartItem = new ViewCartOutputData.CartItemData(
+                item.getMaSanPham(),
+                item.getTenSanPham(),
+                null, // productImageUrl
+                item.getGiaSanPham(),
+                item.getSoLuong(),
+                item.getTamTinh(),
+                0, // availableStock - would need ProductRepository to get this
+                false, // hasStockWarning
+                null // stockWarningMessage
+            );
+            itemList.add(cartItem);
         }
         
         ViewCartOutputData successOutput = ViewCartOutputData.forSuccess(

@@ -48,31 +48,37 @@ public class LoginUseCaseControl
         
         boolean cartMerged = false;
         int mergedItemsCount = 0;
+        Long userCartId = null;
         
+        // Get or create user cart
+        Optional<GioHang> userCartOpt = cartRepository.findByUserId(taiKhoan.getMaTaiKhoan());
+        final GioHang userCart;
+        
+        if (userCartOpt.isPresent()) {
+            userCart = userCartOpt.get();
+            userCartId = userCart.getMaGioHang();
+        } else {
+            // Create new cart for user
+            GioHang newCart = new GioHang(taiKhoan.getMaTaiKhoan());
+            userCart = cartRepository.save(newCart);
+            userCartId = userCart.getMaGioHang();
+        }
+        
+        // Merge guest cart if exists
         if (inputData.getGuestCartId() != null) {
             Optional<GioHang> guestCartOpt = cartRepository.findById(inputData.getGuestCartId());
-            Optional<GioHang> userCartOpt = cartRepository.findByUserId(taiKhoan.getMaTaiKhoan());
             
             if (guestCartOpt.isPresent()) {
                 GioHang guestCart = guestCartOpt.get();
+                mergedItemsCount = guestCart.getDanhSachSanPham().size();
                 
-                if (userCartOpt.isPresent()) {
-                    GioHang userCart = userCartOpt.get();
-                    mergedItemsCount = guestCart.getDanhSachSanPham().size();
-                    
-                    guestCart.getDanhSachSanPham().forEach(item -> {
-                        userCart.themSanPham(item);
-                    });
-                    
-                    cartRepository.save(userCart);
-                    cartRepository.delete(guestCart.getMaGioHang());
-                    cartMerged = true;
-                } else {
-                    guestCart.setMaTaiKhoan(taiKhoan.getMaTaiKhoan());
-                    cartRepository.save(guestCart);
-                    mergedItemsCount = guestCart.getDanhSachSanPham().size();
-                    cartMerged = true;
-                }
+                guestCart.getDanhSachSanPham().forEach(item -> {
+                    userCart.themSanPham(item);
+                });
+                
+                cartRepository.save(userCart);
+                cartRepository.delete(guestCart.getMaGioHang());
+                cartMerged = true;
             }
         }
         
@@ -82,7 +88,8 @@ public class LoginUseCaseControl
             taiKhoan.getTenDangNhap(),
             taiKhoan.getVaiTro(),
             taiKhoan.getLanDangNhapCuoi(),
-            null,
+            null, // sessionToken - for future implementation
+            userCartId,
             cartMerged,
             mergedItemsCount
         );

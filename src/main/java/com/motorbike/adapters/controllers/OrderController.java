@@ -9,28 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import java.util.List;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.motorbike.adapters.dto.request.CancelOrderRequest;
-import com.motorbike.adapters.dto.request.CheckoutRequest;
-import com.motorbike.adapters.dto.response.CancelOrderResponse;
-import com.motorbike.adapters.dto.response.CheckoutResponse;
-import com.motorbike.adapters.dto.response.ListAllOrdersResponse;
-import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
-import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
-import com.motorbike.business.dto.cancelorder.CancelOrderInputData;
-import com.motorbike.business.dto.checkout.CheckoutInputData;
-import com.motorbike.business.dto.listallorders.ListAllOrdersInputData;
-import com.motorbike.business.usecase.control.CancelOrderUseCaseControl;
-import com.motorbike.business.usecase.control.CheckoutUseCaseControl;
-import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
+
 
 
 
@@ -134,12 +119,30 @@ public class OrderController {
         
         // Get data from ViewModel populated by Presenter
         if (checkoutViewModel.success) {
+            // Map ViewModel items to Response items
+            List<CheckoutResponse.OrderItemResponse> responseItems = null;
+            if (checkoutViewModel.items != null) {
+                responseItems = checkoutViewModel.items.stream()
+                    .map(item -> new CheckoutResponse.OrderItemResponse(
+                        item.productId, item.productName, null, // price needs raw BigDecimal
+                        item.quantity, null // subtotal needs raw BigDecimal
+                    ))
+                    .collect(java.util.stream.Collectors.toList());
+            }
+            
             return ResponseEntity.status(HttpStatus.CREATED).body(
-                new CheckoutResponse(true, checkoutViewModel.message, null, null)
+                new CheckoutResponse(true, checkoutViewModel.message, checkoutViewModel.orderId,
+                    checkoutViewModel.customerId, checkoutViewModel.customerName,
+                    checkoutViewModel.customerEmail, checkoutViewModel.customerPhone,
+                    checkoutViewModel.shippingAddress, checkoutViewModel.orderStatus,
+                    null, // totalAmount needs raw BigDecimal
+                    checkoutViewModel.totalItems, checkoutViewModel.totalQuantity,
+                    checkoutViewModel.formattedOrderDate, responseItems, null, null)
             );
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new CheckoutResponse(false, null, checkoutViewModel.errorCode, checkoutViewModel.errorMessage)
+                new CheckoutResponse(false, null, null, null, null, null, null, null, null,
+                    null, 0, 0, null, null, checkoutViewModel.errorCode, checkoutViewModel.errorMessage)
             );
         }
     }

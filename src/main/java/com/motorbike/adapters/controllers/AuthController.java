@@ -84,12 +84,13 @@ public class AuthController {
             RegisterResponse response = new RegisterResponse(
                 true, registerViewModel.userId, registerViewModel.email,
                 registerViewModel.username, registerViewModel.roleDisplay,
-                registerViewModel.message, null, null
+                registerViewModel.registeredAtDisplay, registerViewModel.autoLoginEnabled,
+                registerViewModel.sessionToken, registerViewModel.message, null, null
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
             RegisterResponse response = new RegisterResponse(
-                false, null, null, null, null, null,
+                false, null, null, null, null, null, false, null, null,
                 registerViewModel.errorCode, registerViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -131,12 +132,13 @@ public class AuthController {
             LoginResponse response = new LoginResponse(
                 true, loginViewModel.userId, loginViewModel.email,
                 loginViewModel.username, loginViewModel.roleDisplay,
-                null, loginViewModel.message, null, null
+                loginViewModel.cartId, loginViewModel.cartMerged, loginViewModel.mergedItemsCount,
+                loginViewModel.message, null, null
             );
             return ResponseEntity.ok(response);
         } else {
             LoginResponse response = new LoginResponse(
-                false, null, null, null, null, null, null,
+                false, null, null, null, null, null, false, 0, null,
                 loginViewModel.errorCode, loginViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);

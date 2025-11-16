@@ -59,8 +59,12 @@ public class LoginPresenter implements LoginOutputBoundary {
         // Session token
         viewModel.sessionToken = outputData.getSessionToken();
         
+        // Cart ID
+        viewModel.cartId = outputData.getCartId();
+        
         // Cart merge information
         viewModel.cartMerged = outputData.isCartMerged();
+        viewModel.mergedItemsCount = outputData.getMergedItemsCount();
         if (outputData.isCartMerged()) {
             viewModel.cartMergeMessage = String.format(
                 "Đã thêm %d sản phẩm từ giỏ hàng tạm vào giỏ hàng của bạn",
