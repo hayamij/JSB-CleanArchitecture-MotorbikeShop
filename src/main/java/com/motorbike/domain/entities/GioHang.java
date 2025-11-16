@@ -1,6 +1,7 @@
 package com.motorbike.domain.entities;
 
 import com.motorbike.domain.exceptions.InvalidCartException;
+import com.motorbike.domain.exceptions.ProductNotInCartException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,6 +71,8 @@ public class GioHang {
             this.danhSachSanPham.remove(item.get());
             tinhLaiTongTien();
             this.ngayCapNhat = LocalDateTime.now();
+        } else {
+            throw new ProductNotInCartException("Không thể xóa sản phẩm: Sản phẩm không có trong giỏ hàng");
         }
     }
 
@@ -94,6 +97,8 @@ public class GioHang {
             item.get().datSoLuong(soLuongMoi);
             tinhLaiTongTien();
             this.ngayCapNhat = LocalDateTime.now();
+        } else {
+            throw new ProductNotInCartException("Không thể cập nhật số lượng: Sản phẩm không có trong giỏ hàng");
         }
     }
 

@@ -38,7 +38,7 @@ public class AddToCartUseCaseControl
                 .orElse(new GioHang(inputData.getUserId()));
             
             SanPham sanPham = productRepository.findById(inputData.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException(String.valueOf(inputData.getProductId()), "Không tìm thấy sản phẩm"));
+                .orElseThrow(() -> new ProductNotFoundException(String.valueOf(inputData.getProductId())));
             
             // Simple if-check with throw
             if (sanPham.getSoLuongTonKho() < inputData.getQuantity()) {
@@ -73,45 +73,51 @@ public class AddToCartUseCaseControl
         checkInputNotNull(inputData);
         
         if (inputData.getUserId() == null) {
-            throw new IllegalArgumentException("User ID không được null");
+            throw new com.motorbike.domain.exceptions.InvalidUserIdException();
         }
         
         if (inputData.getProductId() == null) {
-            throw new IllegalArgumentException("Product ID không được null");
+            throw new com.motorbike.domain.exceptions.InvalidProductIdException();
         }
         
         if (inputData.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Số lượng phải > 0");
+            throw new com.motorbike.domain.exceptions.InvalidQuantityException();
         }
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
-        AddToCartOutputData outputData = AddToCartOutputData.forError(
-            "INVALID_INPUT",
-            e.getMessage()
-        );
+        String errorCode = "INVALID_INPUT";
+        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
+            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        }
+        AddToCartOutputData outputData = AddToCartOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
     }
     
     @Override
     protected void handleSystemError(Exception e) {
-        String errorCode = "SYSTEM_ERROR";
-        String message = "Đã xảy ra lỗi: " + e.getMessage();
+        String errorCode;
+        String message;
         
-        try {
-            throw e;
-        } catch (InvalidCartException ex) {
+        if (e instanceof InvalidCartException) {
+            InvalidCartException ex = (InvalidCartException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (ProductNotFoundException ex) {
+        } else if (e instanceof ProductNotFoundException) {
+            ProductNotFoundException ex = (ProductNotFoundException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (InsufficientStockException ex) {
+        } else if (e instanceof InsufficientStockException) {
+            InsufficientStockException ex = (InsufficientStockException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (Exception ex) {
-            // Keep default
+        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
+            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else {
+            throw new com.motorbike.domain.exceptions.SystemException(e);
         }
         
         AddToCartOutputData outputData = AddToCartOutputData.forError(errorCode, message);

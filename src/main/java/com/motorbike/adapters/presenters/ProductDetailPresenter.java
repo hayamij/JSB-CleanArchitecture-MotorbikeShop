@@ -28,6 +28,7 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         if (!outputData.success) {
             // Error case - presentation logic for errors
             viewModel.hasError = true;
+            viewModel.errorCode = outputData.errorCode != null ? outputData.errorCode : "UNKNOWN_ERROR";
             viewModel.errorMessage = formatErrorMessage(outputData.errorCode, outputData.errorMessage);
             viewModel.errorColor = "RED";
             return;
@@ -35,6 +36,8 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         
         // Success case - presentation logic for product display
         viewModel.hasError = false;
+        viewModel.errorCode = null;
+        viewModel.errorMessage = null;
         viewModel.productId = String.valueOf(outputData.productId);
         viewModel.name = outputData.name;
         viewModel.description = outputData.description != null ? outputData.description : "No description available";

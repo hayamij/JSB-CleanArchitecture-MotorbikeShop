@@ -5,71 +5,40 @@ import java.util.List;
 /**
  * View Model for Update Cart Quantity use case.
  * Contains formatted data ready for UI display.
+ * Mutable fields to be populated by Presenter
  */
 public class UpdateCartQuantityViewModel {
     
-    private final boolean success;
-    private final String message;
-    private final String errorCode;
-    private final String messageColor;
+    public boolean success;
+    public String message;
+    public String errorCode;
+    public String errorMessage;
+    public String messageColor;
     
     // Cart and product details
-    private final Long cartId;
-    private final Long userId;
-    private final Long productId;
-    private final String productName;
-    private final int oldQuantity;
-    private final int newQuantity;
-    private final boolean itemRemoved;
+    public Long cartId;
+    public Long userId;
+    public Long productId;
+    public String productName;
+    public int oldQuantity;
+    public int newQuantity;
+    public boolean itemRemoved;
     
     // Cart totals
-    private final int totalItems;
-    private final int totalQuantity;
-    private final String totalAmount;
-    private final String itemSubtotal;
+    public int totalItems;
+    public int totalQuantity;
+    public String totalAmount;
+    public String itemSubtotal;
     
     // All cart items
-    private final List<CartItemViewModel> allItems;
+    public List<CartItemViewModel> allItems;
     
     // Cart summary
-    private final String cartSummary;
+    public String cartSummary;
 
-    // Full constructor
-    public UpdateCartQuantityViewModel(
-            boolean success,
-            String message,
-            String errorCode,
-            String messageColor,
-            Long cartId,
-            Long userId,
-            Long productId,
-            String productName,
-            int oldQuantity,
-            int newQuantity,
-            boolean itemRemoved,
-            int totalItems,
-            int totalQuantity,
-            String totalAmount,
-            String itemSubtotal,
-            List<CartItemViewModel> allItems,
-            String cartSummary) {
-        this.success = success;
-        this.message = message;
-        this.errorCode = errorCode;
-        this.messageColor = messageColor;
-        this.cartId = cartId;
-        this.userId = userId;
-        this.productId = productId;
-        this.productName = productName;
-        this.oldQuantity = oldQuantity;
-        this.newQuantity = newQuantity;
-        this.itemRemoved = itemRemoved;
-        this.totalItems = totalItems;
-        this.totalQuantity = totalQuantity;
-        this.totalAmount = totalAmount;
-        this.itemSubtotal = itemSubtotal;
-        this.allItems = allItems;
-        this.cartSummary = cartSummary;
+    public UpdateCartQuantityViewModel() {
+        this.success = false;
+        this.itemRemoved = false;
     }
 
     // Getters
