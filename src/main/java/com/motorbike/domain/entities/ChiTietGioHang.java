@@ -76,7 +76,10 @@ public class ChiTietGioHang {
 
     // Business logic: Đặt số lượng mới
     public void datSoLuong(int soLuongMoi) {
-        validateSoLuong(soLuongMoi);
+        // Cho phép số lượng = 0 vì logic xóa sẽ được xử lý ở tầng GioHang
+        if (soLuongMoi < 0) {
+            throw new InvalidCartException("INVALID_QUANTITY", "Số lượng không được âm");
+        }
         this.soLuong = soLuongMoi;
         this.tamTinh = tinhTamTinh();
     }
