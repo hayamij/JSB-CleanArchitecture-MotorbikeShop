@@ -5,35 +5,25 @@ import java.util.List;
 /**
  * ViewModel: ViewCartViewModel
  * UI-ready data for cart display
+ * Mutable fields to be populated by Presenter
  */
 public class ViewCartViewModel {
-    public final boolean success;
-    public final Long cartId;
-    public final Long userId;
-    public final int totalItems;
-    public final int totalQuantity;
-    public final String formattedTotalAmount;
-    public final List<CartItemViewModel> items;
-    public final boolean isEmpty;
-    public final boolean hasStockWarnings;
-    public final String message;
-    public final String errorMessage;
+    public boolean success;
+    public Long cartId;
+    public Long userId;
+    public int totalItems;
+    public int totalQuantity;
+    public String formattedTotalAmount;
+    public List<CartItemViewModel> items;
+    public boolean isEmpty;
+    public boolean hasStockWarnings;
+    public String message;
+    public String errorMessage;
 
-    public ViewCartViewModel(boolean success, Long cartId, Long userId,
-                           int totalItems, int totalQuantity, String formattedTotalAmount,
-                           List<CartItemViewModel> items, boolean isEmpty,
-                           boolean hasStockWarnings, String message, String errorMessage) {
-        this.success = success;
-        this.cartId = cartId;
-        this.userId = userId;
-        this.totalItems = totalItems;
-        this.totalQuantity = totalQuantity;
-        this.formattedTotalAmount = formattedTotalAmount;
-        this.items = items;
-        this.isEmpty = isEmpty;
-        this.hasStockWarnings = hasStockWarnings;
-        this.message = message;
-        this.errorMessage = errorMessage;
+    public ViewCartViewModel() {
+        this.success = false;
+        this.isEmpty = false;
+        this.hasStockWarnings = false;
     }
 
     /**

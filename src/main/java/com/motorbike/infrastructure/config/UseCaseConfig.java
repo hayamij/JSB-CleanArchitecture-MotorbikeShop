@@ -44,6 +44,24 @@ public class UseCaseConfig {
         return new AddToCartViewModel();
     }
     
+    @Bean
+    @RequestScope
+    public ViewCartViewModel viewCartViewModel() {
+        return new ViewCartViewModel();
+    }
+    
+    @Bean
+    @RequestScope
+    public UpdateCartQuantityViewModel updateCartQuantityViewModel() {
+        return new UpdateCartQuantityViewModel();
+    }
+    
+    @Bean
+    @RequestScope
+    public CheckoutViewModel checkoutViewModel() {
+        return new CheckoutViewModel();
+    }
+    
     // Login Use Case
     @Bean
     public LoginUseCaseControl loginUseCase(
@@ -108,8 +126,8 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public ViewCartOutputBoundary viewCartPresenter() {
-        return new ViewCartPresenter();
+    public ViewCartOutputBoundary viewCartPresenter(ViewCartViewModel viewCartViewModel) {
+        return new ViewCartPresenter(viewCartViewModel);
     }
     
     // Update Cart Quantity Use Case
@@ -121,8 +139,8 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public UpdateCartQuantityOutputBoundary updateCartQuantityPresenter() {
-        return new UpdateCartQuantityPresenter();
+    public UpdateCartQuantityOutputBoundary updateCartQuantityPresenter(UpdateCartQuantityViewModel updateCartQuantityViewModel) {
+        return new UpdateCartQuantityPresenter(updateCartQuantityViewModel);
     }
     
     // Checkout Use Case
@@ -136,7 +154,7 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public CheckoutOutputBoundary checkoutPresenter() {
-        return new CheckoutPresenter();
+    public CheckoutOutputBoundary checkoutPresenter(CheckoutViewModel checkoutViewModel) {
+        return new CheckoutPresenter(checkoutViewModel);
     }
 }

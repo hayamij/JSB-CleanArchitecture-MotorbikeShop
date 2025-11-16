@@ -198,35 +198,7 @@ public class AddToCartPresenter implements AddToCartOutputBoundary {
      * @return Formatted error message
      */
     private String formatErrorMessage(String errorCode, String errorMessage) {
-        if (errorCode == null) {
-            return errorMessage != null ? errorMessage : "Lỗi không xác định";
-        }
-        
-        // Provide user-friendly error messages
-        switch (errorCode) {
-            case "PRODUCT_NOT_FOUND":
-                return "Sản phẩm không tồn tại hoặc đã bị xóa.";
-            
-            case "PRODUCT_OUT_OF_STOCK":
-                return "Sản phẩm đã hết hàng. Vui lòng chọn sản phẩm khác.";
-            
-            case "INSUFFICIENT_STOCK":
-                return errorMessage; // Already user-friendly from use case
-            
-            case "INVALID_QUANTITY":
-                return "Số lượng phải lớn hơn 0. Vui lòng nhập lại.";
-            
-            case "NULL_PRODUCT_ID":
-                return "Không xác định được sản phẩm. Vui lòng thử lại.";
-            
-            case "NULL_INPUT":
-                return "Dữ liệu không hợp lệ. Vui lòng thử lại.";
-            
-            case "UNEXPECTED_ERROR":
-                return "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại sau. Chi tiết: " + errorMessage;
-            
-            default:
-                return errorMessage != null ? errorMessage : "Lỗi không xác định: " + errorCode;
-        }
+        // Use message directly from domain exception
+        return errorMessage != null ? errorMessage : "Lỗi không xác định";
     }
 }

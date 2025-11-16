@@ -2,6 +2,7 @@ package com.motorbike.adapters.controllers;
 
 import com.motorbike.business.dto.checkout.CheckoutInputData;
 import com.motorbike.business.usecase.control.CheckoutUseCaseControl;
+import com.motorbike.adapters.viewmodels.CheckoutViewModel;
 import com.motorbike.adapters.dto.request.CheckoutRequest;
 import com.motorbike.adapters.dto.response.CheckoutResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,13 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final CheckoutUseCaseControl checkoutUseCase;
+    private final CheckoutViewModel checkoutViewModel;
 
     @Autowired
-    public OrderController(CheckoutUseCaseControl checkoutUseCase) {
+    public OrderController(CheckoutUseCaseControl checkoutUseCase,
+                          CheckoutViewModel checkoutViewModel) {
         this.checkoutUseCase = checkoutUseCase;
+        this.checkoutViewModel = checkoutViewModel;
     }
 
     /**
@@ -104,9 +108,15 @@ public class OrderController {
         
         checkoutUseCase.execute(inputData);
         
-        // Tạm thời return success response với orderId
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            new CheckoutResponse(true, "Đặt hàng thành công")
-        );
+        // Get data from ViewModel populated by Presenter
+        if (checkoutViewModel.success) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                new CheckoutResponse(true, checkoutViewModel.message)
+            );
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new CheckoutResponse(false, checkoutViewModel.message)
+            );
+        }
     }
 }

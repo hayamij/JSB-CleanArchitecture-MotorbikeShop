@@ -7,6 +7,8 @@ import com.motorbike.business.usecase.control.AddToCartUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
+import com.motorbike.adapters.viewmodels.ViewCartViewModel;
+import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
 import com.motorbike.adapters.dto.request.AddToCartRequest;
 import com.motorbike.adapters.dto.request.UpdateCartRequest;
 import com.motorbike.adapters.dto.response.AddToCartResponse;
@@ -30,16 +32,22 @@ public class CartController {
     private final ViewCartUseCaseControl viewCartUseCase;
     private final UpdateCartQuantityUseCaseControl updateCartQuantityUseCase;
     private final AddToCartViewModel addToCartViewModel;
+    private final ViewCartViewModel viewCartViewModel;
+    private final UpdateCartQuantityViewModel updateCartQuantityViewModel;
 
     @Autowired
     public CartController(AddToCartUseCaseControl addToCartUseCase,
                          ViewCartUseCaseControl viewCartUseCase,
                          UpdateCartQuantityUseCaseControl updateCartQuantityUseCase,
-                         AddToCartViewModel addToCartViewModel) {
+                         AddToCartViewModel addToCartViewModel,
+                         ViewCartViewModel viewCartViewModel,
+                         UpdateCartQuantityViewModel updateCartQuantityViewModel) {
         this.addToCartUseCase = addToCartUseCase;
         this.viewCartUseCase = viewCartUseCase;
         this.updateCartQuantityUseCase = updateCartQuantityUseCase;
         this.addToCartViewModel = addToCartViewModel;
+        this.viewCartViewModel = viewCartViewModel;
+        this.updateCartQuantityViewModel = updateCartQuantityViewModel;
     }
 
     /**
@@ -126,10 +134,8 @@ public class CartController {
         
         viewCartUseCase.execute(inputData);
         
-        // Lấy viewModel từ presenter (đã được inject qua constructor nếu có)
-        // Hoặc tạo response từ outputBoundary
-        // Tạm thời return success với userId
-        return ResponseEntity.ok(new ViewCartResponse(true, userId));
+        // Get data from ViewModel populated by Presenter
+        return ResponseEntity.ok(new ViewCartResponse(viewCartViewModel.success, userId));
     }
 
     /**
@@ -166,7 +172,17 @@ public class CartController {
         
         updateCartQuantityUseCase.execute(inputData);
         
-        // Tạm thời return success response
-        return ResponseEntity.ok(new UpdateCartResponse(true, "Đã cập nhật số lượng"));
+        // Get data from ViewModel populated by Presenter
+        if (updateCartQuantityViewModel.isSuccess()) {
+            UpdateCartResponse response = new UpdateCartResponse(
+                true, updateCartQuantityViewModel.getMessage(), null, null
+            );
+            return ResponseEntity.ok(response);
+        } else {
+            UpdateCartResponse response = new UpdateCartResponse(
+                false, null, updateCartQuantityViewModel.getErrorCode(), updateCartQuantityViewModel.getMessage()
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 }
