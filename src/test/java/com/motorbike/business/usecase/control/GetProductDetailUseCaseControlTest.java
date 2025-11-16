@@ -1,94 +1,292 @@
 package com.motorbike.business.usecase.control;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+
+import com.motorbike.adapters.presenters.ProductDetailPresenter;
+import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.ArgumentCaptor;
 
-import java.math.BigDecimal;
-import java.util.Optional;
+public class GetProductDetailUseCaseControlTest {
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-@DisplayName("Get Product Detail Use Case Tests")
-class GetProductDetailUseCaseControlTest {
-
-    private GetProductDetailUseCaseControl useCase;
-    private ProductRepository productRepository;
-    private GetProductDetailOutputBoundary outputBoundary;
-    private ArgumentCaptor<GetProductDetailOutputData> outputCaptor;
-
-    @BeforeEach
-    void setUp() {
-        productRepository = mock(ProductRepository.class);
-        outputBoundary = mock(GetProductDetailOutputBoundary.class);
-        outputCaptor = ArgumentCaptor.forClass(GetProductDetailOutputData.class);
-        useCase = new GetProductDetailUseCaseControl(outputBoundary, productRepository);
-    }
-
-    @Test
-    @DisplayName("Should get product detail successfully")
-    void testGetProductDetailSuccess() {
-        // Arrange
-        Long productId = 1L;
-        XeMay product = new XeMay(
-            productId, "Honda Wave", "Xe số tiết kiệm",
-            new BigDecimal("30000000"), "wave.jpg", 10, true,
-            java.time.LocalDateTime.now(), java.time.LocalDateTime.now(),
-            "Honda", "Wave RSX", "Đỏ", 2023, 110
-        );
-        
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        
-        // Act
-        useCase.execute(new GetProductDetailInputData(productId));
-        
-        // Assert
-        verify(outputBoundary).present(outputCaptor.capture());
-        GetProductDetailOutputData output = outputCaptor.getValue();
-        
-        assertEquals(true, output.success);
-        assertEquals(productId, output.productId);
-        assertEquals("Honda Wave", output.name);
-        assertNotEquals(null, output.price);
-    }
-
-    @Test
-    @DisplayName("Should fail when product not found")
-    void testGetProductDetailFailNotFound() {
-        // Arrange
-        Long productId = 999L;
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
-        
-        // Act
-        useCase.execute(new GetProductDetailInputData(productId));
-        
-        // Assert
-        verify(outputBoundary).present(outputCaptor.capture());
-        GetProductDetailOutputData output = outputCaptor.getValue();
-        
-        assertEquals(false, output.success);
-        assertEquals("PRODUCT_NOT_FOUND", output.errorCode);
-        assertNotEquals(null, output.errorMessage);
-    }
-
-    @Test
-    @DisplayName("Should fail with null input")
-    void testGetProductDetailFailNullInput() {
-        // Act
-        useCase.execute(null);
-        
-        // Assert
-        verify(outputBoundary).present(outputCaptor.capture());
-        GetProductDetailOutputData output = outputCaptor.getValue();
-        
-        assertEquals(false, output.success);
-        assertNotEquals(null, output.errorCode);
-    }
+	@Test
+	public void testExecute_ValidProductId_Success() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(1L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.hasError);
+		assertNotEquals(null, viewModel.productId);
+		assertNotEquals(null, viewModel.name);
+	}
+	
+	@Test
+	public void testExecute_ValidProductId_WithStock() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(2L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.hasError);
+		assertNotEquals(null, viewModel.stockQuantity);
+	}
+	
+	@Test
+	public void testExecute_ValidProductId_CheckPrice() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(3L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.hasError);
+		assertNotEquals(null, viewModel.formattedPrice);
+	}
+	
+	@Test
+	public void testExecute_NullInputData() {
+		GetProductDetailInputData inputData = null;
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_NullProductId() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(null);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_ProductNotFound() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(999L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_ZeroProductId() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(0L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NegativeProductId() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(-1L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_ProductWithZeroStock() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(100L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.hasError);
+		assertNotEquals(null, viewModel.availabilityStatus);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_MinValidProductId() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(1L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_LargeProductId() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(Long.MAX_VALUE);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_ProductWithHighStock() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(200L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_ProductWithLowStock() {
+		GetProductDetailInputData inputData = new GetProductDetailInputData(300L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		
+		ProductDetailViewModel viewModel = new ProductDetailViewModel();
+		GetProductDetailOutputBoundary outputBoundary = new ProductDetailPresenter(viewModel);
+		
+		GetProductDetailUseCaseControl control = new GetProductDetailUseCaseControl(
+			outputBoundary, productRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	private static class MockProductRepository implements ProductRepository {
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findById(Long id) {
+			if (id == null || id <= 0 || id == 999L || id == Long.MAX_VALUE) {
+				return Optional.empty();
+			}
+			
+			int stock = 100;
+			if (id == 100L) {
+				stock = 0;
+			} else if (id == 200L) {
+				stock = 1000;
+			} else if (id == 300L) {
+				stock = 5;
+			}
+			
+			XeMay product = new XeMay(
+				"Honda Wave Alpha",
+				"Xe số tiết kiệm nhiên liệu",
+				new BigDecimal("30000000"),
+				"honda-wave.jpg",
+				stock,
+				"Honda",
+				"Wave Alpha",
+				"Đỏ",
+				2024,
+				110
+			);
+			product.setMaSanPham(id);
+			return Optional.of(product);
+		}
+		
+		@Override
+		public com.motorbike.domain.entities.SanPham save(com.motorbike.domain.entities.SanPham product) {
+			return product;
+		}
+		
+		@Override
+		public boolean existsById(Long productId) {
+			return productId != null && productId > 0 && productId != 999L && productId != Long.MAX_VALUE;
+		}
+	}
 }
