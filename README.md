@@ -203,11 +203,6 @@ spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
 
-Chạy script SQL:
-```bash
-mysql -u username -p < database-setup.sql
-```
-
 ## Nguyên tắc thiết kế
 
 ### SOLID Principles
