@@ -1,290 +1,290 @@
-# 🏍️ Motorbike Shop - Clean Architecture
+# Motorbike Shop - Clean Architecture
 
-> Website giới thiệu, bán xe máy và phụ kiện trực tuyến
+## Tổng quan dự án
 
-**Tác giả:** [hayamij](https://github.com/hayamij) (Nguyen Quang Tuan Phuong)
+Hệ thống quản lý cửa hàng xe máy được xây dựng theo kiến trúc Clean Architecture, tuân thủ các nguyên tắc SOLID và đảm bảo tính độc lập giữa các layer.
 
-## 📋 Tổng quan
+### Công nghệ sử dụng
 
-Dự án xây dựng hệ thống website bán xe máy và phụ kiện trực tuyến, áp dụng kiến trúc **Clean Architecture** để đảm bảo code dễ bảo trì, mở rộng và kiểm thử.
+- **Backend Framework**: Spring Boot
+- **Build Tool**: Maven
+- **Database**: SQL
+- **Testing**: JUnit 5
+- **Architecture Pattern**: Clean Architecture
 
-### Đặc điểm nổi bật
-- ✅ Phân tách rõ ràng các tầng logic nghiệp vụ
-- ✅ Độc lập với framework và database
-- ✅ Dễ dàng kiểm thử (Testable)
-- ✅ Tuân thủ SOLID principles
-- ✅ Dependency Rule được áp dụng nghiêm ngặt
-
----
-
-## 🛠️ Công nghệ sử dụng
-
-| Công nghệ | Phiên bản | Mục đích |
-|-----------|-----------|----------|
-| **Java** | 17 | Ngôn ngữ lập trình |
-| **Spring Boot** | 3.5.6 | Framework backend |
-| **Spring Data JPA** | 3.5.6 | ORM và database access |
-| **Thymeleaf** | 3.5.6 | Template engine |
-| **SQL Server** | - | Database chính |
-| **H2 Database** | - | Database cho testing |
-| **Maven** | - | Build tool |
-| **JUnit 5** | - | Unit testing |
-
----
-
-## 🏗️ Kiến trúc
-
-Dự án tuân thủ **Clean Architecture** của Uncle Bob với 4 tầng:
+### Cấu trúc dự án
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Frameworks & Drivers (Adapters)                    │
-│  - Web Controllers                                   │
-│  - Database Repositories                             │
-│  - External Services                                 │
-├─────────────────────────────────────────────────────┤
-│  Interface Adapters (Infrastructure)                │
-│  - Gateways                                          │
-│  - Presenters                                        │
-│  - DTO Converters                                    │
-├─────────────────────────────────────────────────────┤
-│  Use Cases (Business Logic)                         │
-│  - Application Services                              │
-│  - Interactors                                       │
-│  - Input/Output Boundaries                           │
-├─────────────────────────────────────────────────────┤
-│  Entities (Domain)                                   │
-│  - Business Rules                                    │
-│  - Domain Models                                     │
-└─────────────────────────────────────────────────────┘
-     Inner Layers ← Dependency Rule ← Outer Layers
+src/
+├── main/
+│   ├── java/com/motorbike/
+│   │   ├── domain/           # Entities và Business Logic
+│   │   ├── business/         # Use Cases và DTOs
+│   │   ├── adapters/         # Controllers, Presenters, ViewModels
+│   │   └── infrastructure/   # Database, Config
+│   └── resources/
+│       ├── static/           # CSS, JS
+│       └── templates/        # HTML
+└── test/
+    └── java/com/motorbike/   # Unit Tests
 ```
 
-### Cấu trúc thư mục
+## Chức năng hệ thống
+
+### 1. Quản lý sản phẩm (Customer)
+
+#### Xe máy
+- ✅ Xem chi tiết sản phẩm
+- ✅ Tìm kiếm xe máy
+- ✅ Xem danh sách xe máy
+
+#### Giỏ hàng
+- ✅ Thêm vào giỏ hàng
+- ✅ Xem giỏ hàng
+- ✅ Chỉnh số lượng sản phẩm trong giỏ hàng
+
+#### Tài khoản
+- ✅ Đăng ký tài khoản
+- ✅ Đăng nhập
+
+#### Đơn hàng
+- ✅ Thanh toán (Checkout)
+
+### 2. Quản lý xe máy (Admin)
+
+- 🔄 Tìm kiếm xe máy
+- 🔄 Thêm xe máy
+- 🔄 Xem danh sách xe máy
+- 🔄 Sửa thông tin xe máy
+- 🔄 Xóa xe máy
+
+### 3. Quản lý phụ kiện xe máy (Admin)
+
+- 🔄 Tìm kiếm phụ kiện xe máy
+- 🔄 Thêm phụ kiện xe máy
+- 🔄 Xem danh sách phụ kiện xe máy
+- 🔄 Sửa thông tin phụ kiện xe máy
+- 🔄 Xóa thông tin phụ kiện xe máy
+
+### 4. Quản lý tài khoản (Admin)
+
+- 🔄 Tìm kiếm tài khoản
+- 🔄 Thêm người dùng
+- 🔄 Xem danh sách người dùng
+- 🔄 Sửa thông tin người dùng
+- 🔄 Xóa người dùng
+
+### 5. Quản lý đơn hàng (Admin)
+
+- 🔄 Tìm kiếm đơn hàng
+- 🔄 Thêm đơn hàng
+- 🔄 Xem danh sách đơn hàng
+- 🔄 Sửa đơn hàng
+- 🔄 Xóa đơn hàng
+
+**Chú thích**: ✅ = Đã hoàn thành | 🔄 = Đang phát triển
+
+## Kiến trúc Clean Architecture
+
+### Layer Structure
 
 ```
-src/main/java/com/motorbike/
-├── domain/              # Layer 1: Entities
-│   ├── entities/        # Domain models
-│   └── exceptions/      # Business exceptions
-├── business/            # Layer 2: Use Cases
-│   └── usecase/
-│       ├── control/     # Use case implementations
-│       ├── entity/      # Input/Output boundaries
-│       └── boundary/    # Repository interfaces
-├── infrastructure/      # Layer 3: Interface Adapters
-│   ├── gateway/         # Repository implementations
-│   └── presenter/       # Data transformers
-└── adapters/            # Layer 4: Frameworks & Drivers
-    ├── web/             # Web controllers
-    └── persistence/     # Database entities
+┌─────────────────────────────────────────┐
+│         Adapters (Controllers)          │ ← External Interface
+├─────────────────────────────────────────┤
+│      Use Cases (Business Logic)         │ ← Application Logic
+├─────────────────────────────────────────┤
+│         Domain (Entities)               │ ← Core Business Rules
+├─────────────────────────────────────────┤
+│      Infrastructure (Database)          │ ← External Services
+└─────────────────────────────────────────┘
 ```
 
----
+### Các thành phần chính
 
-## 📚 Thu thập yêu cầu
+#### 1. Domain Layer
+- **Entities**: `TaiKhoan`, `SanPham`, `XeMay`, `GioHang`, `DonHang`
+- **Value Objects**: `VaiTro`, `TrangThaiDonHang`
+- **Exceptions**: Custom domain exceptions
 
-### Actors (Người dùng hệ thống)
+#### 2. Business Layer
+- **Use Cases**: Logic nghiệp vụ độc lập
+- **Input/Output DTOs**: Truyền dữ liệu giữa các layer
+- **Ports (Interfaces)**: Repository interfaces
 
-1. **Guest** - Khách vãng lai (chưa đăng nhập)
-2. **Customer** - Khách hàng đã đăng ký
-3. **Admin** - Quản trị viên
+#### 3. Adapters Layer
+- **Controllers**: Nhận request từ client
+- **Presenters**: Format dữ liệu cho UI
+- **ViewModels**: Dữ liệu hiển thị
+- **Repositories**: Implement ports
 
-### Use Cases chính
+#### 4. Infrastructure Layer
+- **Database**: JPA entities và repositories
+- **Configuration**: Spring Boot config
 
-#### 🔹 Guest Features
-- Xem danh sách sản phẩm
-- Xem chi tiết sản phẩm
-- Thêm sản phẩm vào giỏ hàng
-- Xem và chỉnh sửa giỏ hàng
-- Đăng ký tài khoản
+## Use Case Implementation
 
-#### 🔹 Customer Features
-- Tất cả chức năng của Guest
-- Đăng nhập/Đăng xuất
-- Thanh toán đơn hàng
-- Xem lịch sử đơn hàng
+Mỗi use case được triển khai theo flow:
 
-#### 🔹 Admin Features
-- Tất cả chức năng của Customer
-- Quản lý sản phẩm (CRUD)
-- Quản lý loại sản phẩm
-- Quản lý tài khoản người dùng
-- Quản lý đơn hàng
-
-### Business Rules chính
-
-1. **Sản phẩm:**
-   - Giá > 0
-   - Số lượng tồn kho ≥ 0
-   - Phải thuộc một loại sản phẩm
-
-2. **Giỏ hàng:**
-   - Số lượng thêm vào phải > 0
-   - Không vượt quá tồn kho
-   - Guest: lưu trong session
-   - Customer: lưu trong database
-
-3. **Thanh toán:**
-   - Bắt buộc đăng nhập
-   - Giỏ hàng phải có sản phẩm
-   - Kiểm tra tồn kho trước khi thanh toán
-   - Trừ tồn kho sau khi đặt hàng thành công
-
-4. **Tài khoản:**
-   - Email phải unique
-   - Mật khẩu được mã hóa
-   - Phân quyền: Customer/Admin
-
----
-
-## 🎯 Nguyên tắc thiết kế (SOLID)
-
-| Nguyên tắc | Áp dụng trong dự án |
-|------------|---------------------|
-| **S**RP | Mỗi Use Case chỉ xử lý một nghiệp vụ cụ thể |
-| **O**CP | Mở rộng qua interfaces, không sửa code cũ |
-| **L**SP | Các implementation tuân thủ contract của interface |
-| **I**SP | Interfaces nhỏ, chỉ chứa methods cần thiết |
-| **D**IP | Use Cases phụ thuộc vào abstractions, không phụ thuộc vào implementations cụ thể |
-
-### Dependency Rule
 ```
-❌ Entities không phụ thuộc Use Cases
-❌ Use Cases không phụ thuộc Frameworks
-✅ Outer Layers → Inner Layers (qua Interfaces)
+Controller → InputData → UseCaseControl → Entity
+                ↓
+            OutputData → Presenter → ViewModel
 ```
 
----
+### Ví dụ: Add To Cart Use Case
 
-## 🚀 Cài đặt và chạy
+```java
+1. Controller nhận request
+2. Tạo AddToCartInputData
+3. UseCaseControl thực thi business logic
+4. Tạo AddToCartOutputData
+5. Presenter format dữ liệu
+6. ViewModel trả về cho UI
+```
+
+## Testing
+
+### Test Coverage
+
+Tất cả Use Cases đều có Unit Tests:
+- ✅ `AddToCartUseCaseControlTest`
+- ✅ `CheckoutUseCaseControlTest`
+- ✅ `GetProductDetailUseCaseControlTest`
+- ✅ `LoginUseCaseControlTest`
+- ✅ `RegisterUseCaseControlTest`
+- ✅ `UpdateCartQuantityUseCaseControlTest`
+- ✅ `ViewCartUseCaseControlTest`
+
+### Test Strategy
+
+- **Valid Cases**: Kiểm tra luồng thành công
+- **Invalid Cases**: Kiểm tra validation và error handling
+- **Edge Cases**: Kiểm tra boundary conditions
+- **Mock Objects**: Sử dụng mock repositories
+
+### Chạy tests
+
+```bash
+mvn test
+```
+
+## Cài đặt và chạy
 
 ### Yêu cầu hệ thống
-- Java 17+
+
+- Java 11 or higher
 - Maven 3.6+
-- SQL Server 2019+ (hoặc bất kỳ phiên bản tương thích)
+- MySQL/PostgreSQL
 
-### Bước 1: Clone repository
+### Cài đặt
+
 ```bash
+# Clone repository
 git clone https://github.com/hayamij/JSB-CleanArchitecture-MotorbikeShop.git
+
+# Di chuyển vào thư mục dự án
 cd JSB-CleanArchitecture-MotorbikeShop
+
+# Build project
+mvn clean install
+
+# Chạy ứng dụng
+mvn spring-boot:run
 ```
 
-### Bước 2: Cấu hình Database
+### Cấu hình Database
 
-1. Tạo database trong SQL Server:
-```sql
-CREATE DATABASE MotorcycleShop;
-```
+Chỉnh sửa file `src/main/resources/application.properties`:
 
-2. Chạy script khởi tạo:
-```bash
-sqlcmd -S localhost -d MotorcycleShop -i database-setup.sql
-```
-
-3. Cấu hình kết nối trong `application.properties`:
 ```properties
-spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=MotorcycleShop
+spring.datasource.url=jdbc:mysql://localhost:3306/motorbike_shop
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
 
-### Bước 3: Build và chạy
-
-#### Sử dụng Maven Wrapper (khuyên dùng)
+Chạy script SQL:
 ```bash
-# Windows
-.\mvnw.cmd clean install
-.\mvnw.cmd spring-boot:run
-
-# Linux/Mac
-./mvnw clean install
-./mvnw spring-boot:run
+mysql -u username -p < database-setup.sql
 ```
 
-#### Hoặc sử dụng Maven
-```bash
-mvn clean install
-mvn spring-boot:run
+## Nguyên tắc thiết kế
+
+### SOLID Principles
+
+- **Single Responsibility**: Mỗi class có một trách nhiệm duy nhất
+- **Open/Closed**: Mở cho mở rộng, đóng cho sửa đổi
+- **Liskov Substitution**: Subclass có thể thay thế class cha
+- **Interface Segregation**: Interface nhỏ và tập trung
+- **Dependency Inversion**: Phụ thuộc vào abstraction, không phải concrete
+
+### Clean Architecture Benefits
+
+- ✅ **Testability**: Dễ dàng viết unit tests
+- ✅ **Maintainability**: Code dễ bảo trì và mở rộng
+- ✅ **Independence**: Các layer độc lập với nhau
+- ✅ **Flexibility**: Dễ thay đổi UI, database, framework
+
+## Domain Model
+
+### Core Entities
+
+```
+TaiKhoan (User Account)
+├── VaiTro: CUSTOMER | ADMIN
+└── GioHang (Shopping Cart)
+
+SanPham (Product)
+├── XeMay (Motorbike)
+└── PhuKien (Accessory)
+
+DonHang (Order)
+├── TrangThai: CHO_XAC_NHAN | DANG_GIAO | HOAN_THANH | HUY
+└── ChiTietDonHang (Order Items)
 ```
 
-### Bước 4: Truy cập ứng dụng
-Mở trình duyệt và truy cập: **http://localhost:8080**
+## API Endpoints (Planned)
 
----
-
-## 🧪 Chạy Tests
-
-### Chạy tất cả tests
-```bash
-mvnw test
+### Customer APIs
+```
+GET    /products/{id}           - Xem chi tiết sản phẩm
+POST   /cart/add                - Thêm vào giỏ hàng
+GET    /cart                    - Xem giỏ hàng
+PUT    /cart/update             - Cập nhật giỏ hàng
+POST   /auth/register           - Đăng ký
+POST   /auth/login              - Đăng nhập
+POST   /checkout                - Thanh toán
 ```
 
-### Chạy test với coverage
-```bash
-mvnw test jacoco:report
+### Admin APIs
+```
+GET    /admin/products          - Danh sách sản phẩm
+POST   /admin/products          - Thêm sản phẩm
+PUT    /admin/products/{id}     - Sửa sản phẩm
+DELETE /admin/products/{id}     - Xóa sản phẩm
+GET    /admin/orders            - Danh sách đơn hàng
+GET    /admin/users             - Danh sách người dùng
 ```
 
-### Test structure
-```
-src/test/java/com/motorbike/
-├── business/usecase/control/    # Use case tests
-├── domain/entities/              # Entity tests
-└── infrastructure/               # Gateway tests
-```
+## Contributing
+
+Khi contribute vào dự án, vui lòng tuân thủ:
+
+1. **Code Style**: Follow Java conventions
+2. **Testing**: Viết tests cho mọi use case
+3. **Documentation**: Comment code khi cần thiết
+4. **Clean Architecture**: Tuân thủ nguyên tắc phân tầng
+
+## License
+
+This project is licensed under the MIT License.
+
+## Team
+
+- **Project Type**: University Course Project
+- **Architecture**: Clean Architecture Pattern
+- **Focus**: Learning best practices in software design
 
 ---
 
-## 📖 API Documentation
-
-### Endpoints chính
-
-#### Products
-- `GET /` - Trang chủ, danh sách sản phẩm
-- `GET /product/{id}` - Chi tiết sản phẩm
-
-#### Cart
-- `POST /cart/add` - Thêm vào giỏ hàng
-- `GET /cart` - Xem giỏ hàng
-- `POST /cart/update` - Cập nhật số lượng
-
-#### Authentication
-- `GET /login` - Trang đăng nhập
-- `POST /login` - Xử lý đăng nhập
-- `GET /register` - Trang đăng ký
-- `POST /register` - Xử lý đăng ký
-
-#### Checkout
-- `POST /checkout` - Thanh toán đơn hàng
-
----
-
-## 📂 Tài liệu tham khảo
-
-- [clean_arch_summary.md](clean_arch_summary.md) - Hướng dẫn chi tiết về Clean Architecture
-- [database-setup.sql](database-setup.sql) - Script khởi tạo database
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👤 Tác giả
-
-**Nguyen Quang Tuan Phuong** (hayamij)
-- GitHub: [@hayamij](https://github.com/hayamij)
-
----
-
-## 🙏 Acknowledgments
-
-- Clean Architecture by Robert C. Martin (Uncle Bob)
-- Spring Boot Documentation
-- Java Clean Architecture Community
-
----
-
-*Last updated: November 2025*
+**Note**: Đây là dự án học tập, tập trung vào việc áp dụng Clean Architecture và SOLID principles trong thực tế.
