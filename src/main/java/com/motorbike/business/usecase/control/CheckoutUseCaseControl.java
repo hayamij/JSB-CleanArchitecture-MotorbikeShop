@@ -62,9 +62,7 @@ public class CheckoutUseCaseControl
             // Business Rule: Kiểm tra lại số lượng tồn kho của từng sản phẩm trước khi thanh toán
             for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
                 SanPham sanPham = productRepository.findById(item.getMaSanPham())
-                    .orElseThrow(() -> new ProductNotFoundException(
-                        String.valueOf(item.getMaSanPham()), 
-                        "Sản phẩm không tồn tại: " + item.getMaSanPham()));
+                    .orElseThrow(() -> new ProductNotFoundException(String.valueOf(item.getMaSanPham())));
                 
                 if (sanPham.getSoLuongTonKho() < item.getSoLuong()) {
                     throw new InsufficientStockException(
@@ -131,44 +129,53 @@ public class CheckoutUseCaseControl
     
     @Override
     protected void validateInput(CheckoutInputData inputData) {
-        if (inputData == null || inputData.getUserId() == null) {
-            throw new IllegalArgumentException("User ID không hợp lệ");
+        checkInputNotNull(inputData);
+        if (inputData.getUserId() == null) {
+            throw new com.motorbike.domain.exceptions.InvalidUserIdException();
         }
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
-        CheckoutOutputData outputData = CheckoutOutputData.forError(
-            "INVALID_INPUT",
-            e.getMessage()
-        );
+        String errorCode = "INVALID_INPUT";
+        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
+            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        }
+        CheckoutOutputData outputData = CheckoutOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
     }
     
     @Override
     protected void handleSystemError(Exception e) {
-        String errorCode = "SYSTEM_ERROR";
-        String message = "Đã xảy ra lỗi: " + e.getMessage();
+        String errorCode;
+        String message;
         
-        try {
-            throw e;
-        } catch (InvalidCartException ex) {
+        if (e instanceof InvalidCartException) {
+            InvalidCartException ex = (InvalidCartException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (InvalidOrderException ex) {
+        } else if (e instanceof InvalidOrderException) {
+            InvalidOrderException ex = (InvalidOrderException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (EmptyCartException ex) {
+        } else if (e instanceof EmptyCartException) {
+            EmptyCartException ex = (EmptyCartException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (ProductNotFoundException ex) {
+        } else if (e instanceof ProductNotFoundException) {
+            ProductNotFoundException ex = (ProductNotFoundException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (InsufficientStockException ex) {
+        } else if (e instanceof InsufficientStockException) {
+            InsufficientStockException ex = (InsufficientStockException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (Exception ex) {
-            // Keep default
+        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
+            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else {
+            throw new com.motorbike.domain.exceptions.SystemException(e);
         }
         
         CheckoutOutputData outputData = CheckoutOutputData.forError(errorCode, message);

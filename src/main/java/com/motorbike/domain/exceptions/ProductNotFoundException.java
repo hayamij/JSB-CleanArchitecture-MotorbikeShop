@@ -8,11 +8,6 @@ public class ProductNotFoundException extends RuntimeException {
         this.errorCode = "PRODUCT_NOT_FOUND";
     }
     
-    public ProductNotFoundException(String productId, String message) {
-        super(message);
-        this.errorCode = "PRODUCT_NOT_FOUND";
-    }
-    
     public String getErrorCode() {
         return errorCode;
     }

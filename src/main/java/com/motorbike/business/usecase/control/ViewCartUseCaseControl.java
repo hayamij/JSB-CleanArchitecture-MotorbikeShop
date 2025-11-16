@@ -53,36 +53,41 @@ public class ViewCartUseCaseControl
     
     @Override
     protected void validateInput(ViewCartInputData inputData) {
-        if (inputData == null || inputData.getUserId() == null) {
-            throw new IllegalArgumentException("User ID không hợp lệ");
+        checkInputNotNull(inputData);
+        if (inputData.getUserId() == null) {
+            throw new com.motorbike.domain.exceptions.InvalidUserIdException();
         }
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
-        ViewCartOutputData outputData = ViewCartOutputData.forError(
-            "INVALID_INPUT",
-            e.getMessage()
-        );
+        String errorCode = "INVALID_INPUT";
+        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
+            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        }
+        ViewCartOutputData outputData = ViewCartOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
     }
     
     @Override
     protected void handleSystemError(Exception e) {
-        try {
-            throw e;
-        } catch (EmptyCartException ex) {
+        if (e instanceof EmptyCartException) {
             ViewCartOutputData outputData = ViewCartOutputData.forEmptyCart();
             outputBoundary.present(outputData);
             return;
-        } catch (Exception ex) {
-            // System error
         }
         
-        ViewCartOutputData outputData = ViewCartOutputData.forError(
-            "SYSTEM_ERROR",
-            "Đã xảy ra lỗi: " + e.getMessage()
-        );
+        String errorCode;
+        String message;
+        if (e instanceof com.motorbike.domain.exceptions.SystemException) {
+            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else {
+            throw new com.motorbike.domain.exceptions.SystemException(e);
+        }
+        
+        ViewCartOutputData outputData = ViewCartOutputData.forError(errorCode, message);
         outputBoundary.present(outputData);
     }
 }

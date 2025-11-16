@@ -79,15 +79,15 @@ public class ProductController {
                 productDetailViewModel.categoryDisplay,
                 productDetailViewModel.stockQuantity,
                 productDetailViewModel.availabilityStatus,
-                null,
-                null
+                productDetailViewModel.errorCode,
+                productDetailViewModel.errorMessage
             );
             return ResponseEntity.ok(response);
         } else {
             ProductDetailResponse response = new ProductDetailResponse(
                 false,
                 null, null, null, null, null, null, null, null, null,
-                "PRODUCT_NOT_FOUND",
+                productDetailViewModel.errorCode,
                 productDetailViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

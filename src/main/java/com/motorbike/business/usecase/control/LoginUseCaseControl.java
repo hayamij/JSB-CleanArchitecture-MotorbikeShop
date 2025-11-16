@@ -7,9 +7,7 @@ import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
-import com.motorbike.domain.exceptions.UserNotFoundException;
-import com.motorbike.domain.exceptions.WrongPasswordException;
-import com.motorbike.domain.exceptions.AccountLockedException;
+import com.motorbike.domain.exceptions.*;
 import java.util.Optional;
 
 /**
@@ -97,45 +95,51 @@ public class LoginUseCaseControl
         checkInputNotNull(inputData);
         
         if (inputData.getEmail() == null || inputData.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email không được để trống");
+            throw new EmptyEmailException();
         }
         
         if (inputData.getPassword() == null || inputData.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Mật khẩu không được để trống");
+            throw new EmptyPasswordException();
         }
         
         if (!inputData.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            throw new IllegalArgumentException("Email không hợp lệ");
+            throw new InvalidEmailException();
         }
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
-        LoginOutputData outputData = LoginOutputData.forError(
-            "INVALID_INPUT",
-            e.getMessage()
-        );
+        String errorCode = "INVALID_INPUT";
+        if (e instanceof InvalidInputException) {
+            errorCode = ((InvalidInputException) e).getErrorCode();
+        }
+        LoginOutputData outputData = LoginOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
     }
     
     @Override
     protected void handleSystemError(Exception e) {
-        String errorCode = "SYSTEM_ERROR";
-        String message = "Đã xảy ra lỗi hệ thống: " + e.getMessage();
+        String errorCode;
+        String message;
         
-        try {
-            throw e;
-        } catch (UserNotFoundException ex) {
+        if (e instanceof UserNotFoundException) {
+            UserNotFoundException ex = (UserNotFoundException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (WrongPasswordException ex) {
+        } else if (e instanceof WrongPasswordException) {
+            WrongPasswordException ex = (WrongPasswordException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (AccountLockedException ex) {
+        } else if (e instanceof AccountLockedException) {
+            AccountLockedException ex = (AccountLockedException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (Exception ex) {
-            // Keep default SYSTEM_ERROR
+        } else if (e instanceof SystemException) {
+            SystemException ex = (SystemException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else {
+            throw new SystemException(e);
         }
         
         LoginOutputData outputData = LoginOutputData.forError(errorCode, message);

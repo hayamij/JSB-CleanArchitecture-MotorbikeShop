@@ -66,22 +66,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
-        // Validate confirmPassword matches password
-        if (request.getPassword() == null || request.getConfirmPassword() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new RegisterResponse(false, null, null, null, null, null, 
-                    "VALIDATION_ERROR", "Mật khẩu không được để trống")
-            );
-        }
-        
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new RegisterResponse(false, null, null, null, null, null, 
-                    "PASSWORD_MISMATCH", "Mật khẩu xác nhận không khớp")
-            );
-        }
-        
-        // Constructor: (email, username, password, confirmPassword, phoneNumber, address)
+        // Map request to InputData - NO business logic here
         RegisterInputData inputData = new RegisterInputData(
             request.getEmail(),
             request.getName(),         // name -> username
@@ -91,6 +76,7 @@ public class AuthController {
             request.getAddress()
         );
         
+        // Execute use case - validation happens in business layer
         registerUseCase.execute(inputData);
         
         // Convert ViewModel to Response DTO

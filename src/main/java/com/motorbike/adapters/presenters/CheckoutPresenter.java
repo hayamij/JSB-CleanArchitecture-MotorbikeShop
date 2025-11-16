@@ -17,33 +17,35 @@ import java.util.Locale;
  * Formats data for UI presentation
  */
 public class CheckoutPresenter implements CheckoutOutputBoundary {
-    private CheckoutViewModel viewModel;
+    private final CheckoutViewModel viewModel;
     private static final NumberFormat VND_FORMAT = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    public CheckoutPresenter(CheckoutViewModel viewModel) {
+        this.viewModel = viewModel;
+    }
 
     @Override
     public void present(CheckoutOutputData outputData) {
         if (!outputData.isSuccess()) {
             // Error case
-            viewModel = new CheckoutViewModel(
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                0,
-                null,
-                null,
-                true,
-                outputData.getErrorCode(),
-                outputData.getErrorMessage(),
-                getErrorColor(outputData.getErrorCode())
-            );
+            viewModel.success = false;
+            viewModel.orderId = null;
+            viewModel.customerId = null;
+            viewModel.customerName = null;
+            viewModel.customerEmail = null;
+            viewModel.customerPhone = null;
+            viewModel.shippingAddress = null;
+            viewModel.orderStatus = null;
+            viewModel.formattedTotalAmount = null;
+            viewModel.totalItems = 0;
+            viewModel.totalQuantity = 0;
+            viewModel.items = null;
+            viewModel.formattedOrderDate = null;
+            viewModel.hasError = true;
+            viewModel.errorCode = outputData.getErrorCode();
+            viewModel.message = outputData.getErrorMessage();
+            viewModel.messageColor = getErrorColor(outputData.getErrorCode());
             return;
         }
 
@@ -78,25 +80,23 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
             outputData.getTotalQuantity()
         );
 
-        viewModel = new CheckoutViewModel(
-            true,
-            outputData.getOrderId(),
-            outputData.getCustomerId(),
-            outputData.getCustomerName(),
-            outputData.getCustomerEmail(),
-            outputData.getCustomerPhone(),
-            outputData.getShippingAddress(),
-            orderStatusDisplay,
-            formattedTotalAmount,
-            outputData.getTotalItems(),
-            outputData.getTotalQuantity(),
-            itemViewModels,
-            formattedOrderDate,
-            false,
-            null,
-            successMessage,
-            "#28a745" // Green color for success
-        );
+        viewModel.success = true;
+        viewModel.orderId = outputData.getOrderId();
+        viewModel.customerId = outputData.getCustomerId();
+        viewModel.customerName = outputData.getCustomerName();
+        viewModel.customerEmail = outputData.getCustomerEmail();
+        viewModel.customerPhone = outputData.getCustomerPhone();
+        viewModel.shippingAddress = outputData.getShippingAddress();
+        viewModel.orderStatus = orderStatusDisplay;
+        viewModel.formattedTotalAmount = formattedTotalAmount;
+        viewModel.totalItems = outputData.getTotalItems();
+        viewModel.totalQuantity = outputData.getTotalQuantity();
+        viewModel.items = itemViewModels;
+        viewModel.formattedOrderDate = formattedOrderDate;
+        viewModel.hasError = false;
+        viewModel.errorCode = null;
+        viewModel.message = successMessage;
+        viewModel.messageColor = "#28a745"; // Green color for success
     }
 
     public CheckoutViewModel getViewModel() {
