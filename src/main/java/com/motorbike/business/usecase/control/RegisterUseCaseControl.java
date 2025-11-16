@@ -69,13 +69,11 @@ public class RegisterUseCaseControl
     protected void validateInput(RegisterInputData inputData) {
         checkInputNotNull(inputData);
         
-        if (inputData.getPassword() == null || inputData.getConfirmPassword() == null) {
-            throw new com.motorbike.domain.exceptions.EmptyPasswordException();
-        }
-        
-        if (!inputData.getPassword().equals(inputData.getConfirmPassword())) {
-            throw new com.motorbike.domain.exceptions.PasswordMismatchException();
-        }
+        // Use entity validation for all fields - validates business rules early
+        TaiKhoan.validatePasswordConfirmation(inputData.getPassword(), inputData.getConfirmPassword());
+        TaiKhoan.validateEmail(inputData.getEmail());
+        TaiKhoan.validateTenDangNhap(inputData.getUsername());
+        TaiKhoan.validateSoDienThoai(inputData.getPhoneNumber());
     }
     
     @Override

@@ -60,11 +60,12 @@ public class CheckoutUseCaseControl
             }
             
             // Business Rule: Kiểm tra lại số lượng tồn kho của từng sản phẩm trước khi thanh toán
+            // Use entity method to check stock (business rule in entity)
             for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
                 SanPham sanPham = productRepository.findById(item.getMaSanPham())
                     .orElseThrow(() -> new ProductNotFoundException(String.valueOf(item.getMaSanPham())));
                 
-                if (sanPham.getSoLuongTonKho() < item.getSoLuong()) {
+                if (!sanPham.duSoLuong(item.getSoLuong())) {
                     throw new InsufficientStockException(
                         sanPham.getTenSanPham(), 
                         sanPham.getSoLuongTonKho());

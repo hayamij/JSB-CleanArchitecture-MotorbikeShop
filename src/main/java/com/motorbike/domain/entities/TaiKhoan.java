@@ -95,6 +95,15 @@ public class TaiKhoan {
         }
     }
 
+    public static void validatePasswordConfirmation(String password, String confirmPassword) {
+        if (password == null || confirmPassword == null) {
+            throw new InvalidUserException("EMPTY_PASSWORD", "Mật khẩu không được rỗng");
+        }
+        if (!password.equals(confirmPassword)) {
+            throw new InvalidUserException("PASSWORD_MISMATCH", "Mật khẩu xác nhận không khớp");
+        }
+    }
+
     public static void validateSoDienThoai(String soDienThoai) {
         if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
             throw new InvalidUserException("EMPTY_PHONE", "Số điện thoại không được rỗng");

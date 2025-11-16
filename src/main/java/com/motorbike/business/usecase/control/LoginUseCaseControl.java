@@ -94,16 +94,22 @@ public class LoginUseCaseControl
     protected void validateInput(LoginInputData inputData) {
         checkInputNotNull(inputData);
         
-        if (inputData.getEmail() == null || inputData.getEmail().trim().isEmpty()) {
-            throw new EmptyEmailException();
-        }
-        
-        if (inputData.getPassword() == null || inputData.getPassword().isEmpty()) {
-            throw new EmptyPasswordException();
-        }
-        
-        if (!inputData.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            throw new InvalidEmailException();
+        // Use entity validation instead of duplicating business rules
+        try {
+            TaiKhoan.validateEmail(inputData.getEmail());
+            TaiKhoan.validateMatKhau(inputData.getPassword());
+        } catch (InvalidUserException e) {
+            // Convert InvalidUserException to specific input validation exceptions
+            switch (e.getErrorCode()) {
+                case "EMPTY_EMAIL":
+                    throw new EmptyEmailException();
+                case "INVALID_EMAIL_FORMAT":
+                    throw new InvalidEmailException();
+                case "EMPTY_PASSWORD":
+                    throw new EmptyPasswordException();
+                default:
+                    throw e;
+            }
         }
     }
     

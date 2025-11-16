@@ -40,8 +40,8 @@ public class AddToCartUseCaseControl
             SanPham sanPham = productRepository.findById(inputData.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(String.valueOf(inputData.getProductId())));
             
-            // Simple if-check with throw
-            if (sanPham.getSoLuongTonKho() < inputData.getQuantity()) {
+            // Use entity method to check stock availability (business rule in entity)
+            if (!sanPham.duSoLuong(inputData.getQuantity())) {
                 throw new InsufficientStockException(sanPham.getSoLuongTonKho());
             }
             

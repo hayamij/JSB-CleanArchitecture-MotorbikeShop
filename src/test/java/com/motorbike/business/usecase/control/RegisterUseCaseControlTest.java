@@ -142,6 +142,7 @@ class RegisterUseCaseControlTest {
             "",
             "testuser",
             "Password123!",
+            "Password123!",  // Must match password for validation to proceed
             "0123456789",
             "123 Test Street"
         );
@@ -157,7 +158,7 @@ class RegisterUseCaseControlTest {
         
         RegisterOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
+        assertEquals("EMPTY_EMAIL", output.getErrorCode());  // More specific error code from entity
     }
 
     @Test
@@ -168,6 +169,7 @@ class RegisterUseCaseControlTest {
             "test@example.com",
             "",
             "Password123!",
+            "Password123!",  // Must match password for validation to proceed
             "0123456789",
             "123 Test Street"
         );
@@ -183,6 +185,6 @@ class RegisterUseCaseControlTest {
         
         RegisterOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
+        assertEquals("EMPTY_USERNAME", output.getErrorCode());  // More specific error code from entity
     }
 }
