@@ -17,6 +17,7 @@ public class ProductDetailViewModel {
     public String stockQuantity;
     public String availabilityStatus;
     public String stockStatusColor;
+    public String errorCode;
     
     // Error display
     public boolean hasError;
@@ -31,6 +32,10 @@ public class ProductDetailViewModel {
     // Simple getters for convenience
     public boolean hasError() {
         return hasError;
+    }
+    
+    public String getErrorCode() {
+        return errorCode;
     }
     
     public String getFormattedPrice() {

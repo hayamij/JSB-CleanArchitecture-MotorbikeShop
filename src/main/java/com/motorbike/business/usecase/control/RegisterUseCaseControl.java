@@ -69,39 +69,52 @@ public class RegisterUseCaseControl
     protected void validateInput(RegisterInputData inputData) {
         checkInputNotNull(inputData);
         
+        if (inputData.getEmail() == null || inputData.getEmail().trim().isEmpty()) {
+            throw new com.motorbike.domain.exceptions.EmptyEmailException();
+        }
+        
+        if (inputData.getUsername() == null || inputData.getUsername().trim().isEmpty()) {
+            throw new com.motorbike.domain.exceptions.InvalidUserException("EMPTY_USERNAME", "Tên đăng nhập không được để trống");
+        }
+        
         if (inputData.getPassword() == null || inputData.getConfirmPassword() == null) {
-            throw new IllegalArgumentException("Mật khẩu không được để trống");
+            throw new com.motorbike.domain.exceptions.EmptyPasswordException();
         }
         
         if (!inputData.getPassword().equals(inputData.getConfirmPassword())) {
-            throw new IllegalArgumentException("Mật khẩu xác nhận không khớp");
+            throw new com.motorbike.domain.exceptions.PasswordMismatchException();
         }
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
-        RegisterOutputData outputData = RegisterOutputData.forError(
-            "INVALID_INPUT",
-            e.getMessage()
-        );
+        String errorCode = "INVALID_INPUT";
+        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
+            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        }
+        RegisterOutputData outputData = RegisterOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
     }
     
     @Override
     protected void handleSystemError(Exception e) {
-        String errorCode = "SYSTEM_ERROR";
-        String message = "Đã xảy ra lỗi hệ thống: " + e.getMessage();
+        String errorCode;
+        String message;
         
-        try {
-            throw e;
-        } catch (InvalidUserException ex) {
+        if (e instanceof InvalidUserException) {
+            InvalidUserException ex = (InvalidUserException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (EmailAlreadyExistsException ex) {
+        } else if (e instanceof EmailAlreadyExistsException) {
+            EmailAlreadyExistsException ex = (EmailAlreadyExistsException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (Exception ex) {
-            // Keep default
+        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
+            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else {
+            throw new com.motorbike.domain.exceptions.SystemException(e);
         }
         
         RegisterOutputData outputData = RegisterOutputData.forError(errorCode, message);

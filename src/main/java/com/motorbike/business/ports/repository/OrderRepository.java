@@ -1,9 +1,10 @@
 package com.motorbike.business.ports.repository;
 
-import com.motorbike.domain.entities.DonHang;
-import com.motorbike.domain.entities.TrangThaiDonHang;
 import java.util.List;
 import java.util.Optional;
+
+import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.TrangThaiDonHang;
 
 /**
  * Repository Interface (Port) for DonHang (Order) Entity
@@ -48,6 +49,12 @@ public interface OrderRepository {
      * @return List of orders matching criteria
      */
     List<DonHang> findByUserIdAndStatus(Long userId, TrangThaiDonHang trangThai);
+
+    /**
+     * Find all orders in the system
+     * @return list of all orders
+     */
+    List<DonHang> findAll();
     
     /**
      * Delete order by ID

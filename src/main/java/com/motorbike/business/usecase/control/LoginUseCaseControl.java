@@ -7,9 +7,7 @@ import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
-import com.motorbike.domain.exceptions.UserNotFoundException;
-import com.motorbike.domain.exceptions.WrongPasswordException;
-import com.motorbike.domain.exceptions.AccountLockedException;
+import com.motorbike.domain.exceptions.*;
 import java.util.Optional;
 
 /**
@@ -50,31 +48,37 @@ public class LoginUseCaseControl
         
         boolean cartMerged = false;
         int mergedItemsCount = 0;
+        Long userCartId = null;
         
+        // Get or create user cart
+        Optional<GioHang> userCartOpt = cartRepository.findByUserId(taiKhoan.getMaTaiKhoan());
+        final GioHang userCart;
+        
+        if (userCartOpt.isPresent()) {
+            userCart = userCartOpt.get();
+            userCartId = userCart.getMaGioHang();
+        } else {
+            // Create new cart for user
+            GioHang newCart = new GioHang(taiKhoan.getMaTaiKhoan());
+            userCart = cartRepository.save(newCart);
+            userCartId = userCart.getMaGioHang();
+        }
+        
+        // Merge guest cart if exists
         if (inputData.getGuestCartId() != null) {
             Optional<GioHang> guestCartOpt = cartRepository.findById(inputData.getGuestCartId());
-            Optional<GioHang> userCartOpt = cartRepository.findByUserId(taiKhoan.getMaTaiKhoan());
             
             if (guestCartOpt.isPresent()) {
                 GioHang guestCart = guestCartOpt.get();
+                mergedItemsCount = guestCart.getDanhSachSanPham().size();
                 
-                if (userCartOpt.isPresent()) {
-                    GioHang userCart = userCartOpt.get();
-                    mergedItemsCount = guestCart.getDanhSachSanPham().size();
-                    
-                    guestCart.getDanhSachSanPham().forEach(item -> {
-                        userCart.themSanPham(item);
-                    });
-                    
-                    cartRepository.save(userCart);
-                    cartRepository.delete(guestCart.getMaGioHang());
-                    cartMerged = true;
-                } else {
-                    guestCart.setMaTaiKhoan(taiKhoan.getMaTaiKhoan());
-                    cartRepository.save(guestCart);
-                    mergedItemsCount = guestCart.getDanhSachSanPham().size();
-                    cartMerged = true;
-                }
+                guestCart.getDanhSachSanPham().forEach(item -> {
+                    userCart.themSanPham(item);
+                });
+                
+                cartRepository.save(userCart);
+                cartRepository.delete(guestCart.getMaGioHang());
+                cartMerged = true;
             }
         }
         
@@ -84,7 +88,8 @@ public class LoginUseCaseControl
             taiKhoan.getTenDangNhap(),
             taiKhoan.getVaiTro(),
             taiKhoan.getLanDangNhapCuoi(),
-            null,
+            null, // sessionToken - for future implementation
+            userCartId,
             cartMerged,
             mergedItemsCount
         );
@@ -97,45 +102,51 @@ public class LoginUseCaseControl
         checkInputNotNull(inputData);
         
         if (inputData.getEmail() == null || inputData.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email không được để trống");
+            throw new EmptyEmailException();
         }
         
         if (inputData.getPassword() == null || inputData.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Mật khẩu không được để trống");
+            throw new EmptyPasswordException();
         }
         
         if (!inputData.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            throw new IllegalArgumentException("Email không hợp lệ");
+            throw new InvalidEmailException();
         }
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
-        LoginOutputData outputData = LoginOutputData.forError(
-            "INVALID_INPUT",
-            e.getMessage()
-        );
+        String errorCode = "INVALID_INPUT";
+        if (e instanceof InvalidInputException) {
+            errorCode = ((InvalidInputException) e).getErrorCode();
+        }
+        LoginOutputData outputData = LoginOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
     }
     
     @Override
     protected void handleSystemError(Exception e) {
-        String errorCode = "SYSTEM_ERROR";
-        String message = "Đã xảy ra lỗi hệ thống: " + e.getMessage();
+        String errorCode;
+        String message;
         
-        try {
-            throw e;
-        } catch (UserNotFoundException ex) {
+        if (e instanceof UserNotFoundException) {
+            UserNotFoundException ex = (UserNotFoundException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (WrongPasswordException ex) {
+        } else if (e instanceof WrongPasswordException) {
+            WrongPasswordException ex = (WrongPasswordException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (AccountLockedException ex) {
+        } else if (e instanceof AccountLockedException) {
+            AccountLockedException ex = (AccountLockedException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (Exception ex) {
-            // Keep default SYSTEM_ERROR
+        } else if (e instanceof SystemException) {
+            SystemException ex = (SystemException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else {
+            throw new SystemException(e);
         }
         
         LoginOutputData outputData = LoginOutputData.forError(errorCode, message);

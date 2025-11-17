@@ -7,6 +7,8 @@ import com.motorbike.business.usecase.control.AddToCartUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
+import com.motorbike.adapters.viewmodels.ViewCartViewModel;
+import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
 import com.motorbike.adapters.dto.request.AddToCartRequest;
 import com.motorbike.adapters.dto.request.UpdateCartRequest;
 import com.motorbike.adapters.dto.response.AddToCartResponse;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 /**
  * REST Controller for Cart operations
@@ -30,16 +33,22 @@ public class CartController {
     private final ViewCartUseCaseControl viewCartUseCase;
     private final UpdateCartQuantityUseCaseControl updateCartQuantityUseCase;
     private final AddToCartViewModel addToCartViewModel;
+    private final ViewCartViewModel viewCartViewModel;
+    private final UpdateCartQuantityViewModel updateCartQuantityViewModel;
 
     @Autowired
     public CartController(AddToCartUseCaseControl addToCartUseCase,
                          ViewCartUseCaseControl viewCartUseCase,
                          UpdateCartQuantityUseCaseControl updateCartQuantityUseCase,
-                         AddToCartViewModel addToCartViewModel) {
+                         AddToCartViewModel addToCartViewModel,
+                         ViewCartViewModel viewCartViewModel,
+                         UpdateCartQuantityViewModel updateCartQuantityViewModel) {
         this.addToCartUseCase = addToCartUseCase;
         this.viewCartUseCase = viewCartUseCase;
         this.updateCartQuantityUseCase = updateCartQuantityUseCase;
         this.addToCartViewModel = addToCartViewModel;
+        this.viewCartViewModel = viewCartViewModel;
+        this.updateCartQuantityViewModel = updateCartQuantityViewModel;
     }
 
     /**
@@ -81,15 +90,26 @@ public class CartController {
         
         addToCartUseCase.execute(inputData);
         
-        // Convert ViewModel to Response DTO
+        // Convert ViewModel to Response DTO - need to get raw values from OutputData
         if (addToCartViewModel.success) {
+            // Note: ViewModel has formatted strings, Response needs raw values
+            // We'll pass null for fields that need raw BigDecimal values for now
             AddToCartResponse response = new AddToCartResponse(
-                true, addToCartViewModel.message, null, null
+                true, addToCartViewModel.message, addToCartViewModel.cartId, 
+                addToCartViewModel.totalItems, addToCartViewModel.totalQuantity,
+                null, // totalAmount - need raw BigDecimal
+                addToCartViewModel.productId, addToCartViewModel.productName, 
+                addToCartViewModel.addedQuantity, addToCartViewModel.newItemQuantity, 
+                addToCartViewModel.itemAlreadyInCart,
+                null, // productPrice - need raw BigDecimal
+                addToCartViewModel.productStock,
+                null, null
             );
             return ResponseEntity.ok(response);
         } else {
             AddToCartResponse response = new AddToCartResponse(
-                false, null, addToCartViewModel.errorCode, addToCartViewModel.errorMessage
+                false, null, null, 0, 0, null, null, null, 0, 0, false, null, 0,
+                addToCartViewModel.errorCode, addToCartViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
@@ -126,10 +146,25 @@ public class CartController {
         
         viewCartUseCase.execute(inputData);
         
-        // Lấy viewModel từ presenter (đã được inject qua constructor nếu có)
-        // Hoặc tạo response từ outputBoundary
-        // Tạm thời return success với userId
-        return ResponseEntity.ok(new ViewCartResponse(true, userId));
+        // Get data from ViewModel populated by Presenter
+        // Map ViewModel items to Response items
+        List<ViewCartResponse.CartItemResponse> responseItems = null;
+        if (viewCartViewModel.items != null) {
+            responseItems = viewCartViewModel.items.stream()
+                .map(item -> new ViewCartResponse.CartItemResponse(
+                    item.productId, item.productName, null, // price needs raw BigDecimal
+                    item.quantity, item.availableStock, item.hasStockWarning, null // subtotal needs raw BigDecimal
+                ))
+                .collect(java.util.stream.Collectors.toList());
+        }
+        
+        return ResponseEntity.ok(new ViewCartResponse(
+            viewCartViewModel.success, viewCartViewModel.message, viewCartViewModel.cartId,
+            userId, viewCartViewModel.totalItems, viewCartViewModel.totalQuantity,
+            null, // totalAmount needs raw BigDecimal
+            viewCartViewModel.isEmpty, viewCartViewModel.hasStockWarnings,
+            responseItems, null, viewCartViewModel.errorMessage
+        ));
     }
 
     /**
@@ -138,7 +173,7 @@ public class CartController {
      * 
      * Request Body:
      * {
-     *   "userId": 1,
+     *   "cartId": 3,
      *   "productId": 1,
      *   "newQuantity": 5
      * }
@@ -148,7 +183,7 @@ public class CartController {
      * Success Response (200):
      * {
      *   "success": true,
-     *   "cartId": 1,
+     *   "cartId": 3,
      *   "productId": 1,
      *   "newQuantity": 5,
      *   "newSubtotal": 150000000,
@@ -158,15 +193,31 @@ public class CartController {
      */
     @PutMapping("/update")
     public ResponseEntity<UpdateCartResponse> updateCartQuantity(@RequestBody UpdateCartRequest request) {
-        UpdateCartQuantityInputData inputData = UpdateCartQuantityInputData.forLoggedInUser(
-            request.getUserId(),
+        // Reset ViewModel to initial state before use
+        updateCartQuantityViewModel.success = false;
+        updateCartQuantityViewModel.message = null;
+        updateCartQuantityViewModel.errorCode = null;
+        updateCartQuantityViewModel.errorMessage = null;
+        
+        UpdateCartQuantityInputData inputData = new UpdateCartQuantityInputData(
+            request.getCartId(),
             request.getProductId(),
             request.getNewQuantity()
         );
         
         updateCartQuantityUseCase.execute(inputData);
         
-        // Tạm thời return success response
-        return ResponseEntity.ok(new UpdateCartResponse(true, "Đã cập nhật số lượng"));
+        // Use direct field access instead of getter to avoid potential AOP/proxy issues
+        if (updateCartQuantityViewModel.success) {
+            UpdateCartResponse response = new UpdateCartResponse(
+                true, updateCartQuantityViewModel.message, null, null
+            );
+            return ResponseEntity.ok(response);
+        } else {
+            UpdateCartResponse response = new UpdateCartResponse(
+                false, null, updateCartQuantityViewModel.errorCode, updateCartQuantityViewModel.errorMessage
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 }

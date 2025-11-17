@@ -110,18 +110,16 @@ class GioHangTest {
     }
 
     @Test
-    void testXoaSanPham_NonExistentProduct_DoesNothing() {
+    void testXoaSanPham_NonExistentProduct_ThrowsException() {
         // Given
         GioHang gioHang = new GioHang(1L);
         ChiTietGioHang chiTiet = new ChiTietGioHang(1L, "Honda Winner X", 
                                                    BigDecimal.valueOf(46000000), 1);
         gioHang.themSanPham(chiTiet);
 
-        // When
-        gioHang.xoaSanPham(999L);
-
-        // Then
-        assertEquals(1, gioHang.demSoSanPham());
+        // When & Then
+        assertThrows(com.motorbike.domain.exceptions.ProductNotInCartException.class, 
+            () -> gioHang.xoaSanPham(999L));
     }
 
     @Test

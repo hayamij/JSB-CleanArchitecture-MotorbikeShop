@@ -5,7 +5,10 @@ import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.exceptions.InvalidInputException;
+import com.motorbike.domain.exceptions.InvalidProductIdException;
 import com.motorbike.domain.exceptions.ProductNotFoundException;
+import com.motorbike.domain.exceptions.SystemException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -55,32 +58,37 @@ public class GetProductDetailUseCaseControl
     
     @Override
     protected void validateInput(GetProductDetailInputData inputData) {
-        if (inputData == null || inputData.productId == null) {
-            throw new IllegalArgumentException("Mã sản phẩm không hợp lệ");
+        checkInputNotNull(inputData);
+        if (inputData.productId == null) {
+            throw new InvalidProductIdException();
         }
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
-        GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(
-            "INVALID_INPUT",
-            e.getMessage()
-        );
+        String errorCode = "INVALID_INPUT";
+        if (e instanceof InvalidInputException) {
+            errorCode = ((InvalidInputException) e).getErrorCode();
+        }
+        GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
     }
     
     @Override
     protected void handleSystemError(Exception e) {
-        String errorCode = "SYSTEM_ERROR";
-        String message = "Đã xảy ra lỗi khi lấy thông tin sản phẩm: " + e.getMessage();
+        String errorCode;
+        String message;
         
-        try {
-            throw e;
-        } catch (ProductNotFoundException ex) {
+        if (e instanceof ProductNotFoundException) {
+            ProductNotFoundException ex = (ProductNotFoundException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (Exception ex) {
-            // Keep default
+        } else if (e instanceof SystemException) {
+            SystemException ex = (SystemException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else {
+            throw new SystemException(e);
         }
         
         GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(errorCode, message);

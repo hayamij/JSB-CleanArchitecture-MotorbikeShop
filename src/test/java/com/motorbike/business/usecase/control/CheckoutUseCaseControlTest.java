@@ -1,140 +1,487 @@
 package com.motorbike.business.usecase.control;
 
-import com.motorbike.business.dto.checkout.CheckoutInputData;
-import com.motorbike.business.dto.checkout.CheckoutOutputData;
-import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.ports.repository.OrderRepository;
-import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
-import com.motorbike.domain.entities.GioHang;
-import com.motorbike.domain.entities.ChiTietGioHang;
-import com.motorbike.domain.entities.DonHang;
-import com.motorbike.domain.entities.XeMay;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
 
-@DisplayName("Checkout Use Case Tests")
-class CheckoutUseCaseControlTest {
+import com.motorbike.adapters.presenters.CheckoutPresenter;
+import com.motorbike.adapters.viewmodels.CheckoutViewModel;
+import com.motorbike.business.dto.checkout.CheckoutInputData;
+import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.business.ports.repository.OrderRepository;
+import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
+import com.motorbike.domain.entities.ChiTietGioHang;
+import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.entities.TrangThaiDonHang;
+import com.motorbike.domain.entities.XeMay;
 
-    private CheckoutUseCaseControl useCase;
-    private ProductRepository productRepository;
-    private CartRepository cartRepository;
-    private OrderRepository orderRepository;
-    private CheckoutOutputBoundary outputBoundary;
+public class CheckoutUseCaseControlTest {
 
-    @BeforeEach
-    void setUp() {
-        productRepository = mock(ProductRepository.class);
-        cartRepository = mock(CartRepository.class);
-        orderRepository = mock(OrderRepository.class);
-        outputBoundary = mock(CheckoutOutputBoundary.class);
-        useCase = new CheckoutUseCaseControl(outputBoundary, cartRepository, productRepository, orderRepository);
-    }
-
-    @Test
-    @DisplayName("Should checkout successfully")
-    void testCheckoutSuccess() {
-        // Arrange
-        Long userId = 1L;
-        Long productId = 1L;
-        
-        GioHang cart = new GioHang(userId);
-        cart.themSanPham(new ChiTietGioHang(
-            productId, "Honda Wave", new BigDecimal("30000000"), 2
-        ));
-        
-        XeMay product = new XeMay(
-            productId, "Honda Wave", "Xe số",
-            new BigDecimal("30000000"), "wave.jpg", 10, true,
-            java.time.LocalDateTime.now(), java.time.LocalDateTime.now(),
-            "Honda", "Wave", "Đỏ", 2023, 110
-        );
-        
-        when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(cart));
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(productRepository.save(any())).thenReturn(product);
-        when(orderRepository.save(any(DonHang.class))).thenAnswer(invocation -> {
-            DonHang order = invocation.getArgument(0);
-            order.setMaDonHang(1L);
-            return order;
-        });
-        
-        // Act
-        CheckoutInputData inputData = new CheckoutInputData(userId, "Nguyen Van A", "0123456789", "123 Test St", "Test note");
-        useCase.execute(inputData);
-        
-        // Assert
-        verify(cartRepository).findByUserId(userId);
-        verify(productRepository, times(2)).findById(productId); // Called twice: validation + stock reduction
-        verify(productRepository).save(any());
-        verify(orderRepository).save(any(DonHang.class));
-        verify(cartRepository).save(any(GioHang.class));
-        verify(outputBoundary).present(any(CheckoutOutputData.class));
-    }
-
-    @Test
-    @DisplayName("Should fail with empty cart")
-    void testCheckoutFailEmptyCart() {
-        // Arrange
-        Long userId = 1L;
-        GioHang cart = new GioHang(userId);
-        
-        when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(cart));
-        
-        // Act
-        CheckoutInputData inputData = new CheckoutInputData(userId, "Nguyen Van A", "0123456789", "123 Test St", "Test note");
-        useCase.execute(inputData);
-        
-        // Assert
-        verify(productRepository, never()).save(any());
-        verify(outputBoundary).present(any(CheckoutOutputData.class));
-    }
-
-    @Test
-    @DisplayName("Should fail with insufficient stock")
-    void testCheckoutFailInsufficientStock() {
-        // Arrange
-        Long userId = 1L;
-        Long productId = 1L;
-        
-        GioHang cart = new GioHang(userId);
-        cart.themSanPham(new ChiTietGioHang(
-            productId, "Honda Wave", new BigDecimal("30000000"), 10
-        ));
-        
-        XeMay product = new XeMay(
-            productId, "Honda Wave", "Xe số",
-            new BigDecimal("30000000"), "wave.jpg", 5, true, // Only 5 in stock
-            java.time.LocalDateTime.now(), java.time.LocalDateTime.now(),
-            "Honda", "Wave", "Đỏ", 2023, 110
-        );
-        
-        when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(cart));
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        
-        // Act
-        CheckoutInputData inputData = new CheckoutInputData(userId, "Nguyen Van A", "0123456789", "123 Test St", "Test note");
-        useCase.execute(inputData);
-        
-        // Assert
-        verify(productRepository, never()).save(any());
-        verify(outputBoundary).present(any(CheckoutOutputData.class));
-    }
-
-    @Test
-    @DisplayName("Should fail with null input")
-    void testCheckoutFailNullInput() {
-        // Act
-        useCase.execute(null);
-        
-        // Assert
-        verify(cartRepository, never()).findByUserId(any());
-        verify(outputBoundary).present(any(CheckoutOutputData.class));
-    }
+	@Test
+	public void testExecute_ValidCheckout_Success() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			100L, 
+			"Nguyen Van A", 
+			"0912345678", 
+			"123 Main St", 
+			"Giao trong gio hanh chinh"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+		assertNotEquals(null, viewModel.orderId);
+		assertEquals(100L, viewModel.customerId);
+	}
+	
+	@Test
+	public void testExecute_ValidCheckout_WithNote() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			100L, 
+			"Tran Thi B", 
+			"0987654321", 
+			"456 Side St", 
+			"Goi truoc khi giao"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_ValidCheckout_NoNote() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			100L, 
+			"Le Van C", 
+			"0901234567", 
+			"789 Park Ave", 
+			null
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullInputData() {
+		CheckoutInputData inputData = null;
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullUserId() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			null, 
+			"Nguyen Van A", 
+			"0912345678", 
+			"123 Main St", 
+			"Note"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmptyCart() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			999L, 
+			"Nguyen Van A", 
+			"0912345678", 
+			"123 Main St", 
+			"Note"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_CartNotFound() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			888L, 
+			"Nguyen Van A", 
+			"0912345678", 
+			"123 Main St", 
+			"Note"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_InsufficientStock() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			200L, 
+			"Nguyen Van A", 
+			"0912345678", 
+			"123 Main St", 
+			"Note"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmptyReceiverName() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			100L, 
+			"", 
+			"0912345678", 
+			"123 Main St", 
+			"Note"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmptyPhoneNumber() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			100L, 
+			"Nguyen Van A", 
+			"", 
+			"123 Main St", 
+			"Note"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmptyShippingAddress() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			100L, 
+			"Nguyen Van A", 
+			"0912345678", 
+			"", 
+			"Note"
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_MinimalValidData() {
+		CheckoutInputData inputData = new CheckoutInputData(
+			100L, 
+			"A", 
+			"1", 
+			"X", 
+			""
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_LongStrings() {
+		String longName = "A".repeat(200);
+		String longPhone = "0".repeat(20);
+		String longAddress = "X".repeat(500);
+		
+		CheckoutInputData inputData = new CheckoutInputData(
+			100L, 
+			longName, 
+			longPhone, 
+			longAddress, 
+			null
+		);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		CheckoutViewModel viewModel = new CheckoutViewModel();
+		CheckoutOutputBoundary outputBoundary = new CheckoutPresenter(viewModel);
+		
+		CheckoutUseCaseControl control = new CheckoutUseCaseControl(
+			outputBoundary, cartRepo, productRepo, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	private static class MockCartRepository implements CartRepository {
+		@Override
+		public Optional<GioHang> findByUserId(Long userId) {
+			if (userId == null || userId == 888L) {
+				return Optional.empty();
+			}
+			
+			GioHang cart = new GioHang(userId);
+			
+			if (userId == 999L) {
+				return Optional.of(cart);
+			}
+			
+			if (userId == 200L) {
+				ChiTietGioHang item = new ChiTietGioHang(1L, "Honda Wave", new BigDecimal("30000000"), 150);
+				cart.themSanPham(item);
+			} else {
+				ChiTietGioHang item = new ChiTietGioHang(1L, "Honda Wave", new BigDecimal("30000000"), 2);
+				cart.themSanPham(item);
+			}
+			
+			return Optional.of(cart);
+		}
+		
+		@Override
+		public GioHang save(GioHang gioHang) {
+			gioHang.setMaGioHang(1L);
+			return gioHang;
+		}
+		
+		@Override
+		public Optional<GioHang> findById(Long id) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public void delete(Long cartId) {
+		}
+		
+		@Override
+		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
+			return 0;
+		}
+	}
+	
+	private static class MockProductRepository implements ProductRepository {
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findById(Long id) {
+			if (id == null) {
+				return Optional.empty();
+			}
+			XeMay product = new XeMay(
+				"Honda Wave",
+				"Xe số tiết kiệm nhiên liệu",
+				new BigDecimal("30000000"),
+				"honda-wave.jpg",
+				100,
+				"Honda",
+				"Wave Alpha",
+				"Đỏ",
+				2024,
+				110
+			);
+			product.setMaSanPham(id);
+			return Optional.of(product);
+		}
+		
+		@Override
+		public com.motorbike.domain.entities.SanPham save(com.motorbike.domain.entities.SanPham product) {
+			return product;
+		}
+		
+		@Override
+		public boolean existsById(Long productId) {
+			return productId != null;
+		}
+	}
+	
+	private static class MockOrderRepository implements OrderRepository {
+		private Long nextId = 1L;
+		
+		@Override
+		public DonHang save(DonHang donHang) {
+			donHang.setMaDonHang(nextId++);
+			return donHang;
+		}
+		
+		@Override
+		public Optional<DonHang> findById(Long orderId) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public List<DonHang> findByUserId(Long userId) {
+			return new ArrayList<>();
+		}
+		
+		@Override
+		public List<DonHang> findByStatus(TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
+		
+		@Override
+		public List<DonHang> findByUserIdAndStatus(Long userId, TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
+		
+		@Override
+		public List<DonHang> findAll() {
+			return new ArrayList<>();
+		}
+		
+		@Override
+		public void deleteById(Long orderId) {
+		}
+		
+		@Override
+		public boolean existsById(Long orderId) {
+			return false;
+		}
+	}
 }

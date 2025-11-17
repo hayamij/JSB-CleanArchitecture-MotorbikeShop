@@ -16,44 +16,44 @@ import java.util.Locale;
  * Formats data for UI presentation
  */
 public class ViewCartPresenter implements ViewCartOutputBoundary {
-    private ViewCartViewModel viewModel;
+    private final ViewCartViewModel viewModel;
     private static final NumberFormat VND_FORMAT = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+
+    public ViewCartPresenter(ViewCartViewModel viewModel) {
+        this.viewModel = viewModel;
+    }
 
     @Override
     public void present(ViewCartOutputData outputData) {
         if (!outputData.isSuccess()) {
             // Error case
-            viewModel = new ViewCartViewModel(
-                false,
-                null,
-                null,
-                0,
-                0,
-                "0 ₫",
-                null,
-                true,
-                false,
-                null,
-                outputData.getErrorMessage()
-            );
+            viewModel.success = false;
+            viewModel.cartId = null;
+            viewModel.userId = null;
+            viewModel.totalItems = 0;
+            viewModel.totalQuantity = 0;
+            viewModel.formattedTotalAmount = "0 ₫";
+            viewModel.items = null;
+            viewModel.isEmpty = true;
+            viewModel.hasStockWarnings = false;
+            viewModel.message = null;
+            viewModel.errorMessage = outputData.getErrorMessage();
             return;
         }
 
         // Empty cart case
         if (outputData.isEmpty()) {
-            viewModel = new ViewCartViewModel(
-                true,
-                outputData.getCartId(),
-                outputData.getUserId(),
-                0,
-                0,
-                "0 ₫",
-                new ArrayList<>(),
-                true,
-                false,
-                "Giỏ hàng của bạn đang trống",
-                null
-            );
+            viewModel.success = true;
+            viewModel.cartId = outputData.getCartId();
+            viewModel.userId = outputData.getUserId();
+            viewModel.totalItems = 0;
+            viewModel.totalQuantity = 0;
+            viewModel.formattedTotalAmount = "0 ₫";
+            viewModel.items = new ArrayList<>();
+            viewModel.isEmpty = true;
+            viewModel.hasStockWarnings = false;
+            viewModel.message = "Giỏ hàng của bạn đang trống";
+            viewModel.errorMessage = null;
             return;
         }
 
@@ -94,19 +94,17 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
         String stockWarningMessage = outputData.hasStockWarnings() ?
             "Một số sản phẩm trong giỏ hàng có cảnh báo về số lượng tồn kho" : null;
 
-        viewModel = new ViewCartViewModel(
-            true,
-            outputData.getCartId(),
-            outputData.getUserId(),
-            outputData.getTotalItems(),
-            outputData.getTotalQuantity(),
-            formattedTotalAmount,
-            itemViewModels,
-            false,
-            outputData.hasStockWarnings(),
-            cartSummary,
-            stockWarningMessage
-        );
+        viewModel.success = true;
+        viewModel.cartId = outputData.getCartId();
+        viewModel.userId = outputData.getUserId();
+        viewModel.totalItems = outputData.getTotalItems();
+        viewModel.totalQuantity = outputData.getTotalQuantity();
+        viewModel.formattedTotalAmount = formattedTotalAmount;
+        viewModel.items = itemViewModels;
+        viewModel.isEmpty = false;
+        viewModel.hasStockWarnings = outputData.hasStockWarnings();
+        viewModel.message = cartSummary;
+        viewModel.errorMessage = stockWarningMessage;
     }
 
     public ViewCartViewModel getViewModel() {

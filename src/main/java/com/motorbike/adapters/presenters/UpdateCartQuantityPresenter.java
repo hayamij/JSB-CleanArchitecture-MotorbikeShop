@@ -15,11 +15,15 @@ import java.util.Locale;
  */
 public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoundary {
     
-    private UpdateCartQuantityViewModel viewModel;
+    private final UpdateCartQuantityViewModel viewModel;
     private static final NumberFormat VND_FORMAT;
     
     static {
         VND_FORMAT = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+    }
+
+    public UpdateCartQuantityPresenter(UpdateCartQuantityViewModel viewModel) {
+        this.viewModel = viewModel;
     }
 
     @Override
@@ -66,25 +70,24 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
             outputData.getTotalItems(), 
             outputData.getTotalQuantity());
 
-        viewModel = new UpdateCartQuantityViewModel(
-            true,
-            message,
-            null,
-            "#28a745", // Green for success
-            outputData.getCartId(),
-            outputData.getUserId(),
-            outputData.getProductId(),
-            outputData.getProductName(),
-            outputData.getOldQuantity(),
-            outputData.getNewQuantity(),
-            outputData.isItemRemoved(),
-            outputData.getTotalItems(),
-            outputData.getTotalQuantity(),
-            formattedTotalAmount,
-            formattedItemSubtotal,
-            itemViewModels,
-            cartSummary
-        );
+        viewModel.success = true;
+        viewModel.message = message;
+        viewModel.errorCode = null;
+        viewModel.errorMessage = null;
+        viewModel.messageColor = "#28a745"; // Green for success
+        viewModel.cartId = outputData.getCartId();
+        viewModel.userId = outputData.getUserId();
+        viewModel.productId = outputData.getProductId();
+        viewModel.productName = outputData.getProductName();
+        viewModel.oldQuantity = outputData.getOldQuantity();
+        viewModel.newQuantity = outputData.getNewQuantity();
+        viewModel.itemRemoved = outputData.isItemRemoved();
+        viewModel.totalItems = outputData.getTotalItems();
+        viewModel.totalQuantity = outputData.getTotalQuantity();
+        viewModel.totalAmount = formattedTotalAmount;
+        viewModel.itemSubtotal = formattedItemSubtotal;
+        viewModel.allItems = itemViewModels;
+        viewModel.cartSummary = cartSummary;
     }
 
     private void presentError(UpdateCartQuantityOutputData outputData) {
@@ -93,13 +96,24 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
             outputData.getErrorMessage()
         );
 
-        viewModel = new UpdateCartQuantityViewModel(
-            false,
-            errorMessage,
-            outputData.getErrorCode(),
-            "#dc3545", // Red for error
-            null, null, null, null, 0, 0, false, 0, 0, null, null, null, null
-        );
+        viewModel.success = false;
+        viewModel.message = errorMessage;
+        viewModel.errorCode = outputData.getErrorCode();
+        viewModel.errorMessage = errorMessage;
+        viewModel.messageColor = "#dc3545"; // Red for error
+        viewModel.cartId = null;
+        viewModel.userId = null;
+        viewModel.productId = null;
+        viewModel.productName = null;
+        viewModel.oldQuantity = 0;
+        viewModel.newQuantity = 0;
+        viewModel.itemRemoved = false;
+        viewModel.totalItems = 0;
+        viewModel.totalQuantity = 0;
+        viewModel.totalAmount = null;
+        viewModel.itemSubtotal = null;
+        viewModel.allItems = null;
+        viewModel.cartSummary = null;
     }
 
     private String translateErrorMessage(String errorCode, String originalMessage) {

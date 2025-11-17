@@ -1,5 +1,7 @@
 package com.motorbike.business.usecase.control;
 
+import com.motorbike.domain.exceptions.InvalidInputDataException;
+
 public abstract class AbstractUseCaseControl<I, O> {
 
     protected final O outputBoundary;
@@ -25,7 +27,7 @@ public abstract class AbstractUseCaseControl<I, O> {
     protected abstract void handleSystemError(Exception e);
     protected void checkInputNotNull(I inputData) {
         if (inputData == null) {
-            throw new IllegalArgumentException("Input data không được null");
+            throw new InvalidInputDataException();
         }
     }
 }

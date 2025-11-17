@@ -1,10 +1,13 @@
 package com.motorbike.infrastructure.persistence.jpa.repositories;
 
-import com.motorbike.infrastructure.persistence.jpa.entities.DonHangJpaEntity;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.motorbike.infrastructure.persistence.jpa.entities.DonHangJpaEntity;
 
 /**
  * Spring Data JPA Repository for DonHangJpaEntity
@@ -14,38 +17,36 @@ import java.util.List;
 public interface DonHangJpaRepository extends JpaRepository<DonHangJpaEntity, Long> {
     
     /**
-     * Find all orders by user ID
-     * @param maTaiKhoan User account ID
-     * @return List of orders
+     * Find all orders by user ID (sorted by date - newest first)
      */
-    List<DonHangJpaEntity> findByMaTaiKhoan(Long maTaiKhoan);
+    @Query("SELECT d FROM DonHangJpaEntity d WHERE d.maTaiKhoan = :userId ORDER BY d.ngayDat DESC")
+    List<DonHangJpaEntity> findByMaTaiKhoan(@Param("userId") Long userId);
     
     /**
      * Find orders by status
-     * @param trangThai Order status
-     * @return List of orders with given status
      */
     List<DonHangJpaEntity> findByTrangThai(String trangThai);
     
     /**
      * Find orders by user ID and status
-     * @param maTaiKhoan User account ID
-     * @param trangThai Order status
-     * @return List of orders matching criteria
      */
-    List<DonHangJpaEntity> findByMaTaiKhoanAndTrangThai(Long maTaiKhoan, String trangThai);
+    @Query("SELECT d FROM DonHangJpaEntity d WHERE d.maTaiKhoan = :userId AND d.trangThai = :trangThai ORDER BY d.ngayDat DESC")
+    List<DonHangJpaEntity> findByMaTaiKhoanAndTrangThai(
+            @Param("userId") Long userId,
+            @Param("trangThai") String trangThai);
     
     /**
      * Check if user has any orders
-     * @param maTaiKhoan User account ID
-     * @return true if user has orders
      */
-    boolean existsByMaTaiKhoan(Long maTaiKhoan);
+    boolean existsByMaTaiKhoan(Long userId);
     
     /**
      * Count orders by user ID
-     * @param maTaiKhoan User account ID
-     * @return Number of orders
      */
-    long countByMaTaiKhoan(Long maTaiKhoan);
+    long countByMaTaiKhoan(Long userId);
+    
+    /**
+     * Count orders by user ID and status
+     */
+    long countByMaTaiKhoanAndTrangThai(Long userId, String trangThai);
 }

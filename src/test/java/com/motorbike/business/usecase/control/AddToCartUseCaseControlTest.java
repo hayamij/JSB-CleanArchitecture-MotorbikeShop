@@ -1,91 +1,312 @@
 package com.motorbike.business.usecase.control;
 
-import com.motorbike.business.dto.addtocart.AddToCartInputData;
-import com.motorbike.business.dto.addtocart.AddToCartOutputData;
-import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
-import com.motorbike.domain.entities.XeMay;
-import com.motorbike.domain.entities.GioHang;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
 
-@DisplayName("Add To Cart Use Case Tests")
-class AddToCartUseCaseControlTest {
+import com.motorbike.adapters.presenters.AddToCartPresenter;
+import com.motorbike.adapters.viewmodels.AddToCartViewModel;
+import com.motorbike.business.dto.addtocart.AddToCartInputData;
+import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
+import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.entities.XeMay;
 
-    private AddToCartUseCaseControl useCase;
-    private ProductRepository productRepository;
-    private CartRepository cartRepository;
-    private AddToCartOutputBoundary outputBoundary;
+public class AddToCartUseCaseControlTest {
 
-    @BeforeEach
-    void setUp() {
-        productRepository = mock(ProductRepository.class);
-        cartRepository = mock(CartRepository.class);
-        outputBoundary = mock(AddToCartOutputBoundary.class);
-        useCase = new AddToCartUseCaseControl(outputBoundary, cartRepository, productRepository);
-    }
-
-    @Test
-    @DisplayName("Should add to cart successfully for logged-in user")
-    void testAddToCartSuccessLoggedInUser() {
-        // Arrange
-        Long userId = 1L;
-        Long productId = 1L;
-        
-        XeMay product = new XeMay(
-            productId, "Honda Wave", "Xe số",
-            new BigDecimal("30000000"), "wave.jpg", 10, true,
-            java.time.LocalDateTime.now(), java.time.LocalDateTime.now(),
-            "Honda", "Wave", "Đỏ", 2023, 110
-        );
-        
-        GioHang cart = new GioHang(userId);
-        
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(cartRepository.findByUserId(userId)).thenReturn(Optional.of(cart));
-        when(cartRepository.save(any(GioHang.class))).thenReturn(cart);
-        
-        // Act
-        AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(productId, 2, userId);
-        useCase.execute(inputData);
-        
-        // Assert
-        verify(productRepository).findById(productId);
-        verify(cartRepository).findByUserId(userId);
-        verify(cartRepository).save(any(GioHang.class));
-        verify(outputBoundary).present(any(AddToCartOutputData.class));
-    }
-
-    @Test
-    @DisplayName("Should fail when product not found")
-    void testAddToCartFailProductNotFound() {
-        // Arrange
-        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
-        
-        // Act
-        AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(999L, 1, 1L);
-        useCase.execute(inputData);
-        
-        // Assert
-        verify(cartRepository, never()).save(any());
-        verify(outputBoundary).present(any(AddToCartOutputData.class));
-    }
-
-    @Test
-    @DisplayName("Should fail with null input")
-    void testAddToCartFailNullInput() {
-        // Act
-        useCase.execute(null);
-        
-        // Assert
-        verify(productRepository, never()).findById(any());
-        verify(outputBoundary).present(any(AddToCartOutputData.class));
-    }
+	@Test
+	public void testExecute_ValidInput_LoggedInUser_Success() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 2, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+		assertNotEquals(null, viewModel.cartId);
+		assertEquals(1, viewModel.totalItems);
+	}
+	
+	@Test
+	public void testExecute_ValidInput_MinimumQuantity() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 1, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_ValidInput_LargeQuantity() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 50, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullInputData() {
+		AddToCartInputData inputData = null;
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_NullUserId() {
+		AddToCartInputData inputData = new AddToCartInputData(1L, 2, null, null);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_NullProductId() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(null, 2, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_ZeroQuantity() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 0, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_NegativeQuantity() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, -5, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_ProductNotFound() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(999L, 2, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_InsufficientStock() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 200, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+		assertNotEquals(null, viewModel.errorCode);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_ExactStockQuantity() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 100, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_StockMinusOne() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 99, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_StockPlusOne() {
+		AddToCartInputData inputData = AddToCartInputData.forLoggedInUser(1L, 101, 100L);
+		
+		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
+		
+		AddToCartViewModel viewModel = new AddToCartViewModel();
+		AddToCartOutputBoundary outputBoundary = new AddToCartPresenter(viewModel);
+		
+		AddToCartUseCaseControl control = new AddToCartUseCaseControl(outputBoundary, cartRepo, productRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	private static class MockCartRepository implements CartRepository {
+		@Override
+		public Optional<GioHang> findByUserId(Long userId) {
+			if (userId == null) return Optional.empty();
+			return Optional.of(new GioHang(userId));
+		}
+		
+		@Override
+		public GioHang save(GioHang gioHang) {
+			gioHang.setMaGioHang(1L);
+			return gioHang;
+		}
+		
+		@Override
+		public Optional<GioHang> findById(Long id) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public void delete(Long cartId) {
+		}
+		
+		@Override
+		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
+			return 0;
+		}
+	}
+	
+	private static class MockProductRepository implements ProductRepository {
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findById(Long id) {
+			if (id == null || id == 999L) {
+				return Optional.empty();
+			}
+			XeMay product = new XeMay(
+				"Honda Wave",
+				"Xe số tiết kiệm nhiên liệu",
+				new BigDecimal("30000000"),
+				"honda-wave.jpg",
+				100,
+				"Honda",
+				"Wave Alpha",
+				"Đỏ",
+				2024,
+				110
+			);
+			product.setMaSanPham(id);
+			return Optional.of(product);
+		}
+		
+		@Override
+		public com.motorbike.domain.entities.SanPham save(com.motorbike.domain.entities.SanPham product) {
+			return product;
+		}
+		
+		@Override
+		public boolean existsById(Long productId) {
+			return productId != null && productId != 999L;
+		}
+	}
 }

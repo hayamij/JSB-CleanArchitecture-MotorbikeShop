@@ -66,22 +66,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
-        // Validate confirmPassword matches password
-        if (request.getPassword() == null || request.getConfirmPassword() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new RegisterResponse(false, null, null, null, null, null, 
-                    "VALIDATION_ERROR", "Mật khẩu không được để trống")
-            );
-        }
-        
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new RegisterResponse(false, null, null, null, null, null, 
-                    "PASSWORD_MISMATCH", "Mật khẩu xác nhận không khớp")
-            );
-        }
-        
-        // Constructor: (email, username, password, confirmPassword, phoneNumber, address)
+        // Map request to InputData - NO business logic here
         RegisterInputData inputData = new RegisterInputData(
             request.getEmail(),
             request.getName(),         // name -> username
@@ -91,6 +76,7 @@ public class AuthController {
             request.getAddress()
         );
         
+        // Execute use case - validation happens in business layer
         registerUseCase.execute(inputData);
         
         // Convert ViewModel to Response DTO
@@ -98,12 +84,13 @@ public class AuthController {
             RegisterResponse response = new RegisterResponse(
                 true, registerViewModel.userId, registerViewModel.email,
                 registerViewModel.username, registerViewModel.roleDisplay,
-                registerViewModel.message, null, null
+                registerViewModel.registeredAtDisplay, registerViewModel.autoLoginEnabled,
+                registerViewModel.sessionToken, registerViewModel.message, null, null
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
             RegisterResponse response = new RegisterResponse(
-                false, null, null, null, null, null,
+                false, null, null, null, null, null, false, null, null,
                 registerViewModel.errorCode, registerViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -145,12 +132,13 @@ public class AuthController {
             LoginResponse response = new LoginResponse(
                 true, loginViewModel.userId, loginViewModel.email,
                 loginViewModel.username, loginViewModel.roleDisplay,
-                null, loginViewModel.message, null, null
+                loginViewModel.cartId, loginViewModel.cartMerged, loginViewModel.mergedItemsCount,
+                loginViewModel.message, null, null
             );
             return ResponseEntity.ok(response);
         } else {
             LoginResponse response = new LoginResponse(
-                false, null, null, null, null, null, null,
+                false, null, null, null, null, null, false, 0, null,
                 loginViewModel.errorCode, loginViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);

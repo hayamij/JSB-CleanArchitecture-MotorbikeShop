@@ -20,9 +20,11 @@ public class LoginViewModel {
     
     // Session info
     public String sessionToken;
+    public Long cartId; // User's cart ID
     
     // Cart merge information
     public boolean cartMerged;
+    public int mergedItemsCount; // Number of items merged from guest cart
     public String cartMergeMessage; // e.g., "Đã thêm 3 sản phẩm từ giỏ hàng tạm"
     
     // Error information (only if not success)

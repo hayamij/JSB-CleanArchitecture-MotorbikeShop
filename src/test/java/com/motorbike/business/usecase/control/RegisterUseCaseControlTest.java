@@ -1,188 +1,423 @@
 package com.motorbike.business.usecase.control;
 
-import com.motorbike.business.dto.register.RegisterInputData;
-import com.motorbike.business.dto.register.RegisterOutputData;
-import com.motorbike.business.ports.repository.UserRepository;
-import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.usecase.output.RegisterOutputBoundary;
-import com.motorbike.domain.entities.TaiKhoan;
-import com.motorbike.domain.entities.GioHang;
-import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.ArgumentCaptor;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.motorbike.adapters.presenters.RegisterPresenter;
+import com.motorbike.adapters.viewmodels.RegisterViewModel;
+import com.motorbike.business.dto.register.RegisterInputData;
+import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.business.ports.repository.UserRepository;
+import com.motorbike.business.usecase.output.RegisterOutputBoundary;
+import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.entities.TaiKhoan;
 
-/**
- * Unit Tests for RegisterUseCaseControl
- * Tests all business rules for user registration
- */
-@DisplayName("Register Use Case Tests")
-class RegisterUseCaseControlTest {
+public class RegisterUseCaseControlTest {
 
-    private RegisterUseCaseControl registerUseCase;
-    private UserRepository userRepository;
-    private CartRepository cartRepository;
-    private RegisterOutputBoundary outputBoundary;
-
-    @BeforeEach
-    void setUp() {
-        userRepository = mock(UserRepository.class);
-        cartRepository = mock(CartRepository.class);
-        outputBoundary = mock(RegisterOutputBoundary.class);
-        
-        registerUseCase = new RegisterUseCaseControl(outputBoundary, userRepository, cartRepository);
-    }
-
-    @Test
-    @DisplayName("Should register successfully with valid data")
-    void testRegisterSuccess() {
-        // Arrange
-        RegisterInputData inputData = new RegisterInputData(
-            "newuser@example.com",
-            "newuser",
-            "Password123",
-            "Password123", // confirmPassword
-            "0123456789",
-            "123 Test Street"
-        );
-        
-        when(userRepository.existsByEmail("newuser@example.com")).thenReturn(false);
-        when(userRepository.save(any(TaiKhoan.class))).thenAnswer(invocation -> {
-            TaiKhoan user = invocation.getArgument(0);
-            return new TaiKhoan(
-                1L,
-                user.getEmail(),
-                user.getTenDangNhap(),
-                user.getMatKhau(),
-                user.getSoDienThoai(),
-                user.getDiaChi(),
-                user.getVaiTro(),
-                user.isHoatDong(),
-                java.time.LocalDateTime.now(),
-                java.time.LocalDateTime.now(),
-                null
-            );
-        });
-        when(cartRepository.save(any(GioHang.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        
-        // Act
-        registerUseCase.execute(inputData);
-        
-        // Assert
-        // Note: existsByEmail is called but only after validateInput passes
-        // Since validation can throw exception first, we don't verify it here
-        verify(userRepository).save(any(TaiKhoan.class));
-        verify(cartRepository).save(any(GioHang.class));
-        
-        ArgumentCaptor<RegisterOutputData> captor = ArgumentCaptor.forClass(RegisterOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        RegisterOutputData output = captor.getValue();
-        assertTrue(output.isSuccess());
-        assertEquals("newuser@example.com", output.getEmail());
-    }
-
-    @Test
-    @DisplayName("Should fail when email already exists")
-    void testRegisterFailEmailExists() {
-        // Arrange
-        RegisterInputData inputData = new RegisterInputData(
-            "existing@example.com",
-            "testuser",
-            "Password123",
-            "Password123", // confirmPassword
-            "0123456789",
-            "123 Test Street"
-        );
-        
-        when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
-        
-        // Act
-        registerUseCase.execute(inputData);
-        
-        // Assert
-        // Note: existsByEmail should be called after validation passes
-        verify(userRepository, never()).save(any());
-        verify(cartRepository, never()).save(any());
-        
-        ArgumentCaptor<RegisterOutputData> captor = ArgumentCaptor.forClass(RegisterOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("EMAIL_EXISTS", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail with null input")
-    void testRegisterFailNullInput() {
-        // Act
-        registerUseCase.execute(null);
-        
-        // Assert
-        verify(userRepository, never()).existsByEmail(any());
-        verify(userRepository, never()).save(any());
-        
-        ArgumentCaptor<RegisterOutputData> captor = ArgumentCaptor.forClass(RegisterOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail with empty email")
-    void testRegisterFailEmptyEmail() {
-        // Arrange
-        RegisterInputData inputData = new RegisterInputData(
-            "",
-            "testuser",
-            "Password123!",
-            "0123456789",
-            "123 Test Street"
-        );
-        
-        // Act
-        registerUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository, never()).existsByEmail(any());
-        
-        ArgumentCaptor<RegisterOutputData> captor = ArgumentCaptor.forClass(RegisterOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail with empty username")
-    void testRegisterFailEmptyUsername() {
-        // Arrange
-        RegisterInputData inputData = new RegisterInputData(
-            "test@example.com",
-            "",
-            "Password123!",
-            "0123456789",
-            "123 Test Street"
-        );
-        
-        // Act
-        registerUseCase.execute(inputData);
-        
-        // Assert
-        verify(userRepository, never()).existsByEmail(any());
-        
-        ArgumentCaptor<RegisterOutputData> captor = ArgumentCaptor.forClass(RegisterOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        RegisterOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
-    }
+	@Test
+	public void testExecute_ValidRegistration_Success() {
+		RegisterInputData inputData = new RegisterInputData(
+			"newuser@test.com",
+			"newuser",
+			"password123",
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+		assertNotEquals(null, viewModel.userId);
+		assertEquals("newuser@test.com", viewModel.email);
+	}
+	
+	@Test
+	public void testExecute_ValidRegistration_WithAddress() {
+		RegisterInputData inputData = new RegisterInputData(
+			"user2@test.com",
+			"user2",
+			"password123",
+			"password123",
+			"0912345678",
+			"123 Main Street"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_ValidRegistration_MinimalData() {
+		RegisterInputData inputData = new RegisterInputData(
+			"min@test.com",
+			"usr",
+			"pass12",
+			"pass12",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullInputData() {
+		RegisterInputData inputData = null;
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmptyEmail() {
+		RegisterInputData inputData = new RegisterInputData(
+			"",
+			"username",
+			"password123",
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullEmail() {
+		RegisterInputData inputData = new RegisterInputData(
+			null,
+			"username",
+			"password123",
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmptyUsername() {
+		RegisterInputData inputData = new RegisterInputData(
+			"user@test.com",
+			"",
+			"password123",
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_NullPassword() {
+		RegisterInputData inputData = new RegisterInputData(
+			"user@test.com",
+			"username",
+			null,
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_PasswordMismatch() {
+		RegisterInputData inputData = new RegisterInputData(
+			"user@test.com",
+			"username",
+			"password123",
+			"password456",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EmailAlreadyExists() {
+		RegisterInputData inputData = new RegisterInputData(
+			"existing@test.com",
+			"username",
+			"password123",
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_ShortUsername() {
+		RegisterInputData inputData = new RegisterInputData(
+			"user@test.com",
+			"ab",
+			"password123",
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_ShortPassword() {
+		RegisterInputData inputData = new RegisterInputData(
+			"user@test.com",
+			"username",
+			"pass",
+			"pass",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_InvalidPhoneFormat() {
+		RegisterInputData inputData = new RegisterInputData(
+			"user@test.com",
+			"username",
+			"password123",
+			"password123",
+			"invalid"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_LongUsername() {
+		String longUsername = "a".repeat(100);
+		RegisterInputData inputData = new RegisterInputData(
+			"user@test.com",
+			longUsername,
+			"password123",
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
+	
+	@Test
+	public void testExecute_EdgeCase_ValidMinimalUsername() {
+		RegisterInputData inputData = new RegisterInputData(
+			"user@test.com",
+			"abc",
+			"password123",
+			"password123",
+			"0912345678"
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		CartRepository cartRepo = new MockCartRepository();
+		
+		RegisterViewModel viewModel = new RegisterViewModel();
+		RegisterOutputBoundary outputBoundary = new RegisterPresenter(viewModel);
+		
+		RegisterUseCaseControl control = new RegisterUseCaseControl(outputBoundary, userRepo, cartRepo);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+	}
+	
+	private static class MockUserRepository implements UserRepository {
+		private Long nextId = 1L;
+		
+		@Override
+		public Optional<TaiKhoan> findByEmail(String email) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<TaiKhoan> findById(Long id) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public boolean existsByEmail(String email) {
+			return email != null && email.equals("existing@test.com");
+		}
+		
+		@Override
+		public TaiKhoan save(TaiKhoan taiKhoan) {
+			if (taiKhoan.getMaTaiKhoan() == null) {
+				taiKhoan.setMaTaiKhoan(nextId++);
+			}
+			return taiKhoan;
+		}
+		
+		@Override
+		public void updateLastLogin(Long userId) {
+		}
+	}
+	
+	private static class MockCartRepository implements CartRepository {
+		@Override
+		public Optional<GioHang> findByUserId(Long userId) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public GioHang save(GioHang gioHang) {
+			if (gioHang.getMaGioHang() == null) {
+				gioHang.setMaGioHang(1L);
+			}
+			return gioHang;
+		}
+		
+		@Override
+		public Optional<GioHang> findById(Long id) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public void delete(Long cartId) {
+		}
+		
+		@Override
+		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
+			return 0;
+		}
+	}
 }
