@@ -31,6 +31,7 @@ public enum TrangThaiDonHang {
             case DANG_GIAO:
                 return trangThaiMoi == DA_GIAO || trangThaiMoi == DA_HUY;
             case DA_GIAO:
+                return false; // Không thể chuyển từ trạng thái cuối
             case DA_HUY:
                 return false; // Không thể chuyển từ trạng thái cuối
             default:
