@@ -29,4 +29,10 @@ public interface ProductRepository {
      * @return true if exists, false otherwise
      */
     boolean existsById(Long productId);
+    
+    /**
+     * Find all products
+     * @return List of all products
+     */
+    java.util.List<SanPham> findAll();
 }

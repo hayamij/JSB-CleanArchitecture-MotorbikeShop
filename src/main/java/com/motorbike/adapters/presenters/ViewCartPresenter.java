@@ -69,8 +69,10 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
                     item.getProductName(),
                     item.getProductImageUrl(),
                     VND_FORMAT.format(item.getUnitPrice()),
+                    item.getUnitPrice(), // raw value
                     item.getQuantity(),
                     VND_FORMAT.format(item.getSubtotal()),
+                    item.getSubtotal(), // raw value
                     item.getAvailableStock(),
                     stockStatus,
                     item.hasStockWarning(),
@@ -100,6 +102,7 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
         viewModel.totalItems = outputData.getTotalItems();
         viewModel.totalQuantity = outputData.getTotalQuantity();
         viewModel.formattedTotalAmount = formattedTotalAmount;
+        viewModel.rawTotalAmount = outputData.getTotalAmount(); // raw value
         viewModel.items = itemViewModels;
         viewModel.isEmpty = false;
         viewModel.hasStockWarnings = outputData.hasStockWarnings();

@@ -287,5 +287,10 @@ public class GetProductDetailUseCaseControlTest {
 		public boolean existsById(Long productId) {
 			return productId != null && productId > 0 && productId != 999L && productId != Long.MAX_VALUE;
 		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.SanPham> findAll() {
+			return new java.util.ArrayList<>();
+		}
 	}
 }

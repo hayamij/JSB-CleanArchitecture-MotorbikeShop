@@ -146,14 +146,21 @@ public class CartController {
         
         viewCartUseCase.execute(inputData);
         
-        // Get data from ViewModel populated by Presenter
-        // Map ViewModel items to Response items
+        // Map ViewModel items to Response items with full product info from database
         List<ViewCartResponse.CartItemResponse> responseItems = null;
         if (viewCartViewModel.items != null) {
             responseItems = viewCartViewModel.items.stream()
                 .map(item -> new ViewCartResponse.CartItemResponse(
-                    item.productId, item.productName, null, // price needs raw BigDecimal
-                    item.quantity, item.availableStock, item.hasStockWarning, null // subtotal needs raw BigDecimal
+                    item.productId, 
+                    item.productName, 
+                    item.productImageUrl,
+                    null, // description - can be added later if needed
+                    null, // category - can be added later if needed
+                    item.rawUnitPrice,
+                    item.quantity, 
+                    item.availableStock, 
+                    item.hasStockWarning, 
+                    item.rawSubtotal
                 ))
                 .collect(java.util.stream.Collectors.toList());
         }
@@ -161,7 +168,7 @@ public class CartController {
         return ResponseEntity.ok(new ViewCartResponse(
             viewCartViewModel.success, viewCartViewModel.message, viewCartViewModel.cartId,
             userId, viewCartViewModel.totalItems, viewCartViewModel.totalQuantity,
-            null, // totalAmount needs raw BigDecimal
+            viewCartViewModel.rawTotalAmount,
             viewCartViewModel.isEmpty, viewCartViewModel.hasStockWarnings,
             responseItems, null, viewCartViewModel.errorMessage
         ));
