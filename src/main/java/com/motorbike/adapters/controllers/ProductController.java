@@ -39,45 +39,12 @@ public class ProductController {
         this.productRepository = productRepository;
     }
 
-    /**
-     * GET /api/products/{id}
-     * Xem chi tiết sản phẩm
-     * 
-     * Path Parameter:
-     * - id: ID của sản phẩm (Long)
-     * 
-     * Success Response (200):
-     * {
-     *   "success": true,
-     *   "productId": 1,
-     *   "productName": "Honda Wave",
-     *   "description": "Xe số tiết kiệm nhiên liệu",
-     *   "price": 30000000,
-     *   "imageUrl": "wave.jpg",
-     *   "stockQuantity": 10,
-     *   "available": true,
-     *   "category": "XE_MAY",
-     *   "brand": "Honda",
-     *   "model": "Wave",
-     *   "color": "Đỏ",
-     *   "year": 2023,
-     *   "engineCapacity": 110
-     * }
-     * 
-     * Error Response (404):
-     * {
-     *   "success": false,
-     *   "errorCode": "PRODUCT_NOT_FOUND",
-     *   "errorMessage": "Không tìm thấy sản phẩm"
-     * }
-     */
     @GetMapping("/{id}")
     public ResponseEntity<ProductDetailResponse> getProductDetail(@PathVariable Long id) {
         GetProductDetailInputData inputData = new GetProductDetailInputData(id);
         
         getProductDetailUseCase.execute(inputData);
-        
-        // Convert ViewModel to Response DTO to avoid Spring proxy serialization issues
+
         if (!productDetailViewModel.hasError) {
             ProductDetailResponse response = new ProductDetailResponse(
                 true,
@@ -105,23 +72,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * GET /api/products
-     * Lấy danh sách tất cả sản phẩm
-     * 
-     * Success Response (200):
-     * [
-     *   {
-     *     "id": 1,
-     *     "name": "Honda Wave",
-     *     "description": "Xe số tiết kiệm nhiên liệu",
-     *     "price": 30000000,
-     *     "stock": 10,
-     *     "category": "XE_MAY",
-     *     "imageUrl": "wave.jpg"
-     *   }
-     * ]
-     */
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllProducts() {
         List<SanPham> products = productRepository.findAll();
@@ -136,7 +86,6 @@ public class ProductController {
                 productMap.put("stock", product.getSoLuongTonKho());
                 productMap.put("imageUrl", product.getHinhAnh());
                 
-                // Xác định category dựa trên loại sản phẩm
                 if (product instanceof XeMay) {
                     productMap.put("category", "XE_MAY");
                 } else if (product instanceof PhuKienXeMay) {
