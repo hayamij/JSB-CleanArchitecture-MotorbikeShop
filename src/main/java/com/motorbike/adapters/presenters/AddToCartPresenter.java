@@ -20,10 +20,6 @@ public class AddToCartPresenter implements AddToCartOutputBoundary {
     private static final NumberFormat CURRENCY_FORMATTER = 
         NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
-    /**
-     * Constructor
-     * @param viewModel View model to be updated
-     */
     public AddToCartPresenter(AddToCartViewModel viewModel) {
         this.viewModel = viewModel;
     }
