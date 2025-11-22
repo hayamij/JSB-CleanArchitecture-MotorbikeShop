@@ -439,6 +439,11 @@ public class CheckoutUseCaseControlTest {
 		public boolean existsById(Long productId) {
 			return productId != null;
 		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.SanPham> findAll() {
+			return new java.util.ArrayList<>();
+		}
 	}
 	
 	private static class MockOrderRepository implements OrderRepository {

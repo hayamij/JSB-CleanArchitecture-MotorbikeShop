@@ -40,30 +40,6 @@ public class AuthController {
         this.registerViewModel = registerViewModel;
     }
 
-    /**
-     * POST /api/auth/register
-     * Đăng ký tài khoản mới
-     * 
-     * Request Body:
-     * {
-     *   "email": "user@example.com",
-     *   "password": "password123",
-     *   "confirmPassword": "password123",
-     *   "name": "Nguyen Van A",
-     *   "phone": "0123456789",
-     *   "address": "123 Street, City"
-     * }
-     * 
-     * Success Response (201):
-     * {
-     *   "success": true,
-     *   "userId": 1,
-     *   "email": "user@example.com",
-     *   "name": "Nguyen Van A",
-     *   "role": "CUSTOMER",
-     *   "message": "Đăng ký thành công"
-     * }
-     */
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         // Map request to InputData - NO business logic here
@@ -97,27 +73,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * POST /api/auth/login
-     * Đăng nhập vào hệ thống
-     * 
-     * Request Body:
-     * {
-     *   "email": "user@example.com",
-     *   "password": "password123"
-     * }
-     * 
-     * Success Response (200):
-     * {
-     *   "success": true,
-     *   "userId": 1,
-     *   "email": "user@example.com",
-     *   "name": "Nguyen Van A",
-     *   "role": "CUSTOMER",
-     *   "cartId": 1,
-     *   "message": "Đăng nhập thành công"
-     * }
-     */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginInputData inputData = new LoginInputData(

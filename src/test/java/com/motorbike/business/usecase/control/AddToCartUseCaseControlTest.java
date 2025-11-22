@@ -308,5 +308,10 @@ public class AddToCartUseCaseControlTest {
 		public boolean existsById(Long productId) {
 			return productId != null && productId != 999L;
 		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.SanPham> findAll() {
+			return new java.util.ArrayList<>();
+		}
 	}
 }

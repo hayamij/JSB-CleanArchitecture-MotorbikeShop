@@ -154,8 +154,9 @@ public class UseCaseConfig {
     @Bean
     public ViewCartUseCaseControl viewCartUseCase(
             ViewCartOutputBoundary viewCartPresenter,
-            CartRepository cartRepository) {
-        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository);
+            CartRepository cartRepository,
+            ProductRepository productRepository) {
+        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository);
     }
     
     @Bean

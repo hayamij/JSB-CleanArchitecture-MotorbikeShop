@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.List;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,9 +14,13 @@ import com.motorbike.adapters.presenters.ViewCartPresenter;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
 import com.motorbike.business.dto.viewcart.ViewCartInputData;
 import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.entities.XeMay;
+
 
 public class ViewCartUseCaseControlTest {
 
@@ -23,11 +29,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(100L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.success);
@@ -41,11 +48,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(200L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.success);
@@ -58,11 +66,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(300L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.success);
@@ -74,11 +83,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = null;
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(false, viewModel.success);
@@ -90,11 +100,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(null);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(false, viewModel.success);
@@ -106,11 +117,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(999L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.isEmpty);
@@ -121,11 +133,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(888L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.isEmpty);
@@ -136,11 +149,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(100L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.success);
@@ -152,11 +166,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(400L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.success);
@@ -168,11 +183,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(1L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.success);
@@ -183,11 +199,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(Long.MAX_VALUE);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.isEmpty);
@@ -198,11 +215,12 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(100L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.success);
@@ -214,15 +232,60 @@ public class ViewCartUseCaseControlTest {
 		ViewCartInputData inputData = ViewCartInputData.forLoggedInUser(100L);
 		
 		CartRepository cartRepo = new MockCartRepository();
+		ProductRepository productRepo = new MockProductRepository();
 		
 		ViewCartViewModel viewModel = new ViewCartViewModel();
 		ViewCartOutputBoundary outputBoundary = new ViewCartPresenter(viewModel);
 		
-		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo);
+		ViewCartUseCaseControl control = new ViewCartUseCaseControl(outputBoundary, cartRepo, productRepo);
 		control.execute(inputData);
 		
 		assertEquals(true, viewModel.success);
 		assertNotEquals(null, viewModel.cartId);
+	}
+	
+	private static class MockProductRepository implements ProductRepository {
+		@Override
+		public Optional<SanPham> findById(Long productId) {
+			// Return a mock product with stock=10 for any ID
+			if (productId == null) {
+				return Optional.empty();
+			}
+			
+			// Create a mock XeMay (motorbike) product using proper constructor
+			XeMay product = new XeMay(
+				"Test Product " + productId,
+				"Test product description",
+				new BigDecimal("30000000"),
+				"/images/test-product.jpg",
+				10,  // stock = 10
+				"Honda",  // hangXe
+				"Wave",   // dongXe
+				"Red",    // mauSac
+				2024,     // namSanXuat
+				110       // dungTich
+			);
+			
+			return Optional.of(product);
+		}
+		
+		@Override
+		public SanPham save(SanPham sanPham) {
+			if (sanPham.getMaSanPham() == null) {
+				sanPham.setMaSanPham(1L);
+			}
+			return sanPham;
+		}
+		
+		@Override
+		public boolean existsById(Long productId) {
+			return productId != null;
+		}
+		
+		@Override
+		public List<SanPham> findAll() {
+			return Collections.emptyList();
+		}
 	}
 	
 	private static class MockCartRepository implements CartRepository {

@@ -44,6 +44,13 @@ public class ProductRepositoryAdapter implements ProductRepository {
         return jpaRepository.existsById(id);
     }
     
+    @Override
+    public java.util.List<SanPham> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(this::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
     // Conversion methods
     
     private SanPham toDomain(SanPhamJpaEntity jpaEntity) {

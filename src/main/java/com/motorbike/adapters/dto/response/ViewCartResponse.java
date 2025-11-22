@@ -55,6 +55,9 @@ public class ViewCartResponse {
     public static class CartItemResponse {
         private Long productId;
         private String productName;
+        private String imageUrl;
+        private String description;
+        private String category;
         private BigDecimal price;
         private int quantity;
         private int availableStock;
@@ -73,8 +76,27 @@ public class ViewCartResponse {
             this.subtotal = subtotal;
         }
 
+        public CartItemResponse(Long productId, String productName, String imageUrl, 
+                               String description, String category, BigDecimal price,
+                               int quantity, int availableStock, boolean hasStockIssue,
+                               BigDecimal subtotal) {
+            this.productId = productId;
+            this.productName = productName;
+            this.imageUrl = imageUrl;
+            this.description = description;
+            this.category = category;
+            this.price = price;
+            this.quantity = quantity;
+            this.availableStock = availableStock;
+            this.hasStockIssue = hasStockIssue;
+            this.subtotal = subtotal;
+        }
+
         public Long getProductId() { return productId; }
         public String getProductName() { return productName; }
+        public String getImageUrl() { return imageUrl; }
+        public String getDescription() { return description; }
+        public String getCategory() { return category; }
         public BigDecimal getPrice() { return price; }
         public int getQuantity() { return quantity; }
         public int getAvailableStock() { return availableStock; }
