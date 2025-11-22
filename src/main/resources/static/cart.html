@@ -97,7 +97,7 @@
 
         .cart-layout {
             display: grid;
-            grid-template-columns: 1fr 380px;
+            grid-template-columns: 2fr 380px;
             gap: 30px;
             align-items: start;
         }
@@ -124,14 +124,15 @@
 
         .cart-item {
             background: #fafafa;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
             display: grid;
-            grid-template-columns: 80px 1fr auto auto;
-            gap: 20px;
+            grid-template-columns: 120px 1fr auto auto;
+            gap: 25px;
             align-items: center;
             transition: all 0.3s;
             border: 2px solid #e0e0e0;
+            min-height: 160px;
         }
 
         .cart-item:hover {
@@ -145,14 +146,21 @@
         }
 
         .product-image {
-            width: 80px;
-            height: 80px;
+            width: 120px;
+            height: 120px;
             background: linear-gradient(135deg, #d4a574 0%, #b8936f 100%);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.5em;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .product-info {
@@ -483,7 +491,7 @@
             display: none;
         }
 
-        @media (max-width: 968px) {
+        @media (max-width: 1300px) {
             .cart-layout {
                 grid-template-columns: 1fr;
             }
@@ -493,8 +501,13 @@
             }
 
             .cart-item {
-                grid-template-columns: 60px 1fr;
+                grid-template-columns: 100px 1fr;
                 gap: 15px;
+            }
+
+            .product-image {
+                width: 100px;
+                height: 100px;
             }
 
             .quantity-controls {
@@ -660,8 +673,8 @@
                 
                 html += `
                     <div class="cart-item ${stockClass}">
-                        <div class="product-image" style="${!hasImage ? 'background: linear-gradient(135deg, #d4a574 0%, #b8936f 100%); display: flex; align-items: center; justify-content: center;' : ''}">
-                            ${hasImage ? `<img src="${imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;">` : ''}
+                        <div class="product-image">
+                            ${hasImage ? `<img src="${imageUrl}" alt="${item.productName}">` : ''}
                         </div>
                         
                         <div class="product-info">
@@ -675,8 +688,8 @@
                         
                         <div class="quantity-controls">
                             <button class="quantity-btn" onclick="decreaseQuantity(${item.productId}, ${item.quantity})">−</button>
-                            <input type="number" class="quantity-input" id="qty-${item.productId}" value="${item.quantity}" min="0" max="${item.availableStock}" data-product-id="${item.productId}" data-max-stock="${item.availableStock}">
-                            <button class="quantity-btn" onclick="increaseQuantity(${item.productId}, ${item.quantity})" ${item.quantity >= item.availableStock ? 'disabled' : ''}>+</button>
+                            <input type="number" class="quantity-input" id="qty-${item.productId}" value="${item.quantity}" min="0" onchange="applyQuantityChange(${item.productId})">
+                            <button class="quantity-btn" onclick="increaseQuantity(${item.productId}, ${item.quantity})">+</button>
                         </div>
                         
                         <div class="item-actions">
@@ -715,30 +728,12 @@
         }
 
         async function increaseQuantity(productId, currentQuantity) {
-            const input = document.getElementById(`qty-${productId}`);
-            const maxStock = input ? parseInt(input.getAttribute('data-max-stock')) : 999;
-            
-            if (currentQuantity >= maxStock) {
-                showAlert('⚠️ Đã đạt số lượng tối đa trong kho', 'warning');
-                return;
-            }
-            
             const newQuantity = currentQuantity + 1;
-            if (input) {
-                input.value = newQuantity;
-            }
             await updateQuantity(productId, newQuantity);
         }
 
         async function decreaseQuantity(productId, currentQuantity) {
-            if (currentQuantity <= 0) {
-                return;
-            }
             const newQuantity = currentQuantity - 1;
-            const input = document.getElementById(`qty-${productId}`);
-            if (input) {
-                input.value = newQuantity;
-            }
             await updateQuantity(productId, newQuantity);
         }
 
@@ -746,33 +741,7 @@
             const input = document.getElementById(`qty-${productId}`);
             if (!input) return;
 
-            let newQuantity = parseInt(input.value);
-            const maxStock = parseInt(input.getAttribute('data-max-stock'));
-
-            // Kiểm tra số lượng hợp lệ
-            if (isNaN(newQuantity) || newQuantity < 0) {
-                showAlert('❌ Số lượng không hợp lệ', 'error');
-                input.value = 1;
-                return;
-            }
-
-            // Kiểm tra vượt tồn kho, tự động điều chỉnh
-            if (newQuantity > maxStock) {
-                showAlert(`⚠️ Số lượng vượt quá tồn kho. Đã điều chỉnh về ${maxStock}`, 'warning');
-                newQuantity = maxStock;
-                input.value = newQuantity;
-            }
-
-            // Nếu là 0, xác nhận xóa
-            if (newQuantity === 0) {
-                if (confirm('🗑️ Số lượng = 0. Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?')) {
-                    await updateQuantity(productId, 0);
-                } else {
-                    input.value = 1;
-                }
-                return;
-            }
-
+            const newQuantity = parseInt(input.value);
             await updateQuantity(productId, newQuantity);
         }
 
@@ -780,16 +749,6 @@
             if (!currentCart || !currentCart.cartId) {
                 showAlert('❌ Không tìm thấy thông tin giỏ hàng', 'error');
                 return;
-            }
-
-            if (newQuantity < 0) {
-                showAlert('❌ Số lượng không hợp lệ', 'error');
-                return;
-            }
-
-            // Cho phép newQuantity = 0 để xóa sản phẩm
-            if (newQuantity === 0) {
-                // Gọi API để xóa (business rule sẽ xử lý)
             }
 
             try {
@@ -808,13 +767,10 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showAlert('✅ Đã cập nhật số lượng', 'success');
+                    showAlert('✅ ' + (data.message || 'Đã cập nhật'), 'success');
                     loadCart();
                 } else {
-                    showAlert(data.errorMessage || 'Không thể cập nhật số lượng', 'error');
-                    if (data.errorCode === 'INSUFFICIENT_STOCK') {
-                        showAlert('⚠️ Số lượng vượt quá tồn kho', 'warning');
-                    }
+                    showAlert(data.errorMessage || 'Không thể cập nhật', 'error');
                 }
             } catch (error) {
                 console.error('Error updating quantity:', error);
@@ -827,51 +783,10 @@
                 return;
             }
 
-            // Cập nhật input về 0 trước khi xóa
-            const input = document.getElementById(`qty-${productId}`);
-            if (input) {
-                input.value = 0;
-            }
-
-            try {
-                const response = await fetch('/api/cart/update', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        cartId: parseInt(currentCart.cartId),
-                        productId: productId,
-                        newQuantity: 0
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('✅ Đã xóa sản phẩm khỏi giỏ hàng', 'success');
-                    loadCart();
-                } else {
-                    showAlert(data.errorMessage || 'Không thể xóa sản phẩm', 'error');
-                }
-            } catch (error) {
-                console.error('Error removing item:', error);
-                showAlert('❌ Lỗi kết nối đến server', 'error');
-            }
+            await updateQuantity(productId, 0);
         }
 
         async function checkout() {
-            if (!currentCart || currentCart.isEmpty || currentCart.totalItems === 0) {
-                showAlert('⚠️ Giỏ hàng trống, không thể thanh toán', 'warning');
-                return;
-            }
-
-            if (currentCart.hasStockWarnings) {
-                if (!confirm('⚠️ Một số sản phẩm có vấn đề về tồn kho. Bạn có muốn tiếp tục?')) {
-                    return;
-                }
-            }
-
             const userId = sessionStorage.getItem('userId');
 
             try {
