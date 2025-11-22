@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.List;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +20,7 @@ import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.XeMay;
+
 
 public class ViewCartUseCaseControlTest {
 
@@ -280,8 +283,8 @@ public class ViewCartUseCaseControlTest {
 		}
 		
 		@Override
-		public java.util.List<SanPham> findAll() {
-			return java.util.Collections.emptyList();
+		public List<SanPham> findAll() {
+			return Collections.emptyList();
 		}
 	}
 	
