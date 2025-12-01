@@ -1,6 +1,6 @@
 package com.motorbike.business.usecase.control;
 
-import com.motorbike.domain.exceptions.InvalidInputDataException;
+import com.motorbike.domain.exceptions.ValidationException;
 
 public abstract class AbstractUseCaseControl<I, O> {
 
@@ -27,7 +27,7 @@ public abstract class AbstractUseCaseControl<I, O> {
     protected abstract void handleSystemError(Exception e);
     protected void checkInputNotNull(I inputData) {
         if (inputData == null) {
-            throw new InvalidInputDataException();
+            throw ValidationException.invalidInput();
         }
     }
 }

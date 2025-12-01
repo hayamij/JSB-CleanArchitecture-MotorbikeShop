@@ -1,6 +1,6 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidProductException;
+import com.motorbike.domain.exceptions.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -47,25 +47,34 @@ public abstract class SanPham {
 
     public static void validateTenSanPham(String tenSanPham) {
         if (tenSanPham == null || tenSanPham.trim().isEmpty()) {
-            throw new InvalidProductException("EMPTY_NAME", "Tên sản phẩm không được rỗng");
+            throw ValidationException.emptyProductName();
         }
         if (tenSanPham.length() > 255) {
-            throw new InvalidProductException("NAME_TOO_LONG", "Tên sản phẩm phải <= 255 ký tự");
+            throw ValidationException.productNameTooLong();
         }
     }
 
     public static void validateGia(BigDecimal gia) {
         if (gia == null) {
-            throw new InvalidProductException("NULL_PRICE", "Giá không được null");
+            throw ValidationException.nullPrice();
         }
         if (gia.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidProductException("INVALID_PRICE", "Giá phải > 0");
+            throw ValidationException.invalidPrice();
         }
     }
 
     public static void validateSoLuongTonKho(int soLuong) {
         if (soLuong < 0) {
-            throw new InvalidProductException("NEGATIVE_STOCK", "Số lượng tồn kho không được âm");
+            throw ValidationException.negativeStock();
+        }
+    }
+
+    public static void checkInput(Long productId, int quantity) {
+        if (productId == null) {
+            throw ValidationException.nullProductId();
+        }
+        if (quantity <= 0) {
+            throw ValidationException.invalidQuantity();
         }
     }
 
@@ -76,11 +85,10 @@ public abstract class SanPham {
 
     public void giamTonKho(int soLuong) {
         if (soLuong <= 0) {
-            throw new InvalidProductException("INVALID_QUANTITY", "Số lượng phải > 0");
+            throw ValidationException.invalidQuantity();
         }
         if (this.soLuongTonKho < soLuong) {
-            throw new InvalidProductException("INSUFFICIENT_STOCK",
-                "Không đủ hàng trong kho (còn: " + this.soLuongTonKho + ", yêu cầu: " + soLuong + ")");
+            throw DomainException.insufficientStock(this.tenSanPham, this.soLuongTonKho);
         }
         this.soLuongTonKho -= soLuong;
         this.ngayCapNhat = LocalDateTime.now();
@@ -92,7 +100,7 @@ public abstract class SanPham {
 
     public void tangTonKho(int soLuong) {
         if (soLuong <= 0) {
-            throw new InvalidProductException("INVALID_QUANTITY", "Số lượng phải > 0");
+            throw ValidationException.invalidQuantity();
         }
         this.soLuongTonKho += soLuong;
         this.ngayCapNhat = LocalDateTime.now();
@@ -107,8 +115,7 @@ public abstract class SanPham {
             this.conHang = true;
             this.ngayCapNhat = LocalDateTime.now();
         } else {
-            throw new InvalidProductException("NO_STOCK_TO_RESTORE",
-                "Không thể khôi phục kinh doanh khi không có hàng trong kho");
+            throw DomainException.noStockToRestore();
         }
     }
 

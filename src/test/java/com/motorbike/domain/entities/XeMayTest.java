@@ -1,6 +1,7 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidProductException;
+import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.domain.exceptions.DomainException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -31,7 +32,7 @@ class XeMayTest {
     void testCreateXeMay_InvalidName_ThrowsException() {
         BigDecimal gia = BigDecimal.valueOf(46000000);
 
-        assertThrows(InvalidProductException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             new XeMay(null, "Mô tả", gia, "/images/honda.jpg", 10,
                      "Honda", "Winner X", "Đỏ", 2025, 150);
         });
@@ -39,7 +40,7 @@ class XeMayTest {
 
     @Test
     void testCreateXeMay_InvalidPrice_ThrowsException() {
-        assertThrows(InvalidProductException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             new XeMay("Honda Winner X", "Mô tả", BigDecimal.ZERO, "/images/honda.jpg", 10,
                      "Honda", "Winner X", "Đỏ", 2025, 150);
         });
@@ -72,7 +73,7 @@ class XeMayTest {
         XeMay xeMay = new XeMay("Honda Winner X", "Mô tả", BigDecimal.valueOf(46000000),
                                "/images/honda.jpg", 5, "Honda", "Winner X", "Đỏ", 2025, 150);
 
-        assertThrows(InvalidProductException.class, () -> {
+        assertThrows(DomainException.class, () -> {
             xeMay.giamTonKho(10);
         });
     }

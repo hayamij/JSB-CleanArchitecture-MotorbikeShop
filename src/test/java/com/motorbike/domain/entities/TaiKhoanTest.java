@@ -1,6 +1,6 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidUserException;
+import com.motorbike.domain.exceptions.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,28 +26,28 @@ class TaiKhoanTest {
 
     @Test
     void testCreateTaiKhoan_InvalidEmail_ThrowsException() {
-        assertThrows(InvalidUserException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             new TaiKhoan("invalid-email", "user1", "password123", "0912345678", "Hà Nội");
         });
     }
 
     @Test
     void testCreateTaiKhoan_EmptyUsername_ThrowsException() {
-        assertThrows(InvalidUserException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             new TaiKhoan("test@gmail.com", "", "password123", "0912345678", "Hà Nội");
         });
     }
 
     @Test
     void testCreateTaiKhoan_ShortPassword_ThrowsException() {
-        assertThrows(InvalidUserException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             new TaiKhoan("test@gmail.com", "user1", "12345", "0912345678", "Hà Nội");
         });
     }
 
     @Test
     void testCreateTaiKhoan_InvalidPhoneNumber_ThrowsException() {
-        assertThrows(InvalidUserException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             new TaiKhoan("test@gmail.com", "user1", "password123", "123", "Hà Nội");
         });
     }
@@ -110,7 +110,7 @@ class TaiKhoanTest {
                                         "0912345678", "Hà Nội");
         taiKhoan.khoaTaiKhoan();
 
-        assertThrows(InvalidUserException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             taiKhoan.dangNhapThanhCong();
         });
     }

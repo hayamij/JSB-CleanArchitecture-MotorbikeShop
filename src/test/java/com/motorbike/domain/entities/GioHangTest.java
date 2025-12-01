@@ -1,6 +1,7 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidCartException;
+import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.domain.exceptions.DomainException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -71,7 +72,7 @@ class GioHangTest {
     void testThemSanPham_NullItem_ThrowsException() {
         GioHang gioHang = new GioHang(1L);
 
-        assertThrows(InvalidCartException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             gioHang.themSanPham(null);
         });
     }
@@ -96,7 +97,7 @@ class GioHangTest {
                                                    BigDecimal.valueOf(46000000), 1);
         gioHang.themSanPham(chiTiet);
 
-        assertThrows(com.motorbike.domain.exceptions.ProductNotInCartException.class,
+        assertThrows(DomainException.class,
             () -> gioHang.xoaSanPham(999L));
     }
 
@@ -134,7 +135,7 @@ class GioHangTest {
                                                    BigDecimal.valueOf(46000000), 1);
         gioHang.themSanPham(chiTiet);
 
-        assertThrows(InvalidCartException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             gioHang.capNhatSoLuong(1L, -1);
         });
     }

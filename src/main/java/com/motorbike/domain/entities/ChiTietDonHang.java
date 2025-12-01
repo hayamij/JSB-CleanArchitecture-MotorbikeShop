@@ -1,6 +1,6 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidOrderException;
+import com.motorbike.domain.exceptions.*;
 import java.math.BigDecimal;
 
 public class ChiTietDonHang {
@@ -37,15 +37,14 @@ public class ChiTietDonHang {
 
     private void validateSoLuong(int soLuong) {
         if (soLuong <= 0) {
-            throw new InvalidOrderException("INVALID_QUANTITY",
+            throw ValidationException.invalidOrderQuantity(
                 "Số lượng phải lớn hơn 0 (hiện tại: " + soLuong + ")");
         }
     }
 
     private void validateGia(BigDecimal gia) {
         if (gia == null || gia.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidOrderException("INVALID_PRICE",
-                "Giá bán phải lớn hơn 0");
+            throw ValidationException.invalidOrderPrice("Giá bán phải lớn hơn 0");
         }
     }
 
@@ -55,8 +54,7 @@ public class ChiTietDonHang {
 
     public static ChiTietDonHang fromChiTietGioHang(ChiTietGioHang chiTietGioHang) {
         if (chiTietGioHang == null) {
-            throw new InvalidOrderException("NULL_CART_ITEM",
-                "Chi tiết giỏ hàng không được null");
+            throw ValidationException.nullCartItem();
         }
         
         return new ChiTietDonHang(

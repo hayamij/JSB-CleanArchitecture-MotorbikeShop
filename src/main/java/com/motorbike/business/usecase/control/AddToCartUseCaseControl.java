@@ -7,10 +7,10 @@ import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.ChiTietGioHang;
-import com.motorbike.domain.exceptions.InvalidCartException;
-import com.motorbike.domain.exceptions.ProductNotFoundException;
-import com.motorbike.domain.exceptions.InsufficientStockException;
+import com.motorbike.domain.exceptions.DomainException;
+import com.motorbike.domain.exceptions.ValidationException;
 
 public class AddToCartUseCaseControl
         extends AbstractUseCaseControl<AddToCartInputData, AddToCartOutputBoundary> {
@@ -34,10 +34,10 @@ public class AddToCartUseCaseControl
                 .orElse(new GioHang(inputData.getUserId()));
             
             SanPham sanPham = productRepository.findById(inputData.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException(String.valueOf(inputData.getProductId())));
+                .orElseThrow(() -> DomainException.productNotFound(String.valueOf(inputData.getProductId())));
             
             if (sanPham.getSoLuongTonKho() < inputData.getQuantity()) {
-                throw new InsufficientStockException(sanPham.getSoLuongTonKho());
+                throw DomainException.insufficientStock(sanPham.getTenSanPham(), sanPham.getSoLuongTonKho());
             }
             
             ChiTietGioHang chiTiet = new ChiTietGioHang(
@@ -58,7 +58,7 @@ public class AddToCartUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidCartException | ProductNotFoundException | InsufficientStockException e) {
+        } catch (ValidationException | DomainException e) {
             throw e;
         }
     }
@@ -66,25 +66,15 @@ public class AddToCartUseCaseControl
     @Override
     protected void validateInput(AddToCartInputData inputData) {
         checkInputNotNull(inputData);
-        
-        if (inputData.getUserId() == null) {
-            throw new com.motorbike.domain.exceptions.InvalidUserIdException();
-        }
-        
-        if (inputData.getProductId() == null) {
-            throw new com.motorbike.domain.exceptions.InvalidProductIdException();
-        }
-        
-        if (inputData.getQuantity() <= 0) {
-            throw new com.motorbike.domain.exceptions.InvalidQuantityException();
-        }
+        TaiKhoan.checkInput(inputData.getUserId());
+        SanPham.checkInput(inputData.getProductId(), inputData.getQuantity());
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
         String errorCode = "INVALID_INPUT";
-        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
-            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        if (e instanceof ValidationException) {
+            errorCode = ((ValidationException) e).getErrorCode();
         }
         AddToCartOutputData outputData = AddToCartOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
@@ -95,16 +85,12 @@ public class AddToCartUseCaseControl
         String errorCode;
         String message;
         
-        if (e instanceof InvalidCartException) {
-            InvalidCartException ex = (InvalidCartException) e;
+        if (e instanceof ValidationException) {
+            ValidationException ex = (ValidationException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } else if (e instanceof ProductNotFoundException) {
-            ProductNotFoundException ex = (ProductNotFoundException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof InsufficientStockException) {
-            InsufficientStockException ex = (InsufficientStockException) e;
+        } else if (e instanceof DomainException) {
+            DomainException ex = (DomainException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {

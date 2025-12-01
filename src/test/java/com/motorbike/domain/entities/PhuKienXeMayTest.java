@@ -1,6 +1,6 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidProductException;
+import com.motorbike.domain.exceptions.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -32,7 +32,7 @@ class PhuKienXeMayTest {
     void testCreatePhuKien_InvalidName_ThrowsException() {
         BigDecimal gia = BigDecimal.valueOf(850000);
 
-        assertThrows(InvalidProductException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             new PhuKienXeMay("", "Mô tả", gia, "/images/helmet.jpg", 50,
                             "Mũ bảo hiểm", "Royal", "ABS", "L");
         });
@@ -40,7 +40,7 @@ class PhuKienXeMayTest {
 
     @Test
     void testCreatePhuKien_NegativeStock_ThrowsException() {
-        assertThrows(InvalidProductException.class, () -> {
+        assertThrows(ValidationException.class, () -> {
             new PhuKienXeMay("Mũ bảo hiểm", "Mô tả", BigDecimal.valueOf(850000),
                             "/images/helmet.jpg", -5,
                             "Mũ bảo hiểm", "Royal", "ABS", "L");

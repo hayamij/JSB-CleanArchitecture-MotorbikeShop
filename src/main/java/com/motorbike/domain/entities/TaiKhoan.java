@@ -1,6 +1,6 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidUserException;
+import com.motorbike.domain.exceptions.*;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
@@ -57,47 +57,71 @@ public class TaiKhoan {
 
     public static void validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
-            throw new InvalidUserException("EMPTY_EMAIL", "Email không được rỗng");
+            throw ValidationException.emptyEmail();
         }
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new InvalidUserException("INVALID_EMAIL_FORMAT", "Format email không đúng");
+            throw ValidationException.invalidEmail();
         }
     }
 
     public static void validateTenDangNhap(String tenDangNhap) {
         if (tenDangNhap == null || tenDangNhap.trim().isEmpty()) {
-            throw new InvalidUserException("EMPTY_USERNAME", "Tên đăng nhập không được rỗng");
+            throw ValidationException.emptyUsername();
         }
         if (tenDangNhap.length() < 3) {
-            throw new InvalidUserException("USERNAME_TOO_SHORT", "Tên đăng nhập phải >= 3 ký tự");
+            throw ValidationException.usernameTooShort();
         }
         if (tenDangNhap.length() > 50) {
-            throw new InvalidUserException("USERNAME_TOO_LONG", "Tên đăng nhập phải <= 50 ký tự");
+            throw ValidationException.usernameTooLong();
         }
     }
 
     public static void validateMatKhau(String matKhau) {
         if (matKhau == null || matKhau.isEmpty()) {
-            throw new InvalidUserException("EMPTY_PASSWORD", "Mật khẩu không được rỗng");
+            throw ValidationException.emptyPassword();
         }
         if (matKhau.length() < 6) {
-            throw new InvalidUserException("PASSWORD_TOO_SHORT", "Mật khẩu phải >= 6 ký tự");
+            throw ValidationException.passwordTooShort();
         }
     }
 
     public static void validateSoDienThoai(String soDienThoai) {
         if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
-            throw new InvalidUserException("EMPTY_PHONE", "Số điện thoại không được rỗng");
+            throw ValidationException.emptyPhone();
         }
         if (!PHONE_PATTERN.matcher(soDienThoai).matches()) {
-            throw new InvalidUserException("INVALID_PHONE_FORMAT",
-                "Số điện thoại không đúng định dạng (VD: 0912345678 hoặc +84912345678)");
+            throw ValidationException.invalidPhoneFormat();
         }
+    }
+
+    public static void checkInput(Long userId) {
+        if (userId == null) {
+            throw ValidationException.invalidUserId();
+        }
+    }
+
+    public static void checkInputForLogin(String email, String password) {
+        if (email == null || email.trim().isEmpty()) {
+            throw ValidationException.emptyEmail();
+        }
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw ValidationException.invalidEmail();
+        }
+        if (password == null || password.isEmpty()) {
+            throw ValidationException.emptyPassword();
+        }
+    }
+
+    public static void checkInputForRegister(String email, String tenDangNhap, String matKhau, String soDienThoai) {
+        validateEmail(email);
+        validateTenDangNhap(tenDangNhap);
+        validateMatKhau(matKhau);
+        validateSoDienThoai(soDienThoai);
     }
 
     public void dangNhapThanhCong() {
         if (!this.hoatDong) {
-            throw new InvalidUserException("ACCOUNT_INACTIVE", "Tài khoản đã bị khóa");
+            throw ValidationException.accountInactive();
         }
         this.lanDangNhapCuoi = LocalDateTime.now();
     }

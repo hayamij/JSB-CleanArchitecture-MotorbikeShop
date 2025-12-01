@@ -7,7 +7,8 @@ import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
-import com.motorbike.domain.exceptions.EmptyCartException;
+import com.motorbike.domain.exceptions.DomainException;
+import com.motorbike.domain.exceptions.ValidationException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -29,10 +30,10 @@ public class ViewCartUseCaseControl
     @Override
     protected void executeBusinessLogic(ViewCartInputData inputData) throws Exception {
         GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
-            .orElseThrow(() -> new EmptyCartException());
+            .orElseThrow(DomainException::emptyCart);
         
         if (gioHang.getDanhSachSanPham().isEmpty()) {
-            throw new EmptyCartException();
+            throw DomainException.emptyCart();
         }
         
         List<ViewCartOutputData.CartItemData> itemList = new ArrayList<>();
@@ -84,16 +85,14 @@ public class ViewCartUseCaseControl
     @Override
     protected void validateInput(ViewCartInputData inputData) {
         checkInputNotNull(inputData);
-        if (inputData.getUserId() == null) {
-            throw new com.motorbike.domain.exceptions.InvalidUserIdException();
-        }
+        com.motorbike.domain.entities.TaiKhoan.checkInput(inputData.getUserId());
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
         String errorCode = "INVALID_INPUT";
-        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
-            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        if (e instanceof ValidationException) {
+            errorCode = ((ValidationException) e).getErrorCode();
         }
         ViewCartOutputData outputData = ViewCartOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
@@ -101,7 +100,7 @@ public class ViewCartUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
-        if (e instanceof EmptyCartException) {
+        if (e instanceof DomainException && "EMPTY_CART".equals(((DomainException) e).getErrorCode())) {
             ViewCartOutputData outputData = ViewCartOutputData.forEmptyCart();
             outputBoundary.present(outputData);
             return;

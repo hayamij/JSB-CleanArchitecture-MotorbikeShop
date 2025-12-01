@@ -1,7 +1,6 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidCartException;
-import com.motorbike.domain.exceptions.ProductNotInCartException;
+import com.motorbike.domain.exceptions.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class GioHang {
 
     public void themSanPham(ChiTietGioHang chiTiet) {
         if (chiTiet == null) {
-            throw new InvalidCartException("NULL_ITEM", "Chi tiết giỏ hàng không được null");
+            throw ValidationException.nullItem();
         }
         Optional<ChiTietGioHang> existing = timSanPhamTheoMa(chiTiet.getMaSanPham());
         if (existing.isPresent()) {
@@ -50,7 +49,7 @@ public class GioHang {
 
     public void xoaSanPham(Long maSanPham) {
         if (maSanPham == null) {
-            throw new InvalidCartException("NULL_PRODUCT_ID", "Mã sản phẩm không được null");
+            throw ValidationException.nullProductId();
         }
         Optional<ChiTietGioHang> item = timSanPhamTheoMa(maSanPham);
         if (item.isPresent()) {
@@ -58,16 +57,16 @@ public class GioHang {
             tinhLaiTongTien();
             this.ngayCapNhat = LocalDateTime.now();
         } else {
-            throw new ProductNotInCartException("Không thể xóa sản phẩm: Sản phẩm không có trong giỏ hàng");
+            throw DomainException.productNotInCart();
         }
     }
 
     public void capNhatSoLuong(Long maSanPham, int soLuongMoi) {
         if (maSanPham == null) {
-            throw new InvalidCartException("NULL_PRODUCT_ID", "Mã sản phẩm không được null");
+            throw ValidationException.nullProductId();
         }
         if (soLuongMoi < 0) {
-            throw new InvalidCartException("INVALID_QUANTITY", "Số lượng không được âm");
+            throw ValidationException.invalidCartQuantity();
         }
         if (soLuongMoi == 0) {
             xoaSanPham(maSanPham);
@@ -79,7 +78,7 @@ public class GioHang {
             tinhLaiTongTien();
             this.ngayCapNhat = LocalDateTime.now();
         } else {
-            throw new ProductNotInCartException("Không thể cập nhật số lượng: Sản phẩm không có trong giỏ hàng");
+            throw DomainException.productNotInCart();
         }
     }
 
@@ -89,6 +88,18 @@ public class GioHang {
     public int tongSoLuong() {return this.danhSachSanPham.stream().mapToInt(ChiTietGioHang::getSoLuong).sum();}
     private Optional<ChiTietGioHang> timSanPhamTheoMa(Long maSanPham) {return this.danhSachSanPham.stream().filter(item -> item.getMaSanPham().equals(maSanPham)).findFirst();}
     private void tinhLaiTongTien() {this.tongTien = this.danhSachSanPham.stream().map(ChiTietGioHang::tinhTamTinh).reduce(BigDecimal.ZERO, BigDecimal::add);}
+
+    public static void checkInput(Long cartId, Long productId, int quantity) {
+        if (cartId == null) {
+            throw ValidationException.nullCartId();
+        }
+        if (productId == null) {
+            throw ValidationException.nullProductId();
+        }
+        if (quantity < 0) {
+            throw ValidationException.invalidCartQuantity();
+        }
+    }
 
     public Long getMaGioHang() {return maGioHang;}
     public Long getMaTaiKhoan() {return maTaiKhoan;}

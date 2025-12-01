@@ -1,6 +1,6 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.InvalidOrderException;
+import com.motorbike.domain.exceptions.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,28 +56,38 @@ public class DonHang {
 
     private void validateThongTinNguoiNhan(String tenNguoiNhan, String soDienThoai, String diaChiGiaoHang) {
         if (tenNguoiNhan == null || tenNguoiNhan.trim().isEmpty()) {
-            throw new InvalidOrderException("MISSING_RECEIVER_NAME",
-                "Tên người nhận không được để trống");
+            throw ValidationException.missingReceiverName();
         }
         if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
-            throw new InvalidOrderException("MISSING_PHONE",
-                "Số điện thoại không được để trống");
+            throw ValidationException.missingPhone();
         }
         if (diaChiGiaoHang == null || diaChiGiaoHang.trim().isEmpty()) {
-            throw new InvalidOrderException("MISSING_ADDRESS",
-                "Địa chỉ giao hàng không được để trống");
+            throw ValidationException.missingAddress();
+        }
+    }
+
+    public static void checkInput(Long userId, String tenNguoiNhan, String soDienThoai, String diaChiGiaoHang) {
+        if (userId == null) {
+            throw ValidationException.invalidUserId();
+        }
+        if (tenNguoiNhan == null || tenNguoiNhan.trim().isEmpty()) {
+            throw ValidationException.missingReceiverName();
+        }
+        if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
+            throw ValidationException.missingPhone();
+        }
+        if (diaChiGiaoHang == null || diaChiGiaoHang.trim().isEmpty()) {
+            throw ValidationException.missingAddress();
         }
     }
 
     public void themSanPham(ChiTietDonHang chiTiet) {
         if (chiTiet == null) {
-            throw new InvalidOrderException("NULL_ORDER_ITEM",
-                "Chi tiết đơn hàng không được null");
+            throw ValidationException.nullOrderItem();
         }
         
         if (this.trangThai != TrangThaiDonHang.CHO_XAC_NHAN) {
-            throw new InvalidOrderException("INVALID_ORDER_STATE",
-                "Không thể thêm sản phẩm vào đơn hàng đã được xác nhận");
+            throw DomainException.invalidOrderState();
         }
         
         this.danhSachSanPham.add(chiTiet);
@@ -93,26 +103,24 @@ public class DonHang {
 
     public void validate() {
         if (this.danhSachSanPham == null || this.danhSachSanPham.isEmpty()) {
-            throw new InvalidOrderException("EMPTY_ORDER",
-                "Đơn hàng phải có ít nhất 1 sản phẩm");
+            throw DomainException.emptyOrder();
         }
         
         if (this.tongTien == null || this.tongTien.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidOrderException("INVALID_TOTAL",
-                "Tổng tiền đơn hàng phải lớn hơn 0");
+            throw DomainException.invalidTotal();
         }
     }
 
     public void chuyenTrangThai(TrangThaiDonHang trangThaiMoi) {
         if (trangThaiMoi == null) {
-            throw new InvalidOrderException("NULL_STATUS",
-                "Trạng thái mới không được null");
+            throw ValidationException.nullStatus();
         }
         
         if (!this.trangThai.coTheChuyenSang(trangThaiMoi)) {
-            throw new InvalidOrderException("INVALID_STATUS_TRANSITION",
-                "Không thể chuyển từ trạng thái '" + this.trangThai.getMoTa() +
-                "' sang '" + trangThaiMoi.getMoTa() + "'");
+            throw DomainException.invalidStatusTransition(
+                this.trangThai.getMoTa(),
+                trangThaiMoi.getMoTa()
+            );
         }
         
         this.trangThai = trangThaiMoi;
@@ -121,13 +129,11 @@ public class DonHang {
 
     public void huyDonHang() {
         if (this.trangThai == TrangThaiDonHang.DA_GIAO) {
-            throw new InvalidOrderException("CANNOT_CANCEL_DELIVERED",
-                "Không thể hủy đơn hàng đã giao");
+            throw DomainException.cannotCancelDelivered();
         }
         
         if (this.trangThai == TrangThaiDonHang.DA_HUY) {
-            throw new InvalidOrderException("ALREADY_CANCELLED",
-                "Đơn hàng đã bị hủy trước đó");
+            throw DomainException.alreadyCancelled();
         }
         
         this.trangThai = TrangThaiDonHang.DA_HUY;
@@ -137,12 +143,11 @@ public class DonHang {
     public static DonHang fromGioHang(GioHang gioHang, String tenNguoiNhan,
                                       String soDienThoai, String diaChiGiaoHang, String ghiChu) {
         if (gioHang == null) {
-            throw new InvalidOrderException("NULL_CART", "Giỏ hàng không được null");
+            throw ValidationException.nullCart();
         }
         
         if (gioHang.getDanhSachSanPham() == null || gioHang.getDanhSachSanPham().isEmpty()) {
-            throw new InvalidOrderException("EMPTY_CART",
-                "Giỏ hàng phải có ít nhất 1 sản phẩm");
+            throw DomainException.emptyCart();
         }
         
         DonHang donHang = new DonHang(
