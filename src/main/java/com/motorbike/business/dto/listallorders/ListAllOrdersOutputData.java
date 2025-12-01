@@ -7,23 +7,12 @@ import java.util.List;
 public class ListAllOrdersOutputData {
     private final boolean success;
     private final List<OrderItemData> orders;
-    private final int totalOrders;
-    private final int totalPages;
-    private final int currentPage;
-    private final int pageSize;
-    private final BigDecimal totalRevenue;
     private final String errorCode;
     private final String errorMessage;
 
-    public ListAllOrdersOutputData(List<OrderItemData> orders, int totalOrders, int totalPages,
-                                   int currentPage, int pageSize, BigDecimal totalRevenue) {
+    public ListAllOrdersOutputData(List<OrderItemData> orders) {
         this.success = true;
         this.orders = orders;
-        this.totalOrders = totalOrders;
-        this.totalPages = totalPages;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.totalRevenue = totalRevenue;
         this.errorCode = null;
         this.errorMessage = null;
     }
@@ -31,30 +20,17 @@ public class ListAllOrdersOutputData {
     public ListAllOrdersOutputData(String errorCode, String errorMessage) {
         this.success = false;
         this.orders = null;
-        this.totalOrders = 0;
-        this.totalPages = 0;
-        this.currentPage = 0;
-        this.pageSize = 0;
-        this.totalRevenue = BigDecimal.ZERO;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
 
     public boolean isSuccess() { return success; }
     public List<OrderItemData> getOrders() { return orders; }
-    public int getTotalOrders() { return totalOrders; }
-    public int getTotalPages() { return totalPages; }
-    public int getCurrentPage() { return currentPage; }
-    public int getPageSize() { return pageSize; }
-    public BigDecimal getTotalRevenue() { return totalRevenue; }
     public String getErrorCode() { return errorCode; }
     public String getErrorMessage() { return errorMessage; }
     public boolean isEmpty() { return orders == null || orders.isEmpty(); }
-
-    public static ListAllOrdersOutputData forSuccess(List<OrderItemData> orders, int totalOrders,
-                                                      int currentPage, int pageSize, BigDecimal totalRevenue) {
-        int totalPages = (totalOrders + pageSize - 1) / pageSize;
-        return new ListAllOrdersOutputData(orders, totalOrders, totalPages, currentPage, pageSize, totalRevenue);
+    public static ListAllOrdersOutputData forSuccess(List<OrderItemData> orders) {
+        return new ListAllOrdersOutputData(orders);
     }
 
     public static ListAllOrdersOutputData forError(String errorCode, String errorMessage) {
