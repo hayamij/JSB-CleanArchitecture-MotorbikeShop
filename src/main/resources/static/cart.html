@@ -787,33 +787,8 @@
         }
 
         async function checkout() {
-            const userId = sessionStorage.getItem('userId');
-
-            try {
-                const response = await fetch('/api/orders/checkout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        userId: parseInt(userId)
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('✅ Đặt hàng thành công! Mã đơn hàng: #' + data.orderId, 'success');
-                    setTimeout(() => {
-                        loadCart();
-                    }, 2000);
-                } else {
-                    showAlert(data.errorMessage || 'Không thể đặt hàng', 'error');
-                }
-            } catch (error) {
-                console.error('Error during checkout:', error);
-                showAlert('❌ Lỗi kết nối đến server', 'error');
-            }
+            // Chuyển sang trang checkout để điền thông tin giao hàng
+            window.location.href = 'checkout.html';
         }
 
         window.onload = function() {

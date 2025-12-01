@@ -596,7 +596,7 @@
         }
 
         function viewProduct(productId) {
-            console.log('View product:', productId);
+            window.location.href = `product-detail.html?id=${productId}`;
         }
 
         async function addToCart(event, productId) {
