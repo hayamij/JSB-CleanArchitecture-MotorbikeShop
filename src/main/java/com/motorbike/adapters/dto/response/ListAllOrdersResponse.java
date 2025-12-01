@@ -5,26 +5,14 @@ import java.util.List;
 public class ListAllOrdersResponse {
     private boolean success;
     private List<OrderItemResponse> orders;
-    private int totalOrders;
-    private int totalPages;
-    private int currentPage;
-    private int pageSize;
-    private String formattedTotalRevenue;
     private String message;
     private String errorCode;
     private String errorMessage;
-
     public ListAllOrdersResponse(boolean success, List<OrderItemResponse> orders,
-                                int totalOrders, int totalPages, int currentPage, int pageSize,
-                                String formattedTotalRevenue, String message,
+                                String message,
                                 String errorCode, String errorMessage) {
         this.success = success;
         this.orders = orders;
-        this.totalOrders = totalOrders;
-        this.totalPages = totalPages;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-        this.formattedTotalRevenue = formattedTotalRevenue;
         this.message = message;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
@@ -32,11 +20,6 @@ public class ListAllOrdersResponse {
 
     public boolean isSuccess() { return success; }
     public List<OrderItemResponse> getOrders() { return orders; }
-    public int getTotalOrders() { return totalOrders; }
-    public int getTotalPages() { return totalPages; }
-    public int getCurrentPage() { return currentPage; }
-    public int getPageSize() { return pageSize; }
-    public String getFormattedTotalRevenue() { return formattedTotalRevenue; }
     public String getMessage() { return message; }
     public String getErrorCode() { return errorCode; }
     public String getErrorMessage() { return errorMessage; }

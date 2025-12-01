@@ -7,11 +7,6 @@ public class ListAllOrdersViewModel {
     public boolean hasError;
     public String message;
     public List<OrderItemViewModel> orders;
-    public int totalOrders;
-    public int totalPages;
-    public int currentPage;
-    public int pageSize;
-    public String formattedTotalRevenue;
     public String errorCode;
     public String errorMessage;
 
