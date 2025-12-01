@@ -10,11 +10,8 @@ import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.SanPham;
-import com.motorbike.domain.exceptions.InvalidCartException;
-import com.motorbike.domain.exceptions.InvalidOrderException;
-import com.motorbike.domain.exceptions.EmptyCartException;
-import com.motorbike.domain.exceptions.ProductNotFoundException;
-import com.motorbike.domain.exceptions.InsufficientStockException;
+import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.domain.exceptions.DomainException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,18 +37,18 @@ public class CheckoutUseCaseControl
     protected void executeBusinessLogic(CheckoutInputData inputData) throws Exception {
         try {
             GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
-                .orElseThrow(() -> new EmptyCartException());
+                .orElseThrow(DomainException::emptyCart);
             
             if (gioHang.getDanhSachSanPham().isEmpty()) {
-                throw new EmptyCartException();
+                throw DomainException.emptyCart();
             }
             
             for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
                 SanPham sanPham = productRepository.findById(item.getMaSanPham())
-                    .orElseThrow(() -> new ProductNotFoundException(String.valueOf(item.getMaSanPham())));
+                    .orElseThrow(() -> DomainException.productNotFound(String.valueOf(item.getMaSanPham())));
                 
                 if (sanPham.getSoLuongTonKho() < item.getSoLuong()) {
-                    throw new InsufficientStockException(
+                    throw DomainException.insufficientStock(
                         sanPham.getTenSanPham(),
                         sanPham.getSoLuongTonKho());
                 }
@@ -101,8 +98,7 @@ public class CheckoutUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidCartException | InvalidOrderException | EmptyCartException |
-                 ProductNotFoundException | InsufficientStockException e) {
+        } catch (ValidationException | DomainException e) {
             throw e;
         }
     }
@@ -110,16 +106,19 @@ public class CheckoutUseCaseControl
     @Override
     protected void validateInput(CheckoutInputData inputData) {
         checkInputNotNull(inputData);
-        if (inputData.getUserId() == null) {
-            throw new com.motorbike.domain.exceptions.InvalidUserIdException();
-        }
+        DonHang.checkInput(
+            inputData.getUserId(),
+            inputData.getReceiverName(),
+            inputData.getPhoneNumber(),
+            inputData.getShippingAddress()
+        );
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
         String errorCode = "INVALID_INPUT";
-        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
-            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        if (e instanceof ValidationException) {
+            errorCode = ((ValidationException) e).getErrorCode();
         }
         CheckoutOutputData outputData = CheckoutOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
@@ -130,24 +129,12 @@ public class CheckoutUseCaseControl
         String errorCode;
         String message;
         
-        if (e instanceof InvalidCartException) {
-            InvalidCartException ex = (InvalidCartException) e;
+        if (e instanceof ValidationException) {
+            ValidationException ex = (ValidationException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } else if (e instanceof InvalidOrderException) {
-            InvalidOrderException ex = (InvalidOrderException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof EmptyCartException) {
-            EmptyCartException ex = (EmptyCartException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof ProductNotFoundException) {
-            ProductNotFoundException ex = (ProductNotFoundException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof InsufficientStockException) {
-            InsufficientStockException ex = (InsufficientStockException) e;
+        } else if (e instanceof DomainException) {
+            DomainException ex = (DomainException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {

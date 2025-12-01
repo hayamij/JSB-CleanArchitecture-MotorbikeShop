@@ -28,14 +28,14 @@ public class LoginUseCaseControl
     @Override
     protected void executeBusinessLogic(LoginInputData inputData) throws Exception {
         TaiKhoan taiKhoan = userRepository.findByEmail(inputData.getEmail())
-            .orElseThrow(() -> new UserNotFoundException(inputData.getEmail()));
+            .orElseThrow(() -> DomainException.userNotFound(inputData.getEmail()));
         
         if (!taiKhoan.kiemTraMatKhau(inputData.getPassword())) {
-            throw new WrongPasswordException();
+            throw DomainException.wrongPassword();
         }
         
         if (!taiKhoan.isHoatDong()) {
-            throw new AccountLockedException();
+            throw DomainException.accountLocked();
         }
         
         taiKhoan.dangNhapThanhCong();
@@ -92,25 +92,14 @@ public class LoginUseCaseControl
     @Override
     protected void validateInput(LoginInputData inputData) {
         checkInputNotNull(inputData);
-        
-        if (inputData.getEmail() == null || inputData.getEmail().trim().isEmpty()) {
-            throw new EmptyEmailException();
-        }
-        
-        if (inputData.getPassword() == null || inputData.getPassword().isEmpty()) {
-            throw new EmptyPasswordException();
-        }
-        
-        if (!inputData.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            throw new InvalidEmailException();
-        }
+        TaiKhoan.checkInputForLogin(inputData.getEmail(), inputData.getPassword());
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
         String errorCode = "INVALID_INPUT";
-        if (e instanceof InvalidInputException) {
-            errorCode = ((InvalidInputException) e).getErrorCode();
+        if (e instanceof ValidationException) {
+            errorCode = ((ValidationException) e).getErrorCode();
         }
         LoginOutputData outputData = LoginOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
@@ -121,16 +110,8 @@ public class LoginUseCaseControl
         String errorCode;
         String message;
         
-        if (e instanceof UserNotFoundException) {
-            UserNotFoundException ex = (UserNotFoundException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof WrongPasswordException) {
-            WrongPasswordException ex = (WrongPasswordException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof AccountLockedException) {
-            AccountLockedException ex = (AccountLockedException) e;
+        if (e instanceof DomainException) {
+            DomainException ex = (DomainException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else if (e instanceof SystemException) {

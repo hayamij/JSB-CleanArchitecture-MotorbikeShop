@@ -229,7 +229,7 @@ public class LoginUseCaseControlTest {
 	
 	@Test
 	public void testExecute_EdgeCase_ValidMinimalEmail() {
-		LoginInputData inputData = new LoginInputData("a@b.c", "password123");
+		LoginInputData inputData = new LoginInputData("ab@cd.ef", "password123");
 		
 		UserRepository userRepo = new MockUserRepository();
 		CartRepository cartRepo = new MockCartRepository();

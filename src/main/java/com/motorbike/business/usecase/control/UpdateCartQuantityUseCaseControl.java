@@ -6,9 +6,8 @@ import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
-import com.motorbike.domain.exceptions.InvalidCartException;
-import com.motorbike.domain.exceptions.CartNotFoundException;
-import com.motorbike.domain.exceptions.ProductNotInCartException;
+import com.motorbike.domain.exceptions.DomainException;
+import com.motorbike.domain.exceptions.ValidationException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class UpdateCartQuantityUseCaseControl
     protected void executeBusinessLogic(UpdateCartQuantityInputData inputData) throws Exception {
         try {
             GioHang gioHang = cartRepository.findById(inputData.getCartId())
-                .orElseThrow(() -> new CartNotFoundException());
+                .orElseThrow(DomainException::cartNotFound);
             
             ChiTietGioHang existingItem = gioHang.getDanhSachSanPham().stream()
                 .filter(item -> item.getMaSanPham().equals(inputData.getProductId()))
@@ -79,7 +78,7 @@ public class UpdateCartQuantityUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidCartException | CartNotFoundException | ProductNotInCartException e) {
+        } catch (ValidationException | DomainException e) {
             throw e;
         }
     }
@@ -87,25 +86,18 @@ public class UpdateCartQuantityUseCaseControl
     @Override
     protected void validateInput(UpdateCartQuantityInputData inputData) {
         checkInputNotNull(inputData);
-        
-        if (inputData.getCartId() == null) {
-            throw new InvalidCartException("INVALID_CART_ID", "Cart ID không được để trống");
-        }
-        
-        if (inputData.getProductId() == null) {
-            throw new com.motorbike.domain.exceptions.InvalidProductIdException();
-        }
-        
-        if (inputData.getNewQuantity() < 0) {
-            throw new com.motorbike.domain.exceptions.InvalidQuantityException();
-        }
+        GioHang.checkInput(
+            inputData.getCartId(),
+            inputData.getProductId(),
+            inputData.getNewQuantity()
+        );
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
         String errorCode = "INVALID_INPUT";
-        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
-            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        if (e instanceof ValidationException) {
+            errorCode = ((ValidationException) e).getErrorCode();
         }
         UpdateCartQuantityOutputData outputData = UpdateCartQuantityOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
@@ -116,16 +108,12 @@ public class UpdateCartQuantityUseCaseControl
         String errorCode = null;
         String message = e.getMessage();
         
-        if (e instanceof InvalidCartException) {
-            InvalidCartException ex = (InvalidCartException) e;
+        if (e instanceof ValidationException) {
+            ValidationException ex = (ValidationException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } else if (e instanceof CartNotFoundException) {
-            CartNotFoundException ex = (CartNotFoundException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof ProductNotInCartException) {
-            ProductNotInCartException ex = (ProductNotInCartException) e;
+        } else if (e instanceof DomainException) {
+            DomainException ex = (DomainException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {

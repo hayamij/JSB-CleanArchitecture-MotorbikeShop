@@ -45,3 +45,5 @@ clean_arch_summary.md
 *.db
 *.sqlite
 *.h2.db
+
+materials/

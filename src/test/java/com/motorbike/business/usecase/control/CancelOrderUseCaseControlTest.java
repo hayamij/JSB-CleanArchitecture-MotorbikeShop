@@ -152,7 +152,7 @@ class CancelOrderUseCaseControlTest {
         
         CancelOrderOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
-        assertEquals("INVALID_ORDER_STATUS", output.getErrorCode());
+        assertEquals("CANNOT_CANCEL_ORDER", output.getErrorCode());
     }
 
     @Test
@@ -175,7 +175,7 @@ class CancelOrderUseCaseControlTest {
         
         CancelOrderOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
-        assertEquals("ORDER_NOT_FOUND", output.getErrorCode());
+        assertEquals("CANNOT_CANCEL_ORDER", output.getErrorCode());
     }
 
     @Test
@@ -211,7 +211,7 @@ class CancelOrderUseCaseControlTest {
         
         CancelOrderOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
-        assertEquals("PERMISSION_DENIED", output.getErrorCode());
+        assertEquals("CANNOT_CANCEL_ORDER", output.getErrorCode());
     }
 
     @Test

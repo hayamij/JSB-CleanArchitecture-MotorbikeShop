@@ -204,9 +204,9 @@ public class RegisterUseCaseControlTest {
 		RegisterInputData inputData = new RegisterInputData(
 			"user@test.com",
 			"username",
-			"password123",
-			"password456",
-			"0912345678"
+			"12345",
+			"0912345678",
+			"Hanoi"
 		);
 		
 		UserRepository userRepo = new MockUserRepository();

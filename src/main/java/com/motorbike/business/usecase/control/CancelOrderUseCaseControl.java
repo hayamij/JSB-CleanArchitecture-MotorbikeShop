@@ -11,7 +11,8 @@ import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.TrangThaiDonHang;
-import com.motorbike.domain.exceptions.CannotCancelOrderException;
+import com.motorbike.domain.exceptions.DomainException;
+import com.motorbike.domain.exceptions.ValidationException;
 
 public class CancelOrderUseCaseControl
         extends AbstractUseCaseControl<CancelOrderInputData, CancelOrderOutputBoundary> {
@@ -32,21 +33,18 @@ public class CancelOrderUseCaseControl
     protected void executeBusinessLogic(CancelOrderInputData inputData) throws Exception {
         try {
             DonHang donHang = orderRepository.findById(inputData.getOrderId())
-                .orElseThrow(() -> new CannotCancelOrderException(
-                    "ORDER_NOT_FOUND",
+                .orElseThrow(() -> DomainException.cannotCancelOrder(
                     "Không tìm thấy đơn hàng: " + inputData.getOrderId()
                 ));
             
             if (!donHang.getMaTaiKhoan().equals(inputData.getUserId())) {
-                throw new CannotCancelOrderException(
-                    "PERMISSION_DENIED",
+                throw DomainException.cannotCancelOrder(
                     "Bạn không có quyền hủy đơn hàng này"
                 );
             }
             
             if (donHang.getTrangThai() != TrangThaiDonHang.CHO_XAC_NHAN) {
-                throw new CannotCancelOrderException(
-                    "INVALID_ORDER_STATUS",
+                throw DomainException.cannotCancelOrder(
                     "Chỉ có thể hủy đơn hàng ở trạng thái 'Chờ xác nhận'. " +
                     "Trạng thái hiện tại: " + donHang.getTrangThai().getMoTa()
                 );
@@ -55,8 +53,7 @@ public class CancelOrderUseCaseControl
             BigDecimal totalRefund = BigDecimal.ZERO;
             for (ChiTietDonHang chiTiet : donHang.getDanhSachSanPham()) {
                 SanPham sanPham = productRepository.findById(chiTiet.getMaSanPham())
-                    .orElseThrow(() -> new CannotCancelOrderException(
-                        "PRODUCT_NOT_FOUND",
+                    .orElseThrow(() -> DomainException.productNotFound(
                         "Sản phẩm không tồn tại: " + chiTiet.getMaSanPham()
                     ));
                 
@@ -79,7 +76,7 @@ public class CancelOrderUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (CannotCancelOrderException e) {
+        } catch (ValidationException | DomainException e) {
             throw e;
         }
     }
@@ -87,20 +84,21 @@ public class CancelOrderUseCaseControl
     @Override
     protected void validateInput(CancelOrderInputData inputData) {
         checkInputNotNull(inputData);
+        com.motorbike.domain.entities.TaiKhoan.checkInput(inputData.getUserId());
         
         if (inputData.getOrderId() == null) {
-            throw new IllegalArgumentException("Order ID không được null");
-        }
-        
-        if (inputData.getUserId() == null) {
-            throw new IllegalArgumentException("User ID không được null");
+            throw ValidationException.nullOrderId();
         }
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
+        String errorCode = "INVALID_INPUT";
+        if (e instanceof ValidationException) {
+            errorCode = ((ValidationException) e).getErrorCode();
+        }
         CancelOrderOutputData outputData = CancelOrderOutputData.forError(
-            "INVALID_INPUT",
+            errorCode,
             e.getMessage()
         );
         outputBoundary.present(outputData);
@@ -108,15 +106,23 @@ public class CancelOrderUseCaseControl
     
     @Override
     protected void handleSystemError(Exception e) {
-        String errorCode = "SYSTEM_ERROR";
-        String message = "Đã xảy ra lỗi: " + e.getMessage();
+        String errorCode;
+        String message;
         
-        try {
-            throw e;
-        } catch (CannotCancelOrderException ex) {
+        if (e instanceof ValidationException) {
+            ValidationException ex = (ValidationException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } catch (Exception ex) {
+        } else if (e instanceof DomainException) {
+            DomainException ex = (DomainException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
+            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
+            errorCode = ex.getErrorCode();
+            message = ex.getMessage();
+        } else {
+            throw new com.motorbike.domain.exceptions.SystemException(e);
         }
         
         CancelOrderOutputData outputData = CancelOrderOutputData.forError(errorCode, message);

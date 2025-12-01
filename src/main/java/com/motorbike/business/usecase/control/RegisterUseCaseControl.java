@@ -7,8 +7,9 @@ import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
-import com.motorbike.domain.exceptions.InvalidUserException;
-import com.motorbike.domain.exceptions.EmailAlreadyExistsException;
+import com.motorbike.domain.exceptions.DomainException;
+import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.domain.exceptions.SystemException;
 
 public class RegisterUseCaseControl
         extends AbstractUseCaseControl<RegisterInputData, RegisterOutputBoundary> {
@@ -29,7 +30,7 @@ public class RegisterUseCaseControl
     protected void executeBusinessLogic(RegisterInputData inputData) throws Exception {
         try {
             if (userRepository.existsByEmail(inputData.getEmail())) {
-                throw new EmailAlreadyExistsException(inputData.getEmail());
+                throw DomainException.emailAlreadyExists(inputData.getEmail());
             }
             
             TaiKhoan taiKhoan = new TaiKhoan(
@@ -55,7 +56,7 @@ public class RegisterUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidUserException | EmailAlreadyExistsException e) {
+        } catch (DomainException e) {
             throw e;
         }
     }
@@ -63,29 +64,21 @@ public class RegisterUseCaseControl
     @Override
     protected void validateInput(RegisterInputData inputData) {
         checkInputNotNull(inputData);
-        
-        if (inputData.getEmail() == null || inputData.getEmail().trim().isEmpty()) {
-            throw new com.motorbike.domain.exceptions.EmptyEmailException();
-        }
-        
-        if (inputData.getUsername() == null || inputData.getUsername().trim().isEmpty()) {
-            throw new com.motorbike.domain.exceptions.InvalidUserException("EMPTY_USERNAME", "Tên đăng nhập không được để trống");
-        }
-        
-        if (inputData.getPassword() == null || inputData.getConfirmPassword() == null) {
-            throw new com.motorbike.domain.exceptions.EmptyPasswordException();
-        }
-        
-        if (!inputData.getPassword().equals(inputData.getConfirmPassword())) {
-            throw new com.motorbike.domain.exceptions.PasswordMismatchException();
-        }
+        TaiKhoan.checkInputForRegister(
+            inputData.getEmail(),
+            inputData.getUsername(),
+            inputData.getPassword(),
+            inputData.getPhoneNumber()
+        );
+
+
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
         String errorCode = "INVALID_INPUT";
-        if (e instanceof com.motorbike.domain.exceptions.InvalidInputException) {
-            errorCode = ((com.motorbike.domain.exceptions.InvalidInputException) e).getErrorCode();
+        if (e instanceof ValidationException) {
+            errorCode = ((ValidationException) e).getErrorCode();
         }
         RegisterOutputData outputData = RegisterOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
@@ -96,20 +89,16 @@ public class RegisterUseCaseControl
         String errorCode;
         String message;
         
-        if (e instanceof InvalidUserException) {
-            InvalidUserException ex = (InvalidUserException) e;
+        if (e instanceof DomainException) {
+            DomainException ex = (DomainException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } else if (e instanceof EmailAlreadyExistsException) {
-            EmailAlreadyExistsException ex = (EmailAlreadyExistsException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
-            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
+        } else if (e instanceof SystemException) {
+            SystemException ex = (SystemException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else {
-            throw new com.motorbike.domain.exceptions.SystemException(e);
+            throw new SystemException(e);
         }
         
         RegisterOutputData outputData = RegisterOutputData.forError(errorCode, message);

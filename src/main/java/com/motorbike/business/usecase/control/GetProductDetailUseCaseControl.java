@@ -5,10 +5,8 @@ import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
-import com.motorbike.domain.exceptions.InvalidInputException;
-import com.motorbike.domain.exceptions.InvalidProductIdException;
-import com.motorbike.domain.exceptions.ProductNotFoundException;
-import com.motorbike.domain.exceptions.SystemException;
+import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.domain.exceptions.DomainException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -27,7 +25,7 @@ public class GetProductDetailUseCaseControl
     @Override
     protected void executeBusinessLogic(GetProductDetailInputData inputData) throws Exception {
         SanPham sanPham = productRepository.findById(inputData.productId)
-            .orElseThrow(() -> new ProductNotFoundException(String.valueOf(inputData.productId)));
+            .orElseThrow(() -> DomainException.productNotFound(String.valueOf(inputData.productId)));
         String chiTiet = sanPham.layThongTinChiTiet();
         BigDecimal giaGoc = sanPham.getGia();
         BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
@@ -55,16 +53,14 @@ public class GetProductDetailUseCaseControl
     @Override
     protected void validateInput(GetProductDetailInputData inputData) {
         checkInputNotNull(inputData);
-        if (inputData.productId == null) {
-            throw new InvalidProductIdException();
-        }
+        SanPham.checkInput(inputData.productId, 1);
     }
     
     @Override
     protected void handleValidationError(IllegalArgumentException e) {
         String errorCode = "INVALID_INPUT";
-        if (e instanceof InvalidInputException) {
-            errorCode = ((InvalidInputException) e).getErrorCode();
+        if (e instanceof ValidationException) {
+            errorCode = ((ValidationException) e).getErrorCode();
         }
         GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(errorCode, e.getMessage());
         outputBoundary.present(outputData);
@@ -75,16 +71,16 @@ public class GetProductDetailUseCaseControl
         String errorCode;
         String message;
         
-        if (e instanceof ProductNotFoundException) {
-            ProductNotFoundException ex = (ProductNotFoundException) e;
+        if (e instanceof DomainException) {
+            DomainException ex = (DomainException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
-        } else if (e instanceof SystemException) {
-            SystemException ex = (SystemException) e;
+        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
+            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else {
-            throw new SystemException(e);
+            throw new com.motorbike.domain.exceptions.SystemException(e);
         }
         
         GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(errorCode, message);
