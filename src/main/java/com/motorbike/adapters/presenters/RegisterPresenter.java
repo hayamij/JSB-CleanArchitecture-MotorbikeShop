@@ -8,22 +8,13 @@ import com.motorbike.domain.entities.VaiTro;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Presenter for Register Feature
- * Transforms RegisterOutputData → RegisterViewModel
- * Contains presentation logic (formatting, display rules)
- * NO business logic
- */
 public class RegisterPresenter implements RegisterOutputBoundary {
     
     private final RegisterViewModel viewModel;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = 
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
         DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    /**
-     * Constructor
-     * @param viewModel View model to be updated
-     */
+    
     public RegisterPresenter(RegisterViewModel viewModel) {
         this.viewModel = viewModel;
     }
@@ -37,44 +28,34 @@ public class RegisterPresenter implements RegisterOutputBoundary {
         }
     }
 
-    /**
-     * Present success case
-     * @param outputData Output data from use case
-     */
+    
     private void presentSuccess(RegisterOutputData outputData) {
         viewModel.success = true;
         viewModel.hasError = false;
         
-        // User information
         viewModel.userId = outputData.getUserId();
         viewModel.email = outputData.getEmail();
         viewModel.username = outputData.getUsername();
         
-        // Format role display
         viewModel.roleDisplay = formatRoleDisplay(outputData.getRole());
         
-        // Format registration time
         viewModel.registeredAtDisplay = formatDateTime(outputData.getCreatedAt());
         
-        // Auto-login information
         viewModel.autoLoginEnabled = outputData.isAutoLoginEnabled();
         viewModel.sessionToken = outputData.getSessionToken();
         
-        // Redirect URL (can be customized)
         if (viewModel.autoLoginEnabled) {
-            viewModel.redirectUrl = "/home"; // Auto-login enabled, go to home
+            viewModel.redirectUrl = "/home";
         } else {
-            viewModel.redirectUrl = "/login"; // Need to login manually
+            viewModel.redirectUrl = "/login";
         }
         
-        // Success message
         viewModel.message = String.format(
             "Đăng ký tài khoản thành công! Chào mừng %s (%s)",
             outputData.getUsername(),
             viewModel.roleDisplay
         );
         
-        // Clear error fields
         viewModel.errorCode = null;
         viewModel.errorMessage = null;
         viewModel.errorColor = null;
@@ -84,29 +65,22 @@ public class RegisterPresenter implements RegisterOutputBoundary {
         viewModel.phoneError = null;
     }
 
-    /**
-     * Present error case
-     * @param outputData Output data from use case
-     */
+    
     private void presentError(RegisterOutputData outputData) {
         viewModel.success = false;
         viewModel.hasError = true;
         
-        // Error information
         viewModel.errorCode = outputData.getErrorCode();
         viewModel.errorMessage = formatErrorMessage(
-            outputData.getErrorCode(), 
+            outputData.getErrorCode(),
             outputData.getErrorMessage()
         );
         viewModel.errorColor = "RED";
         
-        // Map error to specific field (for form validation display)
         mapErrorToField(outputData.getErrorCode());
         
-        // Main message
         viewModel.message = "Đăng ký tài khoản thất bại";
         
-        // Clear success fields
         viewModel.userId = null;
         viewModel.email = null;
         viewModel.username = null;
@@ -117,10 +91,7 @@ public class RegisterPresenter implements RegisterOutputBoundary {
         viewModel.redirectUrl = null;
     }
 
-    /**
-     * Map error code to specific field error
-     * @param errorCode Error code from use case
-     */
+    
     private void mapErrorToField(String errorCode) {
         if (errorCode == null) return;
         
@@ -150,16 +121,11 @@ public class RegisterPresenter implements RegisterOutputBoundary {
                 break;
             
             default:
-                // General error, not field-specific
                 break;
         }
     }
 
-    /**
-     * Format user role for display
-     * @param role User role enum
-     * @return Formatted role string in Vietnamese
-     */
+    
     private String formatRoleDisplay(VaiTro role) {
         if (role == null) {
             return "không xác định";
@@ -167,11 +133,7 @@ public class RegisterPresenter implements RegisterOutputBoundary {
         return role.getMoTa();
     }
 
-    /**
-     * Format datetime for display
-     * @param dateTime LocalDateTime to format
-     * @return Formatted datetime string
-     */
+    
     private String formatDateTime(LocalDateTime dateTime) {
         if (dateTime == null) {
             return "";
@@ -179,18 +141,12 @@ public class RegisterPresenter implements RegisterOutputBoundary {
         return dateTime.format(DATE_TIME_FORMATTER);
     }
 
-    /**
-     * Format error message with user-friendly text
-     * @param errorCode Error code from use case
-     * @param errorMessage Original error message
-     * @return Formatted error message
-     */
+    
     private String formatErrorMessage(String errorCode, String errorMessage) {
         if (errorCode == null) {
             return errorMessage != null ? errorMessage : "Lỗi không xác định";
         }
         
-        // Provide user-friendly error messages
         switch (errorCode) {
             case "EMAIL_ALREADY_EXISTS":
                 return "Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.";

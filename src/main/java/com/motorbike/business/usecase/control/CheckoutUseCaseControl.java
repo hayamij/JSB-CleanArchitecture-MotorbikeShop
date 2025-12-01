@@ -18,19 +18,7 @@ import com.motorbike.domain.exceptions.InsufficientStockException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Checkout Use Case Control
- * Business Rules:
- * - Bắt buộc phải đăng nhập (chỉ customer/admin mới được thanh toán)
- * - Giỏ hàng phải có ít nhất 1 sản phẩm
- * - Kiểm tra lại số lượng tồn kho của từng sản phẩm trước khi thanh toán
- * - Tạo Order với trạng thái ban đầu "CHO_XAC_NHAN"
- * - Tạo các OrderItem tương ứng với các CartItem
- * - Trừ số lượng tồn kho của sản phẩm
- * - Xóa giỏ hàng sau khi thanh toán thành công
- * - Entity DonHang chịu trách nhiệm tính tổng tiền (quantity × price cho mỗi item)
- */
-public class CheckoutUseCaseControl 
+public class CheckoutUseCaseControl
         extends AbstractUseCaseControl<CheckoutInputData, CheckoutOutputBoundary> {
     
     private final CartRepository cartRepository;
@@ -51,7 +39,6 @@ public class CheckoutUseCaseControl
     @Override
     protected void executeBusinessLogic(CheckoutInputData inputData) throws Exception {
         try {
-            // Business Rule: Giỏ hàng phải có ít nhất 1 sản phẩm
             GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
                 .orElseThrow(() -> new EmptyCartException());
             
@@ -59,20 +46,17 @@ public class CheckoutUseCaseControl
                 throw new EmptyCartException();
             }
             
-            // Business Rule: Kiểm tra lại số lượng tồn kho của từng sản phẩm trước khi thanh toán
             for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
                 SanPham sanPham = productRepository.findById(item.getMaSanPham())
                     .orElseThrow(() -> new ProductNotFoundException(String.valueOf(item.getMaSanPham())));
                 
                 if (sanPham.getSoLuongTonKho() < item.getSoLuong()) {
                     throw new InsufficientStockException(
-                        sanPham.getTenSanPham(), 
+                        sanPham.getTenSanPham(),
                         sanPham.getSoLuongTonKho());
                 }
             }
             
-            // Business Rule: Tạo Order với trạng thái ban đầu (CHO_XAC_NHAN)
-            // Entity DonHang chịu trách nhiệm tính tổng tiền (quantity × price cho mỗi item)
             DonHang donHang = DonHang.fromGioHang(
                 gioHang,
                 inputData.getReceiverName(),
@@ -81,21 +65,17 @@ public class CheckoutUseCaseControl
                 inputData.getNote()
             );
             
-            // Business Rule: Trừ số lượng tồn kho của sản phẩm
             for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
                 SanPham sanPham = productRepository.findById(item.getMaSanPham()).get();
                 sanPham.giamTonKho(item.getSoLuong());
                 productRepository.save(sanPham);
             }
             
-            // Lưu đơn hàng vào database
             DonHang savedOrder = orderRepository.save(donHang);
             
-            // Business Rule: Xóa giỏ hàng sau khi thanh toán thành công
             gioHang.xoaToanBoGioHang();
             cartRepository.save(gioHang);
             
-            // Prepare output data
             List<CheckoutOutputData.OrderItemData> orderItems = savedOrder.getDanhSachSanPham()
                 .stream()
                 .map(item -> new CheckoutOutputData.OrderItemData(
@@ -121,7 +101,7 @@ public class CheckoutUseCaseControl
             
             outputBoundary.present(outputData);
             
-        } catch (InvalidCartException | InvalidOrderException | EmptyCartException | 
+        } catch (InvalidCartException | InvalidOrderException | EmptyCartException |
                  ProductNotFoundException | InsufficientStockException e) {
             throw e;
         }

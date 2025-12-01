@@ -3,10 +3,6 @@ package com.motorbike.business.dto.viewcart;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * DTO: ViewCartOutputData
- * Output data from view cart use case
- */
 public class ViewCartOutputData {
     private final boolean success;
     private final Long cartId;
@@ -20,7 +16,6 @@ public class ViewCartOutputData {
     private final String errorCode;
     private final String errorMessage;
 
-    // Success constructor
     public ViewCartOutputData(Long cartId, Long userId, int totalItems, int totalQuantity,
                              BigDecimal totalAmount, List<CartItemData> items,
                              boolean isEmpty, boolean hasStockWarnings) {
@@ -37,7 +32,6 @@ public class ViewCartOutputData {
         this.errorMessage = null;
     }
 
-    // Error constructor
     public ViewCartOutputData(String errorCode, String errorMessage) {
         this.success = false;
         this.cartId = null;
@@ -52,34 +46,21 @@ public class ViewCartOutputData {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() {
         return success;
     }
 
-    public Long getCartId() {
-        return cartId;
-    }
+    public Long getCartId() {return cartId;}
 
-    public Long getUserId() {
-        return userId;
-    }
+    public Long getUserId() {return userId;}
 
-    public int getTotalItems() {
-        return totalItems;
-    }
+    public int getTotalItems() {return totalItems;}
 
-    public int getTotalQuantity() {
-        return totalQuantity;
-    }
+    public int getTotalQuantity() {return totalQuantity;}
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
+    public BigDecimal getTotalAmount() {return totalAmount;}
 
-    public List<CartItemData> getItems() {
-        return items;
-    }
+    public List<CartItemData> getItems() {return items;}
 
     public boolean isEmpty() {
         return isEmpty;
@@ -89,17 +70,11 @@ public class ViewCartOutputData {
         return hasStockWarnings;
     }
 
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+    public String getErrorMessage() {return errorMessage;}
 
-    /**
-     * Nested class for cart item data
-     */
+    
     public static class CartItemData {
         private final Long productId;
         private final String productName;
@@ -125,44 +100,27 @@ public class ViewCartOutputData {
             this.stockWarningMessage = stockWarningMessage;
         }
 
-        public Long getProductId() {
-            return productId;
-        }
+        public Long getProductId() {return productId;}
 
-        public String getProductName() {
-            return productName;
-        }
+        public String getProductName() {return productName;}
 
-        public String getProductImageUrl() {
-            return productImageUrl;
-        }
+        public String getProductImageUrl() {return productImageUrl;}
 
-        public BigDecimal getUnitPrice() {
-            return unitPrice;
-        }
+        public BigDecimal getUnitPrice() {return unitPrice;}
 
-        public int getQuantity() {
-            return quantity;
-        }
+        public int getQuantity() {return quantity;}
 
-        public BigDecimal getSubtotal() {
-            return subtotal;
-        }
+        public BigDecimal getSubtotal() {return subtotal;}
 
-        public int getAvailableStock() {
-            return availableStock;
-        }
+        public int getAvailableStock() {return availableStock;}
 
         public boolean hasStockWarning() {
             return hasStockWarning;
         }
 
-        public String getStockWarningMessage() {
-            return stockWarningMessage;
-        }
+        public String getStockWarningMessage() {return stockWarningMessage;}
     }
     
-    // Simplified static factory methods for use cases
     public static ViewCartOutputData forSuccess(Long cartId, List<CartItemData> items, BigDecimal totalAmount) {
         int totalItems = (items == null) ? 0 : items.size();
         int totalQuantity = 0;

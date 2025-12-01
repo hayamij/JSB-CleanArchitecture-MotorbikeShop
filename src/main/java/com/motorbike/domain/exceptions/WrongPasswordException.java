@@ -8,7 +8,5 @@ public class WrongPasswordException extends RuntimeException {
         this.errorCode = "WRONG_PASSWORD";
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

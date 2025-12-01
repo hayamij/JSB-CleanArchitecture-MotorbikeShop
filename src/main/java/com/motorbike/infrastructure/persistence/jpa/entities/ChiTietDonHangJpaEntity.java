@@ -3,9 +3,6 @@ package com.motorbike.infrastructure.persistence.jpa.entities;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/**
- * JPA Entity for ChiTietDonHang (Order Item)
- */
 @Entity
 @Table(name = "chi_tiet_don_hang")
 public class ChiTietDonHangJpaEntity {
@@ -34,7 +31,6 @@ public class ChiTietDonHangJpaEntity {
     @Column(name = "tam_tinh", precision = 15, scale = 2, nullable = false)
     private BigDecimal thanhTien;
 
-    // Constructors
     public ChiTietDonHangJpaEntity() {
     }
 
@@ -46,60 +42,31 @@ public class ChiTietDonHangJpaEntity {
         this.thanhTien = giaBan.multiply(BigDecimal.valueOf(soLuong));
     }
 
-    // Getters and Setters
-    public Long getMaChiTiet() {
-        return maChiTiet;
-    }
+    public Long getMaChiTiet() {return maChiTiet;}
 
-    public void setMaChiTiet(Long maChiTiet) {
-        this.maChiTiet = maChiTiet;
-    }
+    public void setMaChiTiet(Long maChiTiet) {this.maChiTiet = maChiTiet;}
 
-    public DonHangJpaEntity getDonHang() {
-        return donHang;
-    }
+    public DonHangJpaEntity getDonHang() {return donHang;}
 
-    public void setDonHang(DonHangJpaEntity donHang) {
-        this.donHang = donHang;
-    }
+    public void setDonHang(DonHangJpaEntity donHang) {this.donHang = donHang;}
 
-    public Long getMaSanPham() {
-        return maSanPham;
-    }
+    public Long getMaSanPham() {return maSanPham;}
 
-    public void setMaSanPham(Long maSanPham) {
-        this.maSanPham = maSanPham;
-    }
+    public void setMaSanPham(Long maSanPham) {this.maSanPham = maSanPham;}
 
-    public String getTenSanPham() {
-        return tenSanPham;
-    }
+    public String getTenSanPham() {return tenSanPham;}
 
-    public void setTenSanPham(String tenSanPham) {
-        this.tenSanPham = tenSanPham;
-    }
+    public void setTenSanPham(String tenSanPham) {this.tenSanPham = tenSanPham;}
 
-    public BigDecimal getGiaBan() {
-        return giaBan;
-    }
+    public BigDecimal getGiaBan() {return giaBan;}
 
-    public void setGiaBan(BigDecimal giaBan) {
-        this.giaBan = giaBan;
-    }
+    public void setGiaBan(BigDecimal giaBan) {this.giaBan = giaBan;}
 
-    public int getSoLuong() {
-        return soLuong;
-    }
+    public int getSoLuong() {return soLuong;}
 
-    public void setSoLuong(int soLuong) {
-        this.soLuong = soLuong;
-    }
+    public void setSoLuong(int soLuong) {this.soLuong = soLuong;}
 
-    public BigDecimal getThanhTien() {
-        return thanhTien;
-    }
+    public BigDecimal getThanhTien() {return thanhTien;}
 
-    public void setThanhTien(BigDecimal thanhTien) {
-        this.thanhTien = thanhTien;
-    }
+    public void setThanhTien(BigDecimal thanhTien) {this.thanhTien = thanhTien;}
 }

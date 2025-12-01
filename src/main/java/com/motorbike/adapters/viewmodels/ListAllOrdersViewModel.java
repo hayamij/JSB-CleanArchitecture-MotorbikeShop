@@ -2,9 +2,6 @@ package com.motorbike.adapters.viewmodels;
 
 import java.util.List;
 
-/**
- * View Model for List All Orders Feature
- */
 public class ListAllOrdersViewModel {
     public boolean success;
     public boolean hasError;
@@ -23,9 +20,7 @@ public class ListAllOrdersViewModel {
         this.hasError = false;
     }
 
-    /**
-     * Nested class for order item display
-     */
+    
     public static class OrderItemViewModel {
         public final Long orderId;
         public final Long customerId;

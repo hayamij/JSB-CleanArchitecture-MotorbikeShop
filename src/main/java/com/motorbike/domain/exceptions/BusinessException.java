@@ -1,8 +1,5 @@
 package com.motorbike.domain.exceptions;
 
-/**
- * Base exception for all business logic exceptions
- */
 public class BusinessException extends RuntimeException {
     private final String errorCode;
 
@@ -16,7 +13,5 @@ public class BusinessException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

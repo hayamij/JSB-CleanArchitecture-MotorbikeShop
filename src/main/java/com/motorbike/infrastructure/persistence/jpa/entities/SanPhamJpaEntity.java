@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Abstract JPA Entity for SanPham (Product)
- * Uses Table-Per-Class inheritance strategy for simplicity
- */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "san_pham")
@@ -43,9 +39,8 @@ public abstract class SanPhamJpaEntity {
     private LocalDateTime ngayCapNhat;
 
     @Column(name = "loai_san_pham", nullable = false, length = 50, insertable = false, updatable = false)
-    private String loaiSanPham; // discriminator value
+    private String loaiSanPham;
 
-    // Constructors
     protected SanPhamJpaEntity() {
         this.ngayTao = LocalDateTime.now();
         this.ngayCapNhat = LocalDateTime.now();
@@ -62,88 +57,61 @@ public abstract class SanPhamJpaEntity {
         this.soLuongTonKho = soLuongTonKho;
     }
 
-    // Getters and Setters
-    public Long getMaSanPham() {
-        return maSanPham;
-    }
+    public Long getMaSanPham() {return maSanPham;}
 
-    public void setMaSanPham(Long maSanPham) {
-        this.maSanPham = maSanPham;
-    }
+    public void setMaSanPham(Long maSanPham) {this.maSanPham = maSanPham;}
 
-    public String getTenSanPham() {
-        return tenSanPham;
-    }
+    public String getTenSanPham() {return tenSanPham;}
 
     public void setTenSanPham(String tenSanPham) {
         this.tenSanPham = tenSanPham;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public String getMoTa() {
-        return moTa;
-    }
+    public String getMoTa() {return moTa;}
 
     public void setMoTa(String moTa) {
         this.moTa = moTa;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public BigDecimal getGia() {
-        return gia;
-    }
+    public BigDecimal getGia() {return gia;}
 
     public void setGia(BigDecimal gia) {
         this.gia = gia;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public String getHinhAnh() {
-        return hinhAnh;
-    }
+    public String getHinhAnh() {return hinhAnh;}
 
     public void setHinhAnh(String hinhAnh) {
         this.hinhAnh = hinhAnh;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public int getSoLuongTonKho() {
-        return soLuongTonKho;
-    }
+    public int getSoLuongTonKho() {return soLuongTonKho;}
 
     public void setSoLuongTonKho(int soLuongTonKho) {
         this.soLuongTonKho = soLuongTonKho;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public boolean isConHang() {
-        return conHang;
-    }
+    public boolean isConHang() {return conHang;}
 
     public void setConHang(boolean conHang) {
         this.conHang = conHang;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public LocalDateTime getNgayTao() {
-        return ngayTao;
-    }
+    public LocalDateTime getNgayTao() {return ngayTao;}
 
-    public void setNgayTao(LocalDateTime ngayTao) {
-        this.ngayTao = ngayTao;
-    }
+    public void setNgayTao(LocalDateTime ngayTao) {this.ngayTao = ngayTao;}
 
-    public LocalDateTime getNgayCapNhat() {
-        return ngayCapNhat;
-    }
+    public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
 
-    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {
-        this.ngayCapNhat = ngayCapNhat;
-    }
+    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {this.ngayCapNhat = ngayCapNhat;}
 
-    public String getLoaiSanPham() {
-        return loaiSanPham;
-    }
+    public String getLoaiSanPham() {return loaiSanPham;}
 
     @PreUpdate
     protected void onUpdate() {

@@ -13,7 +13,5 @@ public class CannotCancelOrderException extends RuntimeException {
         this.errorCode = errorCode;
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

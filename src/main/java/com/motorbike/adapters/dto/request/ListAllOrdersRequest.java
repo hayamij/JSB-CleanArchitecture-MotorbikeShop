@@ -1,8 +1,5 @@
 package com.motorbike.adapters.dto.request;
 
-/**
- * Request DTO for list all orders endpoint
- */
 public class ListAllOrdersRequest {
     private int page;
     private int pageSize;

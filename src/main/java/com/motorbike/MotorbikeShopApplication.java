@@ -3,29 +3,6 @@ package com.motorbike;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * Main Application Class for Motorbike Shop
- * Clean Architecture với Spring Boot
- * 
- * Server chạy tại: http://localhost:8080
- * 
- * API Endpoints:
- * 
- * Authentication APIs:
- * - POST   /api/auth/register      - Đăng ký tài khoản mới
- * - POST   /api/auth/login         - Đăng nhập
- * 
- * Product APIs:
- * - GET    /api/products/{id}      - Xem chi tiết sản phẩm
- * 
- * Cart APIs:
- * - POST   /api/cart/add           - Thêm sản phẩm vào giỏ hàng
- * - GET    /api/cart/{userId}      - Xem giỏ hàng
- * - PUT    /api/cart/update        - Cập nhật số lượng sản phẩm trong giỏ
- * 
- * Order APIs:
- * - POST   /api/orders/checkout    - Thanh toán đơn hàng
- */
 @SpringBootApplication
 public class MotorbikeShopApplication {
 

@@ -10,11 +10,7 @@ import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.exceptions.*;
 import java.util.Optional;
 
-/**
- * Login Use Case Control
- * Extends AbstractUseCaseControl for common validation and error handling
- */
-public class LoginUseCaseControl 
+public class LoginUseCaseControl
         extends AbstractUseCaseControl<LoginInputData, LoginOutputBoundary> {
     
     private final UserRepository userRepository;
@@ -34,7 +30,6 @@ public class LoginUseCaseControl
         TaiKhoan taiKhoan = userRepository.findByEmail(inputData.getEmail())
             .orElseThrow(() -> new UserNotFoundException(inputData.getEmail()));
         
-        // Simple if-checks with throw - cleaner than nested try-catch
         if (!taiKhoan.kiemTraMatKhau(inputData.getPassword())) {
             throw new WrongPasswordException();
         }
@@ -50,7 +45,6 @@ public class LoginUseCaseControl
         int mergedItemsCount = 0;
         Long userCartId = null;
         
-        // Get or create user cart
         Optional<GioHang> userCartOpt = cartRepository.findByUserId(taiKhoan.getMaTaiKhoan());
         final GioHang userCart;
         
@@ -58,13 +52,11 @@ public class LoginUseCaseControl
             userCart = userCartOpt.get();
             userCartId = userCart.getMaGioHang();
         } else {
-            // Create new cart for user
             GioHang newCart = new GioHang(taiKhoan.getMaTaiKhoan());
             userCart = cartRepository.save(newCart);
             userCartId = userCart.getMaGioHang();
         }
         
-        // Merge guest cart if exists
         if (inputData.getGuestCartId() != null) {
             Optional<GioHang> guestCartOpt = cartRepository.findById(inputData.getGuestCartId());
             
@@ -88,7 +80,7 @@ public class LoginUseCaseControl
             taiKhoan.getTenDangNhap(),
             taiKhoan.getVaiTro(),
             taiKhoan.getLanDangNhapCuoi(),
-            null, // sessionToken - for future implementation
+            null,
             userCartId,
             cartMerged,
             mergedItemsCount

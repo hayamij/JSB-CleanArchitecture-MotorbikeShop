@@ -9,10 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Presenter for Update Cart Quantity use case.
- * Transforms business output data into view-ready format.
- */
 public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoundary {
     
     private final UpdateCartQuantityViewModel viewModel;
@@ -36,13 +32,11 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
     }
 
     private void presentSuccess(UpdateCartQuantityOutputData outputData) {
-        // Format prices
-        String formattedItemSubtotal = outputData.getItemSubtotal() != null 
+        String formattedItemSubtotal = outputData.getItemSubtotal() != null
             ? formatPrice(outputData.getItemSubtotal())
             : null;
         String formattedTotalAmount = formatPrice(outputData.getTotalAmount());
 
-        // Build cart items
         List<UpdateCartQuantityViewModel.CartItemViewModel> itemViewModels = new ArrayList<>();
         for (UpdateCartQuantityOutputData.CartItemData item : outputData.getAllItems()) {
             itemViewModels.add(new UpdateCartQuantityViewModel.CartItemViewModel(
@@ -54,27 +48,25 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
             ));
         }
 
-        // Generate success message
         String message;
         if (outputData.isItemRemoved()) {
             message = String.format("Đã xóa '%s' khỏi giỏ hàng", outputData.getProductName());
         } else {
-            message = String.format("Đã cập nhật số lượng '%s' từ %d thành %d", 
-                outputData.getProductName(), 
-                outputData.getOldQuantity(), 
+            message = String.format("Đã cập nhật số lượng '%s' từ %d thành %d",
+                outputData.getProductName(),
+                outputData.getOldQuantity(),
                 outputData.getNewQuantity());
         }
 
-        // Build cart summary message
-        String cartSummary = String.format("Giỏ hàng có %d sản phẩm (%d món)", 
-            outputData.getTotalItems(), 
+        String cartSummary = String.format("Giỏ hàng có %d sản phẩm (%d món)",
+            outputData.getTotalItems(),
             outputData.getTotalQuantity());
 
         viewModel.success = true;
         viewModel.message = message;
         viewModel.errorCode = null;
         viewModel.errorMessage = null;
-        viewModel.messageColor = "#28a745"; // Green for success
+        viewModel.messageColor = "#28a745";
         viewModel.cartId = outputData.getCartId();
         viewModel.userId = outputData.getUserId();
         viewModel.productId = outputData.getProductId();
@@ -92,7 +84,7 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
 
     private void presentError(UpdateCartQuantityOutputData outputData) {
         String errorMessage = translateErrorMessage(
-            outputData.getErrorCode(), 
+            outputData.getErrorCode(),
             outputData.getErrorMessage()
         );
 
@@ -100,7 +92,7 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
         viewModel.message = errorMessage;
         viewModel.errorCode = outputData.getErrorCode();
         viewModel.errorMessage = errorMessage;
-        viewModel.messageColor = "#dc3545"; // Red for error
+        viewModel.messageColor = "#dc3545";
         viewModel.cartId = null;
         viewModel.userId = null;
         viewModel.productId = null;
@@ -144,7 +136,5 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
         return VND_FORMAT.format(price).replace("₫", "").trim() + " ₫";
     }
 
-    public UpdateCartQuantityViewModel getViewModel() {
-        return viewModel;
-    }
+    public UpdateCartQuantityViewModel getViewModel() {return viewModel;}
 }

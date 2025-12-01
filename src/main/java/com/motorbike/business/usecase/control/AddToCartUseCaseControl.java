@@ -12,11 +12,7 @@ import com.motorbike.domain.exceptions.InvalidCartException;
 import com.motorbike.domain.exceptions.ProductNotFoundException;
 import com.motorbike.domain.exceptions.InsufficientStockException;
 
-/**
- * Add To Cart Use Case Control
- * Extends AbstractUseCaseControl for common validation and error handling
- */
-public class AddToCartUseCaseControl 
+public class AddToCartUseCaseControl
         extends AbstractUseCaseControl<AddToCartInputData, AddToCartOutputBoundary> {
     
     private final CartRepository cartRepository;
@@ -40,7 +36,6 @@ public class AddToCartUseCaseControl
             SanPham sanPham = productRepository.findById(inputData.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(String.valueOf(inputData.getProductId())));
             
-            // Simple if-check with throw
             if (sanPham.getSoLuongTonKho() < inputData.getQuantity()) {
                 throw new InsufficientStockException(sanPham.getSoLuongTonKho());
             }

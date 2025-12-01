@@ -3,10 +3,6 @@ package com.motorbike.business.dto.updatecart;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * DTO: UpdateCartQuantityOutputData
- * Output data from update cart quantity use case
- */
 public class UpdateCartQuantityOutputData {
     private final boolean success;
     private final Long cartId;
@@ -24,7 +20,6 @@ public class UpdateCartQuantityOutputData {
     private final String errorCode;
     private final String errorMessage;
 
-    // Success constructor - item updated
     public UpdateCartQuantityOutputData(Long cartId, Long userId, Long productId, String productName,
                                        int oldQuantity, int newQuantity, boolean itemRemoved,
                                        int totalItems, int totalQuantity, BigDecimal totalAmount,
@@ -46,7 +41,6 @@ public class UpdateCartQuantityOutputData {
         this.errorMessage = null;
     }
 
-    // Error constructor
     public UpdateCartQuantityOutputData(String errorCode, String errorMessage) {
         this.success = false;
         this.cartId = null;
@@ -65,70 +59,41 @@ public class UpdateCartQuantityOutputData {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() {
         return success;
     }
 
-    public Long getCartId() {
-        return cartId;
-    }
+    public Long getCartId() {return cartId;}
 
-    public Long getUserId() {
-        return userId;
-    }
+    public Long getUserId() {return userId;}
 
-    public Long getProductId() {
-        return productId;
-    }
+    public Long getProductId() {return productId;}
 
-    public String getProductName() {
-        return productName;
-    }
+    public String getProductName() {return productName;}
 
-    public int getOldQuantity() {
-        return oldQuantity;
-    }
+    public int getOldQuantity() {return oldQuantity;}
 
-    public int getNewQuantity() {
-        return newQuantity;
-    }
+    public int getNewQuantity() {return newQuantity;}
 
     public boolean isItemRemoved() {
         return itemRemoved;
     }
 
-    public int getTotalItems() {
-        return totalItems;
-    }
+    public int getTotalItems() {return totalItems;}
 
-    public int getTotalQuantity() {
-        return totalQuantity;
-    }
+    public int getTotalQuantity() {return totalQuantity;}
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
+    public BigDecimal getTotalAmount() {return totalAmount;}
 
-    public BigDecimal getItemSubtotal() {
-        return itemSubtotal;
-    }
+    public BigDecimal getItemSubtotal() {return itemSubtotal;}
 
-    public List<CartItemData> getAllItems() {
-        return allItems;
-    }
+    public List<CartItemData> getAllItems() {return allItems;}
 
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+    public String getErrorMessage() {return errorMessage;}
 
-    /**
-     * Nested class for cart item data
-     */
+    
     public static class CartItemData {
         private final Long productId;
         private final String productName;
@@ -136,7 +101,7 @@ public class UpdateCartQuantityOutputData {
         private final int quantity;
         private final BigDecimal subtotal;
 
-        public CartItemData(Long productId, String productName, BigDecimal unitPrice, 
+        public CartItemData(Long productId, String productName, BigDecimal unitPrice,
                           int quantity, BigDecimal subtotal) {
             this.productId = productId;
             this.productName = productName;
@@ -145,28 +110,17 @@ public class UpdateCartQuantityOutputData {
             this.subtotal = subtotal;
         }
 
-        public Long getProductId() {
-            return productId;
-        }
+        public Long getProductId() {return productId;}
 
-        public String getProductName() {
-            return productName;
-        }
+        public String getProductName() {return productName;}
 
-        public BigDecimal getUnitPrice() {
-            return unitPrice;
-        }
+        public BigDecimal getUnitPrice() {return unitPrice;}
 
-        public int getQuantity() {
-            return quantity;
-        }
+        public int getQuantity() {return quantity;}
 
-        public BigDecimal getSubtotal() {
-            return subtotal;
-        }
+        public BigDecimal getSubtotal() {return subtotal;}
     }
     
-    // Simplified static factory methods for use cases
     public static UpdateCartQuantityOutputData forSuccess(Long cartId, int totalItems, BigDecimal totalAmount) {
         return new UpdateCartQuantityOutputData(cartId, null, null, null, 0, 0, false,
                 totalItems, totalItems, totalAmount, BigDecimal.ZERO, null);

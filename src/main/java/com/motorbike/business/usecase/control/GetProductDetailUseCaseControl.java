@@ -12,11 +12,7 @@ import com.motorbike.domain.exceptions.SystemException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-/**
- * Get Product Detail Use Case Control
- * Extends AbstractUseCaseControl for common validation and error handling
- */
-public class GetProductDetailUseCaseControl 
+public class GetProductDetailUseCaseControl
         extends AbstractUseCaseControl<GetProductDetailInputData, GetProductDetailOutputBoundary> {
     
     private final ProductRepository productRepository;

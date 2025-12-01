@@ -1,8 +1,5 @@
 package com.motorbike.adapters.dto.response;
 
-/**
- * Response DTO for update cart quantity operation
- */
 public class UpdateCartResponse {
     private boolean success;
     private String message;
@@ -16,7 +13,6 @@ public class UpdateCartResponse {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() { return success; }
     public String getMessage() { return message; }
     public String getErrorCode() { return errorCode; }

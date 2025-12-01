@@ -12,10 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-/**
- * Adapter implementation for CartRepository
- * Handles conversion between Domain and JPA entities for shopping cart
- */
 @Component
 public class CartRepositoryAdapter implements CartRepository {
     
@@ -66,13 +62,10 @@ public class CartRepositoryAdapter implements CartRepository {
         
         int mergedCount = 0;
         
-        // Merge items from guest cart to user cart
         for (ChiTietGioHangJpaEntity guestItem : guestCart.getDanhSachSanPham()) {
-            // Check if product already exists in user cart
             boolean found = false;
             for (ChiTietGioHangJpaEntity userItem : userCart.getDanhSachSanPham()) {
                 if (userItem.getMaSanPham().equals(guestItem.getMaSanPham())) {
-                    // Update quantity (setSoLuong automatically updates tamTinh)
                     userItem.setSoLuong(userItem.getSoLuong() + guestItem.getSoLuong());
                     found = true;
                     mergedCount++;
@@ -80,7 +73,6 @@ public class CartRepositoryAdapter implements CartRepository {
                 }
             }
             
-            // If not found, add new item
             if (!found) {
                 ChiTietGioHangJpaEntity newItem = new ChiTietGioHangJpaEntity(
                         guestItem.getMaSanPham(),
@@ -93,30 +85,25 @@ public class CartRepositoryAdapter implements CartRepository {
             }
         }
         
-        // Calculate total for user cart
         BigDecimal total = userCart.getDanhSachSanPham().stream()
                 .map(ChiTietGioHangJpaEntity::getTamTinh)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         userCart.setTongTien(total);
         
-        // Save user cart
         jpaRepository.save(userCart);
         
-        // Delete guest cart
         jpaRepository.delete(guestCart);
         
         return mergedCount;
     }
     
-    // Conversion methods
     
     private GioHang toDomain(GioHangJpaEntity jpaEntity) {
-        // Create list of domain cart items
         java.util.List<ChiTietGioHang> items = new java.util.ArrayList<>();
         for (ChiTietGioHangJpaEntity itemJpa : jpaEntity.getDanhSachSanPham()) {
             ChiTietGioHang item = new ChiTietGioHang(
                     itemJpa.getMaChiTiet(),
-                    jpaEntity.getMaGioHang(), // cart ID
+                    jpaEntity.getMaGioHang(),
                     itemJpa.getMaSanPham(),
                     itemJpa.getTenSanPham(),
                     itemJpa.getGiaSanPham(),
@@ -126,7 +113,6 @@ public class CartRepositoryAdapter implements CartRepository {
             items.add(item);
         }
         
-        // Use full constructor to reconstruct from DB
         GioHang gioHang = new GioHang(
                 jpaEntity.getMaGioHang(),
                 jpaEntity.getMaTaiKhoan(),
@@ -144,7 +130,6 @@ public class CartRepositoryAdapter implements CartRepository {
         jpa.setMaGioHang(domain.getMaGioHang());
         jpa.setTongTien(domain.getTongTien());
         
-        // Convert cart items
         for (ChiTietGioHang itemDomain : domain.getDanhSachSanPham()) {
             ChiTietGioHangJpaEntity itemJpa = new ChiTietGioHangJpaEntity(
                     itemDomain.getMaSanPham(),

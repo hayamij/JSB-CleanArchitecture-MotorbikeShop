@@ -15,10 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * REST Controller for Authentication
- * Handles login and registration
- */
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
@@ -30,7 +26,7 @@ public class AuthController {
     private final RegisterViewModel registerViewModel;
 
     @Autowired
-    public AuthController(LoginUseCaseControl loginUseCase, 
+    public AuthController(LoginUseCaseControl loginUseCase,
                          RegisterUseCaseControl registerUseCase,
                          LoginViewModel loginViewModel,
                          RegisterViewModel registerViewModel) {
@@ -42,20 +38,17 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
-        // Map request to InputData - NO business logic here
         RegisterInputData inputData = new RegisterInputData(
             request.getEmail(),
-            request.getName(),         // name -> username
+            request.getName(),
             request.getPassword(),
             request.getConfirmPassword(),
-            request.getPhone(),        // phone -> phoneNumber
+            request.getPhone(),
             request.getAddress()
         );
         
-        // Execute use case - validation happens in business layer
         registerUseCase.execute(inputData);
         
-        // Convert ViewModel to Response DTO
         if (registerViewModel.success) {
             RegisterResponse response = new RegisterResponse(
                 true, registerViewModel.userId, registerViewModel.email,
@@ -82,7 +75,6 @@ public class AuthController {
         
         loginUseCase.execute(inputData);
         
-        // Convert ViewModel to Response DTO
         if (loginViewModel.success) {
             LoginResponse response = new LoginResponse(
                 true, loginViewModel.userId, loginViewModel.email,

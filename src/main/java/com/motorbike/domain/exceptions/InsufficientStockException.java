@@ -13,7 +13,5 @@ public class InsufficientStockException extends RuntimeException {
         this.errorCode = "INSUFFICIENT_STOCK";
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

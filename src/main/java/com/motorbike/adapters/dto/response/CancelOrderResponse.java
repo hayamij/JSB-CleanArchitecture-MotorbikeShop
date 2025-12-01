@@ -1,8 +1,5 @@
 package com.motorbike.adapters.dto.response;
 
-/**
- * Response DTO for cancel order operation
- */
 public class CancelOrderResponse {
     private boolean success;
     private Long orderId;
@@ -12,7 +9,6 @@ public class CancelOrderResponse {
     private String errorCode;
     private String errorMessage;
 
-    // Full Constructor
     public CancelOrderResponse(boolean success, Long orderId, String orderStatus,
                               String formattedRefundAmount, String message,
                               String errorCode, String errorMessage) {
@@ -25,32 +21,19 @@ public class CancelOrderResponse {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() {
         return success;
     }
 
-    public Long getOrderId() {
-        return orderId;
-    }
+    public Long getOrderId() {return orderId;}
 
-    public String getOrderStatus() {
-        return orderStatus;
-    }
+    public String getOrderStatus() {return orderStatus;}
 
-    public String getFormattedRefundAmount() {
-        return formattedRefundAmount;
-    }
+    public String getFormattedRefundAmount() {return formattedRefundAmount;}
 
-    public String getMessage() {
-        return message;
-    }
+    public String getMessage() {return message;}
 
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+    public String getErrorMessage() {return errorMessage;}
 }

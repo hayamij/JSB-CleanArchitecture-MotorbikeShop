@@ -2,9 +2,6 @@ package com.motorbike.adapters.dto.response;
 
 import java.math.BigDecimal;
 
-/**
- * Response DTO for add to cart operation
- */
 public class AddToCartResponse {
     private boolean success;
     private String message;
@@ -22,8 +19,8 @@ public class AddToCartResponse {
     private String errorCode;
     private String errorMessage;
 
-    public AddToCartResponse(boolean success, String message, Long cartId, int totalItems, 
-                            int totalQuantity, BigDecimal totalAmount, Long productId, 
+    public AddToCartResponse(boolean success, String message, Long cartId, int totalItems,
+                            int totalQuantity, BigDecimal totalAmount, Long productId,
                             String productName, int addedQuantity, int newItemQuantity,
                             boolean itemAlreadyInCart, BigDecimal productPrice, int productStock,
                             String errorCode, String errorMessage) {
@@ -44,7 +41,6 @@ public class AddToCartResponse {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() { return success; }
     public String getMessage() { return message; }
     public Long getCartId() { return cartId; }

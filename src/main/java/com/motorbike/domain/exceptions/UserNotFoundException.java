@@ -8,7 +8,5 @@ public class UserNotFoundException extends RuntimeException {
         this.errorCode = "USER_NOT_FOUND";
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

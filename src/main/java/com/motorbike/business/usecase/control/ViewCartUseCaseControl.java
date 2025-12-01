@@ -11,11 +11,7 @@ import com.motorbike.domain.exceptions.EmptyCartException;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * View Cart Use Case Control
- * Extends AbstractUseCaseControl for common validation and error handling
- */
-public class ViewCartUseCaseControl 
+public class ViewCartUseCaseControl
         extends AbstractUseCaseControl<ViewCartInputData, ViewCartOutputBoundary> {
     
     private final CartRepository cartRepository;
@@ -35,14 +31,12 @@ public class ViewCartUseCaseControl
         GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
             .orElseThrow(() -> new EmptyCartException());
         
-        // Simple if-check with throw
         if (gioHang.getDanhSachSanPham().isEmpty()) {
             throw new EmptyCartException();
         }
         
         List<ViewCartOutputData.CartItemData> itemList = new ArrayList<>();
         for (com.motorbike.domain.entities.ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
-            // Lấy thông tin sản phẩm từ database để có availableStock và imageUrl chính xác
             SanPham product = productRepository.findById(item.getMaSanPham())
                 .orElse(null);
             
@@ -55,7 +49,6 @@ public class ViewCartUseCaseControl
                 availableStock = product.getSoLuongTonKho();
                 imageUrl = product.getHinhAnh();
                 
-                // Kiểm tra cảnh báo tồn kho
                 if (item.getSoLuong() > availableStock) {
                     hasStockWarning = true;
                     stockWarningMessage = String.format(

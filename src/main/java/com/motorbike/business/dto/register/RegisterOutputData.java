@@ -3,29 +3,21 @@ package com.motorbike.business.dto.register;
 import com.motorbike.domain.entities.VaiTro;
 import java.time.LocalDateTime;
 
-/**
- * Output DTO for Register Use Case
- * Carries data OUT OF the use case to the presenter
- * Contains raw data before formatting
- */
 public class RegisterOutputData {
     private final boolean success;
     private final String errorCode;
     private final String errorMessage;
     
-    // User data (only if success)
     private final Long userId;
     private final String email;
     private final String username;
     private final VaiTro role;
     private final LocalDateTime createdAt;
     
-    // Auto-login info (optional)
     private final boolean autoLoginEnabled;
     private final String sessionToken;
 
-    // Constructor for success case
-    public RegisterOutputData(Long userId, String email, String username, 
+    public RegisterOutputData(Long userId, String email, String username,
                              VaiTro role, LocalDateTime createdAt,
                              boolean autoLoginEnabled, String sessionToken) {
         this.success = true;
@@ -40,8 +32,7 @@ public class RegisterOutputData {
         this.sessionToken = sessionToken;
     }
 
-    // Constructor for success case without auto-login
-    public RegisterOutputData(Long userId, String email, String username, 
+    public RegisterOutputData(Long userId, String email, String username,
                              VaiTro role, LocalDateTime createdAt) {
         this.success = true;
         this.errorCode = null;
@@ -55,7 +46,6 @@ public class RegisterOutputData {
         this.sessionToken = null;
     }
 
-    // Constructor for error case
     public RegisterOutputData(String errorCode, String errorMessage) {
         this.success = false;
         this.errorCode = errorCode;
@@ -69,48 +59,30 @@ public class RegisterOutputData {
         this.sessionToken = null;
     }
 
-    // Getters
     public boolean isSuccess() {
         return success;
     }
 
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+    public String getErrorMessage() {return errorMessage;}
 
-    public Long getUserId() {
-        return userId;
-    }
+    public Long getUserId() {return userId;}
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() {return email;}
 
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() {return username;}
 
-    public VaiTro getRole() {
-        return role;
-    }
+    public VaiTro getRole() {return role;}
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public LocalDateTime getCreatedAt() {return createdAt;}
 
     public boolean isAutoLoginEnabled() {
         return autoLoginEnabled;
     }
 
-    public String getSessionToken() {
-        return sessionToken;
-    }
+    public String getSessionToken() {return sessionToken;}
     
-    // Static factory methods
     public static RegisterOutputData forSuccess(
             Long userId, String email, String username,
             VaiTro role, LocalDateTime createdAt) {

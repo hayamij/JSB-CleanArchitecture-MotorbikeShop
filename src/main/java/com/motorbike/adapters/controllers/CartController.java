@@ -20,10 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-/**
- * REST Controller for Cart operations
- * Handles add to cart, view cart, and update cart quantity
- */
 @RestController
 @RequestMapping("/api/cart")
 @CrossOrigin(origins = "*")
@@ -61,16 +57,14 @@ public class CartController {
         
         addToCartUseCase.execute(inputData);
         if (addToCartViewModel.success) {
-            // Note: ViewModel has formatted strings, Response needs raw values
-            // We'll pass null for fields that need raw BigDecimal values for now
             AddToCartResponse response = new AddToCartResponse(
-                true, addToCartViewModel.message, addToCartViewModel.cartId, 
+                true, addToCartViewModel.message, addToCartViewModel.cartId,
                 addToCartViewModel.totalItems, addToCartViewModel.totalQuantity,
-                null, // totalAmount - need raw BigDecimal
-                addToCartViewModel.productId, addToCartViewModel.productName, 
-                addToCartViewModel.addedQuantity, addToCartViewModel.newItemQuantity, 
+                null,
+                addToCartViewModel.productId, addToCartViewModel.productName,
+                addToCartViewModel.addedQuantity, addToCartViewModel.newItemQuantity,
                 addToCartViewModel.itemAlreadyInCart,
-                null, // productPrice - need raw BigDecimal
+                null,
                 addToCartViewModel.productStock,
                 null, null
             );
@@ -94,15 +88,15 @@ public class CartController {
         if (viewCartViewModel.items != null) {
             responseItems = viewCartViewModel.items.stream()
                 .map(item -> new ViewCartResponse.CartItemResponse(
-                    item.productId, 
-                    item.productName, 
+                    item.productId,
+                    item.productName,
                     item.productImageUrl,
-                    null, // description - can be added later if needed
-                    null, // category - can be added later if needed
+                    null,
+                    null,
                     item.rawUnitPrice,
-                    item.quantity, 
-                    item.availableStock, 
-                    item.hasStockWarning, 
+                    item.quantity,
+                    item.availableStock,
+                    item.hasStockWarning,
                     item.rawSubtotal
                 ))
                 .collect(java.util.stream.Collectors.toList());
@@ -119,7 +113,6 @@ public class CartController {
 
     @PutMapping("/update")
     public ResponseEntity<UpdateCartResponse> updateCartQuantity(@RequestBody UpdateCartRequest request) {
-        // Reset ViewModel to initial state before use
         updateCartQuantityViewModel.success = false;
         updateCartQuantityViewModel.message = null;
         updateCartQuantityViewModel.errorCode = null;
@@ -133,7 +126,6 @@ public class CartController {
         
         updateCartQuantityUseCase.execute(inputData);
         
-        // Use direct field access instead of getter to avoid potential AOP/proxy issues
         if (updateCartQuantityViewModel.success) {
             UpdateCartResponse response = new UpdateCartResponse(
                 true, updateCartQuantityViewModel.message, null, null

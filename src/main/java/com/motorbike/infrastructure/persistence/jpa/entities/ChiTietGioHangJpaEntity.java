@@ -3,9 +3,6 @@ package com.motorbike.infrastructure.persistence.jpa.entities;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/**
- * JPA Entity for ChiTietGioHang (Cart Item)
- */
 @Entity
 @Table(name = "chi_tiet_gio_hang")
 public class ChiTietGioHangJpaEntity {
@@ -34,7 +31,6 @@ public class ChiTietGioHangJpaEntity {
     @Column(name = "tam_tinh", nullable = false, precision = 15, scale = 2)
     private BigDecimal tamTinh;
 
-    // Constructors
     public ChiTietGioHangJpaEntity() {
     }
 
@@ -47,61 +43,34 @@ public class ChiTietGioHangJpaEntity {
         this.tamTinh = giaSanPham.multiply(BigDecimal.valueOf(soLuong));
     }
 
-    // Getters and Setters
-    public Long getMaChiTiet() {
-        return maChiTiet;
-    }
+    public Long getMaChiTiet() {return maChiTiet;}
 
-    public void setMaChiTiet(Long maChiTiet) {
-        this.maChiTiet = maChiTiet;
-    }
+    public void setMaChiTiet(Long maChiTiet) {this.maChiTiet = maChiTiet;}
 
-    public GioHangJpaEntity getGioHang() {
-        return gioHang;
-    }
+    public GioHangJpaEntity getGioHang() {return gioHang;}
 
-    public void setGioHang(GioHangJpaEntity gioHang) {
-        this.gioHang = gioHang;
-    }
+    public void setGioHang(GioHangJpaEntity gioHang) {this.gioHang = gioHang;}
 
-    public Long getMaSanPham() {
-        return maSanPham;
-    }
+    public Long getMaSanPham() {return maSanPham;}
 
-    public void setMaSanPham(Long maSanPham) {
-        this.maSanPham = maSanPham;
-    }
+    public void setMaSanPham(Long maSanPham) {this.maSanPham = maSanPham;}
 
-    public String getTenSanPham() {
-        return tenSanPham;
-    }
+    public String getTenSanPham() {return tenSanPham;}
 
-    public void setTenSanPham(String tenSanPham) {
-        this.tenSanPham = tenSanPham;
-    }
+    public void setTenSanPham(String tenSanPham) {this.tenSanPham = tenSanPham;}
 
-    public BigDecimal getGiaSanPham() {
-        return giaSanPham;
-    }
+    public BigDecimal getGiaSanPham() {return giaSanPham;}
 
-    public void setGiaSanPham(BigDecimal giaSanPham) {
-        this.giaSanPham = giaSanPham;
-    }
+    public void setGiaSanPham(BigDecimal giaSanPham) {this.giaSanPham = giaSanPham;}
 
-    public int getSoLuong() {
-        return soLuong;
-    }
+    public int getSoLuong() {return soLuong;}
 
     public void setSoLuong(int soLuong) {
         this.soLuong = soLuong;
         this.tamTinh = this.giaSanPham.multiply(BigDecimal.valueOf(soLuong));
     }
 
-    public BigDecimal getTamTinh() {
-        return tamTinh;
-    }
+    public BigDecimal getTamTinh() {return tamTinh;}
 
-    public void setTamTinh(BigDecimal tamTinh) {
-        this.tamTinh = tamTinh;
-    }
+    public void setTamTinh(BigDecimal tamTinh) {this.tamTinh = tamTinh;}
 }

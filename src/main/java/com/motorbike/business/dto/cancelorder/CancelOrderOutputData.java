@@ -3,11 +3,6 @@ package com.motorbike.business.dto.cancelorder;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Output DTO for Cancel Order Use Case
- * Carries data OUT OF the use case to the presenter
- * Contains raw data before formatting
- */
 public class CancelOrderOutputData {
     private final boolean success;
     private final Long orderId;
@@ -19,9 +14,8 @@ public class CancelOrderOutputData {
     private final String errorCode;
     private final String errorMessage;
 
-    // Success Constructor
-    public CancelOrderOutputData(Long orderId, Long customerId, String orderStatus, 
-                                 BigDecimal refundAmount, String cancelReason, 
+    public CancelOrderOutputData(Long orderId, Long customerId, String orderStatus,
+                                 BigDecimal refundAmount, String cancelReason,
                                  LocalDateTime cancelledAt) {
         this.success = true;
         this.orderId = orderId;
@@ -34,7 +28,6 @@ public class CancelOrderOutputData {
         this.errorMessage = null;
     }
 
-    // Error Constructor
     public CancelOrderOutputData(String errorCode, String errorMessage) {
         this.success = false;
         this.orderId = null;
@@ -47,48 +40,30 @@ public class CancelOrderOutputData {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() {
         return success;
     }
 
-    public Long getOrderId() {
-        return orderId;
-    }
+    public Long getOrderId() {return orderId;}
 
-    public Long getCustomerId() {
-        return customerId;
-    }
+    public Long getCustomerId() {return customerId;}
 
-    public String getOrderStatus() {
-        return orderStatus;
-    }
+    public String getOrderStatus() {return orderStatus;}
 
-    public BigDecimal getRefundAmount() {
-        return refundAmount;
-    }
+    public BigDecimal getRefundAmount() {return refundAmount;}
 
-    public String getCancelReason() {
-        return cancelReason;
-    }
+    public String getCancelReason() {return cancelReason;}
 
-    public LocalDateTime getCancelledAt() {
-        return cancelledAt;
-    }
+    public LocalDateTime getCancelledAt() {return cancelledAt;}
 
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+    public String getErrorMessage() {return errorMessage;}
 
-    // Static factory methods
-    public static CancelOrderOutputData forSuccess(Long orderId, Long customerId, 
+    public static CancelOrderOutputData forSuccess(Long orderId, Long customerId,
                                                    String orderStatus, BigDecimal refundAmount,
                                                    String cancelReason) {
-        return new CancelOrderOutputData(orderId, customerId, orderStatus, 
+        return new CancelOrderOutputData(orderId, customerId, orderStatus,
                                         refundAmount, cancelReason, LocalDateTime.now());
     }
 

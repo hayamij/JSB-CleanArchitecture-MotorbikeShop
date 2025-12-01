@@ -3,9 +3,6 @@ package com.motorbike.infrastructure.persistence.jpa.entities;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/**
- * JPA Entity for XeMay (Motorbike)
- */
 @Entity
 @Table(name = "xe_may")
 @PrimaryKeyJoinColumn(name = "ma_san_pham")
@@ -26,7 +23,6 @@ public class XeMayJpaEntity extends SanPhamJpaEntity {
     @Column(name = "dung_tich")
     private int dungTich;
 
-    // Constructors
     public XeMayJpaEntity() {
         super();
     }
@@ -43,44 +39,23 @@ public class XeMayJpaEntity extends SanPhamJpaEntity {
         this.dungTich = dungTich;
     }
 
-    // Getters and Setters
-    public String getHangXe() {
-        return hangXe;
-    }
+    public String getHangXe() {return hangXe;}
 
-    public void setHangXe(String hangXe) {
-        this.hangXe = hangXe;
-    }
+    public void setHangXe(String hangXe) {this.hangXe = hangXe;}
 
-    public String getDongXe() {
-        return dongXe;
-    }
+    public String getDongXe() {return dongXe;}
 
-    public void setDongXe(String dongXe) {
-        this.dongXe = dongXe;
-    }
+    public void setDongXe(String dongXe) {this.dongXe = dongXe;}
 
-    public String getMauSac() {
-        return mauSac;
-    }
+    public String getMauSac() {return mauSac;}
 
-    public void setMauSac(String mauSac) {
-        this.mauSac = mauSac;
-    }
+    public void setMauSac(String mauSac) {this.mauSac = mauSac;}
 
-    public int getNamSanXuat() {
-        return namSanXuat;
-    }
+    public int getNamSanXuat() {return namSanXuat;}
 
-    public void setNamSanXuat(int namSanXuat) {
-        this.namSanXuat = namSanXuat;
-    }
+    public void setNamSanXuat(int namSanXuat) {this.namSanXuat = namSanXuat;}
 
-    public int getDungTich() {
-        return dungTich;
-    }
+    public int getDungTich() {return dungTich;}
 
-    public void setDungTich(int dungTich) {
-        this.dungTich = dungTich;
-    }
+    public void setDungTich(int dungTich) {this.dungTich = dungTich;}
 }

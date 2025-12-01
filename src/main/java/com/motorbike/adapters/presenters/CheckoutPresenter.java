@@ -11,11 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Presenter: CheckoutPresenter
- * Converts CheckoutOutputData to CheckoutViewModel
- * Formats data for UI presentation
- */
 public class CheckoutPresenter implements CheckoutOutputBoundary {
     private final CheckoutViewModel viewModel;
     private static final NumberFormat VND_FORMAT = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
@@ -28,7 +23,6 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
     @Override
     public void present(CheckoutOutputData outputData) {
         if (!outputData.isSuccess()) {
-            // Error case
             viewModel.success = false;
             viewModel.orderId = null;
             viewModel.customerId = null;
@@ -50,12 +44,10 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
             return;
         }
 
-        // Success case - format all data
         String formattedTotalAmount = VND_FORMAT.format(outputData.getTotalAmount());
         String formattedOrderDate = outputData.getOrderDate().format(DATE_FORMATTER);
         String orderStatusDisplay = formatOrderStatus(outputData.getOrderStatus());
         
-        // Format order items
         List<OrderItemViewModel> itemViewModels = new ArrayList<>();
         if (outputData.getItems() != null) {
             for (CheckoutOutputData.OrderItemData item : outputData.getItems()) {
@@ -69,7 +61,6 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
             }
         }
 
-        // Build success message
         String successMessage = String.format(
             "Đặt hàng thành công! Mã đơn hàng: #%d. " +
             "Tổng giá trị: %s. " +
@@ -98,12 +89,10 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
         viewModel.errorCode = null;
         viewModel.errorMessage = null;
         viewModel.message = successMessage;
-        viewModel.messageColor = "#28a745"; // Green color for success
+        viewModel.messageColor = "#28a745";
     }
 
-    public CheckoutViewModel getViewModel() {
-        return viewModel;
-    }
+    public CheckoutViewModel getViewModel() {return viewModel;}
 
     private String formatOrderStatus(String status) {
         switch (status) {
@@ -126,22 +115,22 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
 
     private String getErrorColor(String errorCode) {
         if (errorCode == null) {
-            return "#28a745"; // Green for success
+            return "#28a745";
         }
         
         switch (errorCode) {
             case "USER_NOT_LOGGED_IN":
             case "USER_NOT_FOUND":
-                return "#ffc107"; // Warning yellow
+                return "#ffc107";
             case "CART_EMPTY":
-                return "#17a2b8"; // Info blue
+                return "#17a2b8";
             case "PRODUCT_NOT_FOUND":
             case "PRODUCT_NOT_AVAILABLE":
             case "INSUFFICIENT_STOCK":
             case "SHIPPING_ADDRESS_REQUIRED":
-                return "#dc3545"; // Danger red
+                return "#dc3545";
             default:
-                return "#dc3545"; // Default danger
+                return "#dc3545";
         }
     }
 }

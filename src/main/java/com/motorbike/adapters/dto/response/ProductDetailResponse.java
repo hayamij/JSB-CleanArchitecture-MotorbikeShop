@@ -1,8 +1,5 @@
 package com.motorbike.adapters.dto.response;
 
-/**
- * Response DTO for product detail
- */
 public class ProductDetailResponse {
     private boolean success;
     private String productId;
@@ -17,9 +14,9 @@ public class ProductDetailResponse {
     private String errorCode;
     private String errorMessage;
 
-    public ProductDetailResponse(boolean success, String productId, String name, 
+    public ProductDetailResponse(boolean success, String productId, String name,
                                 String description, String formattedPrice, String imageUrl,
-                                String specifications, String categoryDisplay, 
+                                String specifications, String categoryDisplay,
                                 String stockQuantity, String availabilityStatus,
                                 String errorCode, String errorMessage) {
         this.success = success;
@@ -36,7 +33,6 @@ public class ProductDetailResponse {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() { return success; }
     public String getProductId() { return productId; }
     public String getName() { return name; }

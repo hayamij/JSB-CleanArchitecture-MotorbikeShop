@@ -8,12 +8,6 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-/**
- * Presenter for Product Detail
- * Transforms OutputData (use case output) → ViewModel (UI-ready data)
- * Contains PRESENTATION LOGIC (formatting, colors, display rules)
- * NO business logic
- */
 public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
     
     private final ProductDetailViewModel viewModel;
@@ -26,7 +20,6 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
     @Override
     public void present(GetProductDetailOutputData outputData) {
         if (!outputData.success) {
-            // Error case - presentation logic for errors
             viewModel.hasError = true;
             viewModel.errorCode = outputData.errorCode != null ? outputData.errorCode : "UNKNOWN_ERROR";
             viewModel.errorMessage = formatErrorMessage(outputData.errorCode, outputData.errorMessage);
@@ -34,7 +27,6 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
             return;
         }
         
-        // Success case - presentation logic for product display
         viewModel.hasError = false;
         viewModel.errorCode = null;
         viewModel.errorMessage = null;
@@ -47,7 +39,6 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         viewModel.categoryDisplay = formatCategory(outputData.category);
         viewModel.stockQuantity = formatStockQuantity(outputData.stockQuantity);
         
-        // Presentation logic: Determine availability status and color
         if (outputData.inStock) {
             viewModel.availabilityStatus = "Còn hàng";
             viewModel.stockStatusColor = "GREEN";
@@ -60,9 +51,7 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         }
     }
     
-    /**
-     * Presentation Logic: Format price to Vietnamese currency
-     */
+    
     private String formatPrice(BigDecimal price) {
         if (price == null) {
             return "Liên hệ";
@@ -70,9 +59,7 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         return VND_FORMAT.format(price);
     }
     
-    /**
-     * Presentation Logic: Format category for display
-     */
+    
     private String formatCategory(String category) {
         if (category == null) {
             return "Chưa phân loại";
@@ -87,9 +74,7 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         }
     }
     
-    /**
-     * Presentation Logic: Format stock quantity
-     */
+    
     private String formatStockQuantity(int quantity) {
         if (quantity == 0) {
             return "Hết hàng";
@@ -100,9 +85,7 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         }
     }
     
-    /**
-     * Presentation Logic: Format error message for user-friendly display
-     */
+    
     private String formatErrorMessage(String errorCode, String errorMessage) {
         switch (errorCode) {
             case "INVALID_INPUT":
@@ -116,7 +99,5 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         }
     }
     
-    public ProductDetailViewModel getViewModel() {
-        return viewModel;
-    }
+    public ProductDetailViewModel getViewModel() {return viewModel;}
 }

@@ -6,9 +6,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * JPA Entity for DonHang (Order)
- */
 @Entity
 @Table(name = "don_hang")
 public class DonHangJpaEntity {
@@ -48,111 +45,63 @@ public class DonHangJpaEntity {
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
 
-    // Constructors
     public DonHangJpaEntity() {
         this.tongTien = BigDecimal.ZERO;
         this.ngayDat = LocalDateTime.now();
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    // Helper method to add item
     public void addItem(ChiTietDonHangJpaEntity item) {
         danhSachSanPham.add(item);
         item.setDonHang(this);
     }
 
-    // Helper method to remove item
     public void removeItem(ChiTietDonHangJpaEntity item) {
         danhSachSanPham.remove(item);
         item.setDonHang(null);
     }
 
-    // Getters and Setters
-    public Long getMaDonHang() {
-        return maDonHang;
-    }
+    public Long getMaDonHang() {return maDonHang;}
 
-    public void setMaDonHang(Long maDonHang) {
-        this.maDonHang = maDonHang;
-    }
+    public void setMaDonHang(Long maDonHang) {this.maDonHang = maDonHang;}
 
-    public Long getMaTaiKhoan() {
-        return maTaiKhoan;
-    }
+    public Long getMaTaiKhoan() {return maTaiKhoan;}
 
-    public void setMaTaiKhoan(Long maTaiKhoan) {
-        this.maTaiKhoan = maTaiKhoan;
-    }
+    public void setMaTaiKhoan(Long maTaiKhoan) {this.maTaiKhoan = maTaiKhoan;}
 
-    public List<ChiTietDonHangJpaEntity> getDanhSachSanPham() {
-        return danhSachSanPham;
-    }
+    public List<ChiTietDonHangJpaEntity> getDanhSachSanPham() {return danhSachSanPham;}
 
-    public void setDanhSachSanPham(List<ChiTietDonHangJpaEntity> danhSachSanPham) {
-        this.danhSachSanPham = danhSachSanPham;
-    }
+    public void setDanhSachSanPham(List<ChiTietDonHangJpaEntity> danhSachSanPham) {this.danhSachSanPham = danhSachSanPham;}
 
-    public BigDecimal getTongTien() {
-        return tongTien;
-    }
+    public BigDecimal getTongTien() {return tongTien;}
 
-    public void setTongTien(BigDecimal tongTien) {
-        this.tongTien = tongTien;
-    }
+    public void setTongTien(BigDecimal tongTien) {this.tongTien = tongTien;}
 
-    public String getTrangThai() {
-        return trangThai;
-    }
+    public String getTrangThai() {return trangThai;}
 
-    public void setTrangThai(String trangThai) {
-        this.trangThai = trangThai;
-    }
+    public void setTrangThai(String trangThai) {this.trangThai = trangThai;}
 
-    public String getTenNguoiNhan() {
-        return tenNguoiNhan;
-    }
+    public String getTenNguoiNhan() {return tenNguoiNhan;}
 
-    public void setTenNguoiNhan(String tenNguoiNhan) {
-        this.tenNguoiNhan = tenNguoiNhan;
-    }
+    public void setTenNguoiNhan(String tenNguoiNhan) {this.tenNguoiNhan = tenNguoiNhan;}
 
-    public String getSoDienThoai() {
-        return soDienThoai;
-    }
+    public String getSoDienThoai() {return soDienThoai;}
 
-    public void setSoDienThoai(String soDienThoai) {
-        this.soDienThoai = soDienThoai;
-    }
+    public void setSoDienThoai(String soDienThoai) {this.soDienThoai = soDienThoai;}
 
-    public String getDiaChiGiaoHang() {
-        return diaChiGiaoHang;
-    }
+    public String getDiaChiGiaoHang() {return diaChiGiaoHang;}
 
-    public void setDiaChiGiaoHang(String diaChiGiaoHang) {
-        this.diaChiGiaoHang = diaChiGiaoHang;
-    }
+    public void setDiaChiGiaoHang(String diaChiGiaoHang) {this.diaChiGiaoHang = diaChiGiaoHang;}
 
-    public String getGhiChu() {
-        return ghiChu;
-    }
+    public String getGhiChu() {return ghiChu;}
 
-    public void setGhiChu(String ghiChu) {
-        this.ghiChu = ghiChu;
-    }
+    public void setGhiChu(String ghiChu) {this.ghiChu = ghiChu;}
 
-    public LocalDateTime getNgayDat() {
-        return ngayDat;
-    }
+    public LocalDateTime getNgayDat() {return ngayDat;}
 
-    public void setNgayDat(LocalDateTime ngayDat) {
-        this.ngayDat = ngayDat;
-    }
+    public void setNgayDat(LocalDateTime ngayDat) {this.ngayDat = ngayDat;}
 
-    public LocalDateTime getNgayCapNhat() {
-        return ngayCapNhat;
-    }
+    public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
 
-    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {
-        this.ngayCapNhat = ngayCapNhat;
-    }
+    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {this.ngayCapNhat = ngayCapNhat;}
 }

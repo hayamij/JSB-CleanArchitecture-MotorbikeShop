@@ -1,9 +1,5 @@
 package com.motorbike.domain.exceptions;
 
-/**
- * Exception for system errors
- * Used when an unexpected system error occurs
- */
 public class SystemException extends RuntimeException {
     private final String errorCode;
     
@@ -17,7 +13,5 @@ public class SystemException extends RuntimeException {
         this.errorCode = "SYSTEM_ERROR";
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }
