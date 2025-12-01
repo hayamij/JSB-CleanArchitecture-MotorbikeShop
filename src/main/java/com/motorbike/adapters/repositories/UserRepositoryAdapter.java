@@ -9,11 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Adapter implementation for UserRepository
- * Bridges between business layer (domain) and infrastructure layer (JPA)
- * Converts between Domain entities and JPA entities
- */
 @Component
 public class UserRepositoryAdapter implements UserRepository {
     
@@ -55,7 +50,6 @@ public class UserRepositoryAdapter implements UserRepository {
         });
     }
     
-    // Conversion methods: Domain <-> JPA Entity
     
     private TaiKhoan toDomain(TaiKhoanJpaEntity jpaEntity) {
         return new TaiKhoan(

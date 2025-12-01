@@ -12,11 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Adapter implementation for ProductRepository
- * Handles conversion between Domain and JPA entities
- * Supports inheritance (XeMay, PhuKienXeMay)
- */
 @Component
 public class ProductRepositoryAdapter implements ProductRepository {
     
@@ -51,7 +46,6 @@ public class ProductRepositoryAdapter implements ProductRepository {
                 .collect(java.util.stream.Collectors.toList());
     }
     
-    // Conversion methods
     
     private SanPham toDomain(SanPhamJpaEntity jpaEntity) {
         if (jpaEntity instanceof XeMayJpaEntity) {

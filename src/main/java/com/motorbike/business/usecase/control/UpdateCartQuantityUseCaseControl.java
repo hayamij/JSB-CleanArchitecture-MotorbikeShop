@@ -13,11 +13,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Update Cart Quantity Use Case Control
- * Extends AbstractUseCaseControl for common validation and error handling
- */
-public class UpdateCartQuantityUseCaseControl 
+public class UpdateCartQuantityUseCaseControl
         extends AbstractUseCaseControl<UpdateCartQuantityInputData, UpdateCartQuantityOutputBoundary> {
     
     private final CartRepository cartRepository;
@@ -35,7 +31,6 @@ public class UpdateCartQuantityUseCaseControl
             GioHang gioHang = cartRepository.findById(inputData.getCartId())
                 .orElseThrow(() -> new CartNotFoundException());
             
-            // Find product in cart to get old quantity and productName
             ChiTietGioHang existingItem = gioHang.getDanhSachSanPham().stream()
                 .filter(item -> item.getMaSanPham().equals(inputData.getProductId()))
                 .findFirst()
@@ -52,7 +47,6 @@ public class UpdateCartQuantityUseCaseControl
             
             GioHang savedCart = cartRepository.save(gioHang);
             
-            // Build cart items list
             List<UpdateCartQuantityOutputData.CartItemData> allItems = new ArrayList<>();
             BigDecimal newSubtotal = BigDecimal.ZERO;
             for (ChiTietGioHang item : savedCart.getDanhSachSanPham()) {
@@ -139,7 +133,6 @@ public class UpdateCartQuantityUseCaseControl
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } else {
-            // Unknown exception - use generic error code
             errorCode = "SYSTEM_ERROR";
             message = e.getMessage() != null ? e.getMessage() : "Đã xảy ra lỗi hệ thống";
         }

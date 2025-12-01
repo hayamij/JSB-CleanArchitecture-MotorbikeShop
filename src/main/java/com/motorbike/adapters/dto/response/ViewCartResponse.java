@@ -3,9 +3,6 @@ package com.motorbike.adapters.dto.response;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * Response DTO for view cart operation
- */
 public class ViewCartResponse {
     private boolean success;
     private String message;
@@ -38,7 +35,6 @@ public class ViewCartResponse {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() { return success; }
     public String getMessage() { return message; }
     public Long getCartId() { return cartId; }
@@ -76,7 +72,7 @@ public class ViewCartResponse {
             this.subtotal = subtotal;
         }
 
-        public CartItemResponse(Long productId, String productName, String imageUrl, 
+        public CartItemResponse(Long productId, String productName, String imageUrl,
                                String description, String category, BigDecimal price,
                                int quantity, int availableStock, boolean hasStockIssue,
                                BigDecimal subtotal) {

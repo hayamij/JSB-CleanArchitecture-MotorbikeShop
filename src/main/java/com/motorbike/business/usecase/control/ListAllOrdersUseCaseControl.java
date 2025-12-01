@@ -12,17 +12,6 @@ import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 
-/**
- * List All Orders Use Case Control 
- * Lấy TẤT CẢ đơn hàng trong hệ thống 
- * 
- * Business Rules:
- * - Không cần user ID 
- * - Support pagination
- * - Support filtering by status
- * - Support sorting (date, amount)
- * - Tính tổng doanh thu
- */
 public class ListAllOrdersUseCaseControl
         extends AbstractUseCaseControl<ListAllOrdersInputData, ListAllOrdersOutputBoundary> {
     
@@ -40,33 +29,26 @@ public class ListAllOrdersUseCaseControl
         try {
             List<DonHang> allOrders;
 
-            // Lấy đơn hàng (với optional filter)
             if (inputData.hasStatusFilter()) {
                 TrangThaiDonHang status = TrangThaiDonHang.valueOf(inputData.getFilterStatus());
                 allOrders = orderRepository.findByStatus(status);
             } else {
-                // Lấy tất cả đơn hàng trong hệ thống
                 allOrders = orderRepository.findAll();
             }
 
-            // Apply sorting
             allOrders = applySorting(allOrders, inputData.getSortBy());
 
-            // Tính tổng doanh thu (trước khi pagination)
             BigDecimal totalRevenue = calculateTotalRevenue(allOrders);
 
-            // Calculate pagination
             int totalOrders = allOrders.size();
             int offset = inputData.getOffset();
             int pageSize = inputData.getPageSize();
 
-            // Apply pagination
             List<DonHang> paginatedOrders = allOrders.stream()
                     .skip(offset)
                     .limit(pageSize)
                     .collect(Collectors.toList());
 
-            // Convert to output data
             List<ListAllOrdersOutputData.OrderItemData> orderItems = paginatedOrders.stream()
                     .map(donHang -> new ListAllOrdersOutputData.OrderItemData(
                             donHang.getMaDonHang(),
@@ -85,7 +67,6 @@ public class ListAllOrdersUseCaseControl
                     ))
                     .collect(Collectors.toList());
 
-            // Present success
             ListAllOrdersOutputData outputData = ListAllOrdersOutputData.forSuccess(
                     orderItems,
                     totalOrders,
@@ -101,9 +82,7 @@ public class ListAllOrdersUseCaseControl
         }
     }
 
-    /**
-     * Apply sorting to orders
-     */
+    
     private List<DonHang> applySorting(List<DonHang> orders, String sortBy) {
         if (sortBy == null) sortBy = "date_desc";
 
@@ -129,9 +108,7 @@ public class ListAllOrdersUseCaseControl
         }
     }
 
-    /**
-     * Calculate total revenue from orders
-     */
+    
     private BigDecimal calculateTotalRevenue(List<DonHang> orders) {
         return orders.stream()
                 .map(DonHang::getTongTien)

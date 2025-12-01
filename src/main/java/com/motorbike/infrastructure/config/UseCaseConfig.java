@@ -45,14 +45,9 @@ import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 
-/**
- * Spring Configuration for Use Cases
- * Wires dependencies using Dependency Injection
- */
 @Configuration
 public class UseCaseConfig {
     
-    // View Models (Request Scoped - one per request)
     @Bean
     @RequestScope
     public LoginViewModel loginViewModel() {
@@ -95,7 +90,6 @@ public class UseCaseConfig {
         return new CheckoutViewModel();
     }
     
-    // Login Use Case
     @Bean
     public LoginUseCaseControl loginUseCase(
             LoginOutputBoundary loginPresenter,
@@ -109,7 +103,6 @@ public class UseCaseConfig {
         return new LoginPresenter(loginViewModel);
     }
     
-    // Register Use Case
     @Bean
     public RegisterUseCaseControl registerUseCase(
             RegisterOutputBoundary registerPresenter,
@@ -123,7 +116,6 @@ public class UseCaseConfig {
         return new RegisterPresenter(registerViewModel);
     }
     
-    // Get Product Detail Use Case
     @Bean
     public GetProductDetailUseCaseControl getProductDetailUseCase(
             GetProductDetailOutputBoundary productDetailPresenter,
@@ -136,7 +128,6 @@ public class UseCaseConfig {
         return new ProductDetailPresenter(productDetailViewModel);
     }
     
-    // Add To Cart Use Case
     @Bean
     public AddToCartUseCaseControl addToCartUseCase(
             AddToCartOutputBoundary addToCartPresenter,
@@ -150,7 +141,6 @@ public class UseCaseConfig {
         return new AddToCartPresenter(addToCartViewModel);
     }
     
-    // View Cart Use Case
     @Bean
     public ViewCartUseCaseControl viewCartUseCase(
             ViewCartOutputBoundary viewCartPresenter,
@@ -164,7 +154,6 @@ public class UseCaseConfig {
         return new ViewCartPresenter(viewCartViewModel);
     }
     
-    // Update Cart Quantity Use Case
     @Bean
     public UpdateCartQuantityUseCaseControl updateCartQuantityUseCase(
             UpdateCartQuantityOutputBoundary updateCartQuantityPresenter,
@@ -177,7 +166,6 @@ public class UseCaseConfig {
         return new UpdateCartQuantityPresenter(updateCartQuantityViewModel);
     }
     
-    // Checkout Use Case
     @Bean
     public CheckoutUseCaseControl checkoutUseCase(
             CheckoutOutputBoundary checkoutPresenter,
@@ -208,7 +196,6 @@ public ListAllOrdersUseCaseControl listAllOrdersUseCase(
 public ListAllOrdersOutputBoundary listAllOrdersPresenter(ListAllOrdersViewModel listAllOrdersViewModel) {
     return new ListAllOrdersPresenter(listAllOrdersViewModel);
 }
-// ========== CANCEL ORDER USE CASE ==========
 
 @Bean
 @RequestScope

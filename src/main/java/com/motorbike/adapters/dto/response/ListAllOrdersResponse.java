@@ -2,9 +2,6 @@ package com.motorbike.adapters.dto.response;
 
 import java.util.List;
 
-/**
- * Response DTO for list all orders endpoint
- */
 public class ListAllOrdersResponse {
     private boolean success;
     private List<OrderItemResponse> orders;
@@ -33,7 +30,6 @@ public class ListAllOrdersResponse {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() { return success; }
     public List<OrderItemResponse> getOrders() { return orders; }
     public int getTotalOrders() { return totalOrders; }
@@ -45,9 +41,7 @@ public class ListAllOrdersResponse {
     public String getErrorCode() { return errorCode; }
     public String getErrorMessage() { return errorMessage; }
 
-    /**
-     * Nested class for order item response
-     */
+    
     public static class OrderItemResponse {
         private Long orderId;
         private Long customerId;
@@ -78,7 +72,6 @@ public class ListAllOrdersResponse {
             this.statusColor = statusColor;
         }
 
-        // Getters
         public Long getOrderId() { return orderId; }
         public Long getCustomerId() { return customerId; }
         public String getCustomerName() { return customerName; }

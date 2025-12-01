@@ -1,8 +1,5 @@
 package com.motorbike.domain.exceptions;
 
-/**
- * Exception for User-related business rule violations
- */
 public class InvalidUserException extends BusinessException {
     
     public InvalidUserException(String errorCode, String message) {

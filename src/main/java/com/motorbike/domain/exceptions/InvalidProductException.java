@@ -1,8 +1,5 @@
 package com.motorbike.domain.exceptions;
 
-/**
- * Exception for Product-related business rule violations
- */
 public class InvalidProductException extends BusinessException {
     
     public InvalidProductException(String errorCode, String message) {

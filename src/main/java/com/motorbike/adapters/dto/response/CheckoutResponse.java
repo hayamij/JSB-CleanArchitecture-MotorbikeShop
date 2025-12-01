@@ -3,9 +3,6 @@ package com.motorbike.adapters.dto.response;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * Response DTO for checkout operation
- */
 public class CheckoutResponse {
     private boolean success;
     private String message;
@@ -47,7 +44,6 @@ public class CheckoutResponse {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() { return success; }
     public String getMessage() { return message; }
     public Long getOrderId() { return orderId; }
@@ -72,7 +68,7 @@ public class CheckoutResponse {
         private int quantity;
         private BigDecimal subtotal;
 
-        public OrderItemResponse(Long productId, String productName, BigDecimal price, 
+        public OrderItemResponse(Long productId, String productName, BigDecimal price,
                                 int quantity, BigDecimal subtotal) {
             this.productId = productId;
             this.productName = productName;

@@ -15,14 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
-
-
-/**
- * REST Controller for Order operations
- * Handles checkout/payment process
- */
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin(origins = "*")
@@ -55,8 +47,8 @@ public class OrderController {
             if (checkoutViewModel.items != null) {
                 responseItems = checkoutViewModel.items.stream()
                     .map(item -> new CheckoutResponse.OrderItemResponse(
-                        item.productId, item.productName, null, // price needs raw BigDecimal
-                        item.quantity, null // subtotal needs raw BigDecimal
+                        item.productId, item.productName, null,
+                        item.quantity, null
                     ))
                     .collect(java.util.stream.Collectors.toList());
             }
@@ -66,7 +58,7 @@ public class OrderController {
                     checkoutViewModel.customerId, checkoutViewModel.customerName,
                     checkoutViewModel.customerEmail, checkoutViewModel.customerPhone,
                     checkoutViewModel.shippingAddress, checkoutViewModel.orderStatus,
-                    null, // totalAmount needs raw BigDecimal
+                    null,
                     checkoutViewModel.totalItems, checkoutViewModel.totalQuantity,
                     checkoutViewModel.formattedOrderDate, responseItems, null, null)
             );

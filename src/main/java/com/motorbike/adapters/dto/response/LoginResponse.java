@@ -1,8 +1,5 @@
 package com.motorbike.adapters.dto.response;
 
-/**
- * Response DTO for Login
- */
 public class LoginResponse {
     private boolean success;
     private Long userId;
@@ -32,7 +29,6 @@ public class LoginResponse {
         this.errorMessage = errorMessage;
     }
 
-    // Getters
     public boolean isSuccess() { return success; }
     public Long getUserId() { return userId; }
     public String getEmail() { return email; }

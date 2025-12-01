@@ -49,16 +49,14 @@ class CancelOrderUseCaseControlTest {
     @Test
     @DisplayName("Should cancel order successfully when status is CHO_XAC_NHAN")
     void testCancelOrderSuccess() {
-        // ARRANGE
         Long orderId = 1L;
         Long userId = 2L;
         Long productId1 = 1L;
         Long productId2 = 6L;
         
-        // Tạo đơn hàng với 2 sản phẩm
         DonHang order = new DonHang(
             orderId, userId,
-            null,  // items (sẽ add sau)
+            null,
             BigDecimal.valueOf(47700000),
             TrangThaiDonHang.CHO_XAC_NHAN,
             "Nguyễn Văn A",
@@ -69,7 +67,6 @@ class CancelOrderUseCaseControlTest {
             LocalDateTime.now()
         );
         
-        // Add items
         order.themSanPham(new ChiTietDonHang(
             productId1, "Honda Winner X", BigDecimal.valueOf(46000000), 1
         ));
@@ -77,7 +74,6 @@ class CancelOrderUseCaseControlTest {
             productId2, "Mũ bảo hiểm Royal", BigDecimal.valueOf(850000), 2
         ));
         
-        // Tạo sản phẩm trong kho
         XeMay motorbike = new XeMay(
             productId1, "Honda Winner X", "Xe thể thao",
             BigDecimal.valueOf(46000000), "/images/honda.jpg", 9, true,
@@ -92,14 +88,12 @@ class CancelOrderUseCaseControlTest {
             "Mũ bảo hiểm", "Royal", "ABS + EPS", "L"
         );
         
-        // Mock repositories
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
         when(productRepository.findById(productId1)).thenReturn(Optional.of(motorbike));
         when(productRepository.findById(productId2)).thenReturn(Optional.of(helmet));
         when(productRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(orderRepository.save(any(DonHang.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
-        // ACT
         CancelOrderInputData inputData = new CancelOrderInputData(
             orderId,
             userId,
@@ -107,14 +101,11 @@ class CancelOrderUseCaseControlTest {
         );
         useCase.execute(inputData);
         
-        // ASSERT
-        // 1. Verify repositories được gọi
         verify(orderRepository).findById(orderId);
-        verify(productRepository, times(2)).findById(any());  // Lấy product
-        verify(productRepository, times(2)).save(any());      // Save product sau khi recover stock
-        verify(orderRepository).save(any(DonHang.class));     // Save order
+        verify(productRepository, times(2)).findById(any());
+        verify(productRepository, times(2)).save(any());
+        verify(orderRepository).save(any(DonHang.class));
         
-        // 2. Verify presenter được gọi
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -129,15 +120,13 @@ class CancelOrderUseCaseControlTest {
     @Test
     @DisplayName("Should fail when order status is not CHO_XAC_NHAN")
     void testCancelOrderFailInvalidStatus() {
-        // ARRANGE
         Long orderId = 1L;
         Long userId = 2L;
         
-        // Đơn hàng đã xác nhận (không thể hủy)
         DonHang order = new DonHang(
             orderId, userId, null,
             BigDecimal.valueOf(47700000),
-            TrangThaiDonHang.DA_XAC_NHAN,  // ❌ Status khác
+            TrangThaiDonHang.DA_XAC_NHAN,
             "Nguyễn Văn A",
             "0912345678",
             "123 Nguyễn Trãi, Q1, TP.HCM",
@@ -148,7 +137,6 @@ class CancelOrderUseCaseControlTest {
         
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
         
-        // ACT
         CancelOrderInputData inputData = new CancelOrderInputData(
             orderId,
             userId,
@@ -156,7 +144,6 @@ class CancelOrderUseCaseControlTest {
         );
         useCase.execute(inputData);
         
-        // ASSERT
         verify(productRepository, never()).save(any());
         verify(orderRepository, never()).save(any());
         
@@ -171,13 +158,11 @@ class CancelOrderUseCaseControlTest {
     @Test
     @DisplayName("Should fail when order not found")
     void testCancelOrderFailNotFound() {
-        // ARRANGE
         Long orderId = 999L;
         Long userId = 2L;
         
         when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
         
-        // ACT
         CancelOrderInputData inputData = new CancelOrderInputData(
             orderId,
             userId,
@@ -185,7 +170,6 @@ class CancelOrderUseCaseControlTest {
         );
         useCase.execute(inputData);
         
-        // ASSERT
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -197,10 +181,9 @@ class CancelOrderUseCaseControlTest {
     @Test
     @DisplayName("Should fail when user doesn't have permission")
     void testCancelOrderFailPermissionDenied() {
-        // ARRANGE
         Long orderId = 1L;
         Long userId = 2L;
-        Long wrongUserId = 999L;  // Người dùng khác
+        Long wrongUserId = 999L;
         
         DonHang order = new DonHang(
             orderId, userId, null,
@@ -216,15 +199,13 @@ class CancelOrderUseCaseControlTest {
         
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
         
-        // ACT
         CancelOrderInputData inputData = new CancelOrderInputData(
             orderId,
-            wrongUserId,  // ❌ Người dùng khác
+            wrongUserId,
             "Lý do hủy"
         );
         useCase.execute(inputData);
         
-        // ASSERT
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -236,10 +217,8 @@ class CancelOrderUseCaseControlTest {
     @Test
     @DisplayName("Should fail with null input")
     void testCancelOrderFailNullInput() {
-        // ACT
         useCase.execute(null);
         
-        // ASSERT
         verify(orderRepository, never()).findById(any());
         
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
@@ -253,7 +232,6 @@ class CancelOrderUseCaseControlTest {
     @Test
     @DisplayName("Should recover stock correctly")
     void testStockRecovery() {
-        // ARRANGE
         Long orderId = 1L;
         Long userId = 2L;
         Long productId1 = 1L;
@@ -298,7 +276,6 @@ class CancelOrderUseCaseControlTest {
         when(productRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(orderRepository.save(any(DonHang.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
-        // ACT
         CancelOrderInputData inputData = new CancelOrderInputData(
             orderId,
             userId,
@@ -306,13 +283,8 @@ class CancelOrderUseCaseControlTest {
         );
         useCase.execute(inputData);
         
-        // ASSERT - Verify stock được cộng lại
         ArgumentCaptor<SanPham> productCaptor = ArgumentCaptor.forClass(SanPham.class);
         verify(productRepository, times(2)).save(productCaptor.capture());
         
-        // Kiểm tra stock sau khi recover
-        // Honda: 9 + 1 = 10
-        // Mũ: 48 + 2 = 50
-        // (Trong thực tế, entity tự xử lý logic tangTonKho)
     }
 }

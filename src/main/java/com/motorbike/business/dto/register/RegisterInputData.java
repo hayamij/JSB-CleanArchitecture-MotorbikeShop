@@ -1,19 +1,14 @@
 package com.motorbike.business.dto.register;
 
-/**
- * Input DTO for Register Use Case
- * Carries registration data INTO the use case from the adapter layer
- * Plain data structure - no business logic
- */
 public class RegisterInputData {
     private final String email;
     private final String username;
     private final String password;
-    private final String confirmPassword; // For password confirmation
+    private final String confirmPassword;
     private final String phoneNumber;
-    private final String address; // Optional
+    private final String address;
 
-    public RegisterInputData(String email, String username, String password, 
+    public RegisterInputData(String email, String username, String password,
                             String confirmPassword, String phoneNumber) {
         this.email = email;
         this.username = username;
@@ -23,7 +18,7 @@ public class RegisterInputData {
         this.address = null;
     }
 
-    public RegisterInputData(String email, String username, String password, 
+    public RegisterInputData(String email, String username, String password,
                             String confirmPassword, String phoneNumber, String address) {
         this.email = email;
         this.username = username;
@@ -33,28 +28,15 @@ public class RegisterInputData {
         this.address = address;
     }
 
-    // Getters
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() {return email;}
 
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() {return username;}
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() {return password;}
 
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
+    public String getConfirmPassword() {return confirmPassword;}
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+    public String getPhoneNumber() {return phoneNumber;}
 
-    public String getAddress() {
-        return address;
-    }
+    public String getAddress() {return address;}
 }

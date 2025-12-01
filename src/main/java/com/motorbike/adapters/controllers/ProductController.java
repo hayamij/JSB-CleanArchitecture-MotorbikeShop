@@ -17,10 +17,6 @@ import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * REST Controller for Product operations
- * Handles product detail retrieval
- */
 @RestController
 @RequestMapping("/api/products")
 @CrossOrigin(origins = "*")

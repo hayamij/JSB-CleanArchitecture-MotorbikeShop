@@ -1,8 +1,5 @@
 package com.motorbike.domain.exceptions;
 
-/**
- * Exception for Cart-related business rule violations
- */
 public class InvalidCartException extends BusinessException {
     
     public InvalidCartException(String errorCode, String message) {

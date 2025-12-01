@@ -4,9 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Output DTO for List All Orders Use Case
- */
 public class ListAllOrdersOutputData {
     private final boolean success;
     private final List<OrderItemData> orders;
@@ -14,7 +11,7 @@ public class ListAllOrdersOutputData {
     private final int totalPages;
     private final int currentPage;
     private final int pageSize;
-    private final BigDecimal totalRevenue; // Tổng doanh thu
+    private final BigDecimal totalRevenue;
     private final String errorCode;
     private final String errorMessage;
 
@@ -64,9 +61,7 @@ public class ListAllOrdersOutputData {
         return new ListAllOrdersOutputData(errorCode, errorMessage);
     }
 
-    /**
-     * Nested class for order item data
-     */
+    
     public static class OrderItemData {
         private final Long orderId;
         private final Long customerId;

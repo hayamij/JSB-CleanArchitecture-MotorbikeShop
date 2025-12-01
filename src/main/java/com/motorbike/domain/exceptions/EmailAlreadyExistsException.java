@@ -8,7 +8,5 @@ public class EmailAlreadyExistsException extends RuntimeException {
         this.errorCode = "EMAIL_EXISTS";
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

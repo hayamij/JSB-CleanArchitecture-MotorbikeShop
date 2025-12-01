@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Presenter for List All Orders Use Case
- */
 public class ListAllOrdersPresenter implements ListAllOrdersOutputBoundary {
     
     private final ListAllOrdersViewModel viewModel;

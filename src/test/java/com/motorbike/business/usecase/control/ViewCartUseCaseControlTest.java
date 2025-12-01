@@ -21,7 +21,6 @@ import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.XeMay;
 
-
 public class ViewCartUseCaseControlTest {
 
 	@Test
@@ -247,23 +246,21 @@ public class ViewCartUseCaseControlTest {
 	private static class MockProductRepository implements ProductRepository {
 		@Override
 		public Optional<SanPham> findById(Long productId) {
-			// Return a mock product with stock=10 for any ID
 			if (productId == null) {
 				return Optional.empty();
 			}
 			
-			// Create a mock XeMay (motorbike) product using proper constructor
 			XeMay product = new XeMay(
 				"Test Product " + productId,
 				"Test product description",
 				new BigDecimal("30000000"),
 				"/images/test-product.jpg",
-				10,  // stock = 10
-				"Honda",  // hangXe
-				"Wave",   // dongXe
-				"Red",    // mauSac
-				2024,     // namSanXuat
-				110       // dungTich
+				10,
+				"Honda",
+				"Wave",
+				"Red",
+				2024,
+				110
 			);
 			
 			return Optional.of(product);

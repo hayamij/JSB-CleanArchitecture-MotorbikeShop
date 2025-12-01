@@ -3,9 +3,6 @@ package com.motorbike.infrastructure.persistence.jpa.entities;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * JPA Entity for TaiKhoan (User Account)
- */
 @Entity
 @Table(name = "tai_khoan")
 public class TaiKhoanJpaEntity {
@@ -46,12 +43,10 @@ public class TaiKhoanJpaEntity {
     @Column(name = "lan_dang_nhap_cuoi")
     private LocalDateTime lanDangNhapCuoi;
 
-    // Enum for role
     public enum VaiTroEnum {
         CUSTOMER, ADMIN
     }
 
-    // Constructors
     public TaiKhoanJpaEntity() {
         this.ngayTao = LocalDateTime.now();
         this.ngayCapNhat = LocalDateTime.now();
@@ -69,101 +64,70 @@ public class TaiKhoanJpaEntity {
         this.diaChi = diaChi;
     }
 
-    // Getters and Setters
-    public Long getMaTaiKhoan() {
-        return maTaiKhoan;
-    }
+    public Long getMaTaiKhoan() {return maTaiKhoan;}
 
-    public void setMaTaiKhoan(Long maTaiKhoan) {
-        this.maTaiKhoan = maTaiKhoan;
-    }
+    public void setMaTaiKhoan(Long maTaiKhoan) {this.maTaiKhoan = maTaiKhoan;}
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() {return email;}
 
     public void setEmail(String email) {
         this.email = email;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public String getTenDangNhap() {
-        return tenDangNhap;
-    }
+    public String getTenDangNhap() {return tenDangNhap;}
 
     public void setTenDangNhap(String tenDangNhap) {
         this.tenDangNhap = tenDangNhap;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public String getMatKhau() {
-        return matKhau;
-    }
+    public String getMatKhau() {return matKhau;}
 
     public void setMatKhau(String matKhau) {
         this.matKhau = matKhau;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public String getSoDienThoai() {
-        return soDienThoai;
-    }
+    public String getSoDienThoai() {return soDienThoai;}
 
     public void setSoDienThoai(String soDienThoai) {
         this.soDienThoai = soDienThoai;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public String getDiaChi() {
-        return diaChi;
-    }
+    public String getDiaChi() {return diaChi;}
 
     public void setDiaChi(String diaChi) {
         this.diaChi = diaChi;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public VaiTroEnum getVaiTro() {
-        return vaiTro;
-    }
+    public VaiTroEnum getVaiTro() {return vaiTro;}
 
     public void setVaiTro(VaiTroEnum vaiTro) {
         this.vaiTro = vaiTro;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public boolean isHoatDong() {
-        return hoatDong;
-    }
+    public boolean isHoatDong() {return hoatDong;}
 
     public void setHoatDong(boolean hoatDong) {
         this.hoatDong = hoatDong;
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public LocalDateTime getNgayTao() {
-        return ngayTao;
-    }
+    public LocalDateTime getNgayTao() {return ngayTao;}
 
-    public void setNgayTao(LocalDateTime ngayTao) {
-        this.ngayTao = ngayTao;
-    }
+    public void setNgayTao(LocalDateTime ngayTao) {this.ngayTao = ngayTao;}
 
-    public LocalDateTime getNgayCapNhat() {
-        return ngayCapNhat;
-    }
+    public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
 
-    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {
-        this.ngayCapNhat = ngayCapNhat;
-    }
+    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {this.ngayCapNhat = ngayCapNhat;}
 
-    public LocalDateTime getLanDangNhapCuoi() {
-        return lanDangNhapCuoi;
-    }
+    public LocalDateTime getLanDangNhapCuoi() {return lanDangNhapCuoi;}
 
-    public void setLanDangNhapCuoi(LocalDateTime lanDangNhapCuoi) {
-        this.lanDangNhapCuoi = lanDangNhapCuoi;
-    }
+    public void setLanDangNhapCuoi(LocalDateTime lanDangNhapCuoi) {this.lanDangNhapCuoi = lanDangNhapCuoi;}
 
     @PreUpdate
     protected void onUpdate() {

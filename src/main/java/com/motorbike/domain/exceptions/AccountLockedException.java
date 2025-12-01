@@ -8,7 +8,5 @@ public class AccountLockedException extends RuntimeException {
         this.errorCode = "ACCOUNT_LOCKED";
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

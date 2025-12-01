@@ -10,11 +10,7 @@ import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.exceptions.InvalidUserException;
 import com.motorbike.domain.exceptions.EmailAlreadyExistsException;
 
-/**
- * Register Use Case Control
- * Extends AbstractUseCaseControl for common validation and error handling
- */
-public class RegisterUseCaseControl 
+public class RegisterUseCaseControl
         extends AbstractUseCaseControl<RegisterInputData, RegisterOutputBoundary> {
     
     private final UserRepository userRepository;
@@ -32,7 +28,6 @@ public class RegisterUseCaseControl
     @Override
     protected void executeBusinessLogic(RegisterInputData inputData) throws Exception {
         try {
-            // Simple if-check with throw
             if (userRepository.existsByEmail(inputData.getEmail())) {
                 throw new EmailAlreadyExistsException(inputData.getEmail());
             }

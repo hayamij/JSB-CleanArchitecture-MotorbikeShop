@@ -8,22 +8,13 @@ import com.motorbike.domain.entities.VaiTro;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Presenter for Login Feature
- * Transforms LoginOutputData → LoginViewModel
- * Contains presentation logic (formatting, display rules)
- * NO business logic
- */
 public class LoginPresenter implements LoginOutputBoundary {
     
     private final LoginViewModel viewModel;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = 
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
         DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    /**
-     * Constructor
-     * @param viewModel View model to be updated
-     */
+    
     public LoginPresenter(LoginViewModel viewModel) {
         this.viewModel = viewModel;
     }
@@ -37,32 +28,23 @@ public class LoginPresenter implements LoginOutputBoundary {
         }
     }
 
-    /**
-     * Present success case
-     * @param outputData Output data from use case
-     */
+    
     private void presentSuccess(LoginOutputData outputData) {
         viewModel.success = true;
         viewModel.hasError = false;
         
-        // User information
         viewModel.userId = outputData.getUserId();
         viewModel.email = outputData.getEmail();
         viewModel.username = outputData.getUsername();
         
-        // Format role display
         viewModel.roleDisplay = formatRoleDisplay(outputData.getRole());
         
-        // Format last login time
         viewModel.lastLoginDisplay = formatDateTime(outputData.getLastLoginAt());
         
-        // Session token
         viewModel.sessionToken = outputData.getSessionToken();
         
-        // Cart ID
         viewModel.cartId = outputData.getCartId();
         
-        // Cart merge information
         viewModel.cartMerged = outputData.isCartMerged();
         viewModel.mergedItemsCount = outputData.getMergedItemsCount();
         if (outputData.isCartMerged()) {
@@ -74,39 +56,31 @@ public class LoginPresenter implements LoginOutputBoundary {
             viewModel.cartMergeMessage = null;
         }
         
-        // Success message
         viewModel.message = String.format(
             "Đăng nhập thành công! Xin chào %s (%s)",
             outputData.getUsername(),
             viewModel.roleDisplay
         );
         
-        // Clear error fields
         viewModel.errorCode = null;
         viewModel.errorMessage = null;
         viewModel.errorColor = null;
     }
 
-    /**
-     * Present error case
-     * @param outputData Output data from use case
-     */
+    
     private void presentError(LoginOutputData outputData) {
         viewModel.success = false;
         viewModel.hasError = true;
         
-        // Error information
         viewModel.errorCode = outputData.getErrorCode();
         viewModel.errorMessage = formatErrorMessage(
-            outputData.getErrorCode(), 
+            outputData.getErrorCode(),
             outputData.getErrorMessage()
         );
         viewModel.errorColor = "RED";
         
-        // Main message
         viewModel.message = "Đăng nhập thất bại";
         
-        // Clear success fields
         viewModel.userId = null;
         viewModel.email = null;
         viewModel.username = null;
@@ -117,9 +91,7 @@ public class LoginPresenter implements LoginOutputBoundary {
         viewModel.cartMergeMessage = null;
     }
 
-    /**
-     * format role để hiển thị
-     */
+    
     private String formatRoleDisplay(VaiTro role) {
         if (role == null) {
             return "không xác định";
@@ -127,11 +99,7 @@ public class LoginPresenter implements LoginOutputBoundary {
         return role.getMoTa();
     }
 
-    /**
-     * Format datetime for display
-     * @param dateTime LocalDateTime to format
-     * @return Formatted datetime string
-     */
+    
     private String formatDateTime(LocalDateTime dateTime) {
         if (dateTime == null) {
             return "";
@@ -139,18 +107,12 @@ public class LoginPresenter implements LoginOutputBoundary {
         return dateTime.format(DATE_TIME_FORMATTER);
     }
 
-    /**
-     * Format error message with user-friendly text
-     * @param errorCode Error code from use case
-     * @param errorMessage Original error message
-     * @return Formatted error message
-     */
+    
     private String formatErrorMessage(String errorCode, String errorMessage) {
         if (errorCode == null) {
             return errorMessage != null ? errorMessage : "Lỗi không xác định";
         }
         
-        // Provide user-friendly error messages
         switch (errorCode) {
             case "EMAIL_NOT_FOUND":
                 return "Email không tồn tại trong hệ thống. Vui lòng kiểm tra lại hoặc đăng ký tài khoản mới.";

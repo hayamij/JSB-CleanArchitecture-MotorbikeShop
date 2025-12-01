@@ -14,10 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Adapter implementation for OrderRepository
- * Handles conversion between Domain and JPA entities for orders
- */
 @Component
 public class OrderRepositoryAdapter implements OrderRepository {
     
@@ -80,18 +76,13 @@ public class OrderRepositoryAdapter implements OrderRepository {
         return jpaRepository.existsById(orderId);
     }
     
-    // ===== MAPPING METHODS =====
     
-    /**
-     * Convert JPA Entity to Domain Entity
-     */
+    
     private DonHang toDomain(DonHangJpaEntity jpaEntity) {
-        // Convert items
         List<ChiTietDonHang> items = jpaEntity.getDanhSachSanPham().stream()
                 .map(this::itemToDomain)
                 .collect(Collectors.toList());
         
-        // Create domain entity
         DonHang donHang = new DonHang(
                 jpaEntity.getMaDonHang(),
                 jpaEntity.getMaTaiKhoan(),
@@ -109,13 +100,11 @@ public class OrderRepositoryAdapter implements OrderRepository {
         return donHang;
     }
     
-    /**
-     * Convert ChiTietDonHangJpaEntity to ChiTietDonHang
-     */
+    
     private ChiTietDonHang itemToDomain(ChiTietDonHangJpaEntity jpaEntity) {
         return new ChiTietDonHang(
                 jpaEntity.getMaChiTiet(),
-                null, // maDonHang will be set by parent
+                null,
                 jpaEntity.getMaSanPham(),
                 jpaEntity.getTenSanPham(),
                 jpaEntity.getGiaBan(),
@@ -124,9 +113,7 @@ public class OrderRepositoryAdapter implements OrderRepository {
         );
     }
     
-    /**
-     * Convert Domain Entity to JPA Entity
-     */
+    
     private DonHangJpaEntity toJpaEntity(DonHang donHang) {
         DonHangJpaEntity jpaEntity = new DonHangJpaEntity();
         
@@ -141,7 +128,6 @@ public class OrderRepositoryAdapter implements OrderRepository {
         jpaEntity.setNgayDat(donHang.getNgayDat());
         jpaEntity.setNgayCapNhat(donHang.getNgayCapNhat());
         
-        // Convert and add items
         for (ChiTietDonHang item : donHang.getDanhSachSanPham()) {
             ChiTietDonHangJpaEntity jpaItem = itemToJpaEntity(item);
             jpaEntity.addItem(jpaItem);
@@ -150,9 +136,7 @@ public class OrderRepositoryAdapter implements OrderRepository {
         return jpaEntity;
     }
     
-    /**
-     * Convert ChiTietDonHang to ChiTietDonHangJpaEntity
-     */
+    
     private ChiTietDonHangJpaEntity itemToJpaEntity(ChiTietDonHang item) {
         ChiTietDonHangJpaEntity jpaEntity = new ChiTietDonHangJpaEntity();
         

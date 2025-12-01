@@ -8,7 +8,5 @@ public class CartNotFoundException extends RuntimeException {
         this.errorCode = "CART_NOT_FOUND";
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

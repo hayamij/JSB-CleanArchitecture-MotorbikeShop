@@ -1,12 +1,6 @@
 package com.motorbike.adapters.viewmodels;
 
-/**
- * ViewModel for Product Detail
- * Contains already formatted data ready for display
- * NO logic, pure data container
- */
 public class ProductDetailViewModel {
-    // Display strings - already formatted
     public String productId;
     public String name;
     public String description;
@@ -19,7 +13,6 @@ public class ProductDetailViewModel {
     public String stockStatusColor;
     public String errorCode;
     
-    // Error display
     public boolean hasError;
     public String errorMessage;
     public String errorColor;
@@ -29,20 +22,13 @@ public class ProductDetailViewModel {
         this.stockStatusColor = "GREEN";
     }
     
-    // Simple getters for convenience
     public boolean hasError() {
         return hasError;
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
     
-    public String getFormattedPrice() {
-        return formattedPrice;
-    }
+    public String getFormattedPrice() {return formattedPrice;}
     
-    public String getAvailabilityStatus() {
-        return availabilityStatus;
-    }
+    public String getAvailabilityStatus() {return availabilityStatus;}
 }

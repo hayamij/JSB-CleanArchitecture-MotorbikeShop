@@ -3,9 +3,6 @@ package com.motorbike.infrastructure.persistence.jpa.entities;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/**
- * JPA Entity for PhuKienXeMay (Motorbike Accessory)
- */
 @Entity
 @Table(name = "phu_kien_xe_may")
 @PrimaryKeyJoinColumn(name = "ma_san_pham")
@@ -23,7 +20,6 @@ public class PhuKienXeMayJpaEntity extends SanPhamJpaEntity {
     @Column(name = "kich_thuoc", length = 50)
     private String kichThuoc;
 
-    // Constructors
     public PhuKienXeMayJpaEntity() {
         super();
     }
@@ -39,36 +35,19 @@ public class PhuKienXeMayJpaEntity extends SanPhamJpaEntity {
         this.kichThuoc = kichThuoc;
     }
 
-    // Getters and Setters
-    public String getLoaiPhuKien() {
-        return loaiPhuKien;
-    }
+    public String getLoaiPhuKien() {return loaiPhuKien;}
 
-    public void setLoaiPhuKien(String loaiPhuKien) {
-        this.loaiPhuKien = loaiPhuKien;
-    }
+    public void setLoaiPhuKien(String loaiPhuKien) {this.loaiPhuKien = loaiPhuKien;}
 
-    public String getThuongHieu() {
-        return thuongHieu;
-    }
+    public String getThuongHieu() {return thuongHieu;}
 
-    public void setThuongHieu(String thuongHieu) {
-        this.thuongHieu = thuongHieu;
-    }
+    public void setThuongHieu(String thuongHieu) {this.thuongHieu = thuongHieu;}
 
-    public String getChatLieu() {
-        return chatLieu;
-    }
+    public String getChatLieu() {return chatLieu;}
 
-    public void setChatLieu(String chatLieu) {
-        this.chatLieu = chatLieu;
-    }
+    public void setChatLieu(String chatLieu) {this.chatLieu = chatLieu;}
 
-    public String getKichThuoc() {
-        return kichThuoc;
-    }
+    public String getKichThuoc() {return kichThuoc;}
 
-    public void setKichThuoc(String kichThuoc) {
-        this.kichThuoc = kichThuoc;
-    }
+    public void setKichThuoc(String kichThuoc) {this.kichThuoc = kichThuoc;}
 }

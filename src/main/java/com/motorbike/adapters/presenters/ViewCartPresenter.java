@@ -10,11 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Presenter: ViewCartPresenter
- * Converts ViewCartOutputData to ViewCartViewModel
- * Formats data for UI presentation
- */
 public class ViewCartPresenter implements ViewCartOutputBoundary {
     private final ViewCartViewModel viewModel;
     private static final NumberFormat VND_FORMAT = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
@@ -26,7 +21,6 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
     @Override
     public void present(ViewCartOutputData outputData) {
         if (!outputData.isSuccess()) {
-            // Error case
             viewModel.success = false;
             viewModel.cartId = null;
             viewModel.userId = null;
@@ -41,7 +35,6 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
             return;
         }
 
-        // Empty cart case
         if (outputData.isEmpty()) {
             viewModel.success = true;
             viewModel.cartId = outputData.getCartId();
@@ -57,22 +50,21 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
             return;
         }
 
-        // Format cart items
         List<CartItemViewModel> itemViewModels = new ArrayList<>();
         if (outputData.getItems() != null) {
             for (ViewCartOutputData.CartItemData item : outputData.getItems()) {
                 String stockStatus = getStockStatus(item);
-                String stockWarningColor = item.hasStockWarning() ? "#dc3545" : null; // Red for warnings
+                String stockWarningColor = item.hasStockWarning() ? "#dc3545" : null;
 
                 itemViewModels.add(new CartItemViewModel(
                     item.getProductId(),
                     item.getProductName(),
                     item.getProductImageUrl(),
                     VND_FORMAT.format(item.getUnitPrice()),
-                    item.getUnitPrice(), // raw value
+                    item.getUnitPrice(),
                     item.getQuantity(),
                     VND_FORMAT.format(item.getSubtotal()),
-                    item.getSubtotal(), // raw value
+                    item.getSubtotal(),
                     item.getAvailableStock(),
                     stockStatus,
                     item.hasStockWarning(),
@@ -82,17 +74,14 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
             }
         }
 
-        // Format total amount
         String formattedTotalAmount = VND_FORMAT.format(outputData.getTotalAmount());
 
-        // Build cart summary message
         String cartSummary = String.format(
             "Giỏ hàng có %d sản phẩm (%d món)",
             outputData.getTotalItems(),
             outputData.getTotalQuantity()
         );
 
-        // Stock warning message
         String stockWarningMessage = outputData.hasStockWarnings() ?
             "Một số sản phẩm trong giỏ hàng có cảnh báo về số lượng tồn kho" : null;
 
@@ -102,7 +91,7 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
         viewModel.totalItems = outputData.getTotalItems();
         viewModel.totalQuantity = outputData.getTotalQuantity();
         viewModel.formattedTotalAmount = formattedTotalAmount;
-        viewModel.rawTotalAmount = outputData.getTotalAmount(); // raw value
+        viewModel.rawTotalAmount = outputData.getTotalAmount();
         viewModel.items = itemViewModels;
         viewModel.isEmpty = false;
         viewModel.hasStockWarnings = outputData.hasStockWarnings();
@@ -110,14 +99,11 @@ public class ViewCartPresenter implements ViewCartOutputBoundary {
         viewModel.errorMessage = stockWarningMessage;
     }
 
-    public ViewCartViewModel getViewModel() {
-        return viewModel;
-    }
+    public ViewCartViewModel getViewModel() {return viewModel;}
 
     private String getStockStatus(ViewCartOutputData.CartItemData item) {
         int stock = item.getAvailableStock();
         
-        // Check stock level first for specific statuses
         if (stock == 0) {
             return "out_of_stock";
         } else if (item.hasStockWarning()) {

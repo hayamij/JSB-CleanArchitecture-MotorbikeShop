@@ -13,15 +13,7 @@ import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 import com.motorbike.domain.exceptions.CannotCancelOrderException;
 
-/**
- * Cancel Order Use Case Control
- * Business Rules:
- * - Chỉ có thể hủy đơn hàng với status = CHO_XAC_NHAN
- * - Không thể hủy đơn đã xác nhận thanh toán
- * - Phải recover tồn kho của tất cả sản phẩm
- * - Lưu lý do hủy để thống kê
- */
-public class CancelOrderUseCaseControl 
+public class CancelOrderUseCaseControl
         extends AbstractUseCaseControl<CancelOrderInputData, CancelOrderOutputBoundary> {
     
     private final OrderRepository orderRepository;
@@ -39,14 +31,12 @@ public class CancelOrderUseCaseControl
     @Override
     protected void executeBusinessLogic(CancelOrderInputData inputData) throws Exception {
         try {
-            // 1️⃣ Lấy đơn hàng
             DonHang donHang = orderRepository.findById(inputData.getOrderId())
                 .orElseThrow(() -> new CannotCancelOrderException(
                     "ORDER_NOT_FOUND",
                     "Không tìm thấy đơn hàng: " + inputData.getOrderId()
                 ));
             
-            // 2️⃣ Kiểm tra quyền (user phải là chủ đơn)
             if (!donHang.getMaTaiKhoan().equals(inputData.getUserId())) {
                 throw new CannotCancelOrderException(
                     "PERMISSION_DENIED",
@@ -54,7 +44,6 @@ public class CancelOrderUseCaseControl
                 );
             }
             
-            // 3️⃣ Kiểm tra trạng thái (chỉ hủy được CHO_XAC_NHAN)
             if (donHang.getTrangThai() != TrangThaiDonHang.CHO_XAC_NHAN) {
                 throw new CannotCancelOrderException(
                     "INVALID_ORDER_STATUS",
@@ -63,7 +52,6 @@ public class CancelOrderUseCaseControl
                 );
             }
             
-            // 4️⃣ 🔄 RECOVER TỒN KHO (QUAN TRỌNG!)
             BigDecimal totalRefund = BigDecimal.ZERO;
             for (ChiTietDonHang chiTiet : donHang.getDanhSachSanPham()) {
                 SanPham sanPham = productRepository.findById(chiTiet.getMaSanPham())
@@ -72,19 +60,15 @@ public class CancelOrderUseCaseControl
                         "Sản phẩm không tồn tại: " + chiTiet.getMaSanPham()
                     ));
                 
-                // Cộng lại tồn kho
                 sanPham.tangTonKho(chiTiet.getSoLuong());
                 productRepository.save(sanPham);
                 
-                // Tính tổng hoàn tiền
                 totalRefund = totalRefund.add(chiTiet.getThanhTien());
             }
             
-            // 5️⃣ CẬP NHẬT TRẠNG THÁI ĐƠNHÀNG
-            donHang.huyDonHang();  // Entity tự xử lý logic hủy
+            donHang.huyDonHang();
             DonHang cancelledOrder = orderRepository.save(donHang);
             
-            // 6️⃣ OUTPUT
             CancelOrderOutputData outputData = CancelOrderOutputData.forSuccess(
                 cancelledOrder.getMaDonHang(),
                 cancelledOrder.getMaTaiKhoan(),
@@ -133,7 +117,6 @@ public class CancelOrderUseCaseControl
             errorCode = ex.getErrorCode();
             message = ex.getMessage();
         } catch (Exception ex) {
-            // Keep default
         }
         
         CancelOrderOutputData outputData = CancelOrderOutputData.forError(errorCode, message);

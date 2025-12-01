@@ -1,9 +1,5 @@
 package com.motorbike.domain.exceptions;
 
-/**
- * Base exception for invalid input data
- * Thrown when input validation fails
- */
 public abstract class InvalidInputException extends IllegalArgumentException {
     private final String errorCode;
     
@@ -12,7 +8,5 @@ public abstract class InvalidInputException extends IllegalArgumentException {
         this.errorCode = errorCode;
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }

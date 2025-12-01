@@ -12,7 +12,7 @@ public abstract class AbstractUseCaseControl<I, O> {
 
     public final void execute(I inputData) {
         try {
-            validateInput(inputData);         
+            validateInput(inputData);
             executeBusinessLogic(inputData);
         } catch (IllegalArgumentException e) {
             handleValidationError(e);

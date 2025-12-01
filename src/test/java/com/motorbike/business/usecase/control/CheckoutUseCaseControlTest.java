@@ -28,10 +28,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_ValidCheckout_Success() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			100L, 
-			"Nguyen Van A", 
-			"0912345678", 
-			"123 Main St", 
+			100L,
+			"Nguyen Van A",
+			"0912345678",
+			"123 Main St",
 			"Giao trong gio hanh chinh"
 		);
 		
@@ -56,10 +56,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_ValidCheckout_WithNote() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			100L, 
-			"Tran Thi B", 
-			"0987654321", 
-			"456 Side St", 
+			100L,
+			"Tran Thi B",
+			"0987654321",
+			"456 Side St",
 			"Goi truoc khi giao"
 		);
 		
@@ -82,10 +82,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_ValidCheckout_NoNote() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			100L, 
-			"Le Van C", 
-			"0901234567", 
-			"789 Park Ave", 
+			100L,
+			"Le Van C",
+			"0901234567",
+			"789 Park Ave",
 			null
 		);
 		
@@ -128,10 +128,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_NullUserId() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			null, 
-			"Nguyen Van A", 
-			"0912345678", 
-			"123 Main St", 
+			null,
+			"Nguyen Van A",
+			"0912345678",
+			"123 Main St",
 			"Note"
 		);
 		
@@ -154,10 +154,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_EmptyCart() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			999L, 
-			"Nguyen Van A", 
-			"0912345678", 
-			"123 Main St", 
+			999L,
+			"Nguyen Van A",
+			"0912345678",
+			"123 Main St",
 			"Note"
 		);
 		
@@ -180,10 +180,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_CartNotFound() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			888L, 
-			"Nguyen Van A", 
-			"0912345678", 
-			"123 Main St", 
+			888L,
+			"Nguyen Van A",
+			"0912345678",
+			"123 Main St",
 			"Note"
 		);
 		
@@ -206,10 +206,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_InsufficientStock() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			200L, 
-			"Nguyen Van A", 
-			"0912345678", 
-			"123 Main St", 
+			200L,
+			"Nguyen Van A",
+			"0912345678",
+			"123 Main St",
 			"Note"
 		);
 		
@@ -232,10 +232,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_EmptyReceiverName() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			100L, 
-			"", 
-			"0912345678", 
-			"123 Main St", 
+			100L,
+			"",
+			"0912345678",
+			"123 Main St",
 			"Note"
 		);
 		
@@ -258,10 +258,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_EmptyPhoneNumber() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			100L, 
-			"Nguyen Van A", 
-			"", 
-			"123 Main St", 
+			100L,
+			"Nguyen Van A",
+			"",
+			"123 Main St",
 			"Note"
 		);
 		
@@ -284,10 +284,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_EmptyShippingAddress() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			100L, 
-			"Nguyen Van A", 
-			"0912345678", 
-			"", 
+			100L,
+			"Nguyen Van A",
+			"0912345678",
+			"",
 			"Note"
 		);
 		
@@ -310,10 +310,10 @@ public class CheckoutUseCaseControlTest {
 	@Test
 	public void testExecute_EdgeCase_MinimalValidData() {
 		CheckoutInputData inputData = new CheckoutInputData(
-			100L, 
-			"A", 
-			"1", 
-			"X", 
+			100L,
+			"A",
+			"1",
+			"X",
 			""
 		);
 		
@@ -340,10 +340,10 @@ public class CheckoutUseCaseControlTest {
 		String longAddress = "X".repeat(500);
 		
 		CheckoutInputData inputData = new CheckoutInputData(
-			100L, 
-			longName, 
-			longPhone, 
-			longAddress, 
+			100L,
+			longName,
+			longPhone,
+			longAddress,
 			null
 		);
 		

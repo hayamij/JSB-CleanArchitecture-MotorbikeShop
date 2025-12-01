@@ -8,7 +8,5 @@ public class EmptyCartException extends RuntimeException {
         this.errorCode = "EMPTY_CART";
     }
     
-    public String getErrorCode() {
-        return errorCode;
-    }
+    public String getErrorCode() {return errorCode;}
 }
