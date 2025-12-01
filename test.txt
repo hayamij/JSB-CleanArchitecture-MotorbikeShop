@@ -99,3 +99,17 @@
 - Trường hợp biên - Giỏ hàng có sản phẩm với số lượng rất lớn (ví dụ: 100)
 - Trường hợp biên - Xem giỏ hàng với ID người dùng nhỏ nhất (ví dụ: 1L)
 - Trường hợp biên - Lỗi khi xem giỏ hàng với ID người dùng quá lớn (ví dụ: Long.MAX_VALUE)
+
+8. Usecase: Tìm kiếm xe máy (Search Motorbike)
+- Tìm kiếm thành công (Trả về danh sách ≥ 1 xe)
+-Tìm kiếm thành công (Khớp một phần từ khóa, ví dụ: "Hon")
+- Tìm kiếm thành công (Không phân biệt hoa/thường, ví dụ: “honda”)
+- Validation – Dữ liệu input bị null (inputData = null)
+- Validation – Từ khóa bị null (keyword = null)
+- Validation – Từ khóa rỗng ("")
+- Validation – Từ khóa chứa ký tự đặc biệt không hợp lệ (ví dụ: "@@@")
+- Lỗi nghiệp vụ – Không tìm thấy xe nào phù hợp
+- Trường hợp biên – Từ khóa 1 ký tự (ví dụ: "a")
+- Trường hợp biên – Từ khóa rất dài (ví dụ: 255 ký tự)
+- Trường hợp biên – Tìm kiếm bằng số (ví dụ: "150")
+- Trường hợp biên – Từ khóa có khoảng trắng đầu/đuôi (ví dụ: " Honda ")
