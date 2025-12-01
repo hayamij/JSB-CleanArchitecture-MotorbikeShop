@@ -64,7 +64,7 @@ src/
 - 🔄 Thêm phụ kiện xe máy
 - 🔄 Xem danh sách phụ kiện xe máy
 - 🔄 Sửa thông tin phụ kiện xe máy
-- 🔄 Xóa thông tin phụ kiện xe máy
+- 🔄 Xóa phụ kiện xe máy
 
 ### 4. Quản lý tài khoản (Admin)
 
