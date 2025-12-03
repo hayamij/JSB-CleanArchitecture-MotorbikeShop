@@ -12,120 +12,118 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateCartQuantityUseCaseControl
-        extends AbstractUseCaseControl<UpdateCartQuantityInputData, UpdateCartQuantityOutputBoundary> {
+public class UpdateCartQuantityUseCaseControl {
     
+    private final UpdateCartQuantityOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     
     public UpdateCartQuantityUseCaseControl(
             UpdateCartQuantityOutputBoundary outputBoundary,
             CartRepository cartRepository) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
     }
     
-    @Override
-    protected void executeBusinessLogic(UpdateCartQuantityInputData inputData) throws Exception {
+    public void execute(UpdateCartQuantityInputData inputData) {
+        UpdateCartQuantityOutputData outputData = null;
+        Exception errorException = null;
+        
         try {
-            GioHang gioHang = cartRepository.findById(inputData.getCartId())
-                .orElseThrow(DomainException::cartNotFound);
-            
-            ChiTietGioHang existingItem = gioHang.getDanhSachSanPham().stream()
-                .filter(item -> item.getMaSanPham().equals(inputData.getProductId()))
-                .findFirst()
-                .orElse(null);
-            
-            int oldQuantity = existingItem != null ? existingItem.getSoLuong() : 0;
-            String productName = existingItem != null ? existingItem.getTenSanPham() : null;
-            
-            if (inputData.getNewQuantity() == 0) {
-                gioHang.xoaSanPham(inputData.getProductId());
-            } else {
-                gioHang.capNhatSoLuong(inputData.getProductId(), inputData.getNewQuantity());
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
             }
-            
-            GioHang savedCart = cartRepository.save(gioHang);
-            
-            List<UpdateCartQuantityOutputData.CartItemData> allItems = new ArrayList<>();
-            BigDecimal newSubtotal = BigDecimal.ZERO;
-            for (ChiTietGioHang item : savedCart.getDanhSachSanPham()) {
-                allItems.add(new UpdateCartQuantityOutputData.CartItemData(
-                    item.getMaSanPham(),
-                    item.getTenSanPham(),
-                    item.getGiaSanPham(),
-                    item.getSoLuong(),
-                    item.getTamTinh()
-                ));
-                if (item.getMaSanPham().equals(inputData.getProductId())) {
-                    newSubtotal = item.getTamTinh();
-                }
-            }
-            
-            UpdateCartQuantityOutputData outputData = new UpdateCartQuantityOutputData(
-                savedCart.getMaGioHang(),
-                savedCart.getMaTaiKhoan(),
+            GioHang.checkInput(
+                inputData.getCartId(),
                 inputData.getProductId(),
-                productName,
-                oldQuantity,
-                inputData.getNewQuantity(),
-                inputData.getNewQuantity() == 0,
-                savedCart.getDanhSachSanPham().size(),
-                savedCart.getDanhSachSanPham().stream().mapToInt(ChiTietGioHang::getSoLuong).sum(),
-                savedCart.getTongTien(),
-                newSubtotal,
-                allItems
+                inputData.getNewQuantity()
             );
-            
-            outputBoundary.present(outputData);
-            
-        } catch (ValidationException | DomainException e) {
-            throw e;
-        }
-    }
-    
-    @Override
-    protected void validateInput(UpdateCartQuantityInputData inputData) {
-        checkInputNotNull(inputData);
-        GioHang.checkInput(
-            inputData.getCartId(),
-            inputData.getProductId(),
-            inputData.getNewQuantity()
-        );
-    }
-    
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        String errorCode = "INVALID_INPUT";
-        if (e instanceof ValidationException) {
-            errorCode = ((ValidationException) e).getErrorCode();
-        }
-        UpdateCartQuantityOutputData outputData = UpdateCartQuantityOutputData.forError(errorCode, e.getMessage());
-        outputBoundary.present(outputData);
-    }
-    
-    @Override
-    protected void handleSystemError(Exception e) {
-        String errorCode = null;
-        String message = e.getMessage();
-        
-        if (e instanceof ValidationException) {
-            ValidationException ex = (ValidationException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof DomainException) {
-            DomainException ex = (DomainException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
-            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else {
-            errorCode = "SYSTEM_ERROR";
-            message = e.getMessage() != null ? e.getMessage() : "Đã xảy ra lỗi hệ thống";
+        } catch (Exception e) {
+            errorException = e;
         }
         
-        UpdateCartQuantityOutputData outputData = UpdateCartQuantityOutputData.forError(errorCode, message);
+        GioHang gioHang = null;
+        ChiTietGioHang existingItem = null;
+        int oldQuantity = 0;
+        String productName = null;
+        
+        if (errorException == null) {
+            try {
+                gioHang = cartRepository.findById(inputData.getCartId())
+                    .orElseThrow(DomainException::cartNotFound);
+                
+                existingItem = gioHang.getDanhSachSanPham().stream()
+                    .filter(item -> item.getMaSanPham().equals(inputData.getProductId()))
+                    .findFirst()
+                    .orElse(null);
+                
+                if (existingItem != null) {
+                    oldQuantity = existingItem.getSoLuong();
+                    productName = existingItem.getTenSanPham();
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException == null && gioHang != null) {
+            try {
+                if (inputData.getNewQuantity() == 0) {
+                    gioHang.xoaSanPham(inputData.getProductId());
+                } else {
+                    gioHang.capNhatSoLuong(inputData.getProductId(), inputData.getNewQuantity());
+                }
+                
+                GioHang savedCart = cartRepository.save(gioHang);
+                
+                List<UpdateCartQuantityOutputData.CartItemData> allItems = new ArrayList<>();
+                BigDecimal newSubtotal = BigDecimal.ZERO;
+                for (ChiTietGioHang item : savedCart.getDanhSachSanPham()) {
+                    allItems.add(new UpdateCartQuantityOutputData.CartItemData(
+                        item.getMaSanPham(),
+                        item.getTenSanPham(),
+                        item.getGiaSanPham(),
+                        item.getSoLuong(),
+                        item.getTamTinh()
+                    ));
+                    if (item.getMaSanPham().equals(inputData.getProductId())) {
+                        newSubtotal = item.getTamTinh();
+                    }
+                }
+                
+                outputData = new UpdateCartQuantityOutputData(
+                    savedCart.getMaGioHang(),
+                    savedCart.getMaTaiKhoan(),
+                    inputData.getProductId(),
+                    productName,
+                    oldQuantity,
+                    inputData.getNewQuantity(),
+                    inputData.getNewQuantity() == 0,
+                    savedCart.getDanhSachSanPham().size(),
+                    savedCart.getDanhSachSanPham().stream().mapToInt(ChiTietGioHang::getSoLuong).sum(),
+                    savedCart.getTongTien(),
+                    newSubtotal,
+                    allItems
+                );
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException != null) {
+            String errorCode = "SYSTEM_ERROR";
+            String message = errorException.getMessage();
+            
+            if (errorException instanceof ValidationException) {
+                errorCode = ((ValidationException) errorException).getErrorCode();
+            } else if (errorException instanceof DomainException) {
+                errorCode = ((DomainException) errorException).getErrorCode();
+            } else if (errorException instanceof com.motorbike.domain.exceptions.SystemException) {
+                errorCode = ((com.motorbike.domain.exceptions.SystemException) errorException).getErrorCode();
+            }
+            
+            outputData = UpdateCartQuantityOutputData.forError(errorCode, message);
+        }
+        
         outputBoundary.present(outputData);
     }
 }

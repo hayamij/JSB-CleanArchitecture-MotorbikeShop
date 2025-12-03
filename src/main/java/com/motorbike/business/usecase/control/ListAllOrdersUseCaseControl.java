@@ -11,22 +11,34 @@ import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.TrangThaiDonHang;
+import com.motorbike.domain.exceptions.ValidationException;
 
-public class ListAllOrdersUseCaseControl
-        extends AbstractUseCaseControl<ListAllOrdersInputData, ListAllOrdersOutputBoundary> {
+public class ListAllOrdersUseCaseControl {
     
+    private final ListAllOrdersOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;
 
     public ListAllOrdersUseCaseControl(
             ListAllOrdersOutputBoundary outputBoundary,
             OrderRepository orderRepository) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.orderRepository = orderRepository;
     }
 
-    @Override
-    protected void executeBusinessLogic(ListAllOrdersInputData inputData) throws Exception {
+    public void execute(ListAllOrdersInputData inputData) {
         try {
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
+            }
+
+            if (inputData.getPage() < 0) {
+                throw new IllegalArgumentException("Page phải >= 0");
+            }
+
+            if (inputData.getPageSize() <= 0 || inputData.getPageSize() > 100) {
+                throw new IllegalArgumentException("Page size phải từ 1 đến 100");
+            }
+            
             List<DonHang> allOrders;
 
             if (inputData.hasStatusFilter()) {
@@ -36,9 +48,35 @@ public class ListAllOrdersUseCaseControl
                 allOrders = orderRepository.findAll();
             }
 
-            allOrders = applySorting(allOrders, inputData.getSortBy());
+            String sortBy = inputData.getSortBy();
+            if (sortBy == null) sortBy = "date_desc";
 
-            BigDecimal totalRevenue = calculateTotalRevenue(allOrders);
+            switch (sortBy) {
+                case "date_asc":
+                    allOrders = allOrders.stream()
+                            .sorted(Comparator.comparing(DonHang::getNgayDat))
+                            .collect(Collectors.toList());
+                    break;
+                case "date_desc":
+                    allOrders = allOrders.stream()
+                            .sorted(Comparator.comparing(DonHang::getNgayDat).reversed())
+                            .collect(Collectors.toList());
+                    break;
+                case "amount_asc":
+                    allOrders = allOrders.stream()
+                            .sorted(Comparator.comparing(DonHang::getTongTien))
+                            .collect(Collectors.toList());
+                    break;
+                case "amount_desc":
+                    allOrders = allOrders.stream()
+                            .sorted(Comparator.comparing(DonHang::getTongTien).reversed())
+                            .collect(Collectors.toList());
+                    break;
+            }
+
+            BigDecimal totalRevenue = allOrders.stream()
+                    .map(DonHang::getTongTien)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             int totalOrders = allOrders.size();
             int offset = inputData.getOffset();
@@ -76,73 +114,19 @@ public class ListAllOrdersUseCaseControl
             );
 
             outputBoundary.present(outputData);
-
+            
+        } catch (IllegalArgumentException e) {
+            ListAllOrdersOutputData outputData = ListAllOrdersOutputData.forError(
+                    "INVALID_INPUT",
+                    e.getMessage()
+            );
+            outputBoundary.present(outputData);
         } catch (Exception e) {
-            throw e;
+            ListAllOrdersOutputData outputData = ListAllOrdersOutputData.forError(
+                    "SYSTEM_ERROR",
+                    "Lỗi hệ thống: " + e.getMessage()
+            );
+            outputBoundary.present(outputData);
         }
-    }
-
-    
-    private List<DonHang> applySorting(List<DonHang> orders, String sortBy) {
-        if (sortBy == null) sortBy = "date_desc";
-
-        switch (sortBy) {
-            case "date_asc":
-                return orders.stream()
-                        .sorted(Comparator.comparing(DonHang::getNgayDat))
-                        .collect(Collectors.toList());
-            case "date_desc":
-                return orders.stream()
-                        .sorted(Comparator.comparing(DonHang::getNgayDat).reversed())
-                        .collect(Collectors.toList());
-            case "amount_asc":
-                return orders.stream()
-                        .sorted(Comparator.comparing(DonHang::getTongTien))
-                        .collect(Collectors.toList());
-            case "amount_desc":
-                return orders.stream()
-                        .sorted(Comparator.comparing(DonHang::getTongTien).reversed())
-                        .collect(Collectors.toList());
-            default:
-                return orders;
-        }
-    }
-
-    
-    private BigDecimal calculateTotalRevenue(List<DonHang> orders) {
-        return orders.stream()
-                .map(DonHang::getTongTien)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    @Override
-    protected void validateInput(ListAllOrdersInputData inputData) {
-        checkInputNotNull(inputData);
-
-        if (inputData.getPage() < 0) {
-            throw new IllegalArgumentException("Page phải >= 0");
-        }
-
-        if (inputData.getPageSize() <= 0 || inputData.getPageSize() > 100) {
-            throw new IllegalArgumentException("Page size phải từ 1 đến 100");
-        }
-    }
-
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        ListAllOrdersOutputData outputData = ListAllOrdersOutputData.forError(
-                "INVALID_INPUT",
-                e.getMessage()
-        );
-        outputBoundary.present(outputData);
-    }
-
-    @Override
-    protected void handleSystemError(Exception e) {
-        ListAllOrdersOutputData outputData = ListAllOrdersOutputData.forError(
-                "SYSTEM_ERROR",
-                "Lỗi hệ thống: " + e.getMessage()
-        );
-        outputBoundary.present(outputData);
     }
 }

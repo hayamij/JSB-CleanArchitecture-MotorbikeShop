@@ -10,80 +10,83 @@ import com.motorbike.domain.exceptions.DomainException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class GetProductDetailUseCaseControl
-        extends AbstractUseCaseControl<GetProductDetailInputData, GetProductDetailOutputBoundary> {
+public class GetProductDetailUseCaseControl {
     
+    private final GetProductDetailOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
     
     public GetProductDetailUseCaseControl(
             GetProductDetailOutputBoundary outputBoundary,
             ProductRepository productRepository) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
     }
     
-    @Override
-    protected void executeBusinessLogic(GetProductDetailInputData inputData) throws Exception {
-        SanPham sanPham = productRepository.findById(inputData.productId)
-            .orElseThrow(() -> DomainException.productNotFound(String.valueOf(inputData.productId)));
-        String chiTiet = sanPham.layThongTinChiTiet();
-        BigDecimal giaGoc = sanPham.getGia();
-        BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
-        double phanTramGiam = giaGoc.subtract(giaSauKhuyenMai)
-            .divide(giaGoc, 4, RoundingMode.HALF_UP)
-            .multiply(BigDecimal.valueOf(100))
-            .doubleValue();
-        boolean conHang = sanPham.getSoLuongTonKho() > 0;
+    public void execute(GetProductDetailInputData inputData) {
+        GetProductDetailOutputData outputData = null;
+        Exception errorException = null;
         
-        GetProductDetailOutputData outputData = GetProductDetailOutputData.forSuccess(
-            sanPham.getMaSanPham(),
-            sanPham.getTenSanPham(),
-            sanPham.getMoTa(),
-            chiTiet,
-            giaGoc,
-            giaSauKhuyenMai,
-            phanTramGiam,
-            sanPham.getSoLuongTonKho(),
-            conHang
-        );
-        
-        outputBoundary.present(outputData);
-    }
-    
-    @Override
-    protected void validateInput(GetProductDetailInputData inputData) {
-        checkInputNotNull(inputData);
-        SanPham.checkInput(inputData.productId, 1);
-    }
-    
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        String errorCode = "INVALID_INPUT";
-        if (e instanceof ValidationException) {
-            errorCode = ((ValidationException) e).getErrorCode();
-        }
-        GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(errorCode, e.getMessage());
-        outputBoundary.present(outputData);
-    }
-    
-    @Override
-    protected void handleSystemError(Exception e) {
-        String errorCode;
-        String message;
-        
-        if (e instanceof DomainException) {
-            DomainException ex = (DomainException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
-            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else {
-            throw new com.motorbike.domain.exceptions.SystemException(e);
+        try {
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
+            }
+            SanPham.checkInput(inputData.productId, 1);
+        } catch (Exception e) {
+            errorException = e;
         }
         
-        GetProductDetailOutputData outputData = GetProductDetailOutputData.forError(errorCode, message);
+        SanPham sanPham = null;
+        if (errorException == null) {
+            try {
+                sanPham = productRepository.findById(inputData.productId)
+                    .orElseThrow(() -> DomainException.productNotFound(String.valueOf(inputData.productId)));
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException == null && sanPham != null) {
+            try {
+                String chiTiet = sanPham.layThongTinChiTiet();
+                BigDecimal giaGoc = sanPham.getGia();
+                BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
+                double phanTramGiam = giaGoc.subtract(giaSauKhuyenMai)
+                    .divide(giaGoc, 4, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100))
+                    .doubleValue();
+                boolean conHang = sanPham.getSoLuongTonKho() > 0;
+                
+                outputData = GetProductDetailOutputData.forSuccess(
+                    sanPham.getMaSanPham(),
+                    sanPham.getTenSanPham(),
+                    sanPham.getMoTa(),
+                    chiTiet,
+                    giaGoc,
+                    giaSauKhuyenMai,
+                    phanTramGiam,
+                    sanPham.getSoLuongTonKho(),
+                    conHang
+                );
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException != null) {
+            String errorCode = "SYSTEM_ERROR";
+            String message = errorException.getMessage();
+            
+            if (errorException instanceof ValidationException) {
+                errorCode = ((ValidationException) errorException).getErrorCode();
+            } else if (errorException instanceof DomainException) {
+                errorCode = ((DomainException) errorException).getErrorCode();
+            } else if (errorException instanceof com.motorbike.domain.exceptions.SystemException) {
+                errorCode = ((com.motorbike.domain.exceptions.SystemException) errorException).getErrorCode();
+            }
+            
+            outputData = GetProductDetailOutputData.forError(errorCode, message);
+        }
+        
         outputBoundary.present(outputData);
     }
 }

@@ -12,9 +12,9 @@ import com.motorbike.domain.exceptions.ValidationException;
 import java.util.List;
 import java.util.ArrayList;
 
-public class ViewCartUseCaseControl
-        extends AbstractUseCaseControl<ViewCartInputData, ViewCartOutputBoundary> {
+public class ViewCartUseCaseControl {
     
+    private final ViewCartOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     
@@ -22,101 +22,106 @@ public class ViewCartUseCaseControl
             ViewCartOutputBoundary outputBoundary,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
     }
     
-    @Override
-    protected void executeBusinessLogic(ViewCartInputData inputData) throws Exception {
-        GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
-            .orElseThrow(DomainException::emptyCart);
+    public void execute(ViewCartInputData inputData) {
+        ViewCartOutputData outputData = null;
+        Exception errorException = null;
         
-        if (gioHang.getDanhSachSanPham().isEmpty()) {
-            throw DomainException.emptyCart();
-        }
-        
-        List<ViewCartOutputData.CartItemData> itemList = new ArrayList<>();
-        for (com.motorbike.domain.entities.ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
-            SanPham product = productRepository.findById(item.getMaSanPham())
-                .orElse(null);
-            
-            int availableStock = 0;
-            String imageUrl = null;
-            boolean hasStockWarning = false;
-            String stockWarningMessage = null;
-            
-            if (product != null) {
-                availableStock = product.getSoLuongTonKho();
-                imageUrl = product.getHinhAnh();
-                
-                if (item.getSoLuong() > availableStock) {
-                    hasStockWarning = true;
-                    stockWarningMessage = String.format(
-                        "Số lượng trong giỏ (%d) vượt quá tồn kho (%d)",
-                        item.getSoLuong(), availableStock
-                    );
-                }
+        try {
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
             }
-            
-            ViewCartOutputData.CartItemData cartItem = new ViewCartOutputData.CartItemData(
-                item.getMaSanPham(),
-                item.getTenSanPham(),
-                imageUrl,
-                item.getGiaSanPham(),
-                item.getSoLuong(),
-                item.getTamTinh(),
-                availableStock,
-                hasStockWarning,
-                stockWarningMessage
-            );
-            itemList.add(cartItem);
+            com.motorbike.domain.entities.TaiKhoan.checkInput(inputData.getUserId());
+        } catch (Exception e) {
+            errorException = e;
         }
         
-        ViewCartOutputData successOutput = ViewCartOutputData.forSuccess(
-            gioHang.getMaGioHang(),
-            itemList,
-            gioHang.getTongTien()
-        );
-        
-        outputBoundary.present(successOutput);
-    }
-    
-    @Override
-    protected void validateInput(ViewCartInputData inputData) {
-        checkInputNotNull(inputData);
-        com.motorbike.domain.entities.TaiKhoan.checkInput(inputData.getUserId());
-    }
-    
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        String errorCode = "INVALID_INPUT";
-        if (e instanceof ValidationException) {
-            errorCode = ((ValidationException) e).getErrorCode();
-        }
-        ViewCartOutputData outputData = ViewCartOutputData.forError(errorCode, e.getMessage());
-        outputBoundary.present(outputData);
-    }
-    
-    @Override
-    protected void handleSystemError(Exception e) {
-        if (e instanceof DomainException && "EMPTY_CART".equals(((DomainException) e).getErrorCode())) {
-            ViewCartOutputData outputData = ViewCartOutputData.forEmptyCart();
-            outputBoundary.present(outputData);
-            return;
+        GioHang gioHang = null;
+        if (errorException == null) {
+            try {
+                gioHang = cartRepository.findByUserId(inputData.getUserId())
+                    .orElseThrow(DomainException::emptyCart);
+                
+                if (gioHang.getDanhSachSanPham().isEmpty()) {
+                    throw DomainException.emptyCart();
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
         }
         
-        String errorCode;
-        String message;
-        if (e instanceof com.motorbike.domain.exceptions.SystemException) {
-            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else {
-            throw new com.motorbike.domain.exceptions.SystemException(e);
+        if (errorException == null && gioHang != null) {
+            try {
+                List<ViewCartOutputData.CartItemData> itemList = new ArrayList<>();
+                for (com.motorbike.domain.entities.ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
+                    SanPham product = productRepository.findById(item.getMaSanPham())
+                        .orElse(null);
+                    
+                    int availableStock = 0;
+                    String imageUrl = null;
+                    boolean hasStockWarning = false;
+                    String stockWarningMessage = null;
+                    
+                    if (product != null) {
+                        availableStock = product.getSoLuongTonKho();
+                        imageUrl = product.getHinhAnh();
+                        
+                        if (item.getSoLuong() > availableStock) {
+                            hasStockWarning = true;
+                            stockWarningMessage = String.format(
+                                "Số lượng trong giỏ (%d) vượt quá tồn kho (%d)",
+                                item.getSoLuong(), availableStock
+                            );
+                        }
+                    }
+                    
+                    ViewCartOutputData.CartItemData cartItem = new ViewCartOutputData.CartItemData(
+                        item.getMaSanPham(),
+                        item.getTenSanPham(),
+                        imageUrl,
+                        item.getGiaSanPham(),
+                        item.getSoLuong(),
+                        item.getTamTinh(),
+                        availableStock,
+                        hasStockWarning,
+                        stockWarningMessage
+                    );
+                    itemList.add(cartItem);
+                }
+                
+                outputData = ViewCartOutputData.forSuccess(
+                    gioHang.getMaGioHang(),
+                    itemList,
+                    gioHang.getTongTien()
+                );
+            } catch (Exception e) {
+                errorException = e;
+            }
         }
         
-        ViewCartOutputData outputData = ViewCartOutputData.forError(errorCode, message);
+        if (errorException != null) {
+            if (errorException instanceof DomainException && "EMPTY_CART".equals(((DomainException) errorException).getErrorCode())) {
+                outputData = ViewCartOutputData.forEmptyCart();
+            } else {
+                String errorCode = "SYSTEM_ERROR";
+                String message = errorException.getMessage();
+                
+                if (errorException instanceof ValidationException) {
+                    errorCode = ((ValidationException) errorException).getErrorCode();
+                } else if (errorException instanceof DomainException) {
+                    errorCode = ((DomainException) errorException).getErrorCode();
+                } else if (errorException instanceof com.motorbike.domain.exceptions.SystemException) {
+                    errorCode = ((com.motorbike.domain.exceptions.SystemException) errorException).getErrorCode();
+                }
+                
+                outputData = ViewCartOutputData.forError(errorCode, message);
+            }
+        }
+        
         outputBoundary.present(outputData);
     }
 }

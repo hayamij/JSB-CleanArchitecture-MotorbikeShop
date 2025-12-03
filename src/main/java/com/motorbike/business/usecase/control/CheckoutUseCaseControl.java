@@ -15,9 +15,9 @@ import com.motorbike.domain.exceptions.DomainException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CheckoutUseCaseControl
-        extends AbstractUseCaseControl<CheckoutInputData, CheckoutOutputBoundary> {
+public class CheckoutUseCaseControl {
     
+    private final CheckoutOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
@@ -27,125 +27,118 @@ public class CheckoutUseCaseControl
             CartRepository cartRepository,
             ProductRepository productRepository,
             OrderRepository orderRepository) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
     }
     
-    @Override
-    protected void executeBusinessLogic(CheckoutInputData inputData) throws Exception {
+    public void execute(CheckoutInputData inputData) {
+        CheckoutOutputData outputData = null;
+        Exception errorException = null;
+        
         try {
-            GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
-                .orElseThrow(DomainException::emptyCart);
-            
-            if (gioHang.getDanhSachSanPham().isEmpty()) {
-                throw DomainException.emptyCart();
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
             }
-            
-            for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
-                SanPham sanPham = productRepository.findById(item.getMaSanPham())
-                    .orElseThrow(() -> DomainException.productNotFound(String.valueOf(item.getMaSanPham())));
-                
-                if (sanPham.getSoLuongTonKho() < item.getSoLuong()) {
-                    throw DomainException.insufficientStock(
-                        sanPham.getTenSanPham(),
-                        sanPham.getSoLuongTonKho());
-                }
-            }
-            
-            DonHang donHang = DonHang.fromGioHang(
-                gioHang,
+            DonHang.checkInput(
+                inputData.getUserId(),
                 inputData.getReceiverName(),
                 inputData.getPhoneNumber(),
-                inputData.getShippingAddress(),
-                inputData.getNote()
+                inputData.getShippingAddress()
             );
+        } catch (Exception e) {
+            errorException = e;
+        }
+        
+        GioHang gioHang = null;
+        if (errorException == null) {
+            try {
+                gioHang = cartRepository.findByUserId(inputData.getUserId())
+                    .orElseThrow(DomainException::emptyCart);
+                
+                if (gioHang.getDanhSachSanPham().isEmpty()) {
+                    throw DomainException.emptyCart();
+                }
+                
+                for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
+                    SanPham sanPham = productRepository.findById(item.getMaSanPham())
+                        .orElseThrow(() -> DomainException.productNotFound(String.valueOf(item.getMaSanPham())));
+                    
+                    if (sanPham.getSoLuongTonKho() < item.getSoLuong()) {
+                        throw DomainException.insufficientStock(
+                            sanPham.getTenSanPham(),
+                            sanPham.getSoLuongTonKho());
+                    }
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException == null && gioHang != null) {
+            try {
+                DonHang donHang = DonHang.fromGioHang(
+                    gioHang,
+                    inputData.getReceiverName(),
+                    inputData.getPhoneNumber(),
+                    inputData.getShippingAddress(),
+                    inputData.getNote()
+                );
+                
+                for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
+                    SanPham sanPham = productRepository.findById(item.getMaSanPham()).get();
+                    sanPham.giamTonKho(item.getSoLuong());
+                    productRepository.save(sanPham);
+                }
+                
+                DonHang savedOrder = orderRepository.save(donHang);
+                
+                gioHang.xoaToanBoGioHang();
+                cartRepository.save(gioHang);
+                
+                List<CheckoutOutputData.OrderItemData> orderItems = savedOrder.getDanhSachSanPham()
+                    .stream()
+                    .map(item -> new CheckoutOutputData.OrderItemData(
+                        item.getMaSanPham(),
+                        item.getTenSanPham(),
+                        item.getGiaBan(),
+                        item.getSoLuong(),
+                        item.getThanhTien()
+                    ))
+                    .collect(Collectors.toList());
+                
+                outputData = CheckoutOutputData.forSuccess(
+                    savedOrder.getMaDonHang(),
+                    savedOrder.getMaTaiKhoan(),
+                    savedOrder.getTenNguoiNhan(),
+                    savedOrder.getSoDienThoai(),
+                    savedOrder.getDiaChiGiaoHang(),
+                    savedOrder.getTrangThai().name(),
+                    savedOrder.getTongTien(),
+                    savedOrder.getDanhSachSanPham().size(),
+                    orderItems
+                );
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException != null) {
+            String errorCode = "SYSTEM_ERROR";
+            String message = errorException.getMessage();
             
-            for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
-                SanPham sanPham = productRepository.findById(item.getMaSanPham()).get();
-                sanPham.giamTonKho(item.getSoLuong());
-                productRepository.save(sanPham);
+            if (errorException instanceof ValidationException) {
+                errorCode = ((ValidationException) errorException).getErrorCode();
+            } else if (errorException instanceof DomainException) {
+                errorCode = ((DomainException) errorException).getErrorCode();
+            } else if (errorException instanceof com.motorbike.domain.exceptions.SystemException) {
+                errorCode = ((com.motorbike.domain.exceptions.SystemException) errorException).getErrorCode();
             }
             
-            DonHang savedOrder = orderRepository.save(donHang);
-            
-            gioHang.xoaToanBoGioHang();
-            cartRepository.save(gioHang);
-            
-            List<CheckoutOutputData.OrderItemData> orderItems = savedOrder.getDanhSachSanPham()
-                .stream()
-                .map(item -> new CheckoutOutputData.OrderItemData(
-                    item.getMaSanPham(),
-                    item.getTenSanPham(),
-                    item.getGiaBan(),
-                    item.getSoLuong(),
-                    item.getThanhTien()
-                ))
-                .collect(Collectors.toList());
-            
-            CheckoutOutputData outputData = CheckoutOutputData.forSuccess(
-                savedOrder.getMaDonHang(),
-                savedOrder.getMaTaiKhoan(),
-                savedOrder.getTenNguoiNhan(),
-                savedOrder.getSoDienThoai(),
-                savedOrder.getDiaChiGiaoHang(),
-                savedOrder.getTrangThai().name(),
-                savedOrder.getTongTien(),
-                savedOrder.getDanhSachSanPham().size(),
-                orderItems
-            );
-            
-            outputBoundary.present(outputData);
-            
-        } catch (ValidationException | DomainException e) {
-            throw e;
-        }
-    }
-    
-    @Override
-    protected void validateInput(CheckoutInputData inputData) {
-        checkInputNotNull(inputData);
-        DonHang.checkInput(
-            inputData.getUserId(),
-            inputData.getReceiverName(),
-            inputData.getPhoneNumber(),
-            inputData.getShippingAddress()
-        );
-    }
-    
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        String errorCode = "INVALID_INPUT";
-        if (e instanceof ValidationException) {
-            errorCode = ((ValidationException) e).getErrorCode();
-        }
-        CheckoutOutputData outputData = CheckoutOutputData.forError(errorCode, e.getMessage());
-        outputBoundary.present(outputData);
-    }
-    
-    @Override
-    protected void handleSystemError(Exception e) {
-        String errorCode;
-        String message;
-        
-        if (e instanceof ValidationException) {
-            ValidationException ex = (ValidationException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof DomainException) {
-            DomainException ex = (DomainException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
-            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else {
-            throw new com.motorbike.domain.exceptions.SystemException(e);
+            outputData = CheckoutOutputData.forError(errorCode, message);
         }
         
-        CheckoutOutputData outputData = CheckoutOutputData.forError(errorCode, message);
         outputBoundary.present(outputData);
     }
 }
