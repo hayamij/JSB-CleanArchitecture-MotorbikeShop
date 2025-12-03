@@ -53,18 +53,7 @@ public class ListAllOrdersPresenter implements ListAllOrdersOutputBoundary {
         viewModel.success = true;
         viewModel.hasError = false;
         viewModel.orders = formattedOrders;
-        viewModel.totalOrders = outputData.getTotalOrders();
-        viewModel.totalPages = outputData.getTotalPages();
-        viewModel.currentPage = outputData.getCurrentPage();
-        viewModel.pageSize = outputData.getPageSize();
-        viewModel.formattedTotalRevenue = VND_FORMAT.format(outputData.getTotalRevenue());
-        viewModel.message = String.format(
-                "Tổng %d đơn hàng | Doanh thu: %s | Trang %d/%d",
-                outputData.getTotalOrders(),
-                VND_FORMAT.format(outputData.getTotalRevenue()),
-                outputData.getCurrentPage() + 1,
-                outputData.getTotalPages()
-        );
+        viewModel.message = "Lấy danh sách đơn hàng thành công";
         viewModel.errorCode = null;
         viewModel.errorMessage = null;
     }
@@ -73,11 +62,6 @@ public class ListAllOrdersPresenter implements ListAllOrdersOutputBoundary {
         viewModel.success = true;
         viewModel.hasError = false;
         viewModel.orders = new ArrayList<>();
-        viewModel.totalOrders = 0;
-        viewModel.totalPages = 0;
-        viewModel.currentPage = outputData.getCurrentPage();
-        viewModel.pageSize = outputData.getPageSize();
-        viewModel.formattedTotalRevenue = "0 ₫";
         viewModel.message = "Không có đơn hàng nào";
         viewModel.errorCode = null;
         viewModel.errorMessage = null;
@@ -87,11 +71,6 @@ public class ListAllOrdersPresenter implements ListAllOrdersOutputBoundary {
         viewModel.success = false;
         viewModel.hasError = true;
         viewModel.orders = new ArrayList<>();
-        viewModel.totalOrders = 0;
-        viewModel.totalPages = 0;
-        viewModel.currentPage = 0;
-        viewModel.pageSize = 0;
-        viewModel.formattedTotalRevenue = "0 ₫";
         viewModel.message = "Lỗi khi lấy danh sách đơn hàng";
         viewModel.errorCode = outputData.getErrorCode();
         viewModel.errorMessage = outputData.getErrorMessage();
