@@ -23,6 +23,8 @@ import com.motorbike.adapters.presenters.SearchMotorbikesPresenter;
 import com.motorbike.adapters.presenters.UpdateCartQuantityPresenter;
 import com.motorbike.adapters.presenters.ViewCartPresenter;
 import com.motorbike.adapters.repositories.MotorbikeRepositoryAdapter;
+import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
+import com.motorbike.adapters.presenters.SearchAccessoriesPresenter;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
 import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
@@ -34,6 +36,8 @@ import com.motorbike.adapters.viewmodels.RegisterViewModel;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
+import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
+import com.motorbike.adapters.viewmodels.SearchAccessoriesViewModel;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
 import com.motorbike.business.ports.repository.OrderRepository;
@@ -48,10 +52,14 @@ import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
 import com.motorbike.business.usecase.control.LoginUseCaseControl;
 import com.motorbike.business.usecase.control.RegisterUseCaseControl;
 import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
+import com.motorbike.business.usecase.control.GetAllAccessoriesUseCaseControl;
+import com.motorbike.business.usecase.control.SearchAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
 import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
+import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
 import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 import com.motorbike.business.usecase.output.CancelOrderOutputBoundary;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
@@ -61,6 +69,8 @@ import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
+import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
+import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 import com.motorbike.infrastructure.persistence.jpa.repositories.XeMayJpaRepository;
@@ -314,6 +324,32 @@ public AddMotorbikeUseCaseControl addMotorbikeUseCase(
 @Bean
 public AddMotorbikeInputBoundary addMotorbikeInputBoundary(
         AddMotorbikeUseCaseControl useCase
+// accessories use case beans
+
+@Bean
+@RequestScope
+public GetAllAccessoriesViewModel getAllAccessoriesViewModel() {
+    return new GetAllAccessoriesViewModel();
+}
+
+@Bean
+public GetAllAccessoriesUseCaseControl getAllAccessoriesUseCase(
+        GetAllAccessoriesOutputBoundary presenter,
+        ProductRepository productRepository
+) {
+    return new GetAllAccessoriesUseCaseControl(presenter, productRepository);
+}
+
+@Bean
+public GetAllAccessoriesOutputBoundary getAllAccessoriesPresenter(
+        GetAllAccessoriesViewModel viewModel
+) {
+    return new GetAllAccessoriesPresenter(viewModel);
+}
+
+@Bean
+public com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary getAllAccessoriesInputBoundary(
+        GetAllAccessoriesUseCaseControl useCase
 ) {
     return useCase;
 }
@@ -323,6 +359,23 @@ public MotorbikeRepository motorbikeRepository(
         XeMayJpaRepository jpaRepository
 ) {
     return new MotorbikeRepositoryAdapter(jpaRepository);
+public SearchAccessoriesInputBoundary searchAccessoriesUseCase(
+        SearchAccessoriesOutputBoundary outputBoundary,
+        ProductRepository productRepository
+) {
+    return new SearchAccessoriesUseCaseControl(outputBoundary, productRepository);
+}
+
+@Bean
+public SearchAccessoriesOutputBoundary searchAccessoriesOutputBoundary(
+        SearchAccessoriesViewModel viewModel
+) {
+    return new SearchAccessoriesPresenter(viewModel);
+}
+
+@Bean
+public SearchAccessoriesViewModel searchAccessoriesViewModel() {
+    return new SearchAccessoriesViewModel();
 }
 
 

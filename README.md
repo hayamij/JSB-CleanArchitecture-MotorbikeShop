@@ -74,10 +74,11 @@ src/
 
 ### 3. Quản lý phụ kiện (Admin) - 🔄 Đang phát triển
 
-- 🔄 Tìm kiếm phụ kiện
-- 🔄 Thêm phụ kiện
-- 🔄 Sửa thông tin phụ kiện
-- 🔄 Xóa phụ kiện
+- 🔄 Tìm kiếm phụ kiện xe máy
+- 🔄 Thêm phụ kiện xe máy
+- 🔄 Xem danh sách phụ kiện xe máy
+- 🔄 Sửa thông tin phụ kiện xe máy
+- 🔄 Xóa phụ kiện xe máy
 
 ### 4. Quản lý tài khoản (Admin) - 🔄 Đang phát triển
 
