@@ -11,74 +11,56 @@ import com.motorbike.domain.entities.XeMay;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetAllMotorbikesUseCaseControl
-        extends AbstractUseCaseControl<Void, GetAllMotorbikesOutputBoundary> implements GetAllMotorbikesInputBoundary {
+public class GetAllMotorbikesUseCaseControl implements GetAllMotorbikesInputBoundary {
 
+    private final GetAllMotorbikesOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
 
     public GetAllMotorbikesUseCaseControl(
             GetAllMotorbikesOutputBoundary outputBoundary,
             ProductRepository productRepository
     ) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
     }
 
     @Override
-    protected void validateInput(Void inputData) {
-        // Không có input nên không cần validate
-    }
+    public void execute(Void inputData) {
+        GetAllMotorbikesOutputData outputData = null;
+        Exception errorException = null;
 
-    @Override
-    protected void executeBusinessLogic(Void inputData) {
         try {
             List<SanPham> allProducts = productRepository.findAll();
 
             List<MotorbikeItem> motorbikes = allProducts.stream()
                     .filter(p -> p instanceof XeMay)
-                    .map(p -> mapToItem((XeMay) p))
+                    .map(p -> {
+                        XeMay x = (XeMay) p;
+                        return new MotorbikeItem(
+                                x.getMaSanPham(),
+                                x.getTenSanPham(),
+                                x.getMoTa(),
+                                x.getGia(),
+                                x.getSoLuongTonKho(),
+                                x.getHinhAnh(),
+                                x.getHangXe(),
+                                x.getDongXe(),
+                                x.getMauSac(),
+                                x.getNamSanXuat(),
+                                x.getDungTich()
+                        );
+                    })
                     .collect(Collectors.toList());
 
-            GetAllMotorbikesOutputData outputData =
-                    new GetAllMotorbikesOutputData(motorbikes);
-
-            outputBoundary.present(outputData);
-
+            outputData = new GetAllMotorbikesOutputData(motorbikes);
         } catch (Exception e) {
-            GetAllMotorbikesOutputData error =
-                    new GetAllMotorbikesOutputData("SYSTEM_ERROR", e.getMessage());
-
-            outputBoundary.present(error);
+            errorException = e;
         }
-    }
 
-    private MotorbikeItem mapToItem(XeMay x) {
-        return new MotorbikeItem(
-                x.getMaSanPham(),
-                x.getTenSanPham(),
-                x.getMoTa(),
-                x.getGia(),
-                x.getSoLuongTonKho(),
-                x.getHinhAnh(),
-                x.getHangXe(),
-                x.getDongXe(),
-                x.getMauSac(),
-                x.getNamSanXuat(),
-                x.getDungTich()
-        );
-    }
+        if (errorException != null) {
+            outputData = new GetAllMotorbikesOutputData("SYSTEM_ERROR", errorException.getMessage());
+        }
 
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        GetAllMotorbikesOutputData error =
-                new GetAllMotorbikesOutputData("INVALID_INPUT", e.getMessage());
-        outputBoundary.present(error);
-    }
-
-    @Override
-    protected void handleSystemError(Exception e) {
-        GetAllMotorbikesOutputData error =
-                new GetAllMotorbikesOutputData("SYSTEM_ERROR", e.getMessage());
-        outputBoundary.present(error);
+        outputBoundary.present(outputData);
     }
 }

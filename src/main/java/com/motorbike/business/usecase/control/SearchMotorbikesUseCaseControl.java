@@ -6,35 +6,32 @@ import com.motorbike.business.dto.motorbike.SearchMotorbikesOutputData.Motorbike
 import com.motorbike.business.ports.repository.MotorbikeRepository;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
+import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SearchMotorbikesUseCaseControl
-        extends AbstractUseCaseControl<SearchMotorbikesInputData, SearchMotorbikesOutputBoundary>
-        implements com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary {
+public class SearchMotorbikesUseCaseControl implements SearchMotorbikesInputBoundary{
 
+    private final SearchMotorbikesOutputBoundary outputBoundary;
     private final MotorbikeRepository motorbikeRepository;
 
     public SearchMotorbikesUseCaseControl(
             SearchMotorbikesOutputBoundary outputBoundary,
             MotorbikeRepository motorbikeRepository
     ) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.motorbikeRepository = motorbikeRepository;
     }
 
     @Override
-    protected void validateInput(SearchMotorbikesInputData input) {
-        // không có rule bắt buộc -> không validate
-    }
+    public void execute(SearchMotorbikesInputData input) {
+        SearchMotorbikesOutputData outputData = null;
+        Exception errorException = null;
 
-    @Override
-    protected void executeBusinessLogic(SearchMotorbikesInputData input) {
         try {
             List<XeMay> all = motorbikeRepository.findAllMotorbikes();
 
-            // Lọc xe máy theo tiêu chí
             List<MotorbikeItem> filtered = all.stream()
                     .filter(x -> input.keyword == null || x.getTenSanPham().toLowerCase().contains(input.keyword.toLowerCase()))
                     .filter(x -> input.brand == null || x.getHangXe().equalsIgnoreCase(input.brand))
@@ -42,48 +39,30 @@ public class SearchMotorbikesUseCaseControl
                     .filter(x -> input.color == null || x.getMauSac().equalsIgnoreCase(input.color))
                     .filter(x -> input.minCC == null || x.getDungTich() >= input.minCC)
                     .filter(x -> input.maxCC == null || x.getDungTich() <= input.maxCC)
-                    .map(this::mapToItem)
+                    .map(x -> new MotorbikeItem(
+                            x.getMaSanPham(),
+                            x.getTenSanPham(),
+                            x.getMoTa(),
+                            x.getGia(),
+                            x.getSoLuongTonKho(),
+                            x.getHinhAnh(),
+                            x.getHangXe(),
+                            x.getDongXe(),
+                            x.getMauSac(),
+                            x.getNamSanXuat(),
+                            x.getDungTich()
+                    ))
                     .collect(Collectors.toList());
 
-            SearchMotorbikesOutputData output = new SearchMotorbikesOutputData(filtered);
-            outputBoundary.present(output);
-
+            outputData = new SearchMotorbikesOutputData(filtered);
         } catch (Exception e) {
-            SearchMotorbikesOutputData error = new SearchMotorbikesOutputData(
-                    "SYSTEM_ERROR", e.getMessage()
-            );
-            outputBoundary.present(error);
+            errorException = e;
         }
-    }
 
-    private MotorbikeItem mapToItem(XeMay x) {
-      return new MotorbikeItem(
-          x.getMaSanPham(),           // id
-          x.getTenSanPham(),          // name
-          x.getMoTa(),                // description
-          x.getGia(),                 // price (BigDecimal)
-          x.getSoLuongTonKho(),       // stock
-          x.getHinhAnh(),             // imageUrl
-          x.getHangXe(),              // brand
-          x.getDongXe(),              // model
-          x.getMauSac(),              // color
-          x.getNamSanXuat(),          // year
-          x.getDungTich()             // displacement
-      );
-  }
+        if (errorException != null) {
+            outputData = new SearchMotorbikesOutputData("SYSTEM_ERROR", errorException.getMessage());
+        }
 
-
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        SearchMotorbikesOutputData error =
-                new SearchMotorbikesOutputData("INVALID_INPUT", e.getMessage());
-        outputBoundary.present(error);
-    }
-
-    @Override
-    protected void handleSystemError(Exception e) {
-        SearchMotorbikesOutputData error =
-                new SearchMotorbikesOutputData("SYSTEM_ERROR", e.getMessage());
-        outputBoundary.present(error);
+        outputBoundary.present(outputData);
     }
 }

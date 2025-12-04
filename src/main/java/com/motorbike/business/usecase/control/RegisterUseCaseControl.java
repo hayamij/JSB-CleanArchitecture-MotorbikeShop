@@ -11,9 +11,9 @@ import com.motorbike.domain.exceptions.DomainException;
 import com.motorbike.domain.exceptions.ValidationException;
 import com.motorbike.domain.exceptions.SystemException;
 
-public class RegisterUseCaseControl
-        extends AbstractUseCaseControl<RegisterInputData, RegisterOutputBoundary> {
+public class RegisterUseCaseControl {
     
+    private final RegisterOutputBoundary outputBoundary;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
     
@@ -21,87 +21,81 @@ public class RegisterUseCaseControl
             RegisterOutputBoundary outputBoundary,
             UserRepository userRepository,
             CartRepository cartRepository) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
     }
     
-    @Override
-    protected void executeBusinessLogic(RegisterInputData inputData) throws Exception {
+    public void execute(RegisterInputData inputData) {
+        RegisterOutputData outputData = null;
+        Exception errorException = null;
+        
         try {
-            if (userRepository.existsByEmail(inputData.getEmail())) {
-                throw DomainException.emailAlreadyExists(inputData.getEmail());
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
             }
-            
-            TaiKhoan taiKhoan = new TaiKhoan(
+            TaiKhoan.checkInputForRegister(
                 inputData.getEmail(),
                 inputData.getUsername(),
                 inputData.getPassword(),
-                inputData.getPhoneNumber(),
-                inputData.getAddress()
+                inputData.getPhoneNumber()
             );
-            
-            TaiKhoan savedTaiKhoan = userRepository.save(taiKhoan);
-            
-            GioHang gioHang = new GioHang(savedTaiKhoan.getMaTaiKhoan());
-            cartRepository.save(gioHang);
-            
-            RegisterOutputData outputData = RegisterOutputData.forSuccess(
-                savedTaiKhoan.getMaTaiKhoan(),
-                savedTaiKhoan.getEmail(),
-                savedTaiKhoan.getTenDangNhap(),
-                savedTaiKhoan.getVaiTro(),
-                savedTaiKhoan.getNgayTao()
-            );
-            
-            outputBoundary.present(outputData);
-            
-        } catch (DomainException e) {
-            throw e;
-        }
-    }
-    
-    @Override
-    protected void validateInput(RegisterInputData inputData) {
-        checkInputNotNull(inputData);
-        TaiKhoan.checkInputForRegister(
-            inputData.getEmail(),
-            inputData.getUsername(),
-            inputData.getPassword(),
-            inputData.getPhoneNumber()
-        );
-
-
-    }
-    
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        String errorCode = "INVALID_INPUT";
-        if (e instanceof ValidationException) {
-            errorCode = ((ValidationException) e).getErrorCode();
-        }
-        RegisterOutputData outputData = RegisterOutputData.forError(errorCode, e.getMessage());
-        outputBoundary.present(outputData);
-    }
-    
-    @Override
-    protected void handleSystemError(Exception e) {
-        String errorCode;
-        String message;
-        
-        if (e instanceof DomainException) {
-            DomainException ex = (DomainException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof SystemException) {
-            SystemException ex = (SystemException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else {
-            throw new SystemException(e);
+        } catch (Exception e) {
+            errorException = e;
         }
         
-        RegisterOutputData outputData = RegisterOutputData.forError(errorCode, message);
+        if (errorException == null) {
+            try {
+                if (userRepository.existsByEmail(inputData.getEmail())) {
+                    throw DomainException.emailAlreadyExists(inputData.getEmail());
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException == null) {
+            try {
+                TaiKhoan taiKhoan = new TaiKhoan(
+                    inputData.getEmail(),
+                    inputData.getUsername(),
+                    inputData.getPassword(),
+                    inputData.getPhoneNumber(),
+                    inputData.getAddress()
+                );
+                
+                TaiKhoan savedTaiKhoan = userRepository.save(taiKhoan);
+                
+                GioHang gioHang = new GioHang(savedTaiKhoan.getMaTaiKhoan());
+                cartRepository.save(gioHang);
+                
+                outputData = RegisterOutputData.forSuccess(
+                    savedTaiKhoan.getMaTaiKhoan(),
+                    savedTaiKhoan.getEmail(),
+                    savedTaiKhoan.getTenDangNhap(),
+                    savedTaiKhoan.getVaiTro(),
+                    savedTaiKhoan.getNgayTao()
+                );
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException != null) {
+            String errorCode = "SYSTEM_ERROR";
+            String message = errorException.getMessage();
+            
+            if (errorException instanceof ValidationException) {
+                errorCode = ((ValidationException) errorException).getErrorCode();
+            } else if (errorException instanceof DomainException) {
+                errorCode = ((DomainException) errorException).getErrorCode();
+            } else if (errorException instanceof SystemException) {
+                errorCode = ((SystemException) errorException).getErrorCode();
+            }
+            
+            outputData = RegisterOutputData.forError(errorCode, message);
+        }
+        
         outputBoundary.present(outputData);
     }
 }

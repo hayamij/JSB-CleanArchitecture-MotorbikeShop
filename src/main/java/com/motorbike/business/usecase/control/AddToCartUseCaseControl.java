@@ -12,9 +12,9 @@ import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.exceptions.DomainException;
 import com.motorbike.domain.exceptions.ValidationException;
 
-public class AddToCartUseCaseControl
-        extends AbstractUseCaseControl<AddToCartInputData, AddToCartOutputBoundary> {
+public class AddToCartUseCaseControl {
     
+    private final AddToCartOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     
@@ -22,86 +22,79 @@ public class AddToCartUseCaseControl
             AddToCartOutputBoundary outputBoundary,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        super(outputBoundary);
+        this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
     }
     
-    @Override
-    protected void executeBusinessLogic(AddToCartInputData inputData) throws Exception {
+    public void execute(AddToCartInputData inputData) {
+        AddToCartOutputData outputData = null;
+        Exception errorException = null;
+        
         try {
-            GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
-                .orElse(new GioHang(inputData.getUserId()));
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
+            }
+            TaiKhoan.checkInput(inputData.getUserId());
+            SanPham.checkInput(inputData.getProductId(), inputData.getQuantity());
+        } catch (Exception e) {
+            errorException = e;
+        }
+        
+        SanPham sanPham = null;
+        if (errorException == null) {
+            try {
+                sanPham = productRepository.findById(inputData.getProductId())
+                    .orElseThrow(() -> DomainException.productNotFound(String.valueOf(inputData.getProductId())));
+                
+                if (sanPham.getSoLuongTonKho() < inputData.getQuantity()) {
+                    throw DomainException.insufficientStock(sanPham.getTenSanPham(), sanPham.getSoLuongTonKho());
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException == null && sanPham != null) {
+            try {
+                GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
+                    .orElse(new GioHang(inputData.getUserId()));
+                
+                ChiTietGioHang chiTiet = new ChiTietGioHang(
+                    sanPham.getMaSanPham(),
+                    sanPham.getTenSanPham(),
+                    sanPham.tinhGiaSauKhuyenMai(),
+                    inputData.getQuantity()
+                );
+                
+                gioHang.themSanPham(chiTiet);
+                GioHang savedCart = cartRepository.save(gioHang);
+                
+                outputData = AddToCartOutputData.forSuccess(
+                    savedCart.getMaGioHang(),
+                    savedCart.getDanhSachSanPham().size(),
+                    savedCart.getTongTien()
+                );
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        if (errorException != null) {
+            String errorCode = "SYSTEM_ERROR";
+            String message = errorException.getMessage();
             
-            SanPham sanPham = productRepository.findById(inputData.getProductId())
-                .orElseThrow(() -> DomainException.productNotFound(String.valueOf(inputData.getProductId())));
-            
-            if (sanPham.getSoLuongTonKho() < inputData.getQuantity()) {
-                throw DomainException.insufficientStock(sanPham.getTenSanPham(), sanPham.getSoLuongTonKho());
+            if (errorException instanceof ValidationException) {
+                errorCode = ((ValidationException) errorException).getErrorCode();
+            } else if (errorException instanceof DomainException) {
+                errorCode = ((DomainException) errorException).getErrorCode();
+            } else if (errorException instanceof com.motorbike.domain.exceptions.SystemException) {
+                errorCode = ((com.motorbike.domain.exceptions.SystemException) errorException).getErrorCode();
             }
             
-            ChiTietGioHang chiTiet = new ChiTietGioHang(
-                sanPham.getMaSanPham(),
-                sanPham.getTenSanPham(),
-                sanPham.tinhGiaSauKhuyenMai(),
-                inputData.getQuantity()
-            );
-            
-            gioHang.themSanPham(chiTiet);
-            GioHang savedCart = cartRepository.save(gioHang);
-            
-            AddToCartOutputData outputData = AddToCartOutputData.forSuccess(
-                savedCart.getMaGioHang(),
-                savedCart.getDanhSachSanPham().size(),
-                savedCart.getTongTien()
-            );
-            
-            outputBoundary.present(outputData);
-            
-        } catch (ValidationException | DomainException e) {
-            throw e;
-        }
-    }
-    
-    @Override
-    protected void validateInput(AddToCartInputData inputData) {
-        checkInputNotNull(inputData);
-        TaiKhoan.checkInput(inputData.getUserId());
-        SanPham.checkInput(inputData.getProductId(), inputData.getQuantity());
-    }
-    
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        String errorCode = "INVALID_INPUT";
-        if (e instanceof ValidationException) {
-            errorCode = ((ValidationException) e).getErrorCode();
-        }
-        AddToCartOutputData outputData = AddToCartOutputData.forError(errorCode, e.getMessage());
-        outputBoundary.present(outputData);
-    }
-    
-    @Override
-    protected void handleSystemError(Exception e) {
-        String errorCode;
-        String message;
-        
-        if (e instanceof ValidationException) {
-            ValidationException ex = (ValidationException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof DomainException) {
-            DomainException ex = (DomainException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else if (e instanceof com.motorbike.domain.exceptions.SystemException) {
-            com.motorbike.domain.exceptions.SystemException ex = (com.motorbike.domain.exceptions.SystemException) e;
-            errorCode = ex.getErrorCode();
-            message = ex.getMessage();
-        } else {
-            throw new com.motorbike.domain.exceptions.SystemException(e);
+            outputData = AddToCartOutputData.forError(errorCode, message);
         }
         
-        AddToCartOutputData outputData = AddToCartOutputData.forError(errorCode, message);
         outputBoundary.present(outputData);
     }
 }

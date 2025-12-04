@@ -31,34 +31,48 @@ src/
 
 ## Chức năng hệ thống
 
-### 1. Quản lý sản phẩm (Customer)
-
-#### Xe máy
-- ✅ Xem chi tiết sản phẩm
-- ✅ Tìm kiếm xe máy
-- ✅ Xem danh sách xe máy
-
-#### Giỏ hàng
-- ✅ Thêm vào giỏ hàng
-- ✅ Xem giỏ hàng
-- ✅ Chỉnh số lượng sản phẩm trong giỏ hàng
+### 1. Quản lý khách hàng (Customer Features)
 
 #### Tài khoản
-- ✅ Đăng ký tài khoản
-- ✅ Đăng nhập
+- ✅ Đăng ký tài khoản (Register)
+- ✅ Đăng nhập (Login)
+  - Tự động tạo giỏ hàng khi đăng ký
+  - Gộp giỏ hàng guest vào giỏ hàng user khi đăng nhập
+
+#### Sản phẩm xe máy
+- ✅ Xem danh sách xe máy (Get All Motorbikes)
+- ✅ Tìm kiếm xe máy (Search Motorbikes)
+  - Tìm theo keyword, hãng xe, dòng xe, màu sắc, dung tích
+- ✅ Xem chi tiết sản phẩm (Get Product Detail)
+  - Hiển thị giá gốc, giá sau khuyến mãi, % giảm giá
+
+#### Giỏ hàng
+- ✅ Thêm vào giỏ hàng (Add To Cart)
+  - Kiểm tra tồn kho trước khi thêm
+- ✅ Xem giỏ hàng (View Cart)
+  - Cảnh báo nếu số lượng trong giỏ vượt tồn kho
+- ✅ Cập nhật số lượng (Update Cart Quantity)
+  - Tự động xóa sản phẩm nếu số lượng = 0
 
 #### Đơn hàng
 - ✅ Thanh toán (Checkout)
+  - Tạo đơn hàng
+  - Tự động trừ tồn kho
+  - Xóa giỏ hàng sau khi đặt hàng thành công
+- ✅ Hủy đơn hàng (Cancel Order)
+  - Hoàn lại tồn kho
+  - Kiểm tra quyền hủy đơn
+- ✅ Xem danh sách đơn hàng (List All Orders)
+  - Sắp xếp theo ngày đặt
 
-### 2. Quản lý xe máy (Admin)
+### 2. Quản lý xe máy (Admin) - 🔄 Đang phát triển
 
 - 🔄 Tìm kiếm xe máy
 - 🔄 Thêm xe máy
-- 🔄 Xem danh sách xe máy
 - 🔄 Sửa thông tin xe máy
 - 🔄 Xóa xe máy
 
-### 3. Quản lý phụ kiện xe máy (Admin)
+### 3. Quản lý phụ kiện (Admin) - 🔄 Đang phát triển
 
 - 🔄 Tìm kiếm phụ kiện xe máy
 - 🔄 Thêm phụ kiện xe máy
@@ -66,23 +80,19 @@ src/
 - 🔄 Sửa thông tin phụ kiện xe máy
 - 🔄 Xóa phụ kiện xe máy
 
-### 4. Quản lý tài khoản (Admin)
+### 4. Quản lý tài khoản (Admin) - 🔄 Đang phát triển
 
 - 🔄 Tìm kiếm tài khoản
-- 🔄 Thêm người dùng
 - 🔄 Xem danh sách người dùng
 - 🔄 Sửa thông tin người dùng
 - 🔄 Xóa người dùng
 
-### 5. Quản lý đơn hàng (Admin)
-
-- 🔄 Tìm kiếm đơn hàng
-- 🔄 Thêm đơn hàng
-- 🔄 Xem danh sách đơn hàng
-- 🔄 Sửa đơn hàng
-- 🔄 Xóa đơn hàng
-
 **Chú thích**: ✅ = Đã hoàn thành | 🔄 = Đang phát triển
+
+**Tổng kết triển khai**:
+- **11 Use Cases đã hoàn thành**: Register, Login, AddToCart, GetProductDetail, ViewCart, UpdateCartQuantity, Checkout, CancelOrder, ListAllOrders, GetAllMotorbikes, SearchMotorbikes
+- **Flow Pattern**: Tất cả Use Cases tuân thủ flow pattern - luôn thực thi đầy đủ các bước và present kết quả dù success hay error
+- **Error Handling**: Sử dụng error-accumulation pattern thay vì throw exception
 
 ## Kiến trúc Clean Architecture
 
@@ -124,7 +134,9 @@ src/
 
 ## Use Case Implementation
 
-Mỗi use case được triển khai theo flow:
+### Flow Pattern
+
+Tất cả Use Cases tuân thủ flow pattern hoàn chỉnh:
 
 ```
 Controller → InputData → UseCaseControl → Entity
@@ -132,45 +144,169 @@ Controller → InputData → UseCaseControl → Entity
             OutputData → Presenter → ViewModel
 ```
 
+### Use Case Execution Flow
+
+Mỗi Use Case thực thi theo các bước:
+
+```java
+1. Validate Input (Bước 2)
+   - Kiểm tra tính hợp lệ của dữ liệu đầu vào
+   - Bắt exception nhưng không throw ra ngoài
+
+2. Check Business Rules (Bước 3)
+   - Kiểm tra nghiệp vụ (chỉ thực thi nếu bước 2 không có lỗi)
+   - Ví dụ: kiểm tra email đã tồn tại, kiểm tra tồn kho
+
+3. Execute Business Logic (Bước 4)
+   - Thực thi logic nghiệp vụ (chỉ thực thi nếu không có lỗi)
+   - Ví dụ: tạo tài khoản, thêm vào giỏ hàng, tạo đơn hàng
+
+4. Build Error Response (Bước 4.1)
+   - Nếu có lỗi từ các bước trước, tạo error response
+
+5. Present Result (Bước 5)
+   - Luôn present kết quả (success hoặc error)
+
+6. User Receives Notification (Bước 6)
+   - Người dùng nhận thông báo
+```
+
 ### Ví dụ: Add To Cart Use Case
 
 ```java
-1. Controller nhận request
-2. Tạo AddToCartInputData
-3. UseCaseControl thực thi business logic
-4. Tạo AddToCartOutputData
-5. Presenter format dữ liệu
-6. ViewModel trả về cho UI
+public void execute(AddToCartInputData inputData) {
+    AddToCartOutputData outputData = null;
+    Exception errorException = null;
+    
+    // Bước 2: Validate
+    try {
+        validateInput(inputData);
+    } catch (Exception e) {
+        errorException = e;
+    }
+    
+    // Bước 3: Check business rules
+    if (errorException == null) {
+        try {
+            checkProductAndStock(inputData);
+        } catch (Exception e) {
+            errorException = e;
+        }
+    }
+    
+    // Bước 4: Execute
+    if (errorException == null) {
+        try {
+            outputData = addToCart(inputData);
+        } catch (Exception e) {
+            errorException = e;
+        }
+    }
+    
+    // Bước 4.1: Build error response
+    if (errorException != null) {
+        outputData = buildErrorResponse(errorException);
+    }
+    
+    // Bước 5: Present (luôn thực thi)
+    outputBoundary.present(outputData);
+}
 ```
+
+### Nguyên tắc quan trọng
+
+- ✅ **No throw pattern**: Không bao giờ throw exception ra ngoài use case
+- ✅ **Error accumulation**: Sử dụng biến `errorException` để theo dõi lỗi
+- ✅ **Always present**: Luôn gọi `outputBoundary.present()` bất kể success hay error
+- ✅ **Sequential flow**: Các bước thực thi tuần tự, bước sau chỉ chạy nếu bước trước không lỗi
+- ✅ **Complete execution**: Luôn thực thi hết tất cả các bước (validate → check → execute → present)
 
 ## Testing
 
 ### Test Coverage
 
 Tất cả Use Cases đều có Unit Tests:
-- ✅ `AddToCartUseCaseControlTest`
-- ✅ `CheckoutUseCaseControlTest`
-- ✅ `GetProductDetailUseCaseControlTest`
-- ✅ `LoginUseCaseControlTest`
 - ✅ `RegisterUseCaseControlTest`
-- ✅ `UpdateCartQuantityUseCaseControlTest`
+- ✅ `LoginUseCaseControlTest`
+- ✅ `AddToCartUseCaseControlTest`
+- ✅ `GetProductDetailUseCaseControlTest`
 - ✅ `ViewCartUseCaseControlTest`
+- ✅ `UpdateCartQuantityUseCaseControlTest`
+- ✅ `CheckoutUseCaseControlTest`
+- ✅ `CancelOrderUseCaseControlTest`
+- ✅ `ListAllOrdersUseCaseControlTest`
 
-### Test Strategy
+**Domain Entities có Unit Tests**:
+- ✅ `TaiKhoanTest`
+- ✅ `GioHangTest`
+- ✅ `XeMayTest`
+### Core Entities
 
-- **Valid Cases**: Kiểm tra luồng thành công
-- **Invalid Cases**: Kiểm tra validation và error handling
-- **Edge Cases**: Kiểm tra boundary conditions
-- **Mock Objects**: Sử dụng mock repositories
-
-### Chạy tests
-
-```bash
-mvn test
 ```
+TaiKhoan (User Account)
+├── VaiTro: CUSTOMER | ADMIN
+├── Authentication: email, password (BCrypt hashed)
+├── Status: hoatDong (boolean)
+└── Relationships:
+    └── 1:1 → GioHang (Shopping Cart)
 
-## Cài đặt và chạy
+SanPham (Product) - Abstract
+├── XeMay (Motorbike)
+│   ├── hangXe, dongXe, mauSac
+│   ├── namSanXuat, dungTich
+│   └── giảm giá logic
+└── PhuKien (Accessory)
+## Implemented Use Cases
 
+### 1. Authentication & User Management
+- **RegisterUseCase**: Đăng ký tài khoản mới
+  - Validate email, username, password, phone
+  - Kiểm tra email đã tồn tại
+  - Tự động tạo giỏ hàng cho user mới
+  
+- **LoginUseCase**: Đăng nhập
+  - Xác minh email và password
+  - Kiểm tra trạng thái tài khoản
+  - Gộp giỏ hàng guest vào giỏ hàng user
+
+### 2. Product Management
+- **GetAllMotorbikesUseCase**: Lấy danh sách tất cả xe máy
+- **SearchMotorbikesUseCase**: Tìm kiếm xe máy theo tiêu chí
+  - Filter: keyword, brand, model, color, CC range
+- **GetProductDetailUseCase**: Xem chi tiết sản phẩm
+  - Tính giá sau khuyến mãi
+  - Tính % giảm giá
+
+### 3. Shopping Cart Management
+- **AddToCartUseCase**: Thêm sản phẩm vào giỏ
+  - Validate input
+  - Kiểm tra tồn kho
+  - Cộng dồn nếu sản phẩm đã có trong giỏ
+  
+- **ViewCartUseCase**: Xem giỏ hàng
+  - Hiển thị danh sách sản phẩm
+  - Cảnh báo nếu số lượng vượt tồn kho
+  - Tính tổng tiền
+  
+- **UpdateCartQuantityUseCase**: Cập nhật số lượng
+  - Tự động xóa nếu quantity = 0
+  - Validate số lượng
+
+### 4. Order Management
+- **CheckoutUseCase**: Thanh toán và tạo đơn hàng
+  - Validate thông tin giao hàng
+  - Kiểm tra giỏ hàng và tồn kho
+  - Tạo đơn hàng
+  - Trừ tồn kho tự động
+  - Xóa giỏ hàng sau khi đặt thành công
+  
+- **CancelOrderUseCase**: Hủy đơn hàng
+  - Kiểm tra quyền hủy đơn
+  - Kiểm tra trạng thái đơn hàng
+  - Hoàn lại tồn kho
+  
+- **ListAllOrdersUseCase**: Xem danh sách đơn hàng
+  - Sắp xếp theo ngày đặt (mới nhất trước)
 ### Yêu cầu hệ thống
 
 - Java 11 or higher
