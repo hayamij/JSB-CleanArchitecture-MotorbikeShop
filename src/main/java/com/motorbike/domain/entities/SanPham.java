@@ -135,4 +135,7 @@ public abstract class SanPham {
     public void setTenSanPham(String tenSanPham) {validateTenSanPham(tenSanPham); this.tenSanPham = tenSanPham; this.ngayCapNhat = LocalDateTime.now();}
     public void setMoTa(String moTa) {this.moTa = moTa; this.ngayCapNhat = LocalDateTime.now();}
     public void setHinhAnh(String hinhAnh) {this.hinhAnh = hinhAnh; this.ngayCapNhat = LocalDateTime.now();}
+    public void setSoLuongTonKho(int soLuongTonKho) {
+        this.soLuongTonKho = soLuongTonKho;
+    }
 }

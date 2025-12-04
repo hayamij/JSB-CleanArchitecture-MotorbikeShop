@@ -80,6 +80,8 @@ public class MotorbikeRepositoryAdapter implements MotorbikeRepository {
         e.setMauSac(x.getMauSac());
         e.setNamSanXuat(x.getNamSanXuat());
         e.setDungTich(x.getDungTich());
+
+        e.setLoaiSanPham("XE_MAY");
         return e;
     }
 }
