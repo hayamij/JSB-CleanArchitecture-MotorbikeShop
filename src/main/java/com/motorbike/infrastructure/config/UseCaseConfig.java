@@ -1,5 +1,12 @@
 package com.motorbike.infrastructure.config;
 
+import com.motorbike.adapters.presenters.AddMotorbikePresenter;
+import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
+import com.motorbike.business.usecase.control.AddMotorbikeUseCaseControl;
+import com.motorbike.business.usecase.input.AddMotorbikeInputBoundary;
+import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
+
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.annotation.RequestScope;
@@ -15,6 +22,7 @@ import com.motorbike.adapters.presenters.RegisterPresenter;
 import com.motorbike.adapters.presenters.SearchMotorbikesPresenter;
 import com.motorbike.adapters.presenters.UpdateCartQuantityPresenter;
 import com.motorbike.adapters.presenters.ViewCartPresenter;
+import com.motorbike.adapters.repositories.MotorbikeRepositoryAdapter;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
 import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
@@ -55,6 +63,7 @@ import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
+import com.motorbike.infrastructure.persistence.jpa.repositories.XeMayJpaRepository;
 
 @Configuration
 public class UseCaseConfig {
@@ -277,6 +286,43 @@ public SearchMotorbikesOutputBoundary searchMotorbikesOutputBoundary(
 @Bean
 public SearchMotorbikesViewModel searchMotorbikesViewModel() {
     return new SearchMotorbikesViewModel();
+}
+
+// ADD MOTORBIKE USE CASE BEANS
+
+@Bean
+@RequestScope
+public AddMotorbikeViewModel addMotorbikeViewModel() {
+    return new AddMotorbikeViewModel();
+}
+
+@Bean
+public AddMotorbikeOutputBoundary addMotorbikePresenter(
+        AddMotorbikeViewModel viewModel
+) {
+    return new AddMotorbikePresenter(viewModel);
+}
+
+@Bean
+public AddMotorbikeUseCaseControl addMotorbikeUseCase(
+        AddMotorbikeOutputBoundary presenter,
+        MotorbikeRepository motorbikeRepository
+) {
+    return new AddMotorbikeUseCaseControl(presenter, motorbikeRepository);
+}
+
+@Bean
+public AddMotorbikeInputBoundary addMotorbikeInputBoundary(
+        AddMotorbikeUseCaseControl useCase
+) {
+    return useCase;
+}
+
+@Bean
+public MotorbikeRepository motorbikeRepository(
+        XeMayJpaRepository jpaRepository
+) {
+    return new MotorbikeRepositoryAdapter(jpaRepository);
 }
 
 

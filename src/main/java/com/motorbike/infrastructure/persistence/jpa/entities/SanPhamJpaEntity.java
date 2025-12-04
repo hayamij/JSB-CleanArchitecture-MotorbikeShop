@@ -38,7 +38,7 @@ public abstract class SanPhamJpaEntity {
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
 
-    @Column(name = "loai_san_pham", nullable = false, length = 50, insertable = false, updatable = false)
+    @Column(name = "loai_san_pham", nullable = false, length = 50)
     private String loaiSanPham;
 
     protected SanPhamJpaEntity() {
@@ -113,6 +113,10 @@ public abstract class SanPhamJpaEntity {
 
     public String getLoaiSanPham() {return loaiSanPham;}
 
+    public void setLoaiSanPham(String loaiSanPham) {
+        this.loaiSanPham = loaiSanPham;
+    }
+    
     @PreUpdate
     protected void onUpdate() {
         this.ngayCapNhat = LocalDateTime.now();
