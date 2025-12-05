@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi - Motorbike Shop</title>
+    <link rel="stylesheet" href="css/common.css?v=2">
+    <link rel="stylesheet" href="css/my-orders.css?v=2">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home.html" class="logo">
+                <span>Motorbike Shop</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="home.html">Trang chủ</a></li>
+                <li><a href="cart.html">Giỏ hàng</a></li>
+                <li><a href="my-orders.html" class="active">Đơn hàng</a></li>
+            </ul>
+
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span class="user-name" id="userName">User</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Đơn hàng của tôi</h1>
+            <p>Theo dõi và quản lý đơn hàng của bạn</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <p style="color: #7a7a7a;">Đang tải đơn hàng...</p>
+        </div>
+
+        <div id="ordersContainer" class="hidden">
+            <div class="orders-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Tổng đơn hàng</div>
+                    <div class="stat-value" id="totalOrders">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Đang xử lý</div>
+                    <div class="stat-value" id="processingOrders">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Hoàn thành</div>
+                    <div class="stat-value" id="completedOrders">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Đã hủy</div>
+                    <div class="stat-value" id="cancelledOrders">0</div>
+                </div>
+            </div>
+
+            <div class="orders-list-section">
+                <h2 class="section-title">Danh sách đơn hàng</h2>
+                <div id="ordersList"></div>
+            </div>
+        </div>
+
+        <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon">📦</div>
+            <h3>Chưa có đơn hàng nào</h3>
+            <p>Bạn chưa đặt đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
+            <button class="btn-primary" onclick="window.location.href='home.html'">
+                Khám phá sản phẩm
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
+        <p>Hệ thống quản lý cửa hàng xe máy - Clean Architecture</p>
+    </footer>
+
+    <script src="js/common.js?v=2"></script>
+    <script src="js/my-orders.js?v=2"></script>
+</body>
+</html>
