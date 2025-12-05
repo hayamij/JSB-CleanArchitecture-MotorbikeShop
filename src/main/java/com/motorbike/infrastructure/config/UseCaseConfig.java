@@ -4,6 +4,7 @@ import com.motorbike.adapters.presenters.AddMotorbikePresenter;
 import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
 import com.motorbike.business.usecase.control.AddMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.input.AddMotorbikeInputBoundary;
+import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
 import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
 
 
@@ -14,6 +15,7 @@ import org.springframework.web.context.annotation.RequestScope;
 import com.motorbike.adapters.presenters.AddToCartPresenter;
 import com.motorbike.adapters.presenters.CancelOrderPresenter;
 import com.motorbike.adapters.presenters.CheckoutPresenter;
+import com.motorbike.adapters.presenters.DeleteMotorbikePresenter;
 import com.motorbike.adapters.presenters.GetAllMotorbikesPresenter;
 import com.motorbike.adapters.presenters.ListAllOrdersPresenter;
 import com.motorbike.adapters.presenters.LoginPresenter;
@@ -29,6 +31,7 @@ import com.motorbike.adapters.presenters.SearchAccessoriesPresenter;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
 import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
+import com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
 import com.motorbike.adapters.viewmodels.LoginViewModel;
@@ -48,6 +51,7 @@ import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.control.AddToCartUseCaseControl;
 import com.motorbike.business.usecase.control.CancelOrderUseCaseControl;
 import com.motorbike.business.usecase.control.CheckoutUseCaseControl;
+import com.motorbike.business.usecase.control.DeleteMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.GetAllMotorbikesUseCaseControl;
 import com.motorbike.business.usecase.control.GetProductDetailUseCaseControl;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
@@ -67,6 +71,7 @@ import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
 import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 import com.motorbike.business.usecase.output.CancelOrderOutputBoundary;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
+import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
 import com.motorbike.business.usecase.output.GetAllMotorbikesOutputBoundary;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
@@ -400,5 +405,28 @@ public UpdateMotorbikeViewModel updateMotorbikeViewModel() {
 public UpdateMotorbikePresenter updateMotorbikePresenter(UpdateMotorbikeViewModel viewModel) {
     return new UpdateMotorbikePresenter(viewModel);
 }
+
+// DELETE MOTORBIKE USE CASE BEANS
+@Bean
+@RequestScope
+public DeleteMotorbikeViewModel deleteMotorbikeViewModel() {
+    return new DeleteMotorbikeViewModel();
+}
+
+@Bean
+public DeleteMotorbikeOutputBoundary deleteMotorbikePresenter(DeleteMotorbikeViewModel vm) {
+    return new DeleteMotorbikePresenter(vm);
+}
+
+@Bean
+public DeleteMotorbikeInputBoundary deleteMotorbikeUseCase(
+        DeleteMotorbikeOutputBoundary presenter,
+        MotorbikeRepository motorbikeRepository
+) {
+    return new DeleteMotorbikeUseCaseControl(presenter, motorbikeRepository);
+}
+
+
+
 
 }
