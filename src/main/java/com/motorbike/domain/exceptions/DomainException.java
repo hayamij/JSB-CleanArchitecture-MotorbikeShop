@@ -97,6 +97,10 @@ public class DomainException extends RuntimeException {
     public static DomainException alreadyCancelled() {
         return new DomainException("Đơn hàng đã bị hủy trước đó", "ALREADY_CANCELLED");
     }
+
+    public static DomainException cannotUpdateOrder(String reason) {
+        return new DomainException("Không thể cập nhật đơn hàng: " + reason, "CANNOT_UPDATE_ORDER");
+    }
     
     // ===== PRODUCT =====
     public static DomainException noStockToRestore() {

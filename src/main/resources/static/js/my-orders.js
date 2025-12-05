@@ -87,8 +87,14 @@ function createOrderCard(order) {
     // Check if order can be cancelled (only if waiting for confirmation)
     const canCancelOrder = order.orderStatus === 'Chờ xác nhận';
     const cancelButtonHTML = canCancelOrder ? `
-        <button class="btn-cancel" onclick="cancelOrder(${order.orderId})">
+        <button class="btn-cancel" data-action="cancel-order" data-order-id="${order.orderId}">
             Hủy đơn hàng
+        </button>
+    ` : '';
+
+    const editButtonHTML = canCancelOrder ? `
+        <button class="btn-edit" data-action="edit-shipping">
+            Sửa thông tin giao hàng
         </button>
     ` : '';
 
@@ -126,11 +132,35 @@ function createOrderCard(order) {
 
         <div class="order-footer">
             <div class="order-total">${order.formattedTotalAmount}</div>
-            ${cancelButtonHTML}
+            <div class="order-actions">
+                ${editButtonHTML}
+                ${cancelButtonHTML}
+            </div>
         </div>
     `;
 
+    if (canCancelOrder) {
+        const editBtn = card.querySelector('[data-action="edit-shipping"]');
+        const cancelBtn = card.querySelector('[data-action="cancel-order"]');
+
+        if (editBtn) {
+            editBtn.addEventListener('click', () => goToEditPage(order.orderId));
+        }
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => cancelOrder(order.orderId));
+        }
+    }
+
     return card;
+}
+
+function goToEditPage(orderId) {
+    const userId = sessionStorage.getItem('userId');
+    if (!userId) {
+        showAlert('Lỗi: Không tìm thấy thông tin người dùng!', 'error');
+        return;
+    }
+    window.location.href = `edit-order.html?orderId=${orderId}`;
 }
 
 // Update statistics

@@ -116,6 +116,7 @@ body {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
+
 /* Footer */
 footer {
     background: var(--color-dark-gray, #2a2a2a);
@@ -303,6 +304,13 @@ footer p {
     gap: 16px;
 }
 
+.order-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
 .order-total {
     font-size: 1.3em;
     font-weight: 700;
@@ -321,6 +329,25 @@ footer p {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
+}
+
+.btn-edit {
+    padding: 10px 16px;
+    background: #e8f4ff;
+    color: #1d4ed8;
+    border: 1px solid #1d4ed8;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all var(--transition-base);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.btn-edit:hover {
+    background: #1d4ed8;
+    color: #ffffff;
 }
 
 .btn-cancel:hover {

@@ -19,6 +19,7 @@ import com.motorbike.adapters.presenters.SearchAccessoriesPresenter;
 import com.motorbike.adapters.presenters.SearchMotorbikesPresenter;
 import com.motorbike.adapters.presenters.UpdateCartQuantityPresenter;
 import com.motorbike.adapters.presenters.UpdateMotorbikePresenter;
+import com.motorbike.adapters.presenters.UpdateOrderInforPresenter;
 import com.motorbike.adapters.presenters.ViewCartPresenter;
 import com.motorbike.adapters.repositories.MotorbikeRepositoryAdapter;
 import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
@@ -36,6 +37,7 @@ import com.motorbike.adapters.viewmodels.SearchAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
 import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
+import com.motorbike.adapters.viewmodels.UpdateOrderInforViewModel;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
@@ -57,6 +59,7 @@ import com.motorbike.business.usecase.control.SearchAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateOrderInforUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
 import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
 import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
@@ -78,6 +81,7 @@ import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
+import com.motorbike.business.usecase.output.UpdateOrderInforOutputBoundary;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 import com.motorbike.infrastructure.persistence.jpa.repositories.XeMayJpaRepository;
 
@@ -269,6 +273,24 @@ public CancelOrderUseCaseControl cancelOrderUseCase(
 @Bean
 public CancelOrderOutputBoundary cancelOrderPresenter(CancelOrderViewModel cancelOrderViewModel) {
     return new CancelOrderPresenter(cancelOrderViewModel);
+}
+
+@Bean
+@RequestScope
+public UpdateOrderInforViewModel updateOrderInforViewModel() {
+    return new UpdateOrderInforViewModel();
+}
+
+@Bean
+public UpdateOrderInforUseCaseControl updateOrderInforUseCase(
+        UpdateOrderInforOutputBoundary updateOrderInforPresenter,
+        OrderRepository orderRepository) {
+    return new UpdateOrderInforUseCaseControl(updateOrderInforPresenter, orderRepository);
+}
+
+@Bean
+public UpdateOrderInforOutputBoundary updateOrderInforPresenter(UpdateOrderInforViewModel updateOrderInforViewModel) {
+    return new UpdateOrderInforPresenter(updateOrderInforViewModel);
 }
 
 //motorbike use case beans
