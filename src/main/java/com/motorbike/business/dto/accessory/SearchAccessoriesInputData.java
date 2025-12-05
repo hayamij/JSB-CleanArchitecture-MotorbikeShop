@@ -5,19 +5,22 @@ public class SearchAccessoriesInputData {
     public String loaiPhuKien;
     public String thuongHieu;
     public String chatLieu;
-    public String kichThuoc;
+    public Double minPrice;
+    public Double maxPrice;
 
     public SearchAccessoriesInputData(
             String keyword,
             String loaiPhuKien,
             String thuongHieu,
             String chatLieu,
-            String kichThuoc
+            Double minPrice,
+            Double maxPrice
     ) {
         this.keyword = keyword;
         this.loaiPhuKien = loaiPhuKien;
         this.thuongHieu = thuongHieu;
         this.chatLieu = chatLieu;
-        this.kichThuoc = kichThuoc;
+        this.minPrice = minPrice;
+        this.maxPrice = maxPrice;
     }
 }

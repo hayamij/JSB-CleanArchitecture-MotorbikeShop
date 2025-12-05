@@ -37,7 +37,8 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
                     .filter(pk -> input.loaiPhuKien == null || pk.getLoaiPhuKien().equalsIgnoreCase(input.loaiPhuKien))
                     .filter(pk -> input.thuongHieu == null || pk.getThuongHieu().equalsIgnoreCase(input.thuongHieu))
                     .filter(pk -> input.chatLieu == null || pk.getChatLieu().equalsIgnoreCase(input.chatLieu))
-                    .filter(pk -> input.kichThuoc == null || pk.getKichThuoc().equalsIgnoreCase(input.kichThuoc))
+                    .filter(pk -> input.minPrice == null || pk.getGia().doubleValue() >= input.minPrice)
+                    .filter(pk -> input.maxPrice == null || pk.getGia().doubleValue() <= input.maxPrice)
                     .map(pk -> new AccessoryItem(
                             pk.getMaSanPham(),
                             pk.getTenSanPham(),

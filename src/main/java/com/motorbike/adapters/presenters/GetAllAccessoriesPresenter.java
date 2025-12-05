@@ -14,6 +14,7 @@ public class GetAllAccessoriesPresenter implements GetAllAccessoriesOutputBounda
 
     @Override
     public void present(GetAllAccessoriesOutputData outputData) {
+<<<<<<< HEAD
         // reset state
         viewModel.hasError = false;
         viewModel.errorCode = null;
@@ -26,6 +27,18 @@ public class GetAllAccessoriesPresenter implements GetAllAccessoriesOutputBounda
             viewModel.errorMessage = outputData.errorMessage;
         } else {
             viewModel.accessories = outputData.accessories;
+=======
+        if (outputData.isSuccess()) {
+            viewModel.accessories = outputData.getAccessories();
+            viewModel.hasError = false;
+            viewModel.errorCode = null;
+            viewModel.errorMessage = null;
+        } else {
+            viewModel.accessories = null;
+            viewModel.hasError = true;
+            viewModel.errorCode = outputData.getErrorCode();
+            viewModel.errorMessage = outputData.getErrorMessage();
+>>>>>>> 8dcc07fa4d37eb42bd8eead969b5dc0579148b25
         }
     }
 }

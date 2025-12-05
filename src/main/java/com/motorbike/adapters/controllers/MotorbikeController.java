@@ -1,5 +1,13 @@
 package com.motorbike.adapters.controllers;
 
+import java.math.BigDecimal;
+
+import com.motorbike.adapters.dto.request.AddMotorbikeRequest;
+import com.motorbike.business.dto.motorbike.AddMotorbikeInputData;
+import com.motorbike.business.usecase.input.AddMotorbikeInputBoundary;
+import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
+
+
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
 
@@ -15,6 +23,10 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class MotorbikeController {
 
+    private final AddMotorbikeInputBoundary addMotorbikeUseCase;
+    private final AddMotorbikeViewModel addMotorbikeViewModel;
+
+
     private final GetAllMotorbikesInputBoundary getAllMotorbikesUseCase;
     private final GetAllMotorbikesViewModel getAllViewModel;
 
@@ -25,12 +37,17 @@ public class MotorbikeController {
             GetAllMotorbikesInputBoundary getAllMotorbikesUseCase,
             GetAllMotorbikesViewModel getAllViewModel,
             SearchMotorbikesInputBoundary searchMotorbikesUseCase,
-            SearchMotorbikesViewModel searchViewModel
+            SearchMotorbikesViewModel searchViewModel,
+            AddMotorbikeInputBoundary addMotorbikeUseCase,
+            AddMotorbikeViewModel addMotorbikeViewModel
+            
     ) {
         this.getAllMotorbikesUseCase = getAllMotorbikesUseCase;
         this.getAllViewModel = getAllViewModel;
         this.searchMotorbikesUseCase = searchMotorbikesUseCase;
         this.searchViewModel = searchViewModel;
+        this.addMotorbikeUseCase = addMotorbikeUseCase;
+        this.addMotorbikeViewModel = addMotorbikeViewModel;
     }
 
     // ============================
@@ -82,6 +99,39 @@ public class MotorbikeController {
 
         return ResponseEntity.ok(searchViewModel.motorbikes);
     }
+
+    // ============================
+    // 3) ADD MOTORBIKE
+    // ============================
+    @PostMapping("/add")
+    public ResponseEntity<?> addMotorbike(@RequestBody AddMotorbikeRequest request) {
+
+        AddMotorbikeInputData input = new AddMotorbikeInputData(
+                request.name,
+                request.description,
+                new BigDecimal(request.price),
+                request.imageUrl,
+                request.stock,
+                request.brand,
+                request.model,
+                request.color,
+                request.year,
+                request.displacement
+        );
+
+        addMotorbikeUseCase.execute(input);
+
+        if (addMotorbikeViewModel.hasError) {
+            return ResponseEntity
+                    .status(400)
+                    .body(new ErrorResponse(addMotorbikeViewModel.errorCode, addMotorbikeViewModel.errorMessage));
+        }
+
+        return ResponseEntity.ok(addMotorbikeViewModel);
+
+    }
+
+
 
     // ============================
     // ERROR RESPONSE

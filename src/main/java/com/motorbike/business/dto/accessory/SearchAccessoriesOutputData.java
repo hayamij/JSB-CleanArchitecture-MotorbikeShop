@@ -9,7 +9,10 @@ public class SearchAccessoriesOutputData {
     public String errorMessage;
     public List<AccessoryItem> accessories;
 
+<<<<<<< HEAD
     // Trường hợp thành công
+=======
+>>>>>>> 8dcc07fa4d37eb42bd8eead969b5dc0579148b25
     public SearchAccessoriesOutputData(List<AccessoryItem> accessories) {
         this.hasError = false;
         this.errorCode = null;
@@ -17,7 +20,10 @@ public class SearchAccessoriesOutputData {
         this.accessories = accessories;
     }
 
+<<<<<<< HEAD
     // Trường hợp lỗi
+=======
+>>>>>>> 8dcc07fa4d37eb42bd8eead969b5dc0579148b25
     public SearchAccessoriesOutputData(String errorCode, String errorMessage) {
         this.hasError = true;
         this.errorCode = errorCode;
@@ -25,7 +31,10 @@ public class SearchAccessoriesOutputData {
         this.accessories = null;
     }
 
+<<<<<<< HEAD
     // DTO con cho từng phụ kiện
+=======
+>>>>>>> 8dcc07fa4d37eb42bd8eead969b5dc0579148b25
     public static class AccessoryItem {
         public Long id;
         public String name;
@@ -33,6 +42,7 @@ public class SearchAccessoriesOutputData {
         public java.math.BigDecimal price;
         public int stock;
         public String imageUrl;
+<<<<<<< HEAD
         public String loaiPhuKien;
         public String thuongHieu;
         public String chatLieu;
@@ -48,16 +58,40 @@ public class SearchAccessoriesOutputData {
                             String thuongHieu,
                             String chatLieu,
                             String kichThuoc) {
+=======
+        public String type;
+        public String brand;
+        public String material;
+        public String size;
+
+        public AccessoryItem(Long id,
+                             String name,
+                             String description,
+                             java.math.BigDecimal price,
+                             int stock,
+                             String imageUrl,
+                             String type,
+                             String brand,
+                             String material,
+                             String size) {
+>>>>>>> 8dcc07fa4d37eb42bd8eead969b5dc0579148b25
             this.id = id;
             this.name = name;
             this.description = description;
             this.price = price;
             this.stock = stock;
             this.imageUrl = imageUrl;
+<<<<<<< HEAD
             this.loaiPhuKien = loaiPhuKien;
             this.thuongHieu = thuongHieu;
             this.chatLieu = chatLieu;
             this.kichThuoc = kichThuoc;
+=======
+            this.type = type;
+            this.brand = brand;
+            this.material = material;
+            this.size = size;
+>>>>>>> 8dcc07fa4d37eb42bd8eead969b5dc0579148b25
         }
     }
 }
