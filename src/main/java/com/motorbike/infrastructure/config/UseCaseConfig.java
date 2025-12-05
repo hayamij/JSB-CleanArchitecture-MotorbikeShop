@@ -259,6 +259,7 @@ public CreateMotorbikeOutputBoundary createMotorbikePresenter(
 }
 
 @Bean
+<<<<<<< HEAD
 @RequestScope
 public UpdateMotorbikeViewModel updateMotorbikeViewModel() {
     return new UpdateMotorbikeViewModel();
@@ -366,6 +367,8 @@ public DeleteAccessoryOutputBoundary deleteAccessoryPresenter(
 }
 
 @Bean
+=======
+>>>>>>> acbf7c86c2b72da9877419822177e0ede7261061
 @RequestScope
 public GetAllAccessoriesViewModel getAllAccessoriesViewModel() {
     return new GetAllAccessoriesViewModel();
@@ -387,6 +390,7 @@ public GetAllAccessoriesOutputBoundary getAllAccessoriesPresenter(
 }
 
 @Bean
+<<<<<<< HEAD
 @RequestScope
 public SearchAccessoriesViewModel searchAccessoriesViewModel() {
     return new SearchAccessoriesViewModel();
@@ -395,6 +399,24 @@ public SearchAccessoriesViewModel searchAccessoriesViewModel() {
 @Bean
 public SearchAccessoriesUseCaseControl searchAccessoriesUseCase(
         SearchAccessoriesOutputBoundary presenter,
+=======
+public GetAllAccessoriesInputBoundary getAllAccessoriesInputBoundary(
+        GetAllAccessoriesUseCaseControl useCase
+) {
+    return useCase;
+}
+
+@Bean
+public MotorbikeRepository motorbikeRepository(
+        XeMayJpaRepository jpaRepository
+) {
+    return new MotorbikeRepositoryAdapter(jpaRepository);
+}
+
+@Bean
+public SearchAccessoriesInputBoundary searchAccessoriesUseCase(
+        SearchAccessoriesOutputBoundary outputBoundary,
+>>>>>>> acbf7c86c2b72da9877419822177e0ede7261061
         ProductRepository productRepository
 ) {
     return new SearchAccessoriesUseCaseControl(presenter, productRepository);
