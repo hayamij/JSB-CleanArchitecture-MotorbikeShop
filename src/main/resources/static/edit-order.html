@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa thông tin giao hàng - Motorbike Shop</title>
+    <link rel="stylesheet" href="css/common.css?v=2">
+    <link rel="stylesheet" href="css/my-orders.css?v=2">
+    <style>
+        .edit-container {max-width: 720px; margin: 40px auto; background: #fff; padding: 28px; box-shadow: var(--shadow-md);}
+        .edit-header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;}
+        .breadcrumb {color: var(--color-gray); font-size: 0.95em; margin-bottom: 12px;}
+        .form-group {margin-bottom: 16px;}
+        .form-group label {display: block; margin-bottom: 6px; font-weight: 600; color: var(--color-dark-gray);} 
+        .form-group input, .form-group textarea {width: 100%; padding: 10px 12px; border: 1px solid var(--color-light-gray); border-radius: 6px;}
+        .actions {display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px;}
+        .btn-link {background: transparent; border: 1px solid var(--color-light-gray); padding: 10px 16px; cursor: pointer;}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home.html" class="logo"><span>Motorbike Shop</span></a>
+            <ul class="nav-menu">
+                <li><a href="home.html">Trang chủ</a></li>
+                <li><a href="cart.html">Giỏ hàng</a></li>
+                <li><a href="my-orders.html" class="active">Đơn hàng</a></li>
+            </ul>
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span class="user-name" id="userName">User</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb" id="breadcrumb">Đơn hàng</div>
+        <div class="edit-container">
+            <div class="edit-header">
+                <div>
+                    <h2>Sửa thông tin giao hàng</h2>
+                    <p id="orderMeta" style="color: var(--color-gray);"></p>
+                </div>
+                <button class="btn-link" onclick="window.location.href='my-orders.html'">← Quay lại</button>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <form id="editOrderForm">
+                <div class="form-group">
+                    <label for="receiverName">Tên người nhận</label>
+                    <input id="receiverName" type="text" required>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Số điện thoại</label>
+                    <input id="phoneNumber" type="text" required>
+                </div>
+                <div class="form-group">
+                    <label for="shippingAddress">Địa chỉ giao hàng</label>
+                    <textarea id="shippingAddress" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="note">Ghi chú</label>
+                    <textarea id="note" rows="2"></textarea>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn-secondary" onclick="window.location.href='my-orders.html'">Hủy</button>
+                    <button type="submit" class="btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
+        <p>Hệ thống quản lý cửa hàng xe máy - Clean Architecture</p>
+    </footer>
+
+    <script src="js/common.js?v=2"></script>
+    <script src="js/edit-order.js?v=1"></script>
+</body>
+</html>

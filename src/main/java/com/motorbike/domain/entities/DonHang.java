@@ -1,10 +1,12 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.motorbike.domain.exceptions.DomainException;
+import com.motorbike.domain.exceptions.ValidationException;
 
 public class DonHang {
     private Long maDonHang;
@@ -165,6 +167,21 @@ public class DonHang {
         
         donHang.validate();
         return donHang;
+    }
+
+    public void capNhatThongTinGiaoHang(String tenNguoiNhanMoi, String soDienThoaiMoi,
+                                        String diaChiGiaoHangMoi, String ghiChuMoi) {
+        validateThongTinNguoiNhan(tenNguoiNhanMoi, soDienThoaiMoi, diaChiGiaoHangMoi);
+
+        if (!coTheChinhSua()) {
+            throw DomainException.cannotUpdateOrder("Đơn hàng không ở trạng thái 'Chờ xác nhận'");
+        }
+
+        this.tenNguoiNhan = tenNguoiNhanMoi;
+        this.soDienThoai = soDienThoaiMoi;
+        this.diaChiGiaoHang = diaChiGiaoHangMoi;
+        this.ghiChu = ghiChuMoi;
+        this.ngayCapNhat = LocalDateTime.now();
     }
 
     public boolean coTheChinhSua() {return this.trangThai == TrangThaiDonHang.CHO_XAC_NHAN;}
