@@ -56,7 +56,7 @@ public class MotorbikeController {
     @GetMapping
     public ResponseEntity<?> getAllMotorbikes() {
 
-        getAllMotorbikesUseCase.execute(null); // Không có input
+        getAllMotorbikesUseCase.execute(); // Không có input
 
         if (getAllViewModel.hasError) {
             return ResponseEntity

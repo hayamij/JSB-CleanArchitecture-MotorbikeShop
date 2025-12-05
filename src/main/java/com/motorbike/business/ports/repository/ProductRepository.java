@@ -1,6 +1,7 @@
 package com.motorbike.business.ports.repository;
 
 import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.entities.XeMay;
 import com.motorbike.domain.entities.PhuKienXeMay;
 import java.util.Optional;
 import java.util.List;
@@ -27,4 +28,8 @@ public interface ProductRepository {
     
     
     List<PhuKienXeMay> searchAccessories(String keyword);
+
+    List<XeMay> findAllMotorbikes();
+
+    List<XeMay> searchMotorbikes(String keyword);
 }

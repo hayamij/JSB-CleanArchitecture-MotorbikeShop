@@ -218,9 +218,9 @@ public GetAllMotorbikesInputBoundary getAllMotorbikesInputBoundary(
 @Bean
 public SearchMotorbikesInputBoundary searchMotorbikesUseCase(
         SearchMotorbikesOutputBoundary outputBoundary,
-        MotorbikeRepository motorbikeRepository
+        ProductRepository productRepository
 ) {
-    return new SearchMotorbikesUseCaseControl(outputBoundary, motorbikeRepository);
+    return new SearchMotorbikesUseCaseControl(outputBoundary, productRepository);
 }
 
 @Bean
@@ -395,9 +395,9 @@ public SearchAccessoriesViewModel searchAccessoriesViewModel() {
 @Bean
 public SearchAccessoriesUseCaseControl searchAccessoriesUseCase(
         SearchAccessoriesOutputBoundary presenter,
-        AccessoryRepository accessoryRepository
+        ProductRepository productRepository
 ) {
-    return new SearchAccessoriesUseCaseControl(presenter, accessoryRepository);
+    return new SearchAccessoriesUseCaseControl(presenter, productRepository);
 }
 
 @Bean

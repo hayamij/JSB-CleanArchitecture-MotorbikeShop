@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import com.motorbike.adapters.presenters.SearchAccessoriesPresenter;
 import com.motorbike.adapters.viewmodels.SearchAccessoriesViewModel;
 import com.motorbike.business.dto.accessory.SearchAccessoriesInputData;
-import com.motorbike.business.ports.repository.AccessoryRepository;
 import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
 import com.motorbike.domain.entities.PhuKienXeMay;
 
@@ -23,7 +22,7 @@ public class SearchAccessoriesUseCaseControlTest {
 	public void testExecute_WithKeyword_Success() {
 		SearchAccessoriesInputData inputData = new SearchAccessoriesInputData("mũ", null, null, null, null, null);
 		
-		AccessoryRepository accessoryRepo = new MockAccessoryRepository();
+		MockAccessoryRepository accessoryRepo = new MockAccessoryRepository();
 		SearchAccessoriesViewModel viewModel = new SearchAccessoriesViewModel();
 		SearchAccessoriesOutputBoundary outputBoundary = new SearchAccessoriesPresenter(viewModel);
 		
@@ -38,7 +37,7 @@ public class SearchAccessoriesUseCaseControlTest {
 	public void testExecute_NoResults_Success() {
 		SearchAccessoriesInputData inputData = new SearchAccessoriesInputData("xyz123", null, null, null, null, null);
 		
-		AccessoryRepository accessoryRepo = new MockAccessoryRepository();
+		MockAccessoryRepository accessoryRepo = new MockAccessoryRepository();
 		SearchAccessoriesViewModel viewModel = new SearchAccessoriesViewModel();
 		SearchAccessoriesOutputBoundary outputBoundary = new SearchAccessoriesPresenter(viewModel);
 		
@@ -51,7 +50,7 @@ public class SearchAccessoriesUseCaseControlTest {
 
 	@Test
 	public void testExecute_NullInputData() {
-		AccessoryRepository accessoryRepo = new MockAccessoryRepository();
+		MockAccessoryRepository accessoryRepo = new MockAccessoryRepository();
 		SearchAccessoriesViewModel viewModel = new SearchAccessoriesViewModel();
 		SearchAccessoriesOutputBoundary outputBoundary = new SearchAccessoriesPresenter(viewModel);
 		
@@ -63,7 +62,7 @@ public class SearchAccessoriesUseCaseControlTest {
 		assertNotNull(viewModel.errorMessage);
 	}
 
-	private static class MockAccessoryRepository implements AccessoryRepository {
+	private static class MockAccessoryRepository implements com.motorbike.business.ports.repository.ProductRepository {
 		@Override
 		public List<PhuKienXeMay> findAllAccessories() {
 			List<PhuKienXeMay> accessories = new ArrayList<>();
@@ -81,13 +80,13 @@ public class SearchAccessoriesUseCaseControlTest {
 		}
 
 		@Override
-		public Optional<PhuKienXeMay> findById(Long id) {
+		public Optional<com.motorbike.domain.entities.SanPham> findById(Long id) {
 			return Optional.empty();
 		}
 
 		@Override
-		public PhuKienXeMay save(PhuKienXeMay phuKien) {
-			return phuKien;
+		public com.motorbike.domain.entities.SanPham save(com.motorbike.domain.entities.SanPham sanPham) {
+			return sanPham;
 		}
 
 		@Override
@@ -100,21 +99,23 @@ public class SearchAccessoriesUseCaseControlTest {
 		}
 
 		@Override
-		public List<PhuKienXeMay> searchAccessories(String keyword) {
+		public List<com.motorbike.domain.entities.SanPham> findAll() {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<PhuKienXeMay> search(String keyword, String loaiPhuKien, String thuongHieu) {
-			List<PhuKienXeMay> result = new ArrayList<>();
-			if (keyword != null && keyword.toLowerCase().contains("mũ")) {
-				result.add(new PhuKienXeMay(
-					1L, "Mũ bảo hiểm Fullface", "Mũ cao cấp", new BigDecimal("500000"),
-					"helmet.jpg", 100, true, LocalDateTime.now(), LocalDateTime.now(),
-					"Mũ bảo hiểm", "Royal", "ABS", "L"
-				));
-			}
-			return result;
+		public List<PhuKienXeMay> searchAccessories(String keyword) {
+			return new ArrayList<>();
+		}
+		
+		@Override
+		public List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+			return new ArrayList<>();
+		}
+		
+		@Override
+		public List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+			return new ArrayList<>();
 		}
 	}
 }

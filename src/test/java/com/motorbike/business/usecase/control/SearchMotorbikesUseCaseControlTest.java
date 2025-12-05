@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import com.motorbike.adapters.presenters.SearchMotorbikesPresenter;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesInputData;
-import com.motorbike.business.ports.repository.MotorbikeRepository;
+import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
 
@@ -22,7 +22,7 @@ public class SearchMotorbikesUseCaseControlTest {
 	public void testExecute_WithKeyword_Success() {
 		SearchMotorbikesInputData inputData = new SearchMotorbikesInputData("Honda", null, null, null, null, null);
 		
-		MotorbikeRepository productRepo = new MockMotorbikeRepository();
+		MockMotorbikeRepository productRepo = new MockMotorbikeRepository();
 		SearchMotorbikesViewModel viewModel = new SearchMotorbikesViewModel();
 		SearchMotorbikesOutputBoundary outputBoundary = new SearchMotorbikesPresenter(viewModel);
 		
@@ -38,7 +38,7 @@ public class SearchMotorbikesUseCaseControlTest {
 	public void testExecute_NoResults() {
 		SearchMotorbikesInputData inputData = new SearchMotorbikesInputData("xyz123", null, null, null, null, null);
 		
-		MotorbikeRepository productRepo = new MockMotorbikeRepository();
+		MockMotorbikeRepository productRepo = new MockMotorbikeRepository();
 		SearchMotorbikesViewModel viewModel = new SearchMotorbikesViewModel();
 		SearchMotorbikesOutputBoundary outputBoundary = new SearchMotorbikesPresenter(viewModel);
 		
@@ -52,7 +52,7 @@ public class SearchMotorbikesUseCaseControlTest {
 
 	@Test
 	public void testExecute_NullInputData() {
-		MotorbikeRepository productRepo = new MockMotorbikeRepository();
+		MockMotorbikeRepository productRepo = new MockMotorbikeRepository();
 		SearchMotorbikesViewModel viewModel = new SearchMotorbikesViewModel();
 		SearchMotorbikesOutputBoundary outputBoundary = new SearchMotorbikesPresenter(viewModel);
 		
@@ -64,7 +64,7 @@ public class SearchMotorbikesUseCaseControlTest {
 		assertNotNull(viewModel.errorMessage);
 	}
 
-	private static class MockMotorbikeRepository implements MotorbikeRepository {
+	private static class MockMotorbikeRepository implements ProductRepository {
 		@Override
 		public List<XeMay> searchMotorbikes(String keyword) {
 			List<XeMay> motorbikes = new ArrayList<>();
@@ -75,13 +75,13 @@ public class SearchMotorbikesUseCaseControlTest {
 		}
 
 		@Override
-		public Optional<XeMay> findById(Long id) {
+		public Optional<com.motorbike.domain.entities.SanPham> findById(Long id) {
 			return Optional.empty();
 		}
 
 		@Override
-		public XeMay save(XeMay xeMay) {
-			return xeMay;
+		public com.motorbike.domain.entities.SanPham save(com.motorbike.domain.entities.SanPham sanPham) {
+			return sanPham;
 		}
 
 		@Override
@@ -92,6 +92,11 @@ public class SearchMotorbikesUseCaseControlTest {
 		public boolean existsById(Long id) {
 			return false;
 		}
+		
+		@Override
+		public List<com.motorbike.domain.entities.SanPham> findAll() {
+			return new ArrayList<>();
+		}
 
 		@Override
 		public List<XeMay> findAllMotorbikes() {
@@ -99,6 +104,16 @@ public class SearchMotorbikesUseCaseControlTest {
 			motorbikes.add(new XeMay("Honda Wave", "Xe số tiết kiệm", new BigDecimal("20000000"), "wave.jpg", 10, "Honda", "Wave", "Đỏ", 2024, 110));
 			motorbikes.add(new XeMay("Yamaha Exciter", "Xe thể thao", new BigDecimal("50000000"), "exciter.jpg", 5, "Yamaha", "Exciter", "Xanh", 2024, 155));
 			return motorbikes;
+		}
+		
+		@Override
+		public List<com.motorbike.domain.entities.PhuKienXeMay> findAllAccessories() {
+			return new ArrayList<>();
+		}
+		
+		@Override
+		public List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
+			return new ArrayList<>();
 		}
 	}
 }

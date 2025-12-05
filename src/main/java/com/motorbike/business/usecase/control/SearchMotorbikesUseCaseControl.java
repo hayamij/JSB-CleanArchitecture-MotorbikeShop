@@ -3,7 +3,7 @@ package com.motorbike.business.usecase.control;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesInputData;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesOutputData;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesOutputData.MotorbikeItem;
-import com.motorbike.business.ports.repository.MotorbikeRepository;
+import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
 import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 public class SearchMotorbikesUseCaseControl implements SearchMotorbikesInputBoundary{
 
     private final SearchMotorbikesOutputBoundary outputBoundary;
-    private final MotorbikeRepository motorbikeRepository;
+    private final ProductRepository productRepository;
 
     public SearchMotorbikesUseCaseControl(
             SearchMotorbikesOutputBoundary outputBoundary,
-            MotorbikeRepository motorbikeRepository
+            ProductRepository productRepository
     ) {
         this.outputBoundary = outputBoundary;
-        this.motorbikeRepository = motorbikeRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class SearchMotorbikesUseCaseControl implements SearchMotorbikesInputBoun
         Exception errorException = null;
 
         try {
-            List<XeMay> all = motorbikeRepository.findAllMotorbikes();
+            List<XeMay> all = productRepository.findAllMotorbikes();
 
             List<MotorbikeItem> filtered = all.stream()
                     .filter(x -> input.keyword == null || x.getTenSanPham().toLowerCase().contains(input.keyword.toLowerCase()))

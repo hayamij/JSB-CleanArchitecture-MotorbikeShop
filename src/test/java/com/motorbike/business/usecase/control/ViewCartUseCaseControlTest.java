@@ -298,6 +298,16 @@ public class ViewCartUseCaseControlTest {
 		public List<PhuKienXeMay> searchAccessories(String keyword) {
 			return Collections.emptyList();
 		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+			return Collections.emptyList();
+		}
 	}
 	
 	private static class MockCartRepository implements CartRepository {

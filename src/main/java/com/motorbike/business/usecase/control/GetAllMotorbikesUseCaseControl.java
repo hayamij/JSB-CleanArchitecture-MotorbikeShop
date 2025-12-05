@@ -25,7 +25,7 @@ public class GetAllMotorbikesUseCaseControl implements GetAllMotorbikesInputBoun
     }
 
     @Override
-    public void execute(Void inputData) {
+    public void execute() {
         GetAllMotorbikesOutputData outputData = null;
         Exception errorException = null;
 

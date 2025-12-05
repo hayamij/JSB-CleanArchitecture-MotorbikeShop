@@ -71,6 +71,26 @@ public class ProductRepositoryAdapter implements ProductRepository {
                 .collect(java.util.stream.Collectors.toList());
     }
     
+    @Override
+    public java.util.List<XeMay> findAllMotorbikes() {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity instanceof XeMayJpaEntity)
+                .map(entity -> (XeMay) toDomain(entity))
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    @Override
+    public java.util.List<XeMay> searchMotorbikes(String keyword) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity instanceof XeMayJpaEntity)
+                .filter(entity -> 
+                    entity.getTenSanPham().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getMoTa() != null && entity.getMoTa().toLowerCase().contains(keyword.toLowerCase()))
+                )
+                .map(entity -> (XeMay) toDomain(entity))
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
     
     private SanPham toDomain(SanPhamJpaEntity jpaEntity) {
         if (jpaEntity instanceof XeMayJpaEntity) {

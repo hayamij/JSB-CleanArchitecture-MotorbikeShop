@@ -25,7 +25,7 @@ public class GetAllMotorbikesUseCaseControlTest {
 		GetAllMotorbikesOutputBoundary outputBoundary = new GetAllMotorbikesPresenter(viewModel);
 		
 		GetAllMotorbikesUseCaseControl control = new GetAllMotorbikesUseCaseControl(outputBoundary, productRepo);
-		control.execute(null);
+		control.execute();
 		
 		assertFalse(viewModel.hasError);
 		assertNotNull(viewModel.motorbikes);
@@ -39,7 +39,7 @@ public class GetAllMotorbikesUseCaseControlTest {
 		GetAllMotorbikesOutputBoundary outputBoundary = new GetAllMotorbikesPresenter(viewModel);
 		
 		GetAllMotorbikesUseCaseControl control = new GetAllMotorbikesUseCaseControl(outputBoundary, productRepo);
-		control.execute(null);
+		control.execute();
 		
 		assertFalse(viewModel.hasError);
 		assertNotNull(viewModel.motorbikes);
@@ -47,6 +47,7 @@ public class GetAllMotorbikesUseCaseControlTest {
 	}
 
 	private static class MockProductRepositoryWithData implements ProductRepository {
+		@Override
 		public List<XeMay> findAllMotorbikes() {
 			List<XeMay> motorbikes = new ArrayList<>();
 			motorbikes.add(new XeMay("Honda Wave", "Xe số tiết kiệm", new BigDecimal("20000000"), "wave.jpg", 10, "Honda", "Wave", "Đỏ", 2024, 110));
@@ -95,6 +96,7 @@ public class GetAllMotorbikesUseCaseControlTest {
 	}
 
 	private static class MockProductRepositoryEmpty implements ProductRepository {
+		@Override
 		public List<XeMay> findAllMotorbikes() {
 			return new ArrayList<>();
 		}
@@ -128,10 +130,12 @@ public class GetAllMotorbikesUseCaseControlTest {
 			return new ArrayList<>();
 		}
 
+		@Override
 		public List<XeMay> searchMotorbikes(String keyword) {
 			return new ArrayList<>();
 		}
 
+		@Override
 		public List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
 			return new ArrayList<>();
 		}

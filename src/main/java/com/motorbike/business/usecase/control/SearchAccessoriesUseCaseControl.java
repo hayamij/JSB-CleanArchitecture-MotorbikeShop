@@ -3,7 +3,7 @@ package com.motorbike.business.usecase.control;
 import com.motorbike.business.dto.accessory.SearchAccessoriesInputData;
 import com.motorbike.business.dto.accessory.SearchAccessoriesOutputData;
 import com.motorbike.business.dto.accessory.SearchAccessoriesOutputData.AccessoryItem;
-import com.motorbike.business.ports.repository.AccessoryRepository;
+import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
 import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
 import com.motorbike.domain.entities.PhuKienXeMay;
@@ -14,14 +14,13 @@ import java.util.stream.Collectors;
 public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBoundary {
 
     private final SearchAccessoriesOutputBoundary outputBoundary;
-    private final AccessoryRepository accessoryRepository;
+    private final ProductRepository productRepository;
 
     public SearchAccessoriesUseCaseControl(
             SearchAccessoriesOutputBoundary outputBoundary,
-            AccessoryRepository accessoryRepository
-    ) {
+            ProductRepository productRepository) {
         this.outputBoundary = outputBoundary;
-        this.accessoryRepository = accessoryRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -30,7 +29,7 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
         Exception errorException = null;
 
         try {
-            List<PhuKienXeMay> all = accessoryRepository.findAllAccessories();
+            List<PhuKienXeMay> all = productRepository.findAllAccessories();
 
             List<AccessoryItem> filtered = all.stream()
                     .filter(pk -> input.keyword == null || pk.getTenSanPham().toLowerCase().contains(input.keyword.toLowerCase()))
