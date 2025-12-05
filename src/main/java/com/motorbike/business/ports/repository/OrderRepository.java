@@ -31,4 +31,7 @@ public interface OrderRepository {
     
     
     boolean existsById(Long orderId);
+    
+    
+    List<DonHang> searchOrders(String keyword);
 }

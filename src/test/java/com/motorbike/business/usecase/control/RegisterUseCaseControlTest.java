@@ -390,6 +390,25 @@ public class RegisterUseCaseControlTest {
 		@Override
 		public void updateLastLogin(Long userId) {
 		}
+		
+		@Override
+		public java.util.List<TaiKhoan> findAll() {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public void deleteById(Long userId) {
+		}
+		
+		@Override
+		public boolean existsById(Long userId) {
+			return false;
+		}
+		
+		@Override
+		public java.util.List<TaiKhoan> searchUsers(String keyword) {
+			return new java.util.ArrayList<>();
+		}
 	}
 	
 	private static class MockCartRepository implements CartRepository {

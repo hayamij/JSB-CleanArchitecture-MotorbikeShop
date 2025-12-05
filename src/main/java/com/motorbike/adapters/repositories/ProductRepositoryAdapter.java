@@ -46,6 +46,31 @@ public class ProductRepositoryAdapter implements ProductRepository {
                 .collect(java.util.stream.Collectors.toList());
     }
     
+    @Override
+    public void deleteById(Long productId) {
+        jpaRepository.deleteById(productId);
+    }
+    
+    @Override
+    public java.util.List<PhuKienXeMay> findAllAccessories() {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity instanceof PhuKienXeMayJpaEntity)
+                .map(entity -> (PhuKienXeMay) toDomain(entity))
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    @Override
+    public java.util.List<PhuKienXeMay> searchAccessories(String keyword) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity instanceof PhuKienXeMayJpaEntity)
+                .filter(entity -> 
+                    entity.getTenSanPham().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getMoTa() != null && entity.getMoTa().toLowerCase().contains(keyword.toLowerCase()))
+                )
+                .map(entity -> (PhuKienXeMay) toDomain(entity))
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
     
     private SanPham toDomain(SanPhamJpaEntity jpaEntity) {
         if (jpaEntity instanceof XeMayJpaEntity) {

@@ -76,6 +76,19 @@ public class OrderRepositoryAdapter implements OrderRepository {
         return jpaRepository.existsById(orderId);
     }
     
+    @Override
+    public List<DonHang> searchOrders(String keyword) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> 
+                    entity.getMaDonHang().toString().contains(keyword) ||
+                    entity.getTenNguoiNhan().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getSoDienThoai() != null && entity.getSoDienThoai().contains(keyword)) ||
+                    entity.getTrangThai().toLowerCase().contains(keyword.toLowerCase())
+                )
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+    
     
     
     private DonHang toDomain(DonHangJpaEntity jpaEntity) {

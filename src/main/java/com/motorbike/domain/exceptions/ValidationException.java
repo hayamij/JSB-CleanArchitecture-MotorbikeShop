@@ -173,4 +173,24 @@ public class ValidationException extends IllegalArgumentException {
     public static ValidationException invalidOrderPrice(String message) {
         return new ValidationException(message, "INVALID_PRICE");
     }
+    
+    public static ValidationException invalidStock() {
+        return new ValidationException("Số lượng tồn kho không hợp lệ", "INVALID_STOCK");
+    }
+    
+    public static ValidationException invalidOrderId() {
+        return new ValidationException("Mã đơn hàng không hợp lệ", "INVALID_ORDER_ID");
+    }
+    
+    public static ValidationException fieldRequired(String fieldName) {
+        return new ValidationException(fieldName + " không được để trống", "FIELD_REQUIRED");
+    }
+    
+    public static ValidationException invalidYear() {
+        return new ValidationException("Năm sản xuất không hợp lệ", "INVALID_YEAR");
+    }
+    
+    public static ValidationException invalidEngineCapacity() {
+        return new ValidationException("Dung tích động cơ không hợp lệ", "INVALID_ENGINE_CAPACITY");
+    }
 }

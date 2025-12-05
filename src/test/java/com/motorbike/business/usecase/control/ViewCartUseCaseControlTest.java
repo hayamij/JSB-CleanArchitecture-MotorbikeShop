@@ -20,6 +20,7 @@ import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.XeMay;
+import com.motorbike.domain.entities.PhuKienXeMay;
 
 public class ViewCartUseCaseControlTest {
 
@@ -281,6 +282,20 @@ public class ViewCartUseCaseControlTest {
 		
 		@Override
 		public List<SanPham> findAll() {
+			return Collections.emptyList();
+		}
+		
+		@Override
+		public void deleteById(Long productId) {
+		}
+		
+		@Override
+		public List<PhuKienXeMay> findAllAccessories() {
+			return Collections.emptyList();
+		}
+		
+		@Override
+		public List<PhuKienXeMay> searchAccessories(String keyword) {
 			return Collections.emptyList();
 		}
 	}

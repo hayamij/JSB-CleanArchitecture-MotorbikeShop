@@ -105,4 +105,25 @@ public class DomainException extends RuntimeException {
             "NO_STOCK_TO_RESTORE"
         );
     }
+    
+    public static DomainException productNotFound(Long productId) {
+        return new DomainException("Không tìm thấy sản phẩm với mã: " + productId, "PRODUCT_NOT_FOUND");
+    }
+    
+    public static DomainException productNotMotorbike() {
+        return new DomainException("Sản phẩm không phải là xe máy", "PRODUCT_NOT_MOTORBIKE");
+    }
+    
+    public static DomainException productNotAccessory() {
+        return new DomainException("Sản phẩm không phải là phụ kiện", "PRODUCT_NOT_ACCESSORY");
+    }
+    
+    // ===== ORDER =====
+    public static DomainException orderNotFound(Long orderId) {
+        return new DomainException("Không tìm thấy đơn hàng với mã: " + orderId, "ORDER_NOT_FOUND");
+    }
+    
+    public static DomainException userNotFound(Long userId) {
+        return new DomainException("Không tìm thấy tài khoản với mã: " + userId, "USER_NOT_FOUND");
+    }
 }

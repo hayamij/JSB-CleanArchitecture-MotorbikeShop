@@ -1,7 +1,9 @@
 package com.motorbike.business.ports.repository;
 
 import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.entities.PhuKienXeMay;
 import java.util.Optional;
+import java.util.List;
 
 public interface ProductRepository {
     
@@ -15,5 +17,14 @@ public interface ProductRepository {
     boolean existsById(Long productId);
     
     
-    java.util.List<SanPham> findAll();
+    List<SanPham> findAll();
+    
+    
+    void deleteById(Long productId);
+    
+    
+    List<PhuKienXeMay> findAllAccessories();
+    
+    
+    List<PhuKienXeMay> searchAccessories(String keyword);
 }

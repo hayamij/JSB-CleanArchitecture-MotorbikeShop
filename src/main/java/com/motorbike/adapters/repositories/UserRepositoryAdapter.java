@@ -50,6 +50,35 @@ public class UserRepositoryAdapter implements UserRepository {
         });
     }
     
+    @Override
+    public java.util.List<TaiKhoan> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(this::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    @Override
+    public void deleteById(Long userId) {
+        jpaRepository.deleteById(userId);
+    }
+    
+    @Override
+    public boolean existsById(Long userId) {
+        return jpaRepository.existsById(userId);
+    }
+    
+    @Override
+    public java.util.List<TaiKhoan> searchUsers(String keyword) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> 
+                    entity.getEmail().toLowerCase().contains(keyword.toLowerCase()) ||
+                    entity.getTenDangNhap().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getSoDienThoai() != null && entity.getSoDienThoai().contains(keyword))
+                )
+                .map(this::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
     
     private TaiKhoan toDomain(TaiKhoanJpaEntity jpaEntity) {
         return new TaiKhoan(

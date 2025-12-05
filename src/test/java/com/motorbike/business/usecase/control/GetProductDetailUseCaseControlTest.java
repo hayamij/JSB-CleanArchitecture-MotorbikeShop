@@ -292,5 +292,19 @@ public class GetProductDetailUseCaseControlTest {
 		public java.util.List<com.motorbike.domain.entities.SanPham> findAll() {
 			return new java.util.ArrayList<>();
 		}
+		
+		@Override
+		public void deleteById(Long productId) {
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> findAllAccessories() {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
+			return new java.util.ArrayList<>();
+		}
 	}
 }

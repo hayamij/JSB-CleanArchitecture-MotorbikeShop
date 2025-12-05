@@ -44,6 +44,24 @@ public class MotorbikeRepositoryAdapter implements MotorbikeRepository {
     public void deleteById(Long id) {
         xeMayJpaRepository.deleteById(id);
     }
+    
+    @Override
+    public boolean existsById(Long id) {
+        return xeMayJpaRepository.existsById(id);
+    }
+    
+    @Override
+    public List<XeMay> searchMotorbikes(String keyword) {
+        return xeMayJpaRepository.findAll().stream()
+                .filter(entity -> 
+                    entity.getTenSanPham().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getMoTa() != null && entity.getMoTa().toLowerCase().contains(keyword.toLowerCase())) ||
+                    entity.getHangXe().toLowerCase().contains(keyword.toLowerCase()) ||
+                    entity.getDongXe().toLowerCase().contains(keyword.toLowerCase())
+                )
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
 
     // ================= MAPPER =================
 
