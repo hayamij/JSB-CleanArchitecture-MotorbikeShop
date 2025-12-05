@@ -78,7 +78,7 @@ public class AuthController {
         if (loginViewModel.success) {
             LoginResponse response = new LoginResponse(
                 true, loginViewModel.userId, loginViewModel.email,
-                loginViewModel.username, loginViewModel.roleDisplay,
+                loginViewModel.username, loginViewModel.role,
                 loginViewModel.cartId, loginViewModel.cartMerged, loginViewModel.mergedItemsCount,
                 loginViewModel.message, null, null
             );

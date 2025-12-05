@@ -78,6 +78,13 @@ public class OrderRepositoryAdapter implements OrderRepository {
     
     @Override
     public List<DonHang> searchOrders(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            // Return all orders if no keyword
+            return jpaRepository.findAll().stream()
+                    .map(this::toDomain)
+                    .collect(Collectors.toList());
+        }
+        
         return jpaRepository.findAll().stream()
                 .filter(entity -> 
                     entity.getMaDonHang().toString().contains(keyword) ||

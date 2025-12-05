@@ -250,18 +250,19 @@ INSERT INTO tai_khoan (ma_tai_khoan, email, ten_dang_nhap, mat_khau, so_dien_tho
 (1, N'admin@motorbike.com', N'admin', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0901234567', N'Ha Noi', N'ADMIN'),
 (2, N'customer1@gmail.com', N'customer1', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0912345678', N'TP.HCM', N'CUSTOMER'),
 (3, N'customer2@gmail.com', N'customer2', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0923456789', N'Da Nang', N'CUSTOMER'),
-(4, N'admin@gmail.com', N'admin', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0909999999', N'Ha Noi', N'ADMIN');
+(4, N'admin@gmail.com', N'admin2', N'123', N'0909999999', N'Ha Noi', N'ADMIN');
+(5, N'user@gmail.com', N'user1', N'user', N'0911111111', N'TP.HCM', N'CUSTOMER');
 SET IDENTITY_INSERT tai_khoan OFF;
 GO
 
 -- Sample motorbikes (xe_may)
 SET IDENTITY_INSERT san_pham ON;
 INSERT INTO san_pham (ma_san_pham, ten_san_pham, mo_ta, gia, hinh_anh, so_luong_ton_kho, con_hang, loai_san_pham) VALUES
-(1, N'Honda Winner X', N'Xe the thao phan khoi 150cc, dong co manh me', 46000000.00, N'/images/honda-winner-x.jpg', 10, 1, N'XE_MAY'),
-(2, N'Yamaha Exciter 155', N'Xe con tay the thao, thiet ke tre trung', 47000000.00, N'/images/yamaha-exciter-155.jpg', 15, 1, N'XE_MAY'),
-(3, N'Honda Vision', N'Xe tay ga cao cap, tien nghi', 30000000.00, N'/images/honda-vision.jpg', 20, 1, N'XE_MAY'),
-(4, N'SYM Star SR 170', N'Xe the thao phan khoi 170cc', 52000000.00, N'/images/sym-star-sr-170.jpg', 8, 1, N'XE_MAY'),
-(5, N'Yamaha Sirius', N'Xe so tiet kiem nhien lieu', 21000000.00, N'/images/yamaha-sirius.jpg', 25, 1, N'XE_MAY');
+-- (1, N'Honda Winner X', N'Xe the thao phan khoi 150cc, dong co manh me', 46000000.00, N'/images/honda-winner-x.jpg', 10, 1, N'XE_MAY'),
+-- (2, N'Yamaha Exciter 155', N'Xe con tay the thao, thiet ke tre trung', 47000000.00, N'/images/yamaha-exciter-155.jpg', 15, 1, N'XE_MAY'),
+-- (3, N'Honda Vision', N'Xe tay ga cao cap, tien nghi', 30000000.00, N'/images/honda-vision.jpg', 20, 1, N'XE_MAY'),
+-- (4, N'SYM Star SR 170', N'Xe the thao phan khoi 170cc', 52000000.00, N'/images/sym-star-sr-170.jpg', 8, 1, N'XE_MAY'),
+-- (5, N'Yamaha Sirius', N'Xe so tiet kiem nhien lieu', 21000000.00, N'/images/yamaha-sirius.jpg', 25, 1, N'XE_MAY'),
 (6, N'Honda Wave Alpha 110', N'Xe so nho gon, tiet kiem', 18000000.00, N'https://www.hongliyangzhi.com/manufacturers/honda/honda-wave/honda-wave-110/honda-wave-110-3.jpg', 30, 1, N'XE_MAY'),
 (7, N'Yamaha NVX 155', N'Xe tay ga the thao, dong co 155cc', 55000000.00, N'https://www.bikesrepublic.com/wp-content/uploads/2022/10/2022-yamaha-nvx-155-2-1024x683.jpg', 12, 1, N'XE_MAY'),
 (8, N'Honda Air Blade 125', N'Xe tay ga thiet ke hien dai, tien nghi', 40000000.00, N'https://cdn.abphotos.link/photos/resized/640x/2024/06/01/1717213606_xZmz0vg6rVN3eFiP_1717217919-phpktceyd.png', 18, 1, N'XE_MAY'),
@@ -290,7 +291,7 @@ INSERT INTO xe_may (ma_san_pham, hang_xe, dong_xe, mau_sac, nam_san_xuat, dung_t
 (2, N'Yamaha', N'Exciter 155', N'Xanh GP', 2025, 155),
 (3, N'Honda', N'Vision', N'Trang', 2025, 110),
 (4, N'SYM', N'Star SR', N'Den', 2024, 170),
-(5, N'Yamaha', N'Sirius', N'Xanh den', 2025, 110);
+(5, N'Yamaha', N'Sirius', N'Xanh den', 2025, 110),
 (6, N'Honda', N'Wave Alpha', N'Xanh trang', 2024, 110),
 (7, N'Yamaha', N'NVX 155', N'Den xam', 2025, 155),
 (8, N'Honda', N'Air Blade', N'Bac', 2024, 125),
@@ -316,16 +317,16 @@ GO
 -- Sample accessories (phu_kien_xe_may)
 SET IDENTITY_INSERT san_pham ON;
 INSERT INTO san_pham (ma_san_pham, ten_san_pham, mo_ta, gia, hinh_anh, so_luong_ton_kho, con_hang, loai_san_pham) VALUES
-(26, N'Mu bao hiem fullface Royal M139', N'Mu bao hiem cao cap, dat chuan an toan', 850000.00, N'/images/helmet-royal.jpg', 50, 1, N'PHU_KIEN'),
-(27, N'Gang tay Komine GK-162', N'Gang tay bao ho chong truot', 450000.00, N'/images/gloves-komine.jpg', 100, 1, N'PHU_KIEN'),
-(28, N'Ao mua Givi', N'Ao mua cao cap, chong tham tot', 250000.00, N'/images/raincoat-givi.jpg', 150, 1, N'PHU_KIEN'),
-(29, N'Kinh mu bao hiem Bulldog', N'Kinh chong bui, chong tia UV', 120000.00, N'/images/visor-bulldog.jpg', 200, 1, N'PHU_KIEN'),
-(30, N'Khoa dia Kinbar', N'Khoa dia chong trom cao cap', 350000.00, N'/images/lock-kinbar.jpg', 80, 1, N'PHU_KIEN'),
+-- (26, N'Mu bao hiem fullface Royal M139', N'Mu bao hiem cao cap, dat chuan an toan', 850000.00, N'/images/helmet-royal.jpg', 50, 1, N'PHU_KIEN'),
+-- (27, N'Gang tay Komine GK-162', N'Gang tay bao ho chong truot', 450000.00, N'/images/gloves-komine.jpg', 100, 1, N'PHU_KIEN'),
+-- (28, N'Ao mua Givi', N'Ao mua cao cap, chong tham tot', 250000.00, N'/images/raincoat-givi.jpg', 150, 1, N'PHU_KIEN'),
+-- (29, N'Kinh mu bao hiem Bulldog', N'Kinh chong bui, chong tia UV', 120000.00, N'/images/visor-bulldog.jpg', 200, 1, N'PHU_KIEN'),
+-- (30, N'Khoa dia Kinbar', N'Khoa dia chong trom cao cap', 350000.00, N'/images/lock-kinbar.jpg', 80, 1, N'PHU_KIEN'),
 (31, N'Tui dung do xe may', N'Tui dung do tien ich cho xe may', 150000.00, N'https://img.lazcdn.com/g/ff/kf/S09c8be1913904a9eb1c2eab6b68e7de12.jpg_720x720q80.jpg_.webp', 120, 1, N'PHU_KIEN'),
 (32, N'Dau nhot xe may Motul', N'Dau nhot cao cap cho dong co xe may', 300000.00, N'https://phutungchinhhieu.vn/wp-content/uploads/2020/06/nhot-xe-may-motul-scooter-5w-40-1l.jpg', 90, 1, N'PHU_KIEN'),
 (33, N'Binh xit rua xe', N'Binh xit rua xe tien loi', 200000.00, N'https://maynenkhiruaxe.com/wp-content/uploads/2023/04/binh-xit-nuoc-rua-xe-1.jpg', 110, 1, N'PHU_KIEN'),
 (34, N'Den led xe may Philips', N'Den led nang cao tam nhin ban dem', 400000.00, N'https://ledoto.net/wp-content/uploads/2020/07/Philips-led-m5-hs1-100.jpg', 70, 1, N'PHU_KIEN'),
-(35, N'Bao ve binh xang xe may', N'Bao ve binh xang chong va cham', 180000.00, N'https://m.media-amazon.com/images/I/61nx21BfHpL._AC_SY300_SX300_QL70_FMwebp_.jpg', 130, 1, N'PHU_KIEN'),
+(35, N'Bao ve binh xang xe may', N'Bao ve binh xang chong va cham', 180000.00, N'https://m.media-amazon.com/images/I/61nx21BfHpL._AC_SY300_SX300_QL70_FMwebp_.jpg', 130, 1, N'PHU_KIEN');
 SET IDENTITY_INSERT san_pham OFF;
 GO
 
@@ -334,7 +335,7 @@ INSERT INTO phu_kien_xe_may (ma_san_pham, loai_phu_kien, thuong_hieu, chat_lieu,
 (2, N'Gang tay', N'Komine', N'Da + vai', N'XL'),
 (3, N'Ao mua', N'Givi', N'Vai PVC', N'L'),
 (4, N'Kinh mu bao hiem', N'Bulldog', N'Polycarbonate', N'Universal'),
-(5, N'Khoa dia', N'Kinbar', N'Thep hop kim', N'Universal');
+(5, N'Khoa dia', N'Kinbar', N'Thep hop kim', N'Universal'),
 (6, N'Tui dung do', N'Tui dung do tien ich', N'Vai Oxford', N'Universal'),
 (7, N'Dau nhot', N'Motul', N'Dau nhot tong hop', N'1L'),
 (8, N'Binh xit rua xe', N'Tien loi', N'Nhua cao cap', N'1.5L'),

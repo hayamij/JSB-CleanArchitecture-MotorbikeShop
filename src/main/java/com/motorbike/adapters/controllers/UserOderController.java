@@ -17,7 +17,7 @@ import com.motorbike.business.dto.cancelorder.CancelOrderInputData;
 import com.motorbike.business.usecase.control.CancelOrderUseCaseControl;
 
 @RestController
-@RequestMapping("/api/user/orders")
+@RequestMapping("/api/orders")
 @CrossOrigin(origins = "*")
 public class UserOderController {
     private final CancelOrderUseCaseControl cancelOrderUseCase;

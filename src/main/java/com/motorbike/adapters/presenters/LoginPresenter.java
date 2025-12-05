@@ -37,6 +37,7 @@ public class LoginPresenter implements LoginOutputBoundary {
         viewModel.email = outputData.getEmail();
         viewModel.username = outputData.getUsername();
         
+        viewModel.role = outputData.getRole() != null ? outputData.getRole().name() : null;
         viewModel.roleDisplay = formatRoleDisplay(outputData.getRole());
         
         viewModel.lastLoginDisplay = formatDateTime(outputData.getLastLoginAt());
