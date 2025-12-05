@@ -31,8 +31,8 @@ public class AdminOrderController {
     }
     @GetMapping("/all")
     public ResponseEntity<ListAllOrdersResponse> listAllOrders() {
-// InputData mới: lấy tất cả đơn hàng, không filter
-    ListAllOrdersInputData inputData = ListAllOrdersInputData.getAllOrders();
+    // Admin only: lấy tất cả đơn hàng
+    ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
 
     // Gọi use case
     listAllOrdersUseCase.execute(inputData);

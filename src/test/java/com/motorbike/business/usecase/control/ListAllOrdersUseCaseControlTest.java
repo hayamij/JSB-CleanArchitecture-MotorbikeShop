@@ -44,7 +44,7 @@ class ListAllOrdersUseCaseControlTest {
         List<DonHang> mockOrders = createMockOrders(5);
         when(orderRepository.findAll()).thenReturn(mockOrders);
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.getAllOrders();
+        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
         listAllOrdersUseCase.execute(inputData);
 
         verify(orderRepository).findAll();
@@ -64,7 +64,7 @@ class ListAllOrdersUseCaseControlTest {
     void testListAllOrdersEmptyResult() {
         when(orderRepository.findAll()).thenReturn(new ArrayList<>());
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.getAllOrders();
+        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
         listAllOrdersUseCase.execute(inputData);
 
         ArgumentCaptor<ListAllOrdersOutputData> captor =
@@ -97,7 +97,7 @@ class ListAllOrdersUseCaseControlTest {
         
         when(orderRepository.findAll()).thenReturn(mockOrders);
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.getAllOrders();
+        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
         listAllOrdersUseCase.execute(inputData);
 
         ArgumentCaptor<ListAllOrdersOutputData> captor =
@@ -135,7 +135,7 @@ class ListAllOrdersUseCaseControlTest {
         List<DonHang> mockOrders = createMockOrders(1);
         when(orderRepository.findAll()).thenReturn(mockOrders);
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.getAllOrders();
+        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
         listAllOrdersUseCase.execute(inputData);
 
         ArgumentCaptor<ListAllOrdersOutputData> captor =
@@ -153,7 +153,7 @@ class ListAllOrdersUseCaseControlTest {
         List<DonHang> mockOrders = createMockOrders(3);
         when(orderRepository.findAll()).thenReturn(mockOrders);
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.getAllOrders();
+        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
         listAllOrdersUseCase.execute(inputData);
 
         ArgumentCaptor<ListAllOrdersOutputData> captor =

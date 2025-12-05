@@ -87,8 +87,9 @@ class CancelOrderUseCaseControlTest {
             LocalDateTime.now(), LocalDateTime.now(),
             "Mũ bảo hiểm", "Royal", "ABS + EPS", "L"
         );
-        
+        // Step 2.1: tìm thấy đơn
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        // Step 2.2.2.2: hoàn kho
         when(productRepository.findById(productId1)).thenReturn(Optional.of(motorbike));
         when(productRepository.findById(productId2)).thenReturn(Optional.of(helmet));
         when(productRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -105,7 +106,7 @@ class CancelOrderUseCaseControlTest {
         verify(productRepository, times(2)).findById(any());
         verify(productRepository, times(2)).save(any());
         verify(orderRepository).save(any(DonHang.class));
-        
+        // Step 3: trả kết quả
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -118,101 +119,110 @@ class CancelOrderUseCaseControlTest {
     }
 
     @Test
-    @DisplayName("Should fail when order status is not CHO_XAC_NHAN")
-    void testCancelOrderFailInvalidStatus() {
+    @DisplayName("KB3 - Fail when order status is invalid for cancellation")
+    void testCancelOrder_KB3_InvalidStatus() {
+
         Long orderId = 1L;
         Long userId = 2L;
-        
+
+        // Step 2.1: Tìm thấy đơn
         DonHang order = new DonHang(
             orderId, userId, null,
-            BigDecimal.valueOf(47700000),
-            TrangThaiDonHang.DA_XAC_NHAN,
-            "Nguyễn Văn A",
-            "0912345678",
-            "123 Nguyễn Trãi, Q1, TP.HCM",
-            null,
-            LocalDateTime.now(),
-            LocalDateTime.now()
+            BigDecimal.valueOf(30000000),
+            TrangThaiDonHang.DA_XAC_NHAN, // ❌ không cho phép hủy
+            null, null, null, null,
+            LocalDateTime.now(), LocalDateTime.now()
         );
-        
+
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-        
-        CancelOrderInputData inputData = new CancelOrderInputData(
-            orderId,
-            userId,
-            "Tôi muốn hủy"
-        );
-        useCase.execute(inputData);
-        
+
+        CancelOrderInputData input = new CancelOrderInputData(orderId, userId, "Hủy");
+
+        useCase.execute(input);
+
+        // Step 2.2.1: quyền hợp lệ → nhưng không được hoàn kho vì status sai
+        verify(orderRepository).findById(orderId);
+        verify(productRepository, never()).findById(any());
         verify(productRepository, never()).save(any());
         verify(orderRepository, never()).save(any());
-        
+
+        // Step 3: trả lỗi
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
-        
+
         CancelOrderOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
         assertEquals("CANNOT_CANCEL_ORDER", output.getErrorCode());
     }
 
+
     @Test
-    @DisplayName("Should fail when order not found")
-    void testCancelOrderFailNotFound() {
-        Long orderId = 999L;
-        Long userId = 2L;
-        
+    @DisplayName("KB1 - Fail when order not found")
+    void testCancelOrder_KB1_OrderNotFound() {
+
+        Long orderId = 10L;
+        Long userId = 20L;
+
+        // Step 2: Không tìm thấy đơn hàng
         when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
-        
-        CancelOrderInputData inputData = new CancelOrderInputData(
-            orderId,
-            userId,
-            "Lý do hủy"
-        );
-        useCase.execute(inputData);
-        
+
+        CancelOrderInputData input = new CancelOrderInputData(orderId, userId, "Hủy đơn");
+
+        useCase.execute(input);
+
+        // Không được kiểm tra quyền
+        verify(orderRepository).findById(orderId);
+        verify(productRepository, never()).findById(any());
+        verify(productRepository, never()).save(any());
+        verify(orderRepository, never()).save(any());
+
+        // Step 3: trả lỗi
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
-        
+
         CancelOrderOutputData output = captor.getValue();
         assertFalse(output.isSuccess());
         assertEquals("CANNOT_CANCEL_ORDER", output.getErrorCode());
     }
 
+
     @Test
-    @DisplayName("Should fail when user doesn't have permission")
-    void testCancelOrderFailPermissionDenied() {
-        Long orderId = 1L;
-        Long userId = 2L;
-        Long wrongUserId = 999L;
-        
-        DonHang order = new DonHang(
-            orderId, userId, null,
-            BigDecimal.valueOf(47700000),
-            TrangThaiDonHang.CHO_XAC_NHAN,
-            "Nguyễn Văn A",
-            "0912345678",
-            "123 Nguyễn Trãi, Q1, TP.HCM",
-            null,
-            LocalDateTime.now(),
-            LocalDateTime.now()
-        );
-        
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-        
-        CancelOrderInputData inputData = new CancelOrderInputData(
-            orderId,
-            wrongUserId,
-            "Lý do hủy"
-        );
-        useCase.execute(inputData);
-        
-        ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        CancelOrderOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("CANNOT_CANCEL_ORDER", output.getErrorCode());
-    }
+@DisplayName("KB2 - Fail when user does not have permission to cancel")
+void testCancelOrder_KB2_NoPermission() {
+
+    Long orderId = 1L;
+    Long ownerId = 2L;       // chủ đơn
+    Long wrongUserId = 999L; // user không có quyền
+
+    // Step 2.1: tìm thấy đơn
+    DonHang order = new DonHang(
+        orderId, ownerId, null,
+        BigDecimal.valueOf(20000000),
+        TrangThaiDonHang.CHO_XAC_NHAN,
+        null, null, null, null,
+        LocalDateTime.now(), LocalDateTime.now()
+    );
+
+    when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+    CancelOrderInputData input = new CancelOrderInputData(orderId, wrongUserId, "Hủy");
+
+    useCase.execute(input);
+
+    // Không được kiểm tra trạng thái nếu quyền sai
+    verify(orderRepository).findById(orderId);
+    verify(productRepository, never()).findById(any());
+    verify(productRepository, never()).save(any());
+    verify(orderRepository, never()).save(any());
+
+    ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
+    verify(outputBoundary).present(captor.capture());
+
+    CancelOrderOutputData output = captor.getValue();
+    assertFalse(output.isSuccess());
+    assertEquals("CANNOT_CANCEL_ORDER", output.getErrorCode());
+}
+
 
     @Test
     @DisplayName("Should fail with null input")
