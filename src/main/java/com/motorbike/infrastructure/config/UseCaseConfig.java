@@ -1,16 +1,5 @@
 package com.motorbike.infrastructure.config;
 
-<<<<<<< HEAD
-=======
-import com.motorbike.adapters.presenters.AddMotorbikePresenter;
-import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
-import com.motorbike.business.usecase.control.AddMotorbikeUseCaseControl;
-import com.motorbike.business.usecase.input.AddMotorbikeInputBoundary;
-import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
-import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
-
-
->>>>>>> 3b7cc6c2a83bcc28ebf2c5a6d263bf8e0fc48281
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.annotation.RequestScope;
@@ -19,11 +8,8 @@ import com.motorbike.adapters.presenters.AddMotorbikePresenter;
 import com.motorbike.adapters.presenters.AddToCartPresenter;
 import com.motorbike.adapters.presenters.CancelOrderPresenter;
 import com.motorbike.adapters.presenters.CheckoutPresenter;
-<<<<<<< HEAD
-import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
-=======
 import com.motorbike.adapters.presenters.DeleteMotorbikePresenter;
->>>>>>> 3b7cc6c2a83bcc28ebf2c5a6d263bf8e0fc48281
+import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
 import com.motorbike.adapters.presenters.GetAllMotorbikesPresenter;
 import com.motorbike.adapters.presenters.ListAllOrdersPresenter;
 import com.motorbike.adapters.presenters.LoginPresenter;
@@ -39,11 +25,8 @@ import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
 import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
-<<<<<<< HEAD
-import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
-=======
 import com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel;
->>>>>>> 3b7cc6c2a83bcc28ebf2c5a6d263bf8e0fc48281
+import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
 import com.motorbike.adapters.viewmodels.LoginViewModel;
@@ -63,11 +46,8 @@ import com.motorbike.business.usecase.control.AddMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.AddToCartUseCaseControl;
 import com.motorbike.business.usecase.control.CancelOrderUseCaseControl;
 import com.motorbike.business.usecase.control.CheckoutUseCaseControl;
-<<<<<<< HEAD
-import com.motorbike.business.usecase.control.GetAllAccessoriesUseCaseControl;
-=======
 import com.motorbike.business.usecase.control.DeleteMotorbikeUseCaseControl;
->>>>>>> 3b7cc6c2a83bcc28ebf2c5a6d263bf8e0fc48281
+import com.motorbike.business.usecase.control.GetAllAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.GetAllMotorbikesUseCaseControl;
 import com.motorbike.business.usecase.control.GetProductDetailUseCaseControl;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
@@ -78,6 +58,7 @@ import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
+import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
 import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
 import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
@@ -87,11 +68,8 @@ import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
 import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 import com.motorbike.business.usecase.output.CancelOrderOutputBoundary;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
-<<<<<<< HEAD
-import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
-=======
 import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
->>>>>>> 3b7cc6c2a83bcc28ebf2c5a6d263bf8e0fc48281
+import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.GetAllMotorbikesOutputBoundary;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
