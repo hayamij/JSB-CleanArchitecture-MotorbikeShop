@@ -2,7 +2,10 @@ package com.motorbike.adapters.controllers;
 
 import java.math.BigDecimal;
 
+import com.motorbike.adapters.dto.request.UpdateMotorbikeRequest;
+
 import com.motorbike.adapters.dto.request.AddMotorbikeRequest;
+import com.motorbike.adapters.presenters.UpdateMotorbikePresenter;
 import com.motorbike.business.dto.motorbike.AddMotorbikeInputData;
 import com.motorbike.business.usecase.input.AddMotorbikeInputBoundary;
 import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
@@ -10,10 +13,12 @@ import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
 
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
-
+import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
 import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.UpdateMotorbikeInputBoundary;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesInputData;
+import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +31,9 @@ public class MotorbikeController {
     private final AddMotorbikeInputBoundary addMotorbikeUseCase;
     private final AddMotorbikeViewModel addMotorbikeViewModel;
 
+    private final UpdateMotorbikePresenter updateMotorbikePresenter;
+    private final UpdateMotorbikeViewModel updateMotorbikeViewModel;
+
 
     private final GetAllMotorbikesInputBoundary getAllMotorbikesUseCase;
     private final GetAllMotorbikesViewModel getAllViewModel;
@@ -33,13 +41,20 @@ public class MotorbikeController {
     private final SearchMotorbikesInputBoundary searchMotorbikesUseCase;
     private final SearchMotorbikesViewModel searchViewModel;
 
+    private final UpdateMotorbikeInputBoundary updateMotorbikeUseCase;
+
+
     public MotorbikeController(
             GetAllMotorbikesInputBoundary getAllMotorbikesUseCase,
             GetAllMotorbikesViewModel getAllViewModel,
             SearchMotorbikesInputBoundary searchMotorbikesUseCase,
             SearchMotorbikesViewModel searchViewModel,
             AddMotorbikeInputBoundary addMotorbikeUseCase,
-            AddMotorbikeViewModel addMotorbikeViewModel
+            AddMotorbikeViewModel addMotorbikeViewModel,
+            UpdateMotorbikeInputBoundary updateMotorbikeUseCase,
+            UpdateMotorbikePresenter updateMotorbikePresenter,
+            UpdateMotorbikeViewModel updateMotorbikeViewModel
+
             
     ) {
         this.getAllMotorbikesUseCase = getAllMotorbikesUseCase;
@@ -48,6 +63,10 @@ public class MotorbikeController {
         this.searchViewModel = searchViewModel;
         this.addMotorbikeUseCase = addMotorbikeUseCase;
         this.addMotorbikeViewModel = addMotorbikeViewModel;
+        this.updateMotorbikeUseCase = updateMotorbikeUseCase;
+        this.updateMotorbikePresenter = updateMotorbikePresenter;
+        this.updateMotorbikeViewModel = updateMotorbikeViewModel;
+
     }
 
     // ============================
@@ -131,6 +150,44 @@ public class MotorbikeController {
         return ResponseEntity.ok(addMotorbikeViewModel.motorbike);
 
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateMotorbike(
+            @PathVariable Long id,
+            @RequestBody UpdateMotorbikeRequest request
+    ) {
+
+        UpdateMotorbikeInputData input = new UpdateMotorbikeInputData(
+                id,
+                request.name,
+                request.description,
+                request.price == null ? null : new BigDecimal(request.price.toString()),
+                request.imageUrl,
+                request.stock == null ? 0 : request.stock,
+                request.brand,
+                request.model,
+                request.color,
+                request.year == null ? 0 : request.year,
+                request.displacement == null ? 0 : request.displacement
+        );
+
+        // Gọi use case -> đi qua presenter -> presenter GÁN DATA vào bean updateMotorbikeViewModel (request-scope)
+        updateMotorbikeUseCase.execute(input);
+
+        // Lấy đúng bean đã được Spring inject ở constructor
+        UpdateMotorbikeViewModel vm = this.updateMotorbikeViewModel;
+
+        if (vm.hasError) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(vm);
+        }
+
+        // Trả ra đúng object motorbike, không phải số 1 nữa
+        return ResponseEntity.ok(vm.motorbike);
+    }
+
+
 
 
 
