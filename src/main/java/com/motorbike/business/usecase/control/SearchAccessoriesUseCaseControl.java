@@ -36,17 +36,17 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
             List<AccessoryItem> accessories = allProducts.stream()
                     .filter(p -> p instanceof PhuKienXeMay)
                     .map(p -> (PhuKienXeMay) p)
-                    .filter(a -> inputData.keyword == null || 
+                    .filter(a -> inputData == null || inputData.keyword == null || 
                             a.getTenSanPham().toLowerCase().contains(inputData.keyword.toLowerCase()) ||
                             (a.getMoTa() != null && a.getMoTa().toLowerCase().contains(inputData.keyword.toLowerCase())))
-                    .filter(a -> inputData.loaiPhuKien == null || 
+                    .filter(a -> inputData == null || inputData.loaiPhuKien == null || 
                             (a.getLoaiPhuKien() != null && a.getLoaiPhuKien().equalsIgnoreCase(inputData.loaiPhuKien)))
-                    .filter(a -> inputData.thuongHieu == null || 
+                    .filter(a -> inputData == null || inputData.thuongHieu == null || 
                             (a.getThuongHieu() != null && a.getThuongHieu().equalsIgnoreCase(inputData.thuongHieu)))
-                    .filter(a -> inputData.chatLieu == null || 
+                    .filter(a -> inputData == null || inputData.chatLieu == null || 
                             (a.getChatLieu() != null && a.getChatLieu().equalsIgnoreCase(inputData.chatLieu)))
-                    .filter(a -> inputData.minPrice == null || a.getGia().doubleValue() >= inputData.minPrice)
-                    .filter(a -> inputData.maxPrice == null || a.getGia().doubleValue() <= inputData.maxPrice)
+                    .filter(a -> inputData == null || inputData.minPrice == null || a.getGia().doubleValue() >= inputData.minPrice)
+                    .filter(a -> inputData == null || inputData.maxPrice == null || a.getGia().doubleValue() <= inputData.maxPrice)
                     .map(this::mapToAccessoryItem)
                     .collect(Collectors.toList());
 

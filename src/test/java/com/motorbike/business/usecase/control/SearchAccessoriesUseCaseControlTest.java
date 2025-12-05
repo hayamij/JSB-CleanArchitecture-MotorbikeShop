@@ -57,9 +57,9 @@ public class SearchAccessoriesUseCaseControlTest {
 		SearchAccessoriesUseCaseControl control = new SearchAccessoriesUseCaseControl(outputBoundary, accessoryRepo);
 		control.execute(null);
 		
-		// Use case catches NullPointerException and returns system error
-		assertTrue(viewModel.hasError);
-		assertNotNull(viewModel.errorMessage);
+		// With null inputData, all accessories should be returned
+		assertFalse(viewModel.hasError);
+		assertEquals(2, viewModel.accessories.size());
 	}
 
 	private static class MockAccessoryRepository implements com.motorbike.business.ports.repository.ProductRepository {
@@ -100,7 +100,7 @@ public class SearchAccessoriesUseCaseControlTest {
 
 		@Override
 		public List<com.motorbike.domain.entities.SanPham> findAll() {
-			return new ArrayList<>();
+			return new ArrayList<>(findAllAccessories());
 		}
 
 		@Override
