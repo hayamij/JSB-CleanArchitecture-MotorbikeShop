@@ -4,100 +4,123 @@ import com.motorbike.business.dto.accessory.SearchAccessoriesInputData;
 import com.motorbike.business.dto.accessory.SearchAccessoriesOutputData;
 import com.motorbike.business.dto.accessory.SearchAccessoriesOutputData.AccessoryItem;
 import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
 import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
-import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.domain.entities.SanPham;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SearchAccessoriesUseCaseControl
-    extends AbstractUseCaseControl<SearchAccessoriesInputData, SearchAccessoriesOutputBoundary>
-    implements com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary {
+public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBoundary {
 
+    private final SearchAccessoriesOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
 
-    public SearchAccessoriesUseCaseControl(SearchAccessoriesOutputBoundary outputBoundary,
-                                           ProductRepository productRepository) {
-        super(outputBoundary);
+    public SearchAccessoriesUseCaseControl(
+            SearchAccessoriesOutputBoundary outputBoundary,
+            ProductRepository productRepository
+    ) {
+        this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
     }
 
     @Override
-    protected void validateInput(SearchAccessoriesInputData inputData) {
-        // no strict validation; all fields optional
-    }
+    public void execute(SearchAccessoriesInputData inputData) {
+        SearchAccessoriesOutputData outputData = null;
+        Exception errorException = null;
 
-    @Override
-    protected void executeBusinessLogic(SearchAccessoriesInputData inputData) {
         try {
-            List<SanPham> all = productRepository.findAll();
+            List<SanPham> allProducts = productRepository.findAll();
 
-            List<AccessoryItem> result = all.stream()
+            List<AccessoryItem> accessories = allProducts.stream()
                     .filter(p -> p instanceof PhuKienXeMay)
                     .map(p -> (PhuKienXeMay) p)
-                    .filter(p -> matches(p, inputData))
-                    .map(p -> new AccessoryItem(
-                            p.getMaSanPham(),
-                            p.getTenSanPham(),
-                            p.getMoTa(),
-                            p.getGia(),
-                            p.getSoLuongTonKho(),
-                            p.getHinhAnh(),
-                            p.getLoaiPhuKien(),
-                            p.getThuongHieu(),
-                            p.getChatLieu(),
-                            p.getKichThuoc()))
+                    .filter(p -> matchesSearchCriteria(p, inputData))
+                    .map(this::mapToAccessoryItem)
                     .collect(Collectors.toList());
 
-            SearchAccessoriesOutputData out = new SearchAccessoriesOutputData(result);
-            outputBoundary.present(out);
-
+            outputData = new SearchAccessoriesOutputData(accessories);
         } catch (Exception e) {
-            SearchAccessoriesOutputData err = new SearchAccessoriesOutputData("SYSTEM_ERROR", e.getMessage());
-            outputBoundary.present(err);
+            errorException = e;
         }
+
+        if (errorException != null) {
+            outputData = new SearchAccessoriesOutputData("SYSTEM_ERROR", errorException.getMessage());
+        }
+
+        outputBoundary.present(outputData);
     }
 
-    private boolean matches(PhuKienXeMay p, SearchAccessoriesInputData q) {
-        if (q == null) return true;
-        if (q.keyword != null && !q.keyword.isEmpty()) {
-            String kw = q.keyword.toLowerCase();
-            if (!(p.getTenSanPham().toLowerCase().contains(kw) || p.getMoTa().toLowerCase().contains(kw))) {
+    private boolean matchesSearchCriteria(PhuKienXeMay accessory, SearchAccessoriesInputData criteria) {
+        if (criteria == null) {
+            return true;
+        }
+
+        // Tìm kiếm theo keyword trong tên hoặc mô tả
+        if (criteria.keyword != null && !criteria.keyword.isEmpty()) {
+            String keyword = criteria.keyword.toLowerCase();
+            boolean matchesName = accessory.getTenSanPham().toLowerCase().contains(keyword);
+            boolean matchesDescription = accessory.getMoTa() != null && 
+                                        accessory.getMoTa().toLowerCase().contains(keyword);
+            if (!matchesName && !matchesDescription) {
                 return false;
             }
         }
-        if (q.type != null && !q.type.isEmpty()) {
-            if (p.getLoaiPhuKien() == null || !p.getLoaiPhuKien().toLowerCase().contains(q.type.toLowerCase()))
+
+        // Lọc theo loại phụ kiện
+        if (criteria.type != null && !criteria.type.isEmpty()) {
+            if (accessory.getLoaiPhuKien() == null || 
+                !accessory.getLoaiPhuKien().equalsIgnoreCase(criteria.type)) {
                 return false;
+            }
         }
-        if (q.brand != null && !q.brand.isEmpty()) {
-            if (p.getThuongHieu() == null || !p.getThuongHieu().toLowerCase().contains(q.brand.toLowerCase()))
+
+        // Lọc theo thương hiệu
+        if (criteria.brand != null && !criteria.brand.isEmpty()) {
+            if (accessory.getThuongHieu() == null || 
+                !accessory.getThuongHieu().equalsIgnoreCase(criteria.brand)) {
                 return false;
+            }
         }
-        if (q.material != null && !q.material.isEmpty()) {
-            if (p.getChatLieu() == null || !p.getChatLieu().toLowerCase().contains(q.material.toLowerCase()))
+
+        // Lọc theo chất liệu
+        if (criteria.material != null && !criteria.material.isEmpty()) {
+            if (accessory.getChatLieu() == null || 
+                !accessory.getChatLieu().equalsIgnoreCase(criteria.material)) {
                 return false;
+            }
         }
-        if (q.minPrice != null) {
-            if (p.getGia().doubleValue() < q.minPrice) return false;
+
+        // Lọc theo khoảng giá tối thiểu
+        if (criteria.minPrice != null) {
+            if (accessory.getGia().doubleValue() < criteria.minPrice) {
+                return false;
+            }
         }
-        if (q.maxPrice != null) {
-            if (p.getGia().doubleValue() > q.maxPrice) return false;
+
+        // Lọc theo khoảng giá tối đa
+        if (criteria.maxPrice != null) {
+            if (accessory.getGia().doubleValue() > criteria.maxPrice) {
+                return false;
+            }
         }
 
         return true;
     }
 
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        SearchAccessoriesOutputData err = new SearchAccessoriesOutputData("INVALID_INPUT", e.getMessage());
-        outputBoundary.present(err);
-    }
-
-    @Override
-    protected void handleSystemError(Exception e) {
-        SearchAccessoriesOutputData err = new SearchAccessoriesOutputData("SYSTEM_ERROR", e.getMessage());
-        outputBoundary.present(err);
+    private AccessoryItem mapToAccessoryItem(PhuKienXeMay accessory) {
+        return new AccessoryItem(
+                accessory.getMaSanPham(),
+                accessory.getTenSanPham(),
+                accessory.getMoTa(),
+                accessory.getGia(),
+                accessory.getSoLuongTonKho(),
+                accessory.getHinhAnh(),
+                accessory.getLoaiPhuKien(),
+                accessory.getThuongHieu(),
+                accessory.getChatLieu(),
+                accessory.getKichThuoc()
+        );
     }
 }

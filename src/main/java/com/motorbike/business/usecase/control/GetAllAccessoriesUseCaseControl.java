@@ -5,71 +5,61 @@ import com.motorbike.business.dto.accessory.GetAllAccessoriesOutputData.Accessor
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
 import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
-import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.domain.entities.SanPham;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetAllAccessoriesUseCaseControl
-    extends AbstractUseCaseControl<Void, GetAllAccessoriesOutputBoundary> implements GetAllAccessoriesInputBoundary {
+public class GetAllAccessoriesUseCaseControl implements GetAllAccessoriesInputBoundary {
 
+    private final GetAllAccessoriesOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
 
-    public GetAllAccessoriesUseCaseControl(GetAllAccessoriesOutputBoundary outputBoundary,
-                                          ProductRepository productRepository) {
-        super(outputBoundary);
+    public GetAllAccessoriesUseCaseControl(
+            GetAllAccessoriesOutputBoundary outputBoundary,
+            ProductRepository productRepository
+    ) {
+        this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
     }
 
     @Override
-    protected void validateInput(Void inputData) {
-        // no input
-    }
+    public void execute(Void inputData) {
+        GetAllAccessoriesOutputData outputData = null;
+        Exception errorException = null;
 
-    @Override
-    protected void executeBusinessLogic(Void inputData) {
         try {
             List<SanPham> allProducts = productRepository.findAll();
 
             List<AccessoryItem> accessories = allProducts.stream()
                     .filter(p -> p instanceof PhuKienXeMay)
-                    .map(p -> mapToItem((PhuKienXeMay) p))
+                    .map(p -> {
+                        PhuKienXeMay pk = (PhuKienXeMay) p;
+                        return new AccessoryItem(
+                                pk.getMaSanPham(),
+                                pk.getTenSanPham(),
+                                pk.getMoTa(),
+                                pk.getGia(),
+                                pk.getSoLuongTonKho(),
+                                pk.getHinhAnh(),
+                                pk.getLoaiPhuKien(),
+                                pk.getThuongHieu(),
+                                pk.getChatLieu(),
+                                pk.getKichThuoc()
+                        );
+                    })
                     .collect(Collectors.toList());
 
-            GetAllAccessoriesOutputData outputData = new GetAllAccessoriesOutputData(accessories);
-            outputBoundary.present(outputData);
-
+            outputData = new GetAllAccessoriesOutputData(accessories);
         } catch (Exception e) {
-            GetAllAccessoriesOutputData error = new GetAllAccessoriesOutputData("SYSTEM_ERROR", e.getMessage());
-            outputBoundary.present(error);
+            errorException = e;
         }
-    }
 
-    private AccessoryItem mapToItem(PhuKienXeMay p) {
-        return new AccessoryItem(
-                p.getMaSanPham(),
-                p.getTenSanPham(),
-                p.getMoTa(),
-                p.getGia(),
-                p.getSoLuongTonKho(),
-                p.getHinhAnh(),
-                p.getLoaiPhuKien(),
-                p.getThuongHieu(),
-                p.getChatLieu(),
-                p.getKichThuoc()
-        );
-    }
+        if (errorException != null) {
+            outputData = new GetAllAccessoriesOutputData("SYSTEM_ERROR", errorException.getMessage());
+        }
 
-    @Override
-    protected void handleValidationError(IllegalArgumentException e) {
-        GetAllAccessoriesOutputData error = new GetAllAccessoriesOutputData("INVALID_INPUT", e.getMessage());
-        outputBoundary.present(error);
-    }
-
-    @Override
-    protected void handleSystemError(Exception e) {
-        GetAllAccessoriesOutputData error = new GetAllAccessoriesOutputData("SYSTEM_ERROR", e.getMessage());
-        outputBoundary.present(error);
+        outputBoundary.present(outputData);
     }
 }

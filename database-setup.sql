@@ -261,25 +261,25 @@ INSERT INTO san_pham (ma_san_pham, ten_san_pham, mo_ta, gia, hinh_anh, so_luong_
 (3, N'Honda Vision', N'Xe tay ga cao cap, tien nghi', 30000000.00, N'/images/honda-vision.jpg', 20, 1, N'XE_MAY'),
 (4, N'SYM Star SR 170', N'Xe the thao phan khoi 170cc', 52000000.00, N'/images/sym-star-sr-170.jpg', 8, 1, N'XE_MAY'),
 (5, N'Yamaha Sirius', N'Xe so tiet kiem nhien lieu', 21000000.00, N'/images/yamaha-sirius.jpg', 25, 1, N'XE_MAY');
-(6, N'Honda Wave Alpha 110', N'Xe so nho gon, tiet kiem', 18000000.00, N'https://www.hongliyangzhi.com/manufacturers/honda/honda-wave/honda-wave-110/honda-wave-110-3.jpg', 30, 1, N'XE_MAY');
-(7, N'Yamaha NVX 155', N'Xe tay ga the thao, dong co 155cc', 55000000.00, N'https://www.bikesrepublic.com/wp-content/uploads/2022/10/2022-yamaha-nvx-155-2-1024x683.jpg', 12, 1, N'XE_MAY');
-(8, N'Honda Air Blade 125', N'Xe tay ga thiet ke hien dai, tien nghi', 40000000.00, N'https://cdn.abphotos.link/photos/resized/640x/2024/06/01/1717213606_xZmz0vg6rVN3eFiP_1717217919-phpktceyd.png', 18, 1, N'XE_MAY');
-(9, N'SYM Attila Elizabeth', N'Xe tay ga thoi trang, phu hop di trong thanh pho', 28000000.00, N'https://imgcdn.zigwheels.my/large/gallery/color/70/987/sym-attila-elizabeth-color-342469.jpg', 22, 1, N'XE_MAY');
-(10, N'Yamaha Janus', N'Xe tay ga nhe nhang, tiet kiem nhien lieu', 25000000.00, N'https://yamahatownnamtien.com/uploads/source/san-pham/janus-tieu-chuan/2022/new-janus-red-metallic-004.png', 28, 1, N'XE_MAY');
-(11, N'Honda CBR150R', N'Xe the thao phan khoi lon, thiet ke aerodynamically', 75000000.00, N'https://product.hstatic.net/200000712539/product/honda-cbr150r-dac-biet-den-xam_2df0cdd3596d4f37874bc69ecf9767dc_master.png', 5, 1, N'XE_MAY');
-(12, N'Kawasaki Ninja 400', N'Xe the thao phan khoi lon, dong co manh me', 180000000.00, N'https://m.media-amazon.com/images/I/71By7iLJoxL._AC_SX679_.jpg', 7, 1, N'XE_MAY');
-(13, N'Suzuki GSX-R150', N'Xe the thao phan khoi 150cc, thiet ke hien dai', 60000000.00, N'https://www.suzukisingapore.com.sg/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FGSX-R150_YSF_Diagonal.969e795b.jpeg&w=1920&q=75', 9, 1, N'XE_MAY');
-(14, N'Piaggio Liberty S 125', N'Xe tay ga thoi trang, phu hop di trong thanh pho', 70000000.00, N'https://images.piaggio.com/piaggio/vehicles/nclq000u28/nclqd27u28/nclqd27u28-01-m.png', 14, 1, N'XE_MAY');
-(15, N'Vespa Primavera 150', N'Xe tay ga cao cap, thiet ke doc dao', 120000000.00, N'https://wlassets.vespa.com/wlassets/vespa/master/APAC/Primavera/2025/2025-launch-Primavera-STD/(3840x1646)Vespa_Product_Prima/original/%283840x1646%29Vespa_Product_Prima.jpg?1748244709819', 6, 1, N'XE_MAY');
-(16, N'Honda SH 150i', N'Xe tay ga cao cap, dong co 150cc', 95000000.00, N'https://motonewsworld.com/wp-content/uploads/2022/11/2023-honda-sh150i-Hyper-Red-right-side-800x445.jpg', 11, 1, N'XE_MAY');
-(17, N'Yamaha TFX 150', N'Xe the thao phan khoi 150cc, thiet ke hung du', 52000000.00, N'https://insideracing.com.ph/wp-content/uploads/2019/01/RA6_3875.jpg', 13, 1, N'XE_MAY');
-(18, N'Honda CB150R Exmotion', N'Xe the thao phan khoi 150cc, thiet ke hien dai', 60000000.00, N'https://autobikes.vn/stores/photo_data/vantrinh/042019/12/17/5939_anh-thuc-te-honda-CB150R-Autobikes4.jpg', 4, 1, N'XE_MAY');
-(19, N'SYM Wolf 125', N'Xe so nhe nhang, tiet kiem nhien lieu', 22000000.00, N'https://autocity.com/wp-content/uploads/images/0/2/98502_sym-wolf-125-1.jpg', 16, 1, N'XE_MAY');
-(20, N'KTM Duke 200', N'Xe the thao phan khoi lon, dong co manh me', 90000000.00, N'https://media.zigcdn.com/media/model/2024/Oct/front-right-view-1888583955_930x620.jpg', 3, 1, N'XE_MAY');
-(21, N'Benelli TNT 150i', N'Xe the thao phan khoi 150cc, thiet ke an tuong', 45000000.00, N'https://ivoiremoto.com/267-large_default/benelli-tnt-150i.jpg', 17, 1, N'XE_MAY');
-(22, N'Hero Splendor Plus', N'Xe so tiet kiem nhien lieu, phu hop di lai hang ngay', 17000000.00, N'https://www.timesbull.com/wp-content/uploads/2024/09/SPLENDER.png', 19, 1, N'XE_MAY');
-(23, N'TVS Apache RTR 160 4V', N'Xe the thao phan khoi 160cc, dong co manh me', 40000000.00, N'https://www.bikes4sale.in/pictures/default/tvs-apache-rtr-160-4v/tvs-apache-rtr-160-4v-pic-1.jpg', 2, 1, N'XE_MAY');
-(24, N'Mahindra Mojo 300', N'Xe the thao phan khoi lon, thiet ke doc dao', 130000000.00, N'https://blog.gaadikey.com/wp-content/uploads/2015/10/Mahindra-MOJO-Front.jpg', 1, 1, N'XE_MAY');
+(6, N'Honda Wave Alpha 110', N'Xe so nho gon, tiet kiem', 18000000.00, N'https://www.hongliyangzhi.com/manufacturers/honda/honda-wave/honda-wave-110/honda-wave-110-3.jpg', 30, 1, N'XE_MAY'),
+(7, N'Yamaha NVX 155', N'Xe tay ga the thao, dong co 155cc', 55000000.00, N'https://www.bikesrepublic.com/wp-content/uploads/2022/10/2022-yamaha-nvx-155-2-1024x683.jpg', 12, 1, N'XE_MAY'),
+(8, N'Honda Air Blade 125', N'Xe tay ga thiet ke hien dai, tien nghi', 40000000.00, N'https://cdn.abphotos.link/photos/resized/640x/2024/06/01/1717213606_xZmz0vg6rVN3eFiP_1717217919-phpktceyd.png', 18, 1, N'XE_MAY'),
+(9, N'SYM Attila Elizabeth', N'Xe tay ga thoi trang, phu hop di trong thanh pho', 28000000.00, N'https://imgcdn.zigwheels.my/large/gallery/color/70/987/sym-attila-elizabeth-color-342469.jpg', 22, 1, N'XE_MAY'),
+(10, N'Yamaha Janus', N'Xe tay ga nhe nhang, tiet kiem nhien lieu', 25000000.00, N'https://yamahatownnamtien.com/uploads/source/san-pham/janus-tieu-chuan/2022/new-janus-red-metallic-004.png', 28, 1, N'XE_MAY'),
+(11, N'Honda CBR150R', N'Xe the thao phan khoi lon, thiet ke aerodynamically', 75000000.00, N'https://product.hstatic.net/200000712539/product/honda-cbr150r-dac-biet-den-xam_2df0cdd3596d4f37874bc69ecf9767dc_master.png', 5, 1, N'XE_MAY'),
+(12, N'Kawasaki Ninja 400', N'Xe the thao phan khoi lon, dong co manh me', 180000000.00, N'https://m.media-amazon.com/images/I/71By7iLJoxL._AC_SX679_.jpg', 7, 1, N'XE_MAY'),
+(13, N'Suzuki GSX-R150', N'Xe the thao phan khoi 150cc, thiet ke hien dai', 60000000.00, N'https://www.suzukisingapore.com.sg/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FGSX-R150_YSF_Diagonal.969e795b.jpeg&w=1920&q=75', 9, 1, N'XE_MAY'),
+(14, N'Piaggio Liberty S 125', N'Xe tay ga thoi trang, phu hop di trong thanh pho', 70000000.00, N'https://images.piaggio.com/piaggio/vehicles/nclq000u28/nclqd27u28/nclqd27u28-01-m.png', 14, 1, N'XE_MAY'),
+(15, N'Vespa Primavera 150', N'Xe tay ga cao cap, thiet ke doc dao', 120000000.00, N'https://wlassets.vespa.com/wlassets/vespa/master/APAC/Primavera/2025/2025-launch-Primavera-STD/(3840x1646)Vespa_Product_Prima/original/%283840x1646%29Vespa_Product_Prima.jpg?1748244709819', 6, 1, N'XE_MAY'),
+(16, N'Honda SH 150i', N'Xe tay ga cao cap, dong co 150cc', 95000000.00, N'https://motonewsworld.com/wp-content/uploads/2022/11/2023-honda-sh150i-Hyper-Red-right-side-800x445.jpg', 11, 1, N'XE_MAY'),
+(17, N'Yamaha TFX 150', N'Xe the thao phan khoi 150cc, thiet ke hung du', 52000000.00, N'https://insideracing.com.ph/wp-content/uploads/2019/01/RA6_3875.jpg', 13, 1, N'XE_MAY'),
+(18, N'Honda CB150R Exmotion', N'Xe the thao phan khoi 150cc, thiet ke hien dai', 60000000.00, N'https://autobikes.vn/stores/photo_data/vantrinh/042019/12/17/5939_anh-thuc-te-honda-CB150R-Autobikes4.jpg', 4, 1, N'XE_MAY'),
+(19, N'SYM Wolf 125', N'Xe so nhe nhang, tiet kiem nhien lieu', 22000000.00, N'https://autocity.com/wp-content/uploads/images/0/2/98502_sym-wolf-125-1.jpg', 16, 1, N'XE_MAY'),
+(20, N'KTM Duke 200', N'Xe the thao phan khoi lon, dong co manh me', 90000000.00, N'https://media.zigcdn.com/media/model/2024/Oct/front-right-view-1888583955_930x620.jpg', 3, 1, N'XE_MAY'),
+(21, N'Benelli TNT 150i', N'Xe the thao phan khoi 150cc, thiet ke an tuong', 45000000.00, N'https://ivoiremoto.com/267-large_default/benelli-tnt-150i.jpg', 17, 1, N'XE_MAY'),
+(22, N'Hero Splendor Plus', N'Xe so tiet kiem nhien lieu, phu hop di lai hang ngay', 17000000.00, N'https://www.timesbull.com/wp-content/uploads/2024/09/SPLENDER.png', 19, 1, N'XE_MAY'),
+(23, N'TVS Apache RTR 160 4V', N'Xe the thao phan khoi 160cc, dong co manh me', 40000000.00, N'https://www.bikes4sale.in/pictures/default/tvs-apache-rtr-160-4v/tvs-apache-rtr-160-4v-pic-1.jpg', 2, 1, N'XE_MAY'),
+(24, N'Mahindra Mojo 300', N'Xe the thao phan khoi lon, thiet ke doc dao', 130000000.00, N'https://blog.gaadikey.com/wp-content/uploads/2015/10/Mahindra-MOJO-Front.jpg', 1, 1, N'XE_MAY'),
 (25, N'Lifan KPR 150', N'Xe the thao phan khoi 150cc, gia ca phai chang', 35000000.00, N'https://www.motorcycle.com.bd/images/bikes/Lifan-KPR-150.jpg', 20, 1, N'XE_MAY');
 SET IDENTITY_INSERT san_pham OFF;
 GO
@@ -319,12 +319,12 @@ INSERT INTO san_pham (ma_san_pham, ten_san_pham, mo_ta, gia, hinh_anh, so_luong_
 (27, N'Gang tay Komine GK-162', N'Gang tay bao ho chong truot', 450000.00, N'/images/gloves-komine.jpg', 100, 1, N'PHU_KIEN'),
 (28, N'Ao mua Givi', N'Ao mua cao cap, chong tham tot', 250000.00, N'/images/raincoat-givi.jpg', 150, 1, N'PHU_KIEN'),
 (29, N'Kinh mu bao hiem Bulldog', N'Kinh chong bui, chong tia UV', 120000.00, N'/images/visor-bulldog.jpg', 200, 1, N'PHU_KIEN'),
-(30, N'Khoa dia Kinbar', N'Khoa dia chong trom cao cap', 350000.00, N'/images/lock-kinbar.jpg', 80, 1, N'PHU_KIEN');
-(31, N'Tui dung do xe may', N'Tui dung do tien ich cho xe may', 150000.00, N'https://img.lazcdn.com/g/ff/kf/S09c8be1913904a9eb1c2eab6b68e7de12.jpg_720x720q80.jpg_.webp', 120, 1, N'PHU_KIEN');
-(32, N'Dau nhot xe may Motul', N'Dau nhot cao cap cho dong co xe may', 300000.00, N'https://phutungchinhhieu.vn/wp-content/uploads/2020/06/nhot-xe-may-motul-scooter-5w-40-1l.jpg', 90, 1, N'PHU_KIEN');
-(33, N'Binh xit rua xe', N'Binh xit rua xe tien loi', 200000.00, N'https://maynenkhiruaxe.com/wp-content/uploads/2023/04/binh-xit-nuoc-rua-xe-1.jpg', 110, 1, N'PHU_KIEN');
-(34, N'Den led xe may Philips', N'Den led nang cao tam nhin ban dem', 400000.00, N'https://ledoto.net/wp-content/uploads/2020/07/Philips-led-m5-hs1-100.jpg', 70, 1, N'PHU_KIEN');
-(35, N'Bao ve binh xang xe may', N'Bao ve binh xang chong va cham', 180000.00, N'https://m.media-amazon.com/images/I/61nx21BfHpL._AC_SY300_SX300_QL70_FMwebp_.jpg', 130, 1, N'PHU_KIEN');
+(30, N'Khoa dia Kinbar', N'Khoa dia chong trom cao cap', 350000.00, N'/images/lock-kinbar.jpg', 80, 1, N'PHU_KIEN'),
+(31, N'Tui dung do xe may', N'Tui dung do tien ich cho xe may', 150000.00, N'https://img.lazcdn.com/g/ff/kf/S09c8be1913904a9eb1c2eab6b68e7de12.jpg_720x720q80.jpg_.webp', 120, 1, N'PHU_KIEN'),
+(32, N'Dau nhot xe may Motul', N'Dau nhot cao cap cho dong co xe may', 300000.00, N'https://phutungchinhhieu.vn/wp-content/uploads/2020/06/nhot-xe-may-motul-scooter-5w-40-1l.jpg', 90, 1, N'PHU_KIEN'),
+(33, N'Binh xit rua xe', N'Binh xit rua xe tien loi', 200000.00, N'https://maynenkhiruaxe.com/wp-content/uploads/2023/04/binh-xit-nuoc-rua-xe-1.jpg', 110, 1, N'PHU_KIEN'),
+(34, N'Den led xe may Philips', N'Den led nang cao tam nhin ban dem', 400000.00, N'https://ledoto.net/wp-content/uploads/2020/07/Philips-led-m5-hs1-100.jpg', 70, 1, N'PHU_KIEN'),
+(35, N'Bao ve binh xang xe may', N'Bao ve binh xang chong va cham', 180000.00, N'https://m.media-amazon.com/images/I/61nx21BfHpL._AC_SY300_SX300_QL70_FMwebp_.jpg', 130, 1, N'PHU_KIEN'),
 SET IDENTITY_INSERT san_pham OFF;
 GO
 

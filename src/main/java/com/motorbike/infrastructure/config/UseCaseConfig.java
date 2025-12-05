@@ -322,11 +322,6 @@ public AddMotorbikeUseCaseControl addMotorbikeUseCase(
 }
 
 @Bean
-public AddMotorbikeInputBoundary addMotorbikeInputBoundary(
-        AddMotorbikeUseCaseControl useCase
-// accessories use case beans
-
-@Bean
 @RequestScope
 public GetAllAccessoriesViewModel getAllAccessoriesViewModel() {
     return new GetAllAccessoriesViewModel();
@@ -348,7 +343,7 @@ public GetAllAccessoriesOutputBoundary getAllAccessoriesPresenter(
 }
 
 @Bean
-public com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary getAllAccessoriesInputBoundary(
+public GetAllAccessoriesInputBoundary getAllAccessoriesInputBoundary(
         GetAllAccessoriesUseCaseControl useCase
 ) {
     return useCase;
@@ -359,6 +354,9 @@ public MotorbikeRepository motorbikeRepository(
         XeMayJpaRepository jpaRepository
 ) {
     return new MotorbikeRepositoryAdapter(jpaRepository);
+}
+
+@Bean
 public SearchAccessoriesInputBoundary searchAccessoriesUseCase(
         SearchAccessoriesOutputBoundary outputBoundary,
         ProductRepository productRepository
