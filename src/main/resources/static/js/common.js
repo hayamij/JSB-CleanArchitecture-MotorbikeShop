@@ -114,3 +114,117 @@ function updateNavForRole() {
         adminLink.href = 'admin.html';
     }
 }
+
+/**
+ * Guest Cart Management - LocalStorage based
+ */
+function getGuestCart() {
+    const cart = localStorage.getItem('guestCart');
+    return cart ? JSON.parse(cart) : [];
+}
+
+function saveGuestCart(cart) {
+    localStorage.setItem('guestCart', JSON.stringify(cart));
+}
+
+function addToGuestCart(productId, quantity = 1) {
+    const cart = getGuestCart();
+    const existingItem = cart.find(item => item.productId === productId);
+    
+    if (existingItem) {
+        existingItem.quantity += quantity;
+    } else {
+        cart.push({ productId, quantity });
+    }
+    
+    saveGuestCart(cart);
+    return cart;
+}
+
+function getGuestCartCount() {
+    const cart = getGuestCart();
+    return cart.reduce((total, item) => total + item.quantity, 0);
+}
+
+function clearGuestCart() {
+    localStorage.removeItem('guestCart');
+}
+
+/**
+ * Update cart badge count on navbar
+ */
+async function updateCartBadge() {
+    const cartBadge = document.getElementById('cartItems');
+    if (!cartBadge) return;
+    
+    const userId = sessionStorage.getItem('userId');
+    
+    if (!userId) {
+        // Guest user - show guest cart count
+        cartBadge.textContent = getGuestCartCount();
+        return;
+    }
+
+    // Logged-in user - fetch from server
+    try {
+        const response = await fetch(`/api/cart/${userId}`);
+        const data = await response.json();
+
+        if (data.success) {
+            cartBadge.textContent = data.totalItems || 0;
+        } else {
+            cartBadge.textContent = '0';
+        }
+    } catch (error) {
+        console.error('Error loading cart info:', error);
+        // Fallback to 0
+        cartBadge.textContent = '0';
+    }
+}
+
+/**
+ * Merge guest cart into user's cart after login/registration
+ */
+async function mergeGuestCartToUser(userId) {
+    const guestCart = getGuestCart();
+    
+    if (!guestCart || guestCart.length === 0) {
+        return { success: true, itemsMerged: 0 };
+    }
+    
+    try {
+        const mergePromises = guestCart.map(item =>
+            fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    productId: item.productId,
+                    quantity: item.quantity
+                })
+            }).then(response => response.json())
+        );
+        
+        const results = await Promise.all(mergePromises);
+        const successfulMerges = results.filter(r => r.success).length;
+        
+        // Clear guest cart after successful merge
+        clearGuestCart();
+        
+        // Update cart badge
+        await updateCartBadge();
+        
+        return {
+            success: true,
+            itemsMerged: successfulMerges,
+            totalItems: guestCart.length
+        };
+    } catch (error) {
+        console.error('Error merging guest cart:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+

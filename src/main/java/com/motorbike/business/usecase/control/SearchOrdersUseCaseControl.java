@@ -55,6 +55,20 @@ public class SearchOrdersUseCaseControl {
                                 .map(TaiKhoan::getEmail)
                                 .orElse("N/A");
                         
+                        Integer soMatHang = dh.getDanhSachSanPham() != null 
+                                ? dh.getDanhSachSanPham().size() 
+                                : 0;
+                        
+                        List<SearchOrdersOutputData.ProductItem> sanPham = dh.getDanhSachSanPham().stream()
+                                .map(ct -> new SearchOrdersOutputData.ProductItem(
+                                        ct.getMaSanPham(),
+                                        ct.getTenSanPham(),
+                                        ct.getGiaBan(),
+                                        ct.getSoLuong(),
+                                        ct.getThanhTien()
+                                ))
+                                .collect(Collectors.toList());
+                        
                         return new OrderItem(
                                 dh.getMaDonHang(),
                                 dh.getMaTaiKhoan(),
@@ -65,7 +79,9 @@ public class SearchOrdersUseCaseControl {
                                 dh.getTongTien(),
                                 dh.getTrangThai().getMoTa(),
                                 dh.getNgayDat(),
-                                dh.getNgayCapNhat()
+                                dh.getNgayCapNhat(),
+                                soMatHang,
+                                sanPham
                         );
                     })
                     .collect(Collectors.toList());

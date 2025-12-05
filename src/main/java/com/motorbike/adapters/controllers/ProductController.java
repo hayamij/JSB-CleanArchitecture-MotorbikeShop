@@ -81,11 +81,23 @@ public class ProductController {
                 productMap.put("price", product.getGia());
                 productMap.put("stock", product.getSoLuongTonKho());
                 productMap.put("imageUrl", product.getHinhAnh());
+                productMap.put("createdDate", product.getNgayTao());
                 
                 if (product instanceof XeMay) {
+                    XeMay xeMay = (XeMay) product;
                     productMap.put("category", "XE_MAY");
+                    productMap.put("brand", xeMay.getHangXe());
+                    productMap.put("model", xeMay.getDongXe());
+                    productMap.put("color", xeMay.getMauSac());
+                    productMap.put("engineCapacity", xeMay.getDungTich());
+                    productMap.put("year", xeMay.getNamSanXuat());
                 } else if (product instanceof PhuKienXeMay) {
+                    PhuKienXeMay phuKien = (PhuKienXeMay) product;
                     productMap.put("category", "PHU_KIEN");
+                    productMap.put("type", phuKien.getLoaiPhuKien());
+                    productMap.put("brand", phuKien.getThuongHieu());
+                    productMap.put("material", phuKien.getChatLieu());
+                    productMap.put("size", phuKien.getKichThuoc());
                 } else {
                     productMap.put("category", "KHAC");
                 }

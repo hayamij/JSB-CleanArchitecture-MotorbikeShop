@@ -16,9 +16,9 @@ function checkAdminAuth() {
         return false;
     }
     
-    const userName = sessionStorage.getItem('userName');
-    if (userName) {
-        document.getElementById('userName').textContent = userName;
+    const username = sessionStorage.getItem('username');
+    if (username) {
+        document.getElementById('userName').textContent = username;
     }
     
     return true;

@@ -3,7 +3,12 @@
 const API_BASE_URL = 'http://localhost:8080/api';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize navbar and footer (requires authentication)
+    initNavbar('orders', true);
+    initFooter();
+    
     if (checkAuth()) {
+        updateCartBadge();
         loadMyOrders();
     }
 });
@@ -13,10 +18,6 @@ function checkAuth() {
     if (!userId) {
         window.location.href = 'login.html';
         return false;
-    }
-    const userName = sessionStorage.getItem('userName');
-    if (userName) {
-        document.getElementById('userName').textContent = userName;
     }
     return true;
 }
@@ -40,61 +41,89 @@ async function loadMyOrders() {
     } catch (error) {
         showLoading(false);
         console.error('Error loading orders:', error);
-        showAlert('Lỗi kết nối server', 'error');
+        showToast('Lỗi kết nối server', 'error');
     }
 }
+
+let allOrders = []; // Store all orders for detail view
 
 function displayOrders(orders) {
     const container = document.getElementById('ordersContainer');
     const emptyState = document.getElementById('emptyState');
     
+    console.log('Orders data:', orders);
+    
+    // Store orders for later use
+    allOrders = orders;
+    
     container.classList.remove('hidden');
     emptyState.classList.add('hidden');
     
     container.innerHTML = orders.map(order => {
-        const statusClass = getStatusClass(order.orderStatus);
-        const canCancel = order.orderStatus === 'PENDING';
+        console.log('Order:', order);
+        
+        // Handle different possible field names
+        const orderId = order.orderId || order.id || order.maDonHang || 'undefined';
+        const status = order.orderStatus || order.status || order.trangThai || 'PENDING';
+        const customerName = order.customerName || order.tenNguoiNhan || order.receiverName || 'N/A';
+        const customerPhone = order.customerPhone || order.soDienThoai || order.phoneNumber || 'N/A';
+        const shippingAddress = order.shippingAddress || order.diaChiGiaoHang || order.address || 'N/A';
+        const orderDate = order.formattedOrderDate || order.orderDate || order.ngayDat || 'N/A';
+        const totalAmount = order.formattedTotalAmount || order.totalAmount || order.tongTien || 'N/A';
+        const totalItems = order.soMatHang || 0;
+        
+        const statusClass = getStatusClass(status);
+        const canCancel = status === 'PENDING';
         
         return `
-        <div class="order-card">
-            <div class="order-header">
-                <div class="order-id">Đơn hàng #${order.orderId}</div>
-                <div class="order-status ${statusClass}">${translateStatus(order.orderStatus)}</div>
+        <div class="order-item">
+            <div class="order-header-row">
+                <div class="order-id-section">
+                    <span class="order-label">Đơn hàng</span>
+                    <span class="order-number">#${orderId}</span>
+                </div>
+                <div class="order-status ${statusClass}">${translateStatus(status)}</div>
             </div>
             
-            <div class="order-info">
-                <div class="info-item">
-                    <span class="info-label">Người nhận</span>
-                    <span class="info-value">${order.customerName || 'N/A'}</span>
+            <div class="order-details-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Người nhận</div>
+                    <div class="detail-value">${customerName}</div>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Số điện thoại</span>
-                    <span class="info-value">${order.customerPhone || 'N/A'}</span>
+                <div class="detail-item">
+                    <div class="detail-label">Số điện thoại</div>
+                    <div class="detail-value">${customerPhone}</div>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Địa chỉ giao hàng</span>
-                    <span class="info-value">${order.shippingAddress || 'N/A'}</span>
+                <div class="detail-item">
+                    <div class="detail-label">Ngày đặt</div>
+                    <div class="detail-value">${orderDate}</div>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Ngày đặt</span>
-                    <span class="info-value">${order.formattedOrderDate || 'N/A'}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Số lượng</span>
-                    <span class="info-value">${order.totalItems || 0} mặt hàng (${order.totalQuantity || 0} sản phẩm)</span>
+                <div class="detail-item">
+                    <div class="detail-label">Số lượng</div>
+                    <div class="detail-value">${totalItems} mặt hàng</div>
                 </div>
             </div>
             
-            <div class="order-total">
-                Tổng tiền: ${order.formattedTotalAmount || 'N/A'}
+            <div class="detail-item full-width">
+                <div class="detail-label">Địa chỉ giao hàng</div>
+                <div class="detail-value">${shippingAddress}</div>
             </div>
             
-            <div class="order-actions">
-                <button class="btn-cancel-order" 
-                    ${canCancel ? '' : 'disabled'} 
-                    onclick="cancelOrder(${order.orderId})">
-                    ${canCancel ? 'Hủy đơn hàng' : 'Không thể hủy'}
-                </button>
+            <div class="order-footer">
+                <div class="order-total-section">
+                    <span class="total-label">Tổng tiền:</span>
+                    <span class="total-amount">${totalAmount}</span>
+                </div>
+                <div class="order-actions">
+                    <button class="btn-view-details" onclick="viewOrderDetail(${orderId})">
+                        Xem chi tiết
+                    </button>
+                    <button class="btn-cancel-order" 
+                        ${canCancel ? '' : 'disabled'} 
+                        onclick="cancelOrder(${orderId})">
+                        ${canCancel ? 'Hủy đơn hàng' : 'Không thể hủy'}
+                    </button>
+                </div>
             </div>
         </div>
         `;
@@ -132,14 +161,14 @@ async function cancelOrder(orderId) {
         const data = await response.json();
         
         if (data.success || response.ok) {
-            showAlert('Hủy đơn hàng thành công!', 'success');
+            showToast('Hủy đơn hàng thành công!', 'success');
             loadMyOrders();
         } else {
-            showAlert(data.errorMessage || 'Không thể hủy đơn hàng', 'error');
+            showToast(data.errorMessage || 'Không thể hủy đơn hàng', 'error');
         }
     } catch (error) {
         console.error('Error canceling order:', error);
-        showAlert('Lỗi kết nối server', 'error');
+        showToast('Lỗi kết nối server', 'error');
     }
 }
 
@@ -162,19 +191,140 @@ function showLoading(show) {
     }
 }
 
-function showAlert(message, type) {
-    const alertContainer = document.getElementById('alertContainer');
-    alertContainer.innerHTML = `
-        <div class="alert alert-${type} show">
-            <span>${message}</span>
-        </div>
-    `;
-    setTimeout(() => {
-        alertContainer.innerHTML = '';
-    }, 3000);
-}
+
 
 function logout() {
     sessionStorage.clear();
     window.location.href = 'login.html';
+}
+
+// View Order Detail
+function viewOrderDetail(orderId) {
+    console.log('Loading order detail:', orderId);
+    
+    // Find order from stored orders
+    const order = allOrders.find(o => {
+        const id = o.orderId || o.id || o.maDonHang;
+        return id == orderId;
+    });
+    
+    if (order) {
+        renderOrderDetail(order);
+        showOrderDetailSidebar();
+    } else {
+        showToast('Không tìm thấy đơn hàng', 'error');
+    }
+}
+
+function renderOrderDetail(order) {
+    console.log('Rendering order detail:', order);
+    
+    const orderId = order.orderId || order.id || order.maDonHang || 'N/A';
+    const status = order.orderStatus || order.status || order.trangThai || 'PENDING';
+    const customerName = order.customerName || order.tenNguoiNhan || order.receiverName || 'N/A';
+    const customerPhone = order.customerPhone || order.soDienThoai || order.phoneNumber || 'N/A';
+    const shippingAddress = order.shippingAddress || order.diaChiGiaoHang || order.address || 'N/A';
+    const orderDate = order.formattedOrderDate || order.orderDate || order.ngayDat || 'N/A';
+    const totalAmount = order.formattedTotalAmount || order.totalAmount || order.tongTien || 'N/A';
+    const items = order.sanPham || order.items || order.orderItems || order.chiTietDonHang || [];
+    
+    let productsHtml = '';
+    if (items && items.length > 0) {
+        productsHtml = items.map(item => {
+            const productName = item.tenSanPham || item.productName || 'N/A';
+            const price = item.giaBan || item.price || item.gia || 0;
+            const quantity = item.soLuong || item.quantity || 0;
+            const subtotal = item.thanhTien || item.subtotal || 0;
+            
+            const formattedPrice = new Intl.NumberFormat('vi-VN', { 
+                style: 'currency', 
+                currency: 'VND' 
+            }).format(price);
+            
+            const formattedSubtotal = new Intl.NumberFormat('vi-VN', { 
+                style: 'currency', 
+                currency: 'VND' 
+            }).format(subtotal);
+            
+            return `
+                <div class="detail-product-item">
+                    <div class="detail-product-info">
+                        <div class="detail-product-name">${productName}</div>
+                        <div class="detail-product-price">${formattedPrice} x ${quantity}</div>
+                    </div>
+                    <div class="detail-product-subtotal">${formattedSubtotal}</div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        productsHtml = '<p style="text-align: center; color: #666;">Không có sản phẩm</p>';
+    }
+    
+    const content = `
+        <div class="detail-section">
+            <div class="detail-section-title">Thông tin đơn hàng</div>
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Mã đơn hàng</div>
+                    <div class="detail-info-value">#${orderId}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Trạng thái</div>
+                    <div class="detail-info-value">${translateStatus(status)}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Ngày đặt</div>
+                    <div class="detail-info-value">${orderDate}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Tổng số lượng</div>
+                    <div class="detail-info-value">${items.length} sản phẩm</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <div class="detail-section-title">Thông tin người nhận</div>
+            <div class="detail-info-grid">
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Họ tên</div>
+                    <div class="detail-info-value">${customerName}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Số điện thoại</div>
+                    <div class="detail-info-value">${customerPhone}</div>
+                </div>
+            </div>
+            <div class="detail-info-item" style="margin-top: 15px;">
+                <div class="detail-info-label">Địa chỉ giao hàng</div>
+                <div class="detail-info-value">${shippingAddress}</div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <div class="detail-section-title">Danh sách sản phẩm</div>
+            <div class="detail-products-list">
+                ${productsHtml}
+            </div>
+        </div>
+        
+        <div class="detail-total-box">
+            <span class="detail-total-label">Tổng cộng</span>
+            <span class="detail-total-amount">${totalAmount}</span>
+        </div>
+    `;
+    
+    document.getElementById('orderDetailContent').innerHTML = content;
+}
+
+function showOrderDetailSidebar() {
+    document.getElementById('orderDetailOverlay').classList.add('show');
+    document.getElementById('orderDetailSidebar').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeOrderDetail() {
+    document.getElementById('orderDetailOverlay').classList.remove('show');
+    document.getElementById('orderDetailSidebar').classList.remove('show');
+    document.body.style.overflow = '';
 }

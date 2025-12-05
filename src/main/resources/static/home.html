@@ -4,29 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang chủ - Motorbike Shop</title>
-    <link rel="stylesheet" href="css/common.css?v=2">
-    <link rel="stylesheet" href="css/home.css?v=2">
+    <link rel="stylesheet" href="css/common.css?v=5">
+    <link rel="stylesheet" href="css/navbar.css?v=5">
+    <link rel="stylesheet" href="css/home.css?v=5">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="home.html" class="logo">
-                <span>Motorbike Shop</span>
-            </a>
-
-            <ul class="nav-menu">
-                <li><a href="home.html" class="active">Trang chủ</a></li>
-                <li><a href="cart.html">Giỏ hàng</a></li>
-                <li><a href="my-orders.html">Đơn hàng của tôi</a></li>
-                <li><a href="#" id="adminLink" style="display: none;">Admin Panel</a></li>
-            </ul>
-
-            <div class="user-info">
-                <span class="user-greeting">Xin chào, <span class="user-name" id="userName">User</span></span>
-                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
-            </div>
-        </div>
-    </nav>
+    <!-- Navbar will be inserted here -->
+    <div id="navbarContainer"></div>
 
     <div class="hero">
         <h1>Chào mừng đến với Motorbike Shop</h1>
@@ -34,41 +18,101 @@
     </div>
 
     <div class="main-container">
-        <h2 class="section-title">Sản phẩm nổi bật</h2>
-        <p class="section-subtitle">Khám phá các sản phẩm xe máy và phụ kiện chất lượng</p>
+        <div class="content-wrapper">
+            <!-- Sidebar Filters -->
+            <aside class="filters-sidebar">
+                <div class="sidebar-header">
+                    <h3>⚙️ Sắp xếp & Lọc</h3>
+                </div>
 
-        <div id="productsList" class="products-grid"></div>
+                <!-- Sort Section -->
+                <div class="filter-section">
+                    <h4 class="filter-section-title">Sắp xếp theo</h4>
+                    
+                    <div class="filter-item">
+                        <select id="sortBy" class="filter-select" onchange="applySortAndFilter()">
+                            <option value="default">Mặc định</option>
+                            <option value="name-asc">Tên: A → Z</option>
+                            <option value="name-desc">Tên: Z → A</option>
+                            <option value="price-asc">Giá: Thấp → Cao</option>
+                            <option value="price-desc">Giá: Cao → Thấp</option>
+                            <option value="stock-asc">Tồn kho: Ít → Nhiều</option>
+                            <option value="stock-desc">Tồn kho: Nhiều → Ít</option>
+                            <option value="date-desc">Mới nhất</option>
+                            <option value="date-asc">Cũ nhất</option>
+                        </select>
+                    </div>
+                </div>
 
-        <h2 class="section-title" style="margin-top: 60px;">Dịch vụ của chúng tôi</h2>
-        <p class="section-subtitle">Các tính năng tiện ích dành cho bạn</p>
+                <!-- Price Filter Section -->
+                <div class="filter-section">
+                    <h4 class="filter-section-title">Khoảng giá</h4>
+                    
+                    <div class="filter-item">
+                        <label class="filter-label">Giá tối thiểu (VNĐ)</label>
+                        <input type="number" id="minPriceFilter" class="filter-input" placeholder="0" min="0" step="100000">
+                    </div>
 
-        <div class="card-grid">
-            <a href="cart.html" class="feature-card">
-                <h3 class="card-title">🛒 Giỏ hàng</h3>
-                <p class="card-description">Quản lý sản phẩm trong giỏ hàng</p>
-                <p class="card-subtitle">Use Cases: AddToCart, ViewCart, UpdateCartQuantity</p>
-            </a>
+                    <div class="filter-item">
+                        <label class="filter-label">Giá tối đa (VNĐ)</label>
+                        <input type="number" id="maxPriceFilter" class="filter-input" placeholder="Không giới hạn" min="0" step="100000">
+                    </div>
+                </div>
 
-            <a href="my-orders.html" class="feature-card">
-                <h3 class="card-title">📦 Đơn hàng</h3>
-                <p class="card-description">Xem và quản lý đơn hàng của bạn</p>
-                <p class="card-subtitle">Use Cases: Checkout, SearchOrders, CancelOrder</p>
-            </a>
+                <!-- Stock Status Filter -->
+                <div class="filter-section">
+                    <h4 class="filter-section-title">Tình trạng</h4>
+                    
+                    <div class="filter-item">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="inStockOnly" onchange="applySortAndFilter()">
+                            <span>Chỉ hiển thị còn hàng</span>
+                        </label>
+                    </div>
+                </div>
 
-            <a href="product-detail.html" class="feature-card">
-                <h3 class="card-title">🔍 Chi tiết sản phẩm</h3>
-                <p class="card-description">Xem thông tin chi tiết sản phẩm</p>
-                <p class="card-subtitle">Use Case: GetProductDetail</p>
-            </a>
+                <div class="filter-actions">
+                    <button class="btn-apply-filters" onclick="applySortAndFilter()">Áp dụng</button>
+                    <button class="btn-clear-filters" onclick="clearFilters()">Đặt lại</button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Search Bar -->
+                <div class="search-section">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm sản phẩm theo tên...">
+                    <button class="search-button" onclick="searchProducts()">🔍 Tìm kiếm</button>
+                </div>
+
+                <h2 class="section-title">Sản phẩm nổi bật</h2>
+                <p class="section-subtitle">Khám phá các sản phẩm xe máy và phụ kiện chất lượng</p>
+
+                <!-- Category Tabs -->
+                <div class="category-tabs">
+                    <button class="tab-button active" data-category="all" onclick="filterByCategory('all')">
+                        Tất cả
+                    </button>
+                    <button class="tab-button" data-category="XE_MAY" onclick="filterByCategory('XE_MAY')">
+                        Xe máy
+                    </button>
+                    <button class="tab-button" data-category="PHU_KIEN" onclick="filterByCategory('PHU_KIEN')">
+                        Phụ kiện
+                    </button>
+                </div>
+
+                <div id="productsList" class="products-grid"></div>
+
+                <!-- Pagination -->
+                <div id="paginationContainer" class="pagination-container"></div>
+            </div>
         </div>
     </div>
+    <!-- Footer will be inserted here -->
+    <div id="footerContainer"></div>
 
-    <footer>
-        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
-        <p>Hệ thống quản lý cửa hàng xe máy - Clean Architecture</p>
-    </footer>
-
-    <script src="js/common.js?v=2"></script>
-    <script src="js/home.js?v=2"></script>
+    <script src="js/common.js?v=6"></script>
+    <script src="js/navbar.js?v=6"></script>
+    <script src="js/home.js?v=6"></script>
 </body>
 </html>

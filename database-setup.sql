@@ -250,8 +250,9 @@ INSERT INTO tai_khoan (ma_tai_khoan, email, ten_dang_nhap, mat_khau, so_dien_tho
 (1, N'admin@motorbike.com', N'admin', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0901234567', N'Ha Noi', N'ADMIN'),
 (2, N'customer1@gmail.com', N'customer1', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0912345678', N'TP.HCM', N'CUSTOMER'),
 (3, N'customer2@gmail.com', N'customer2', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0923456789', N'Da Nang', N'CUSTOMER'),
-(4, N'admin@gmail.com', N'admin2', N'123', N'0909999999', N'Ha Noi', N'ADMIN');
-(5, N'user@gmail.com', N'user1', N'user', N'0911111111', N'TP.HCM', N'CUSTOMER');
+(4, N'admin@gmail.com', N'admin2', N'123', N'0909999999', N'Ha Noi', N'ADMIN'),
+(5, N'user@gmail.com', N'user1', N'user', N'0911111111', N'TP.HCM', N'CUSTOMER'),
+(6, N'nqtuanp2005@gmail.com', N'Nguyen Quang Tuan Phuong', N'123456', N'0369164853', N'Ba Dinh, Hanoi', N'CUSTOMER');
 SET IDENTITY_INSERT tai_khoan OFF;
 GO
 
@@ -287,11 +288,6 @@ SET IDENTITY_INSERT san_pham OFF;
 GO
 
 INSERT INTO xe_may (ma_san_pham, hang_xe, dong_xe, mau_sac, nam_san_xuat, dung_tich) VALUES
-(1, N'Honda', N'Winner X', N'Do den', 2025, 150),
-(2, N'Yamaha', N'Exciter 155', N'Xanh GP', 2025, 155),
-(3, N'Honda', N'Vision', N'Trang', 2025, 110),
-(4, N'SYM', N'Star SR', N'Den', 2024, 170),
-(5, N'Yamaha', N'Sirius', N'Xanh den', 2025, 110),
 (6, N'Honda', N'Wave Alpha', N'Xanh trang', 2024, 110),
 (7, N'Yamaha', N'NVX 155', N'Den xam', 2025, 155),
 (8, N'Honda', N'Air Blade', N'Bac', 2024, 125),
@@ -331,16 +327,11 @@ SET IDENTITY_INSERT san_pham OFF;
 GO
 
 INSERT INTO phu_kien_xe_may (ma_san_pham, loai_phu_kien, thuong_hieu, chat_lieu, kich_thuoc) VALUES
-(1, N'Mu bao hiem', N'Royal', N'ABS + EPS', N'L'),
-(2, N'Gang tay', N'Komine', N'Da + vai', N'XL'),
-(3, N'Ao mua', N'Givi', N'Vai PVC', N'L'),
-(4, N'Kinh mu bao hiem', N'Bulldog', N'Polycarbonate', N'Universal'),
-(5, N'Khoa dia', N'Kinbar', N'Thep hop kim', N'Universal'),
-(6, N'Tui dung do', N'Tui dung do tien ich', N'Vai Oxford', N'Universal'),
-(7, N'Dau nhot', N'Motul', N'Dau nhot tong hop', N'1L'),
-(8, N'Binh xit rua xe', N'Tien loi', N'Nhua cao cap', N'1.5L'),
-(9, N'Den led', N'Philips', N'LED', N'HS1'),
-(10, N'Bao ve binh xang', N'Tien ich', N'Nhua PVC', N'Universal');
+(31, N'Tui dung do', N'Tui dung do tien ich', N'Vai Oxford', N'Universal'),
+(32, N'Dau nhot', N'Motul', N'Dau nhot tong hop', N'1L'),
+(33, N'Binh xit rua xe', N'Tien loi', N'Nhua cao cap', N'1.5L'),
+(34, N'Den led', N'Philips', N'LED', N'HS1'),
+(35, N'Bao ve binh xang', N'Tien ich', N'Nhua PVC', N'Universal');
 GO
 
 -- ===== INSERT SAMPLE DATA - ĐƠN HÀNG =====

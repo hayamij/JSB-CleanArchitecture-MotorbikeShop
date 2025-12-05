@@ -6,66 +6,6 @@ body {
     min-height: 100vh;
 }
 
-.navbar {
-    background: var(--color-white, #ffffff);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 3px solid var(--color-black, #000000);
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 70px;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.5em;
-    font-weight: 700;
-    color: var(--color-black, #000000);
-    text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.logo:hover {
-    transform: scale(1.05);
-}
-
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.btn-back {
-    padding: 10px 20px;
-    background: var(--color-white, #ffffff);
-    color: var(--color-black, #000000);
-    border: 2px solid var(--color-black, #000000);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    text-decoration: none;
-    display: inline-block;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.btn-back:hover {
-    background: var(--color-black, #000000);
-    color: var(--color-white, #ffffff);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
 .container {
     max-width: 1200px;
     margin: 0 auto;

@@ -22,5 +22,15 @@ public class SearchOrdersViewModel {
         public String trangThai;
         public String ngayDat;
         public String ngayCapNhat;
+        public Integer soMatHang;
+        public List<ProductItem> sanPham;
+    }
+
+    public static class ProductItem {
+        public Long maSanPham;
+        public String tenSanPham;
+        public BigDecimal giaBan;
+        public int soLuong;
+        public BigDecimal thanhTien;
     }
 }

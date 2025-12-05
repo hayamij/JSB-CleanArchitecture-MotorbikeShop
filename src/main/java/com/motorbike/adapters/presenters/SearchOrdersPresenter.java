@@ -41,6 +41,18 @@ public class SearchOrdersPresenter implements SearchOrdersOutputBoundary {
                 vmItem.trangThai = item.getTrangThai();
                 vmItem.ngayDat = item.getNgayDat() != null ? item.getNgayDat().format(DATE_FORMATTER) : "";
                 vmItem.ngayCapNhat = item.getNgayCapNhat() != null ? item.getNgayCapNhat().format(DATE_FORMATTER) : "";
+                vmItem.soMatHang = item.getSoMatHang();
+                vmItem.sanPham = item.getSanPham().stream()
+                    .map(product -> {
+                        SearchOrdersViewModel.ProductItem vmProduct = new SearchOrdersViewModel.ProductItem();
+                        vmProduct.maSanPham = product.getMaSanPham();
+                        vmProduct.tenSanPham = product.getTenSanPham();
+                        vmProduct.giaBan = product.getGiaBan();
+                        vmProduct.soLuong = product.getSoLuong();
+                        vmProduct.thanhTien = product.getThanhTien();
+                        return vmProduct;
+                    })
+                    .collect(Collectors.toList());
                 return vmItem;
             })
             .collect(Collectors.toList());

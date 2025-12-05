@@ -199,5 +199,9 @@ async function placeOrder() {
 }
 
 window.onload = function() {
+    // Initialize navbar and footer (requires authentication)
+    initNavbar('cart', true);
+    initFooter();
+    updateCartBadge();
     loadCartForCheckout();
 };

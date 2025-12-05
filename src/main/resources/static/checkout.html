@@ -4,29 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thanh toán - Motorbike Shop</title>
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/checkout.css">
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/navbar.css?v=3">
+    <link rel="stylesheet" href="css/checkout.css?v=3">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="home.html" class="logo">
-                <span>Motorbike Shop</span>
-            </a>
-
-            <ul class="nav-menu">
-                <li><a href="home.html">Trang chủ</a></li>
-                <li><a href="cart.html">Giỏ hàng</a></li>
-                <li><a href="my-orders.html">Đơn hàng của tôi</a></li>
-                <li><a href="#" id="adminLink" style="display: none;">Admin Panel</a></li>
-            </ul>
-
-            <div class="user-info">
-                <span class="user-greeting">Xin chào, <span class="user-name" id="userName">User</span></span>
-                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
-            </div>
-        </div>
-    </nav>
+    <!-- Navbar will be inserted here -->
+    <div id="navbarContainer"></div>
     
     <div class="checkout-steps-bar">
         <div class="steps-container">
@@ -156,7 +140,11 @@
         </div>
     </div>
 
-    <script src="js/common.js?v=2"></script>
-    <script src="js/checkout.js?v=2"></script>
+    <!-- Footer will be inserted here -->
+    <div id="footerContainer"></div>
+
+    <script src="js/common.js?v=3"></script>
+    <script src="js/navbar.js?v=3"></script>
+    <script src="js/checkout.js?v=3"></script>
 </body>
 </html>

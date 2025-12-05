@@ -56,6 +56,10 @@ public class GetProductDetailUseCaseControl {
                     .doubleValue();
                 boolean conHang = sanPham.getSoLuongTonKho() > 0;
                 
+                // Determine category based on instance type
+                String category = (sanPham instanceof com.motorbike.domain.entities.XeMay) 
+                    ? "MOTORCYCLE" : "ACCESSORY";
+                
                 outputData = GetProductDetailOutputData.forSuccess(
                     sanPham.getMaSanPham(),
                     sanPham.getTenSanPham(),
@@ -65,7 +69,9 @@ public class GetProductDetailUseCaseControl {
                     giaSauKhuyenMai,
                     phanTramGiam,
                     sanPham.getSoLuongTonKho(),
-                    conHang
+                    conHang,
+                    sanPham.getHinhAnh(),
+                    category
                 );
             } catch (Exception e) {
                 errorException = e;

@@ -57,6 +57,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (data.success) {
+            // Store user information in sessionStorage
             sessionStorage.setItem('userId', data.userId);
             sessionStorage.setItem('email', data.email);
             sessionStorage.setItem('username', data.username);
@@ -67,16 +68,30 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 localStorage.setItem('userId', data.userId);
                 localStorage.setItem('email', data.email);
                 localStorage.setItem('username', data.username);
+                localStorage.setItem('role', data.role);
             }
 
+            // Merge guest cart into user cart
+            const mergeResult = await mergeGuestCartToUser(data.userId);
+            
             showAlert('Đăng nhập thành công! Đang chuyển hướng...', 'success');
 
-            if (data.cartMerged) {
+            if (mergeResult.success && mergeResult.itemsMerged > 0) {
+                showAlert(`Đã hợp nhất ${mergeResult.itemsMerged} sản phẩm vào giỏ hàng`, 'success');
+            } else if (data.cartMerged) {
                 showAlert(`Đã hợp nhất ${data.mergedItemsCount} sản phẩm vào giỏ hàng`, 'success');
             }
 
+            // Check if user was trying to checkout
+            const returnToCheckout = sessionStorage.getItem('returnToCheckout');
+            sessionStorage.removeItem('returnToCheckout');
+            
             setTimeout(() => {
-                window.location.href = 'home.html';
+                if (returnToCheckout === 'true') {
+                    window.location.href = 'checkout.html';
+                } else {
+                    window.location.href = 'home.html';
+                }
             }, 1500);
         } else {
             showAlert(data.errorMessage || 'Đăng nhập thất bại', 'error');

@@ -35,11 +35,14 @@ public class SearchOrdersOutputData {
         private final String trangThai;
         private final LocalDateTime ngayDat;
         private final LocalDateTime ngayCapNhat;
+        private final Integer soMatHang;
+        private final List<ProductItem> sanPham;
 
         public OrderItem(Long maDonHang, Long maTaiKhoan, String emailKhachHang,
                         String tenNguoiNhan, String soDienThoai, String diaChiGiaoHang,
                         BigDecimal tongTien, String trangThai,
-                        LocalDateTime ngayDat, LocalDateTime ngayCapNhat) {
+                        LocalDateTime ngayDat, LocalDateTime ngayCapNhat, Integer soMatHang,
+                        List<ProductItem> sanPham) {
             this.maDonHang = maDonHang;
             this.maTaiKhoan = maTaiKhoan;
             this.emailKhachHang = emailKhachHang;
@@ -50,6 +53,8 @@ public class SearchOrdersOutputData {
             this.trangThai = trangThai;
             this.ngayDat = ngayDat;
             this.ngayCapNhat = ngayCapNhat;
+            this.soMatHang = soMatHang;
+            this.sanPham = sanPham;
         }
 
         public Long getMaDonHang() {return maDonHang;}
@@ -62,6 +67,31 @@ public class SearchOrdersOutputData {
         public String getTrangThai() {return trangThai;}
         public LocalDateTime getNgayDat() {return ngayDat;}
         public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
+        public Integer getSoMatHang() {return soMatHang;}
+        public List<ProductItem> getSanPham() {return sanPham;}
+    }
+
+    public static class ProductItem {
+        private final Long maSanPham;
+        private final String tenSanPham;
+        private final BigDecimal giaBan;
+        private final int soLuong;
+        private final BigDecimal thanhTien;
+
+        public ProductItem(Long maSanPham, String tenSanPham, BigDecimal giaBan,
+                          int soLuong, BigDecimal thanhTien) {
+            this.maSanPham = maSanPham;
+            this.tenSanPham = tenSanPham;
+            this.giaBan = giaBan;
+            this.soLuong = soLuong;
+            this.thanhTien = thanhTien;
+        }
+
+        public Long getMaSanPham() {return maSanPham;}
+        public String getTenSanPham() {return tenSanPham;}
+        public BigDecimal getGiaBan() {return giaBan;}
+        public int getSoLuong() {return soLuong;}
+        public BigDecimal getThanhTien() {return thanhTien;}
     }
 
     public boolean isSuccess() {return success;}

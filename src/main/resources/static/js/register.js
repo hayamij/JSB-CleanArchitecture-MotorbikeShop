@@ -170,8 +170,23 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
                 sessionStorage.setItem('email', data.email);
                 sessionStorage.setItem('username', data.username);
                 
+                // Merge guest cart into newly created user account
+                const mergeResult = await mergeGuestCartToUser(data.userId);
+                
+                if (mergeResult.success && mergeResult.itemsMerged > 0) {
+                    showAlert(`Đã hợp nhất ${mergeResult.itemsMerged} sản phẩm vào giỏ hàng`, 'success');
+                }
+                
+                // Check if user was trying to checkout
+                const returnToCheckout = sessionStorage.getItem('returnToCheckout');
+                sessionStorage.removeItem('returnToCheckout');
+                
                 setTimeout(() => {
-                    window.location.href = 'home.html';
+                    if (returnToCheckout === 'true') {
+                        window.location.href = 'checkout.html';
+                    } else {
+                        window.location.href = 'home.html';
+                    }
                 }, 1500);
             } else {
                 setTimeout(() => {

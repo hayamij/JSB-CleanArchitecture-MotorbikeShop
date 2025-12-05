@@ -4,42 +4,28 @@ let currentCart = null;
 
 async function loadCart() {
     const userId = sessionStorage.getItem('userId');
-    const userName = sessionStorage.getItem('userName');
-    const role = sessionStorage.getItem('userRole');
     
-    if (!userId) {
-        showAlert('Vui lòng đăng nhập để xem giỏ hàng', 'warning');
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 2000);
-        return;
-    }
-
-    // Update user info in navbar
-    if (userName) document.getElementById('userName').textContent = userName;
-    if (role === 'ADMIN') {
-        const adminLink = document.getElementById('adminLink');
-        if (adminLink) {
-            adminLink.style.display = 'block';
-            adminLink.href = 'admin.html';
-        }
-    }
-
     showLoading(true);
 
     try {
-        const response = await fetch(`/api/cart/${userId}`);
-        const data = await response.json();
+        if (userId) {
+            // Load cart from server for logged-in users
+            const response = await fetch(`/api/cart/${userId}`);
+            const data = await response.json();
 
-        if (data.success) {
-            currentCart = data;
-            renderCart(data);
-            if (data.hasStockWarnings) {
-                showAlert('Một số sản phẩm trong giỏ hàng có cảnh báo về tồn kho', 'warning');
+            if (data.success) {
+                currentCart = data;
+                renderCart(data);
+                if (data.hasStockWarnings) {
+                    showAlert('Một số sản phẩm trong giỏ hàng có cảnh báo về tồn kho', 'warning');
+                }
+            } else {
+                showAlert(data.errorMessage || 'Không thể tải giỏ hàng', 'error');
+                renderEmptyCart();
             }
         } else {
-            showAlert(data.errorMessage || 'Không thể tải giỏ hàng', 'error');
-            renderEmptyCart();
+            // Load guest cart from localStorage
+            await loadGuestCart();
         }
     } catch (error) {
         console.error('Error loading cart:', error);
@@ -47,6 +33,65 @@ async function loadCart() {
         renderEmptyCart();
     } finally {
         showLoading(false);
+    }
+}
+
+async function loadGuestCart() {
+    const guestCart = getGuestCart();
+    
+    if (!guestCart || guestCart.length === 0) {
+        renderEmptyCart();
+        return;
+    }
+    
+    // Fetch all products from server
+    try {
+        const response = await fetch('/api/products');
+        const allProducts = await response.json();
+        
+        // Create a map for quick lookup
+        const productMap = {};
+        allProducts.forEach(product => {
+            productMap[product.id] = product;
+        });
+        
+        // Build cart object similar to server response
+        const cartItems = guestCart.map(item => {
+            const product = productMap[item.productId];
+            if (!product) return null;
+            
+            const subtotal = product.price * item.quantity;
+            const hasStockIssue = item.quantity > product.stock;
+            
+            return {
+                productId: item.productId,
+                productName: product.name,
+                price: product.price,
+                quantity: item.quantity,
+                subtotal: subtotal,
+                availableStock: product.stock,
+                imageUrl: product.imageUrl,
+                hasStockIssue: hasStockIssue
+            };
+        }).filter(item => item !== null);
+        
+        const totalAmount = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+        const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+        
+        currentCart = {
+            items: cartItems,
+            totalItems: cartItems.length,
+            totalQuantity: totalQuantity,
+            totalAmount: totalAmount,
+            isEmpty: cartItems.length === 0,
+            isGuest: true
+        };
+        
+        renderCart(currentCart);
+    } catch (error) {
+        console.error('Error loading guest cart:', error);
+        showAlert('Không thể tải thông tin sản phẩm', 'error');
+        renderEmptyCart();
     }
 }
 
@@ -141,7 +186,34 @@ async function applyQuantityChange(productId) {
     await updateQuantity(productId, newQuantity);
 }
 
+function updateGuestCartQuantity(productId, newQuantity) {
+    const guestCart = getGuestCart();
+    const itemIndex = guestCart.findIndex(item => item.productId === productId);
+    
+    if (itemIndex !== -1) {
+        if (newQuantity <= 0) {
+            guestCart.splice(itemIndex, 1);
+        } else {
+            guestCart[itemIndex].quantity = newQuantity;
+        }
+        saveGuestCart(guestCart);
+    }
+    
+    loadGuestCart();
+    updateCartBadge();
+}
+
 async function updateQuantity(productId, newQuantity) {
+    const userId = sessionStorage.getItem('userId');
+    
+    if (!userId) {
+        // Update guest cart
+        updateGuestCartQuantity(productId, newQuantity);
+        showAlert(newQuantity === 0 ? 'Đã xóa sản phẩm' : 'Đã cập nhật', 'success');
+        return;
+    }
+    
+    // Update server cart for logged-in users
     if (!currentCart || !currentCart.cartId) {
         showAlert('Không tìm thấy thông tin giỏ hàng', 'error');
         return;
@@ -165,6 +237,7 @@ async function updateQuantity(productId, newQuantity) {
         if (data.success) {
             showAlert(data.message || 'Đã cập nhật', 'success');
             loadCart();
+            updateCartBadge();
         } else {
             showAlert(data.errorMessage || 'Không thể cập nhật', 'error');
         }
@@ -183,9 +256,26 @@ async function removeItem(productId) {
 }
 
 async function checkout() {
+    const userId = sessionStorage.getItem('userId');
+    
+    if (!userId) {
+        // Guest user - redirect to login and set flag to return to checkout
+        sessionStorage.setItem('returnToCheckout', 'true');
+        showAlert('Vui lòng đăng nhập để tiếp tục thanh toán', 'info');
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1500);
+        return;
+    }
+    
+    // Logged-in user - proceed to checkout
     window.location.href = 'checkout.html';
 }
 
 window.onload = function() {
+    // Initialize navbar and footer (no authentication required for cart view)
+    initNavbar('cart', false);
+    initFooter();
     loadCart();
+    updateCartBadge();
 };

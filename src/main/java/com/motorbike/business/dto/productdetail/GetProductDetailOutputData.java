@@ -24,7 +24,7 @@ public class GetProductDetailOutputData {
     public static GetProductDetailOutputData forSuccess(
             Long productId, String name, String description, String specifications,
             BigDecimal originalPrice, BigDecimal discountedPrice, double discountPercent,
-            int stockQuantity, boolean available) {
+            int stockQuantity, boolean available, String imageUrl, String category) {
         GetProductDetailOutputData data = new GetProductDetailOutputData();
         data.success = true;
         data.productId = productId;
@@ -35,6 +35,8 @@ public class GetProductDetailOutputData {
         data.stockQuantity = stockQuantity;
         data.available = available;
         data.inStock = stockQuantity > 0;
+        data.imageUrl = imageUrl;
+        data.category = category;
         return data;
     }
     

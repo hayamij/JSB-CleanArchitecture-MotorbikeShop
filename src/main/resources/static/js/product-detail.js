@@ -47,11 +47,23 @@ async function loadProductDetail() {
 function renderProduct(product) {
     const container = document.getElementById('productContainer');
     
+    // Debug: Log product data
+    console.log('Product data:', product);
+    console.log('Image URL:', product.imageUrl);
+    
+    // Parse stockQuantity to number if it's a string
+    const stockQty = typeof product.stockQuantity === 'string' 
+        ? parseInt(product.stockQuantity.replace(/[^0-9]/g, '')) || 0
+        : product.stockQuantity;
+    
+    // Store numeric stock quantity in currentProduct
+    currentProduct.stockQuantity = stockQty;
+    
     document.getElementById('breadcrumbCategory').textContent = product.categoryDisplay || 'Sản phẩm';
     document.getElementById('breadcrumbProduct').textContent = product.name;
 
-    const isOutOfStock = product.stockQuantity === 0;
-    const isLowStock = product.stockQuantity > 0 && product.stockQuantity < 10;
+    const isOutOfStock = stockQty === 0;
+    const isLowStock = stockQty > 0 && stockQty < 10;
     
     let stockBadgeHtml = '';
     if (isOutOfStock) {
@@ -64,32 +76,34 @@ function renderProduct(product) {
     if (isOutOfStock) {
         stockStatusHtml = '<div class="stock-status stock-out"><span class="stock-text">Hết hàng</span></div>';
     } else if (isLowStock) {
-        stockStatusHtml = `<div class="stock-status stock-low"><span class="stock-text">Chỉ còn ${product.stockQuantity} sản phẩm</span></div>`;
+        stockStatusHtml = `<div class="stock-status stock-low"><span class="stock-text">Chỉ còn ${stockQty} sản phẩm</span></div>`;
     } else {
-        stockStatusHtml = `<div class="stock-status stock-available"><span class="stock-text">Còn ${product.stockQuantity} sản phẩm</span></div>`;
+        stockStatusHtml = `<div class="stock-status stock-available"><span class="stock-text">Còn ${stockQty} sản phẩm</span></div>`;
     }
 
     let specsHtml = '';
-    if (product.specifications && Object.keys(product.specifications).length > 0) {
-        specsHtml = '<div class="specifications-section"><div class="spec-title">Thông số kỹ thuật</div><div class="spec-grid">';
-        for (const [key, value] of Object.entries(product.specifications)) {
-            specsHtml += `
-                <div class="spec-item">
-                    <div class="spec-label">${key}</div>
-                    <div class="spec-value">${value}</div>
-                </div>
-            `;
-        }
-        specsHtml += '</div></div>';
+    if (product.specifications && product.specifications.trim() !== '' && product.specifications !== '{}') {
+        specsHtml = `
+            <div class="specifications-section">
+                <div class="spec-title">Thông số kỹ thuật</div>
+                <div class="spec-content">${product.specifications}</div>
+            </div>
+        `;
     }
 
-    const hasImage = product.imageUrl && product.imageUrl.trim() !== '' && product.imageUrl !== '/images/no-image.jpg' && product.imageUrl !== 'null';
+    const hasImage = product.imageUrl && 
+                     product.imageUrl.trim() !== '' && 
+                     product.imageUrl !== 'null' && 
+                     product.imageUrl !== '/images/no-image.jpg' &&
+                     !product.imageUrl.includes('no-image');
+    
+    console.log('Has valid image:', hasImage);
 
     container.innerHTML = `
         <div class="product-container">
             <div class="product-image-section">
                 <div class="main-image-container">
-                    ${hasImage ? `<img src="${product.imageUrl}" alt="${product.name}" class="main-image">` : ''}
+                    ${hasImage ? `<img src="${product.imageUrl}" alt="${product.name}" class="main-image" onerror="this.style.display='none'">` : '<div class="no-image-placeholder">📷</div>'}
                     ${stockBadgeHtml}
                 </div>
             </div>
@@ -143,27 +157,67 @@ function decreaseQuantity() {
 }
 
 function increaseQuantity() {
-    if (currentProduct && quantity < currentProduct.stockQuantity) {
+    if (!currentProduct) {
+        showToast('Chưa tải được thông tin sản phẩm', 'error');
+        return;
+    }
+    
+    const maxStock = currentProduct.stockQuantity;
+    console.log('Current quantity:', quantity, 'Max stock:', maxStock);
+    
+    if (quantity < maxStock) {
         quantity++;
         document.getElementById('quantityDisplay').textContent = quantity;
-    } else if (currentProduct) {
-        showAlert('Không đủ hàng trong kho', 'error');
+    } else {
+        showToast(`Chỉ còn ${maxStock} sản phẩm trong kho`, 'error');
     }
 }
 
 async function addToCart() {
     const userId = sessionStorage.getItem('userId');
-    
-    if (!userId) {
-        if (confirm('Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng. Chuyển đến trang đăng nhập?')) {
-            window.location.href = 'login.html';
-        }
+
+    if (!currentProduct) {
+        showToast('Không tìm thấy thông tin sản phẩm', 'error');
         return;
     }
 
-    if (!currentProduct) {
-        showAlert('Không tìm thấy thông tin sản phẩm', 'error');
-        return;
+    const button = document.querySelector('.btn-add-cart');
+    const originalText = button ? button.innerHTML : '';
+    
+    if (button) {
+        button.disabled = true;
+        button.innerHTML = 'Đang thêm...';
+    }
+    
+    // Guest user - use local storage
+    if (!userId) {
+        try {
+            addToGuestCart(currentProduct.productId, quantity);
+            
+            if (button) {
+                button.innerHTML = '✓ Đã thêm';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1500);
+            }
+            
+            // Reset quantity to 1
+            quantity = 1;
+            document.getElementById('quantityDisplay').textContent = quantity;
+            
+            updateCartBadge();
+            showToast(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`, 'success');
+            return;
+        } catch (error) {
+            console.error('Error adding to guest cart:', error);
+            showToast('Lỗi khi thêm vào giỏ hàng. Vui lòng thử lại.', 'error');
+            if (button) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+            return;
+        }
     }
 
     try {
@@ -182,22 +236,36 @@ async function addToCart() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            showAlert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`, 'success');
+            if (button) {
+                button.innerHTML = '✓ Đã thêm';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1500);
+            }
             
+            // Reset quantity to 1
             quantity = 1;
             document.getElementById('quantityDisplay').textContent = quantity;
             
-            setTimeout(() => {
-                if (confirm('Xem giỏ hàng ngay?')) {
-                    window.location.href = 'cart.html';
-                }
-            }, 1000);
+            // Update cart badge
+            updateCartBadge();
+            
+            showToast(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`, 'success');
         } else {
-            showAlert(data.errorMessage || 'Không thể thêm vào giỏ hàng', 'error');
+            showToast(data.errorMessage || 'Không thể thêm vào giỏ hàng', 'error');
+            if (button) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
         }
     } catch (error) {
         console.error('Error adding to cart:', error);
-        showAlert('Lỗi kết nối đến server', 'error');
+        showToast('Lỗi kết nối đến server. Vui lòng thử lại.', 'error');
+        if (button) {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
     }
 }
 
@@ -209,5 +277,12 @@ async function buyNow() {
 }
 
 window.onload = function() {
+    // Initialize navbar and footer (no authentication required)
+    initNavbar('', false);
+    initFooter();
+    
+    // Update cart badge for both guest and logged-in users
+    updateCartBadge();
+    
     loadProductDetail();
 };
