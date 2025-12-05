@@ -5,18 +5,21 @@ import java.math.BigDecimal;
 import com.motorbike.adapters.dto.request.UpdateMotorbikeRequest;
 
 import com.motorbike.adapters.dto.request.AddMotorbikeRequest;
+import com.motorbike.adapters.presenters.DeleteMotorbikePresenter;
 import com.motorbike.adapters.presenters.UpdateMotorbikePresenter;
 import com.motorbike.business.dto.motorbike.AddMotorbikeInputData;
+import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
 import com.motorbike.business.usecase.input.AddMotorbikeInputBoundary;
+import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
 import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
-
-
+import com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
 import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.UpdateMotorbikeInputBoundary;
+import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesInputData;
 import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
 
@@ -31,6 +34,11 @@ public class MotorbikeController {
     private final AddMotorbikeInputBoundary addMotorbikeUseCase;
     private final AddMotorbikeViewModel addMotorbikeViewModel;
 
+    private final DeleteMotorbikeOutputBoundary deleteMotorbikePresenter;
+
+    private final DeleteMotorbikeViewModel deleteMotorbikeViewModel;
+
+
     private final UpdateMotorbikePresenter updateMotorbikePresenter;
     private final UpdateMotorbikeViewModel updateMotorbikeViewModel;
 
@@ -42,6 +50,8 @@ public class MotorbikeController {
     private final SearchMotorbikesViewModel searchViewModel;
 
     private final UpdateMotorbikeInputBoundary updateMotorbikeUseCase;
+    private final DeleteMotorbikeInputBoundary deleteMotorbikeUseCase;
+
 
 
     public MotorbikeController(
@@ -53,7 +63,13 @@ public class MotorbikeController {
             AddMotorbikeViewModel addMotorbikeViewModel,
             UpdateMotorbikeInputBoundary updateMotorbikeUseCase,
             UpdateMotorbikePresenter updateMotorbikePresenter,
-            UpdateMotorbikeViewModel updateMotorbikeViewModel
+            UpdateMotorbikeViewModel updateMotorbikeViewModel,
+            DeleteMotorbikeOutputBoundary deleteMotorbikePresenter,
+
+            DeleteMotorbikeViewModel deleteMotorbikeViewModel,
+            DeleteMotorbikeInputBoundary deleteMotorbikeUseCase
+
+
 
             
     ) {
@@ -66,6 +82,10 @@ public class MotorbikeController {
         this.updateMotorbikeUseCase = updateMotorbikeUseCase;
         this.updateMotorbikePresenter = updateMotorbikePresenter;
         this.updateMotorbikeViewModel = updateMotorbikeViewModel;
+        this.deleteMotorbikePresenter = deleteMotorbikePresenter;
+        this.deleteMotorbikeViewModel = deleteMotorbikeViewModel;
+        this.deleteMotorbikeUseCase = deleteMotorbikeUseCase;
+
 
     }
 
@@ -186,6 +206,28 @@ public class MotorbikeController {
         // Trả ra đúng object motorbike, không phải số 1 nữa
         return ResponseEntity.ok(vm.motorbike);
     }
+
+
+    //delete motorbike
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteMotorbike(@PathVariable Long id) {
+
+        DeleteMotorbikeInputData input = new DeleteMotorbikeInputData(id);
+
+        deleteMotorbikeUseCase.execute(input);
+
+        DeleteMotorbikeViewModel vm = this.deleteMotorbikeViewModel;
+
+        if (!vm.success) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ErrorResponse(vm.errorCode, vm.errorMessage));
+        }
+
+        return ResponseEntity.ok("Deleted successfully");
+    }
+
+
 
 
 
