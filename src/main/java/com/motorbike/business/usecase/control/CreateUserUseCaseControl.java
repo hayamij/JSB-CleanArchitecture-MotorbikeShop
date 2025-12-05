@@ -5,7 +5,7 @@ import com.motorbike.business.dto.user.CreateUserOutputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.output.CreateUserOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
-import com.motorbike.domain.entities.VaiTro;
+// import com.motorbike.domain.entities.VaiTro;
 import com.motorbike.domain.exceptions.*;
 
 public class CreateUserUseCaseControl {

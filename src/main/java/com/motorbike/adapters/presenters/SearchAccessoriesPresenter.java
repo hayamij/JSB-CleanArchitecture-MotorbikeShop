@@ -14,10 +14,6 @@ public class SearchAccessoriesPresenter implements SearchAccessoriesOutputBounda
 
     @Override
     public void present(SearchAccessoriesOutputData outputData) {
-<<<<<<< HEAD
-        // reset state
-=======
->>>>>>> 8dcc07fa4d37eb42bd8eead969b5dc0579148b25
         viewModel.hasError = false;
         viewModel.errorCode = null;
         viewModel.errorMessage = null;

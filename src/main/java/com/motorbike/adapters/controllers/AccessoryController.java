@@ -34,7 +34,7 @@ public class AccessoryController {
 
     @GetMapping
     public ResponseEntity<?> getAllAccessories() {
-        getAllAccessoriesUseCase.execute(null);
+        getAllAccessoriesUseCase.execute();
 
         if (getAllViewModel.hasError) {
             return ResponseEntity.status(500).body(new ErrorResponse(getAllViewModel.errorCode, getAllViewModel.errorMessage));

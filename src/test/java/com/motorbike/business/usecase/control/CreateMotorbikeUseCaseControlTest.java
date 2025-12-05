@@ -13,7 +13,6 @@ import com.motorbike.business.dto.motorbike.CreateMotorbikeInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.CreateMotorbikeOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
-import com.motorbike.domain.entities.XeMay;
 import com.motorbike.domain.entities.PhuKienXeMay;
 
 public class CreateMotorbikeUseCaseControlTest {
