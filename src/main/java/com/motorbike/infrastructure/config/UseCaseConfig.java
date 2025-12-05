@@ -21,6 +21,7 @@ import com.motorbike.adapters.presenters.ProductDetailPresenter;
 import com.motorbike.adapters.presenters.RegisterPresenter;
 import com.motorbike.adapters.presenters.SearchMotorbikesPresenter;
 import com.motorbike.adapters.presenters.UpdateCartQuantityPresenter;
+import com.motorbike.adapters.presenters.UpdateMotorbikePresenter;
 import com.motorbike.adapters.presenters.ViewCartPresenter;
 import com.motorbike.adapters.repositories.MotorbikeRepositoryAdapter;
 import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
@@ -35,6 +36,7 @@ import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.adapters.viewmodels.RegisterViewModel;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
+import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
 import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.SearchAccessoriesViewModel;
@@ -55,9 +57,11 @@ import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
 import com.motorbike.business.usecase.control.GetAllAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.SearchAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
 import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.UpdateMotorbikeInputBoundary;
 import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
 import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
 import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
@@ -376,5 +380,25 @@ public SearchAccessoriesViewModel searchAccessoriesViewModel() {
     return new SearchAccessoriesViewModel();
 }
 
+// UPDATE MOTORBIKE USE CASE BEANS
+@Bean
+public UpdateMotorbikeInputBoundary updateMotorbikeUseCase(
+        UpdateMotorbikePresenter presenter,
+        MotorbikeRepository motorbikeRepository
+) {
+    return new UpdateMotorbikeUseCaseControl(presenter, motorbikeRepository);
+}
+
+
+@Bean
+@RequestScope
+public UpdateMotorbikeViewModel updateMotorbikeViewModel() {
+    return new UpdateMotorbikeViewModel();
+}
+
+@Bean
+public UpdateMotorbikePresenter updateMotorbikePresenter(UpdateMotorbikeViewModel viewModel) {
+    return new UpdateMotorbikePresenter(viewModel);
+}
 
 }

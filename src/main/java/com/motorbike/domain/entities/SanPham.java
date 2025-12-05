@@ -137,5 +137,11 @@ public abstract class SanPham {
     public void setHinhAnh(String hinhAnh) {this.hinhAnh = hinhAnh; this.ngayCapNhat = LocalDateTime.now();}
     public void setSoLuongTonKho(int soLuongTonKho) {
         this.soLuongTonKho = soLuongTonKho;
+        this.ngayCapNhat = LocalDateTime.now();
     }
+    public void setGia(BigDecimal gia) {
+        this.gia = gia;
+        this.ngayCapNhat = LocalDateTime.now();
+    }
+
 }
