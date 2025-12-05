@@ -1,0 +1,137 @@
+/* Orders Page Styles */
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.order-card {
+    background: var(--color-white);
+    box-shadow: var(--shadow-md);
+    padding: 24px;
+    transition: all var(--transition-base);
+}
+
+.order-card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--color-light-gray);
+    margin-bottom: 16px;
+}
+
+.order-id {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--color-black);
+}
+
+.order-status {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: var(--color-gray);
+    color: var(--color-white);
+}
+
+.status-confirmed {
+    background: var(--color-dark-gray);
+    color: var(--color-white);
+}
+
+.status-cancelled {
+    background: var(--color-light-gray);
+    color: var(--color-dark-gray);
+}
+
+.order-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 0.85em;
+    color: var(--color-gray);
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 1em;
+    color: var(--color-dark-gray);
+    font-weight: 500;
+}
+
+.order-total {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--color-black);
+    text-align: right;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px solid var(--color-light-gray);
+}
+
+.order-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+
+.btn-cancel-order {
+    padding: 10px 20px;
+    background: var(--color-dark-gray);
+    color: var(--color-white);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.btn-cancel-order:hover {
+    background: var(--color-black);
+    transform: translateY(-2px);
+}
+
+.btn-cancel-order:disabled {
+    background: var(--color-light-gray);
+    color: var(--color-gray);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--color-black);
+    color: var(--color-white);
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 20px;
+    transition: all var(--transition-fast);
+}
+
+.btn-primary:hover {
+    background: var(--color-dark-gray);
+    transform: translateY(-2px);
+}

@@ -13,24 +13,39 @@
             <a href="home.html" class="logo">
                 <span>Motorbike Shop</span>
             </a>
-            <div class="checkout-steps">
-                <div class="step completed">
-                    <div class="step-number">1</div>
-                    <span>Giỏ hàng</span>
-                </div>
-                <span>→</span>
-                <div class="step active">
-                    <div class="step-number">2</div>
-                    <span>Thanh toán</span>
-                </div>
-                <span>→</span>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <span>Hoàn tất</span>
-                </div>
+
+            <ul class="nav-menu">
+                <li><a href="home.html">Trang chủ</a></li>
+                <li><a href="cart.html">Giỏ hàng</a></li>
+                <li><a href="my-orders.html">Đơn hàng của tôi</a></li>
+                <li><a href="#" id="adminLink" style="display: none;">Admin Panel</a></li>
+            </ul>
+
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span class="user-name" id="userName">User</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
             </div>
         </div>
     </nav>
+    
+    <div class="checkout-steps-bar">
+        <div class="steps-container">
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <span>Giỏ hàng</span>
+            </div>
+            <span class="step-arrow">→</span>
+            <div class="step active">
+                <div class="step-number">2</div>
+                <span>Thanh toán</span>
+            </div>
+            <span class="step-arrow">→</span>
+            <div class="step">
+                <div class="step-number">3</div>
+                <span>Hoàn tất</span>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="page-header">

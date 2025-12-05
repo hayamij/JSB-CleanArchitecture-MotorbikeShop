@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi - Motorbike Shop</title>
+    <link rel="stylesheet" href="css/common.css?v=2">
+    <link rel="stylesheet" href="css/orders.css?v=2">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home.html" class="logo">
+                <span>Motorbike Shop</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="home.html">Trang chủ</a></li>
+                <li><a href="cart.html">Giỏ hàng</a></li>
+                <li><a href="my-orders.html" class="active">Đơn hàng</a></li>
+            </ul>
+
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span class="user-name" id="userName">User</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <h1 class="section-title">Đơn hàng của tôi</h1>
+        <div id="alertContainer"></div>
+
+        <!-- Loading -->
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Đang tải đơn hàng...</p>
+        </div>
+
+        <!-- Orders List -->
+        <div id="ordersContainer" class="orders-list">
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state hidden">
+            <h3>Bạn chưa có đơn hàng nào</h3>
+            <p>Hãy mua sắm ngay để có trải nghiệm tốt nhất!</p>
+            <a href="home.html" class="btn-primary">Mua sắm ngay</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="js/common.js?v=2"></script>
+    <script src="js/my-orders.js?v=2"></script>
+</body>
+</html>

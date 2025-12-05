@@ -1,0 +1,324 @@
+/* Admin Panel Styles */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin: 40px 0;
+}
+
+.stat-card {
+    background: var(--color-white);
+    padding: 32px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: all var(--transition-base);
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.stat-card h3 {
+    font-size: 0.95em;
+    color: var(--color-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+.stat-number {
+    font-size: 3em;
+    font-weight: 700;
+    color: var(--color-black);
+    margin: 16px 0;
+}
+
+.stat-link {
+    display: inline-block;
+    color: var(--color-dark-gray);
+    text-decoration: none;
+    font-size: 0.9em;
+    margin-top: 12px;
+    transition: color var(--transition-fast);
+}
+
+.stat-link:hover {
+    color: var(--color-black);
+}
+
+/* Table Styles */
+.admin-table {
+    width: 100%;
+    background: var(--color-white);
+    box-shadow: var(--shadow-md);
+    border-collapse: collapse;
+    margin: 24px 0;
+}
+
+.admin-table thead {
+    background: var(--color-dark-gray);
+    color: var(--color-white);
+}
+
+.admin-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+}
+
+.admin-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--color-light-gray);
+}
+
+.admin-table tbody tr {
+    transition: background var(--transition-fast);
+}
+
+.admin-table tbody tr:hover {
+    background: var(--color-light-gray);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 8px 16px;
+    border: none;
+    background: var(--color-dark-gray);
+    color: var(--color-white);
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-action:hover {
+    background: var(--color-black);
+    transform: translateY(-2px);
+}
+
+.btn-edit {
+    background: var(--color-gray);
+}
+
+.btn-delete {
+    background: var(--color-dark-gray);
+}
+
+.btn-delete:hover {
+    background: var(--color-black);
+}
+
+/* Search Bar */
+.search-bar {
+    background: var(--color-white);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
+}
+
+.search-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.9em;
+    color: var(--color-gray);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px;
+    border: 2px solid var(--color-light-gray);
+    background: var(--color-white);
+    font-size: 1em;
+    transition: border var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--color-dark-gray);
+}
+
+.btn-search {
+    padding: 12px 24px;
+    background: var(--color-black);
+    color: var(--color-white);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.btn-search:hover {
+    background: var(--color-dark-gray);
+    transform: translateY(-2px);
+}
+
+.btn-add {
+    background: var(--color-dark-gray);
+    color: var(--color-white);
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-add:hover {
+    background: var(--color-black);
+    transform: translateY(-2px);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--color-white);
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-xl);
+}
+
+.modal-header {
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--color-light-gray);
+    padding-bottom: 16px;
+}
+
+.modal-header h2 {
+    font-size: 1.5em;
+    color: var(--color-black);
+}
+
+.modal-body {
+    margin-bottom: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: 2px solid var(--color-light-gray);
+    padding-top: 16px;
+}
+
+.btn-cancel {
+    padding: 12px 24px;
+    background: var(--color-gray);
+    color: var(--color-white);
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-cancel:hover {
+    background: var(--color-dark-gray);
+}
+
+.btn-submit {
+    padding: 12px 24px;
+    background: var(--color-black);
+    color: var(--color-white);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.btn-submit:hover {
+    background: var(--color-dark-gray);
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: var(--color-gray);
+    color: var(--color-white);
+}
+
+.status-confirmed {
+    background: var(--color-dark-gray);
+    color: var(--color-white);
+}
+
+.status-cancelled {
+    background: var(--color-light-gray);
+    color: var(--color-dark-gray);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--color-white);
+    box-shadow: var(--shadow-md);
+    margin: 24px 0;
+}
+
+.empty-state h3 {
+    font-size: 1.5em;
+    color: var(--color-dark-gray);
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    color: var(--color-gray);
+}
+
+/* Product Image Thumbnail */
+.product-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 2px solid var(--color-light-gray);
+}

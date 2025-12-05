@@ -102,3 +102,15 @@ function logout() {
     }
     window.location.href = 'login.html';
 }
+
+/**
+ * Show/Hide admin link based on user role
+ */
+function updateNavForRole() {
+    const role = sessionStorage.getItem('userRole');
+    const adminLink = document.getElementById('adminLink');
+    if (adminLink && role === 'ADMIN') {
+        adminLink.style.display = 'block';
+        adminLink.href = 'admin.html';
+    }
+}

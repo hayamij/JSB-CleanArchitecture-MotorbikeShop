@@ -369,6 +369,24 @@ body {
     color: var(--color-gray, #666666);
     line-height: 1.6;
     font-size: 0.95em;
+    margin-bottom: 12px;
+}
+
+.card-subtitle {
+    font-size: 0.75em;
+    color: var(--color-gray, #666666);
+    font-style: italic;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+.nav-menu a.active {
+    color: var(--color-black, #000000);
+    font-weight: 700;
+}
+
+.nav-menu a.active::after {
+    width: 100%;
 }
 
 footer {

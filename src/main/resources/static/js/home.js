@@ -4,7 +4,7 @@ let products = [];
 
 function checkAuth() {
     const userId = sessionStorage.getItem('userId');
-    const username = sessionStorage.getItem('username');
+    const username = sessionStorage.getItem('userName');
 
     if (!userId) {
         window.location.href = 'login.html';
@@ -12,6 +12,14 @@ function checkAuth() {
     }
 
     document.getElementById('userName').textContent = username || 'User';
+    
+    // Show admin link if user is admin
+    const role = sessionStorage.getItem('userRole');
+    const adminLink = document.getElementById('adminLink');
+    if (adminLink && role === 'ADMIN') {
+        adminLink.style.display = 'block';
+        adminLink.href = 'admin.html';
+    }
 }
 
 async function loadCartInfo() {

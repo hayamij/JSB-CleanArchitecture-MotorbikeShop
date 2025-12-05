@@ -15,9 +15,10 @@
             </a>
 
             <ul class="nav-menu">
-                <li><a href="home.html">Trang chủ</a></li>
+                <li><a href="home.html" class="active">Trang chủ</a></li>
                 <li><a href="cart.html">Giỏ hàng</a></li>
-                <li><a href="#orders">Đơn hàng</a></li>
+                <li><a href="my-orders.html">Đơn hàng của tôi</a></li>
+                <li><a href="#" id="adminLink" style="display: none;">Admin Panel</a></li>
             </ul>
 
             <div class="user-info">
@@ -43,18 +44,21 @@
 
         <div class="card-grid">
             <a href="cart.html" class="feature-card">
-                <h3 class="card-title">Giỏ hàng</h3>
+                <h3 class="card-title">🛒 Giỏ hàng</h3>
                 <p class="card-description">Quản lý sản phẩm trong giỏ hàng</p>
+                <p class="card-subtitle">Use Cases: AddToCart, ViewCart, UpdateCartQuantity</p>
             </a>
 
-            <a href="#orders" class="feature-card">
-                <h3 class="card-title">Đơn hàng</h3>
-                <p class="card-description">Theo dõi tình trạng đơn hàng</p>
+            <a href="my-orders.html" class="feature-card">
+                <h3 class="card-title">📦 Đơn hàng</h3>
+                <p class="card-description">Xem và quản lý đơn hàng của bạn</p>
+                <p class="card-subtitle">Use Cases: Checkout, SearchOrders, CancelOrder</p>
             </a>
 
-            <a href="#profile" class="feature-card">
-                <h3 class="card-title">Tài khoản</h3>
-                <p class="card-description">Quản lý thông tin cá nhân</p>
+            <a href="product-detail.html" class="feature-card">
+                <h3 class="card-title">🔍 Chi tiết sản phẩm</h3>
+                <p class="card-description">Xem thông tin chi tiết sản phẩm</p>
+                <p class="card-subtitle">Use Case: GetProductDetail</p>
             </a>
         </div>
     </div>

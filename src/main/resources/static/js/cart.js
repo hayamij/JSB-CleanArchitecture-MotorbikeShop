@@ -4,6 +4,8 @@ let currentCart = null;
 
 async function loadCart() {
     const userId = sessionStorage.getItem('userId');
+    const userName = sessionStorage.getItem('userName');
+    const role = sessionStorage.getItem('userRole');
     
     if (!userId) {
         showAlert('Vui lòng đăng nhập để xem giỏ hàng', 'warning');
@@ -11,6 +13,16 @@ async function loadCart() {
             window.location.href = 'login.html';
         }, 2000);
         return;
+    }
+
+    // Update user info in navbar
+    if (userName) document.getElementById('userName').textContent = userName;
+    if (role === 'ADMIN') {
+        const adminLink = document.getElementById('adminLink');
+        if (adminLink) {
+            adminLink.style.display = 'block';
+            adminLink.href = 'admin.html';
+        }
     }
 
     showLoading(true);

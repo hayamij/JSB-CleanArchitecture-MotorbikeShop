@@ -249,7 +249,8 @@ SET IDENTITY_INSERT tai_khoan ON;
 INSERT INTO tai_khoan (ma_tai_khoan, email, ten_dang_nhap, mat_khau, so_dien_thoai, dia_chi, vai_tro) VALUES
 (1, N'admin@motorbike.com', N'admin', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0901234567', N'Ha Noi', N'ADMIN'),
 (2, N'customer1@gmail.com', N'customer1', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0912345678', N'TP.HCM', N'CUSTOMER'),
-(3, N'customer2@gmail.com', N'customer2', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0923456789', N'Da Nang', N'CUSTOMER');
+(3, N'customer2@gmail.com', N'customer2', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0923456789', N'Da Nang', N'CUSTOMER'),
+(4, N'admin@gmail.com', N'admin', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0909999999', N'Ha Noi', N'ADMIN');
 SET IDENTITY_INSERT tai_khoan OFF;
 GO
 

@@ -13,8 +13,17 @@
             <a href="home.html" class="logo">
                 <span>Motorbike Shop</span>
             </a>
-            <div class="nav-actions">
-                <a href="home.html" class="btn-back">Quay lại</a>
+
+            <ul class="nav-menu">
+                <li><a href="home.html">Trang chủ</a></li>
+                <li><a href="cart.html" class="active">Giỏ hàng</a></li>
+                <li><a href="my-orders.html">Đơn hàng của tôi</a></li>
+                <li><a href="#" id="adminLink" style="display: none;">Admin Panel</a></li>
+            </ul>
+
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span class="user-name" id="userName">User</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
             </div>
         </div>
     </nav>
