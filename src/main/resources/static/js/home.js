@@ -13,29 +13,32 @@ async function loadProducts() {
         
         console.log('Loaded products from API:', data);
         
-        allProducts = data.map(product => {
-            return {
-                id: product.id,
-                name: product.name,
-                description: product.description || '',
-                price: product.price,
-                category: product.category, // Keep original category
-                categoryDisplay: product.category === 'XE_MAY' ? 'Xe máy' : 'Phụ kiện',
-                stock: product.stock,
-                imageUrl: product.imageUrl,
-                createdDate: product.createdDate, // Ngày tạo từ backend
-                // Motorbike specific
-                brand: product.brand,
-                model: product.model,
-                color: product.color,
-                engineCapacity: product.engineCapacity,
-                year: product.year,
-                // Accessory specific
-                type: product.type,
-                material: product.material,
-                size: product.size
-            };
-        });
+        allProducts = data
+            .filter(product => product.available !== false) // Only show available products on home page
+            .map(product => {
+                return {
+                    id: product.id,
+                    name: product.name,
+                    description: product.description || '',
+                    price: product.price,
+                    category: product.category, // Keep original category
+                    categoryDisplay: product.category === 'XE_MAY' ? 'Xe máy' : 'Phụ kiện',
+                    stock: product.stock,
+                    imageUrl: product.imageUrl,
+                    createdDate: product.createdDate, // Ngày tạo từ backend
+                    available: product.available,
+                    // Motorbike specific
+                    brand: product.brand,
+                    model: product.model,
+                    color: product.color,
+                    engineCapacity: product.engineCapacity,
+                    year: product.year,
+                    // Accessory specific
+                    type: product.type,
+                    material: product.material,
+                    size: product.size
+                };
+            });
         
         products = [...allProducts];
         currentPage = 1;

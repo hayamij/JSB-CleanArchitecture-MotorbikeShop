@@ -8,21 +8,17 @@ import com.motorbike.adapters.viewmodels.GetOrderDetailViewModel;
 import com.motorbike.adapters.viewmodels.GetOrderDetailViewModel.OrderDetailDisplay;
 import com.motorbike.adapters.viewmodels.GetOrderDetailViewModel.OrderItemDisplay;
 
-import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class GetOrderDetailPresenter implements GetOrderDetailOutputBoundary {
 
     private final GetOrderDetailViewModel viewModel;
-    private final NumberFormat currencyFormat;
     private final DateTimeFormatter dateFormatter;
 
     public GetOrderDetailPresenter(GetOrderDetailViewModel viewModel) {
         this.viewModel = viewModel;
-        this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         this.dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     }
 
@@ -50,7 +46,7 @@ public class GetOrderDetailPresenter implements GetOrderDetailOutputBoundary {
         display.shippingAddress = info.getShippingAddress();
         display.orderStatus = info.getOrderStatus();
         display.orderStatusCode = info.getOrderStatusCode();
-        display.formattedTotalAmount = currencyFormat.format(info.getTotalAmount());
+        display.totalAmount = info.getTotalAmount();
         display.formattedOrderDate = info.getOrderDate().format(dateFormatter);
         display.note = info.getNote();
         display.paymentMethod = info.getPaymentMethod();
@@ -69,8 +65,8 @@ public class GetOrderDetailPresenter implements GetOrderDetailOutputBoundary {
         item.productId = itemInfo.getProductId();
         item.productName = itemInfo.getProductName();
         item.quantity = itemInfo.getQuantity();
-        item.formattedPrice = currencyFormat.format(itemInfo.getPrice());
-        item.formattedSubtotal = currencyFormat.format(itemInfo.getSubtotal());
+        item.price = itemInfo.getPrice();
+        item.subtotal = itemInfo.getSubtotal();
         return item;
     }
 

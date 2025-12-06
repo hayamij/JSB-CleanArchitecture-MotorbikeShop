@@ -89,6 +89,11 @@ public class GetAllUsersUseCaseControlTest {
 		}
 
 		@Override
+		public boolean existsByTenDangNhap(String tenDangNhap) {
+			return false;
+		}
+
+		@Override
 		public TaiKhoan save(TaiKhoan taiKhoan) {
 			return taiKhoan;
 		}
@@ -140,6 +145,11 @@ public class GetAllUsersUseCaseControlTest {
 
 		@Override
 		public boolean existsByUsername(String username) {
+			return false;
+		}
+
+		@Override
+		public boolean existsByTenDangNhap(String tenDangNhap) {
 			return false;
 		}
 

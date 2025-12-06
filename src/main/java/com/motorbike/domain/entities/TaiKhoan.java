@@ -167,6 +167,7 @@ public class TaiKhoan {
     public void setMaTaiKhoan(Long maTaiKhoan) {this.maTaiKhoan = maTaiKhoan;}
     public void setHoTen(String hoTen) {validateHoTen(hoTen); this.hoTen = hoTen; this.ngayCapNhat = LocalDateTime.now();}
     public void setEmail(String email) {validateEmail(email); this.email = email; this.ngayCapNhat = LocalDateTime.now();}
+    public void setTenDangNhap(String tenDangNhap) {validateTenDangNhap(tenDangNhap); this.tenDangNhap = tenDangNhap; this.ngayCapNhat = LocalDateTime.now();}
     public void setSoDienThoai(String soDienThoai) {validateSoDienThoai(soDienThoai); this.soDienThoai = soDienThoai; this.ngayCapNhat = LocalDateTime.now();}
     public void setDiaChi(String diaChi) {this.diaChi = diaChi; this.ngayCapNhat = LocalDateTime.now();}
 }

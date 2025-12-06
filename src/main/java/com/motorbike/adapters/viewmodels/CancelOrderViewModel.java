@@ -2,12 +2,10 @@ package com.motorbike.adapters.viewmodels;
 
 import com.motorbike.business.dto.cancelorder.CancelOrderOutputData;
 import com.motorbike.business.usecase.output.CancelOrderOutputBoundary;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 
-@Component
 public class CancelOrderViewModel implements CancelOrderOutputBoundary {
     
     public boolean success;

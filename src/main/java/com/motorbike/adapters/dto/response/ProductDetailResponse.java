@@ -1,11 +1,13 @@
 package com.motorbike.adapters.dto.response;
 
+import java.math.BigDecimal;
+
 public class ProductDetailResponse {
     private boolean success;
     private String productId;
     private String name;
     private String description;
-    private String formattedPrice;
+    private BigDecimal price;
     private String imageUrl;
     private String specifications;
     private String categoryDisplay;
@@ -15,7 +17,7 @@ public class ProductDetailResponse {
     private String errorMessage;
 
     public ProductDetailResponse(boolean success, String productId, String name,
-                                String description, String formattedPrice, String imageUrl,
+                                String description, BigDecimal price, String imageUrl,
                                 String specifications, String categoryDisplay,
                                 String stockQuantity, String availabilityStatus,
                                 String errorCode, String errorMessage) {
@@ -23,7 +25,7 @@ public class ProductDetailResponse {
         this.productId = productId;
         this.name = name;
         this.description = description;
-        this.formattedPrice = formattedPrice;
+        this.price = price;
         this.imageUrl = imageUrl;
         this.specifications = specifications;
         this.categoryDisplay = categoryDisplay;
@@ -37,7 +39,7 @@ public class ProductDetailResponse {
     public String getProductId() { return productId; }
     public String getName() { return name; }
     public String getDescription() { return description; }
-    public String getFormattedPrice() { return formattedPrice; }
+    public BigDecimal getPrice() { return price; }
     public String getImageUrl() { return imageUrl; }
     public String getSpecifications() { return specifications; }
     public String getCategoryDisplay() { return categoryDisplay; }

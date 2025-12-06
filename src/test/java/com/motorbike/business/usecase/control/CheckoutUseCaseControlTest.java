@@ -530,5 +530,10 @@ public class CheckoutUseCaseControlTest {
 		public List<DonHang> searchOrders(String keyword) {
 			return new ArrayList<>();
 		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.ProductSalesStats> getTopSellingProducts(int limit) {
+			return new java.util.ArrayList<>();
+		}
 	}
 }

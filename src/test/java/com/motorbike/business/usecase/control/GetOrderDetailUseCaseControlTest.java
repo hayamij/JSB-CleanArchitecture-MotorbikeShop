@@ -136,6 +136,11 @@ public class GetOrderDetailUseCaseControlTest {
 		public List<DonHang> searchOrders(String keyword) {
 			return List.of();
 		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.ProductSalesStats> getTopSellingProducts(int limit) {
+			return new java.util.ArrayList<>();
+		}
 	}
 
 	private static class MockOrderRepositoryEmpty implements OrderRepository {
@@ -173,14 +178,19 @@ public class GetOrderDetailUseCaseControlTest {
 			return List.of();
 		}
 
-		@Override
-		public List<DonHang> findByUserIdAndStatus(Long userId, TrangThaiDonHang trangThai) {
-			return List.of();
-		}
-
-		@Override
-		public List<DonHang> searchOrders(String keyword) {
-			return List.of();
-		}
+	@Override
+	public List<DonHang> findByUserIdAndStatus(Long userId, TrangThaiDonHang trangThai) {
+		return List.of();
 	}
+
+	@Override
+	public List<DonHang> searchOrders(String keyword) {
+		return List.of();
+	}
+
+	@Override
+	public java.util.List<com.motorbike.domain.entities.ProductSalesStats> getTopSellingProducts(int limit) {
+		return new java.util.ArrayList<>();
+	}
+}
 }

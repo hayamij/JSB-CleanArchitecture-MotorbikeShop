@@ -125,6 +125,11 @@ public class UpdateOrderUseCaseControlTest {
 		}
 
 		@Override
+		public java.util.List<com.motorbike.domain.entities.ProductSalesStats> getTopSellingProducts(int limit) {
+			return new java.util.ArrayList<>();
+		}
+
+		@Override
 		public List<DonHang> findByStatus(TrangThaiDonHang trangThai) {
 			return new ArrayList<>();
 		}

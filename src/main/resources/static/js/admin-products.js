@@ -216,8 +216,8 @@ function editMotorbike(id) {
     document.getElementById('motorbikeBrand').value = bike.brand || '';
     document.getElementById('motorbikeModel').value = bike.model || '';
     document.getElementById('motorbikeColor').value = bike.color || '';
-    document.getElementById('motorbikeYear').value = bike.year || new Date().getFullYear();
-    document.getElementById('motorbikeDisplacement').value = bike.engineCapacity || 0;
+    document.getElementById('motorbikeYear').value = bike.year || '';
+    document.getElementById('motorbikeDisplacement').value = bike.engineCapacity || '';
     document.getElementById('motorbikePrice').value = bike.price || 0;
     document.getElementById('motorbikeStock').value = bike.stock || 0;
     document.getElementById('motorbikeImage').value = bike.imageUrl || '';
@@ -233,13 +233,13 @@ async function saveMotorbike() {
     const model = document.getElementById('motorbikeModel').value.trim();
     const color = document.getElementById('motorbikeColor').value.trim();
     const year = parseInt(document.getElementById('motorbikeYear').value);
-    const displacement = parseInt(document.getElementById('motorbikeDisplacement').value);
+    const engineCapacity = parseInt(document.getElementById('motorbikeDisplacement').value);
     const price = parseFloat(document.getElementById('motorbikePrice').value);
     const stock = parseInt(document.getElementById('motorbikeStock').value);
     const image = document.getElementById('motorbikeImage').value.trim();
     const description = document.getElementById('motorbikeDescription').value.trim();
     
-    if (!name || !brand || !model || !color || isNaN(year) || isNaN(displacement) || isNaN(price) || isNaN(stock)) {
+    if (!name || !brand || !model || !color || isNaN(year) || isNaN(engineCapacity) || isNaN(price) || isNaN(stock)) {
         showAlert('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
         return;
     }
@@ -254,7 +254,7 @@ async function saveMotorbike() {
         model,
         color,
         year,
-        displacement
+        displacement: engineCapacity
     };
     
     console.log('Saving motorbike data:', JSON.stringify(motorbikeData, null, 2));

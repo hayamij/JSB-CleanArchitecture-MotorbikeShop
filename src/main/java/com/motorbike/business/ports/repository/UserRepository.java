@@ -22,6 +22,9 @@ public interface UserRepository {
     boolean existsByUsername(String username);
     
     
+    boolean existsByTenDangNhap(String tenDangNhap);
+    
+    
     TaiKhoan save(TaiKhoan taiKhoan);
     
     

@@ -72,7 +72,7 @@ public class GetProductDetailUseCaseControlTest {
 		control.execute(inputData);
 		
 		assertEquals(false, viewModel.hasError);
-		assertNotEquals(null, viewModel.formattedPrice);
+		assertNotEquals(null, viewModel.price);
 	}
 	
 	@Test
@@ -321,3 +321,4 @@ public class GetProductDetailUseCaseControlTest {
 		}
 	}
 }
+

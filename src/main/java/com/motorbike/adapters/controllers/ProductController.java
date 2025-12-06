@@ -48,7 +48,7 @@ public class ProductController {
                 productDetailViewModel.productId,
                 productDetailViewModel.name,
                 productDetailViewModel.description,
-                productDetailViewModel.formattedPrice,
+                productDetailViewModel.price,
                 productDetailViewModel.imageUrl,
                 productDetailViewModel.specifications,
                 productDetailViewModel.categoryDisplay,
@@ -80,7 +80,7 @@ public class ProductController {
                     productMap.put("id", product.id);
                     productMap.put("name", product.name);
                     productMap.put("description", product.description);
-                    productMap.put("price", product.formattedPrice);
+                    productMap.put("price", product.price);
                     productMap.put("stock", product.stock);
                     productMap.put("imageUrl", product.imageUrl);
                     productMap.put("createdDate", product.formattedCreatedDate);

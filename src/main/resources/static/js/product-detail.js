@@ -114,7 +114,7 @@ function renderProduct(product) {
                 <h1 class="product-title">${product.name}</h1>
 
                 <div class="product-price-section">
-                    <div class="product-price">${product.formattedPrice || formatCurrency(product.price)}</div>
+                    <div class="product-price">${formatCurrency(product.price)}</div>
                     ${stockStatusHtml}
                 </div>
 

@@ -5,6 +5,11 @@ const API_BASE_URL = 'http://localhost:8080/api';
 // Store original orders data for filtering
 let allOrdersData = [];
 
+// Format price helper
+function formatPrice(price) {
+    return price.toLocaleString('vi-VN') + ' đ';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAdminAuth();
     loadAllOrders();
@@ -258,9 +263,9 @@ async function viewOrder(orderId) {
                         <div style="padding: 12px; background: white; margin-bottom: 8px; border-left: 3px solid var(--color-black); display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <strong>${item.productName}</strong><br>
-                                <span style="color: var(--color-gray);">Số lượng: ${item.quantity} x ${item.formattedPrice}</span>
+                                <span style="color: var(--color-gray);">Số lượng: ${item.quantity} x ${formatPrice(item.price)}</span>
                             </div>
-                            <div style="font-weight: bold;">${item.formattedSubtotal}</div>
+                            <div style="font-weight: bold;">${formatPrice(item.subtotal)}</div>
                         </div>
                     `).join('') : 
                     '<p style="text-align: center;">Không có sản phẩm</p>'
@@ -268,7 +273,7 @@ async function viewOrder(orderId) {
             </div>
             
             <div style="text-align: right; padding: 20px; background: var(--color-black); color: white; font-size: 1.2em;">
-                <strong>Tổng cộng: ${order.formattedTotalAmount}</strong>
+                <strong>Tổng cộng: ${formatPrice(order.totalAmount)}</strong>
             </div>
         `;
         
@@ -341,7 +346,7 @@ async function editOrder(order) {
                 <div style="margin-bottom: 10px;"><strong>SĐT:</strong> ${fullOrder.customerPhone}</div>
                 <div style="margin-bottom: 10px;"><strong>Địa chỉ:</strong> ${fullOrder.shippingAddress}</div>
                 <div style="margin-bottom: 10px;"><strong>Ngày đặt:</strong> ${fullOrder.formattedOrderDate}</div>
-                <div style="margin-bottom: 10px;"><strong>Tổng tiền:</strong> <strong>${fullOrder.formattedTotalAmount}</strong></div>
+                <div style="margin-bottom: 10px;"><strong>Tổng tiền:</strong> <strong>${formatPrice(fullOrder.totalAmount)}</strong></div>
             </div>
             
             <div style="background: var(--color-light-gray); padding: 20px;">
@@ -353,10 +358,10 @@ async function editOrder(order) {
                                 <div>
                                     <strong>${item.productName}</strong><br>
                                     <span style="color: var(--color-gray); font-size: 0.9em;">
-                                        Số lượng: ${item.quantity} x ${item.formattedPrice}
+                                        Số lượng: ${item.quantity} x ${formatPrice(item.price)}
                                     </span>
                                 </div>
-                                <strong>${item.formattedSubtotal}</strong>
+                                <strong>${formatPrice(item.subtotal)}</strong>
                             </div>
                         </div>
                     `).join('') :

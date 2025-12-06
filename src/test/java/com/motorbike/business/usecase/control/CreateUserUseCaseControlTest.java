@@ -108,6 +108,11 @@ public class CreateUserUseCaseControlTest {
 	}
 
 	@Override
+	public boolean existsByTenDangNhap(String tenDangNhap) {
+		return false;
+	}
+
+	@Override
 	public Optional<TaiKhoan> findById(Long id) {
 		return Optional.empty();
 	}		@Override

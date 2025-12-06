@@ -1,10 +1,12 @@
 package com.motorbike.adapters.viewmodels;
 
+import java.math.BigDecimal;
+
 public class ProductDetailViewModel {
     public String productId;
     public String name;
     public String description;
-    public String formattedPrice;
+    public BigDecimal price;
     public String imageUrl;
     public String specifications;
     public String categoryDisplay;
@@ -28,7 +30,7 @@ public class ProductDetailViewModel {
     
     public String getErrorCode() {return errorCode;}
     
-    public String getFormattedPrice() {return formattedPrice;}
+    public BigDecimal getPrice() {return price;}
     
     public String getAvailabilityStatus() {return availabilityStatus;}
 }

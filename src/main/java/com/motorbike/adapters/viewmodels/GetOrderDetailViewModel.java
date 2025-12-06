@@ -1,5 +1,6 @@
 package com.motorbike.adapters.viewmodels;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class GetOrderDetailViewModel {
@@ -16,7 +17,7 @@ public class GetOrderDetailViewModel {
         public String shippingAddress;
         public String orderStatus;
         public String orderStatusCode;
-        public String formattedTotalAmount;
+        public BigDecimal totalAmount;
         public String formattedOrderDate;
         public String note;
         public String paymentMethod;
@@ -29,7 +30,7 @@ public class GetOrderDetailViewModel {
         public Long productId;
         public String productName;
         public int quantity;
-        public String formattedPrice;
-        public String formattedSubtotal;
+        public BigDecimal price;
+        public BigDecimal subtotal;
     }
 }

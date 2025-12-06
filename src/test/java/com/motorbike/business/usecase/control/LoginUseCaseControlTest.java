@@ -275,25 +275,30 @@ public class LoginUseCaseControlTest {
 					"0912345678", "123 Street", VaiTro.CUSTOMER,
 					false, LocalDateTime.now(), LocalDateTime.now(), null
 				);
-				return Optional.of(lockedAccount);
-			}
-			
-			if (email.equals("admin@test.com")) {
-				TaiKhoan admin = new TaiKhoan(
-					2L, "Admin User", email, "admin", "admin123",
-					"0912345678", "123 Street", VaiTro.ADMIN,
-					true, LocalDateTime.now(), LocalDateTime.now(), null
-				);
-				return Optional.of(admin);
-			}
-			
-			TaiKhoan user = new TaiKhoan(
-				1L, "Test User", email, "testuser", "password123",
-				"0912345678", "123 Street", VaiTro.CUSTOMER,
+			return Optional.of(lockedAccount);
+		}
+		
+		if (email.equals("admin@test.com")) {
+			TaiKhoan admin = new TaiKhoan(
+				2L, "Admin User", email, "admin", "admin123",
+				"0912345678", "123 Street", VaiTro.ADMIN,
 				true, LocalDateTime.now(), LocalDateTime.now(), null
 			);
-			return Optional.of(user);
+			return Optional.of(admin);
 		}
+		
+		TaiKhoan user = new TaiKhoan(
+			1L, "Test User", email, "testuser", "password123",
+			"0912345678", "123 Street", VaiTro.CUSTOMER,
+			true, LocalDateTime.now(), LocalDateTime.now(), null
+		);
+		return Optional.of(user);
+	}
+	
+	@Override
+	public boolean existsByTenDangNhap(String tenDangNhap) {
+		return false;
+	}
 		
 		@Override
 		public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {

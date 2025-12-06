@@ -35,9 +35,20 @@ public class UpdateUserUseCaseControl implements UpdateUserInputBoundary {
             }
             
             TaiKhoan.checkInput(inputData.getMaTaiKhoan());
-            TaiKhoan.validateHoTen(inputData.getHoTen());
-            TaiKhoan.validateEmail(inputData.getEmail());
-            TaiKhoan.validateSoDienThoai(inputData.getSoDienThoai());
+            
+            // Only validate fields that are being updated (non-null)
+            if (inputData.getTenDangNhap() != null) {
+                TaiKhoan.validateTenDangNhap(inputData.getTenDangNhap());
+            }
+            if (inputData.getHoTen() != null) {
+                TaiKhoan.validateHoTen(inputData.getHoTen());
+            }
+            if (inputData.getEmail() != null) {
+                TaiKhoan.validateEmail(inputData.getEmail());
+            }
+            if (inputData.getSoDienThoai() != null) {
+                TaiKhoan.validateSoDienThoai(inputData.getSoDienThoai());
+            }
             
         } catch (Exception e) {
             errorException = e;
@@ -56,19 +67,34 @@ public class UpdateUserUseCaseControl implements UpdateUserInputBoundary {
         // Step 3: Update user entity
         if (errorException == null && taiKhoan != null) {
             try {
-                // Update hoTen
-                taiKhoan.setHoTen(inputData.getHoTen());
+                // Check if username is changed and already exists (only if provided)
+                if (inputData.getTenDangNhap() != null && !taiKhoan.getTenDangNhap().equals(inputData.getTenDangNhap())) {
+                    if (userRepository.existsByTenDangNhap(inputData.getTenDangNhap())) {
+                        throw DomainException.usernameAlreadyExists(inputData.getTenDangNhap());
+                    }
+                    taiKhoan.setTenDangNhap(inputData.getTenDangNhap());
+                }
                 
-                // Check if email is changed and already exists
-                if (!taiKhoan.getEmail().equals(inputData.getEmail())) {
+                // Update hoTen (only if provided)
+                if (inputData.getHoTen() != null) {
+                    taiKhoan.setHoTen(inputData.getHoTen());
+                }
+                
+                // Check if email is changed and already exists (only if provided)
+                if (inputData.getEmail() != null && !taiKhoan.getEmail().equals(inputData.getEmail())) {
                     if (userRepository.existsByEmail(inputData.getEmail())) {
                         throw DomainException.emailAlreadyExists(inputData.getEmail());
                     }
                     taiKhoan.setEmail(inputData.getEmail());
                 }
                 
-                taiKhoan.setSoDienThoai(inputData.getSoDienThoai());
-                taiKhoan.setDiaChi(inputData.getDiaChi());
+                // Update phone and address (only if provided)
+                if (inputData.getSoDienThoai() != null) {
+                    taiKhoan.setSoDienThoai(inputData.getSoDienThoai());
+                }
+                if (inputData.getDiaChi() != null) {
+                    taiKhoan.setDiaChi(inputData.getDiaChi());
+                }
                 
                 // Update role
                 if (inputData.getVaiTro() != null && taiKhoan.getVaiTro() != inputData.getVaiTro()) {

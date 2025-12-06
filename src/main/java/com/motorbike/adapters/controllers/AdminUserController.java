@@ -173,12 +173,56 @@ public class AdminUserController {
         
         UpdateUserInputData input = new UpdateUserInputData(
             userId,
+            (String) request.get("username"),
             (String) request.get("name"),
             (String) request.get("email"),
             (String) request.get("phone"),
             (String) request.get("address"),
             RoleConverter.fromString(roleStr),
             active
+        );
+        
+        updateUserUseCase.execute(input);
+
+        if (updateUserViewModel.hasError) {
+            return ResponseEntity.status(400)
+                    .body(Map.of(
+                        "success", false,
+                        "errorCode", updateUserViewModel.errorCode,
+                        "errorMessage", updateUserViewModel.errorMessage
+                    ));
+        }
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", updateUserViewModel.successMessage
+        ));
+    }
+
+    // Toggle user status (lock/unlock)
+    @PatchMapping("/{userId}/status")
+    public ResponseEntity<?> toggleUserStatus(
+            @PathVariable Long userId,
+            @RequestBody Map<String, Object> request) {
+        
+        Boolean isActive = (Boolean) request.get("isActive");
+        if (isActive == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                        "success", false,
+                        "errorMessage", "Missing isActive parameter"
+                    ));
+        }
+        
+        UpdateUserInputData input = new UpdateUserInputData(
+            userId,
+            null, // tenDangNhap
+            null, // hoTen
+            null, // email
+            null, // soDienThoai
+            null, // diaChi
+            null, // vaiTro
+            isActive // hoatDong
         );
         
         updateUserUseCase.execute(input);

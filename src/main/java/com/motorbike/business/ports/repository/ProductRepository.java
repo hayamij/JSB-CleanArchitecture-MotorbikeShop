@@ -32,4 +32,5 @@ public interface ProductRepository {
     List<XeMay> findAllMotorbikes();
 
     List<XeMay> searchMotorbikes(String keyword);
+
 }

@@ -48,6 +48,8 @@ public class AdminOrderController {
     private final GetOrderDetailViewModel getOrderDetailViewModel;
     private final GetValidOrderStatusesInputBoundary getValidOrderStatusesUseCase;
     private final GetValidOrderStatusesViewModel getValidOrderStatusesViewModel;
+    private final com.motorbike.business.usecase.control.GetTopProductsUseCaseControl getTopProductsUseCase;
+    private final com.motorbike.adapters.viewmodels.GetTopProductsViewModel getTopProductsViewModel;
 
     @Autowired
     public AdminOrderController(
@@ -58,7 +60,9 @@ public class AdminOrderController {
             GetOrderDetailInputBoundary getOrderDetailUseCase,
             GetOrderDetailViewModel getOrderDetailViewModel,
             GetValidOrderStatusesInputBoundary getValidOrderStatusesUseCase,
-            GetValidOrderStatusesViewModel getValidOrderStatusesViewModel) 
+            GetValidOrderStatusesViewModel getValidOrderStatusesViewModel,
+            com.motorbike.business.usecase.control.GetTopProductsUseCaseControl getTopProductsUseCase,
+            com.motorbike.adapters.viewmodels.GetTopProductsViewModel getTopProductsViewModel) 
     {
         this.listAllOrdersUseCase = listAllOrdersUseCase;
         this.listAllOrdersViewModel = listAllOrdersViewModel;
@@ -68,6 +72,8 @@ public class AdminOrderController {
         this.getOrderDetailViewModel = getOrderDetailViewModel;
         this.getValidOrderStatusesUseCase = getValidOrderStatusesUseCase;
         this.getValidOrderStatusesViewModel = getValidOrderStatusesViewModel;
+        this.getTopProductsUseCase = getTopProductsUseCase;
+        this.getTopProductsViewModel = getTopProductsViewModel;
     }
     @GetMapping("/all")
     public ResponseEntity<ListAllOrdersResponse> listAllOrders() {
@@ -141,7 +147,7 @@ public class AdminOrderController {
             orderData.put("shippingAddress", getOrderDetailViewModel.orderDetail.shippingAddress);
             orderData.put("orderStatus", getOrderDetailViewModel.orderDetail.orderStatus);
             orderData.put("orderStatusCode", getOrderDetailViewModel.orderDetail.orderStatusCode);
-            orderData.put("formattedTotalAmount", getOrderDetailViewModel.orderDetail.formattedTotalAmount);
+            orderData.put("totalAmount", getOrderDetailViewModel.orderDetail.totalAmount);
             orderData.put("formattedOrderDate", getOrderDetailViewModel.orderDetail.formattedOrderDate);
             orderData.put("note", getOrderDetailViewModel.orderDetail.note);
             orderData.put("paymentMethod", getOrderDetailViewModel.orderDetail.paymentMethod);
@@ -153,8 +159,8 @@ public class AdminOrderController {
                 itemData.put("productId", item.productId);
                 itemData.put("productName", item.productName);
                 itemData.put("quantity", item.quantity);
-                itemData.put("formattedPrice", item.formattedPrice);
-                itemData.put("formattedSubtotal", item.formattedSubtotal);
+                itemData.put("price", item.price);
+                itemData.put("subtotal", item.subtotal);
                 items.add(itemData);
             }
             orderData.put("items", items);
@@ -173,19 +179,34 @@ public class AdminOrderController {
         }
     }
     
-    // TODO: Create GetTopProductsUseCaseControl for this functionality
-    // This method is temporarily disabled because it violates Clean Architecture
-    // by accessing OrderRepository directly from Controller
-    /*
     @GetMapping("/stats/top-products")
     public ResponseEntity<Map<String, Object>> getTopProducts() {
-        // VIOLATION: Direct repository access - need to create Use Case
-        Map<String, Object> error = new HashMap<>();
-        error.put("success", false);
-        error.put("message", "Feature temporarily unavailable - needs Use Case implementation");
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(error);
+        // Default limit: top 10 products
+        com.motorbike.business.dto.topproducts.GetTopProductsInputData inputData = 
+                new com.motorbike.business.dto.topproducts.GetTopProductsInputData(10);
+        
+        getTopProductsUseCase.execute(inputData);
+        
+        Map<String, Object> response = new HashMap<>();
+        if (getTopProductsViewModel.success) {
+            response.put("success", true);
+            response.put("products", getTopProductsViewModel.products.stream()
+                    .map(product -> {
+                        Map<String, Object> productMap = new HashMap<>();
+                        productMap.put("id", product.productId);
+                        productMap.put("name", product.productName);
+                        productMap.put("sold", product.totalSold);
+                        return productMap;
+                    })
+                    .collect(java.util.stream.Collectors.toList()));
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("success", false);
+            response.put("errorMessage", getTopProductsViewModel.errorMessage);
+            response.put("errorCode", getTopProductsViewModel.errorCode);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
-    */
     
     @PostMapping("/{orderId}/update")
     public ResponseEntity<Map<String, Object>> updateOrder(

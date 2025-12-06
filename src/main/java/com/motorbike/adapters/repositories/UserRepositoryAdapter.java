@@ -61,6 +61,11 @@ public class UserRepositoryAdapter implements UserRepository {
     }
     
     @Override
+    public boolean existsByTenDangNhap(String tenDangNhap) {
+        return jpaRepository.existsByTenDangNhap(tenDangNhap);
+    }
+    
+    @Override
     public void updateLastLogin(Long userId) {
         jpaRepository.findById(userId).ifPresent(user -> {
             user.setLanDangNhapCuoi(java.time.LocalDateTime.now());

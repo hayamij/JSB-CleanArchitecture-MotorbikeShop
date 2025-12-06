@@ -125,6 +125,11 @@ public class SearchOrdersUseCaseControlTest {
 		}
 
 		@Override
+		public java.util.List<com.motorbike.domain.entities.ProductSalesStats> getTopSellingProducts(int limit) {
+			return new java.util.ArrayList<>();
+		}
+
+		@Override
 		public List<DonHang> findByStatus(TrangThaiDonHang trangThai) {
 			return new ArrayList<>();
 		}
@@ -144,6 +149,11 @@ public class SearchOrdersUseCaseControlTest {
 	@Override
 	public Optional<com.motorbike.domain.entities.TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
 		return findByEmail(username);
+	}
+
+	@Override
+	public boolean existsByTenDangNhap(String tenDangNhap) {
+		return false;
 	}
 
 	@Override

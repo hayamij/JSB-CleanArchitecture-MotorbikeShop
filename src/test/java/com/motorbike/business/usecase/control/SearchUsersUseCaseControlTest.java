@@ -85,6 +85,11 @@ public class SearchUsersUseCaseControlTest {
 	}
 
 	@Override
+	public boolean existsByTenDangNhap(String tenDangNhap) {
+		return false;
+	}
+
+	@Override
 	public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
 		return findByEmail(username);
 	}

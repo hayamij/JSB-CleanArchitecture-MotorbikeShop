@@ -6,21 +6,17 @@ import com.motorbike.business.usecase.output.GetAllProductsOutputBoundary;
 import com.motorbike.adapters.viewmodels.GetAllProductsViewModel;
 import com.motorbike.adapters.viewmodels.GetAllProductsViewModel.ProductItemViewModel;
 
-import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class GetAllProductsPresenter implements GetAllProductsOutputBoundary {
 
     private final GetAllProductsViewModel viewModel;
-    private final NumberFormat currencyFormat;
     private final DateTimeFormatter dateFormatter;
 
     public GetAllProductsPresenter(GetAllProductsViewModel viewModel) {
         this.viewModel = viewModel;
-        this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         this.dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     }
 
@@ -45,8 +41,10 @@ public class GetAllProductsPresenter implements GetAllProductsOutputBoundary {
         ProductItemViewModel item = new ProductItemViewModel();
         item.id = productInfo.getProductId();
         item.name = productInfo.getName();
+        item.id = productInfo.getProductId();
+        item.name = productInfo.getName();
         item.description = productInfo.getDescription();
-        item.formattedPrice = currencyFormat.format(productInfo.getPrice());
+        item.price = productInfo.getPrice();
         item.stock = productInfo.getStockQuantity();
         item.imageUrl = productInfo.getImageUrl();
         item.formattedCreatedDate = productInfo.getCreatedDate() != null 
@@ -56,16 +54,21 @@ public class GetAllProductsPresenter implements GetAllProductsOutputBoundary {
         item.category = productInfo.getCategory();
         
         // Motorbike fields
-        item.brand = productInfo.getBrand();
-        item.model = productInfo.getModel();
-        item.color = productInfo.getColor();
-        item.year = productInfo.getYear();
-        item.engineCapacity = productInfo.getEngineCapacity();
+        if ("XE_MAY".equals(productInfo.getCategory())) {
+            item.brand = productInfo.getBrand();
+            item.model = productInfo.getModel();
+            item.color = productInfo.getColor();
+            item.year = productInfo.getYear();
+            item.engineCapacity = productInfo.getEngineCapacity();
+        }
         
         // Accessory fields
-        item.type = productInfo.getType();
-        item.material = productInfo.getMaterial();
-        item.size = productInfo.getSize();
+        if ("PHU_KIEN".equals(productInfo.getCategory())) {
+            item.type = productInfo.getType();
+            item.brand = productInfo.getBrand(); // thuongHieu for accessories
+            item.material = productInfo.getMaterial();
+            item.size = productInfo.getSize();
+        }
         
         return item;
     }

@@ -767,4 +767,27 @@ public com.motorbike.business.usecase.output.CreateUserOutputBoundary createUser
         return new com.motorbike.adapters.presenters.ToggleProductVisibilityPresenter(viewModel);
     }
 
+    // ==================== GET TOP PRODUCTS USE CASE ====================
+    
+    @Bean
+    @RequestScope
+    public com.motorbike.adapters.viewmodels.GetTopProductsViewModel getTopProductsViewModel() {
+        return new com.motorbike.adapters.viewmodels.GetTopProductsViewModel();
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.control.GetTopProductsUseCaseControl getTopProductsUseCase(
+            com.motorbike.business.usecase.output.GetTopProductsOutputBoundary presenter,
+            OrderRepository orderRepository
+    ) {
+        return new com.motorbike.business.usecase.control.GetTopProductsUseCaseControl(presenter, orderRepository);
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.output.GetTopProductsOutputBoundary getTopProductsPresenter(
+            com.motorbike.adapters.viewmodels.GetTopProductsViewModel viewModel
+    ) {
+        return new com.motorbike.adapters.presenters.GetTopProductsPresenter(viewModel);
+    }
+
 }

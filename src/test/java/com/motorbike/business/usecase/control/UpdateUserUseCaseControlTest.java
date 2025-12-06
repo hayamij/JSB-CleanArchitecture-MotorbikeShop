@@ -21,6 +21,7 @@ public class UpdateUserUseCaseControlTest {
 	public void testExecute_ValidUpdate_Success() {
 		UpdateUserInputData inputData = new UpdateUserInputData(
 			1L,
+			null, // tenDangNhap
 			"Updated Name",
 			"user@test.com",
 			"0987654321",
@@ -44,6 +45,7 @@ public class UpdateUserUseCaseControlTest {
 	public void testExecute_UserNotFound() {
 		UpdateUserInputData inputData = new UpdateUserInputData(
 			999L,
+			null, // tenDangNhap
 			"Test User",
 			"user@test.com",
 			"0987654321",
@@ -85,6 +87,11 @@ public class UpdateUserUseCaseControlTest {
 		@Override
 		public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
 			return findByEmail(username);
+		}
+
+		@Override
+		public boolean existsByTenDangNhap(String tenDangNhap) {
+			return false;
 		}
 
 		@Override

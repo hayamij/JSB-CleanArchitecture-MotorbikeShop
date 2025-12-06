@@ -387,6 +387,11 @@ public class RegisterUseCaseControlTest {
 	public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
 		return findByEmail(username);
 	}
+
+	@Override
+	public boolean existsByTenDangNhap(String tenDangNhap) {
+		return false;
+	}
 	
 	@Override
 	public Optional<TaiKhoan> findById(Long id) {
