@@ -477,3 +477,14 @@ PRINT N'   - 5 motorbikes';
 PRINT N'   - 5 accessories';
 PRINT N'   - 2 empty shopping carts';
 GO
+
+-- Add payment method column to don_hang table
+ALTER TABLE don_hang
+ADD phuong_thuc_thanh_toan VARCHAR(50);
+GO
+
+-- Set default value for existing records
+UPDATE don_hang
+SET phuong_thuc_thanh_toan = 'THANH_TOAN_TRUC_TIEP'
+WHERE phuong_thuc_thanh_toan IS NULL;
+GO

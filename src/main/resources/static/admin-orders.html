@@ -4,104 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Đơn hàng - Admin Panel</title>
-    <link rel="stylesheet" href="css/common.css?v=2">
-    <link rel="stylesheet" href="css/admin.css?v=2">
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/admin.css?v=3">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="admin.html" class="logo">
-                <span>Admin Panel</span>
-            </a>
-
-            <ul class="nav-menu">
-                <li><a href="admin-users.html">Quản lý Users</a></li>
-                <li><a href="admin-motorbikes.html">Quản lý Xe máy</a></li>
-                <li><a href="admin-accessories.html">Quản lý Phụ kiện</a></li>
-                <li><a href="admin-orders.html" class="active">Quản lý Đơn hàng</a></li>
-            </ul>
-
-            <div class="user-info">
-                <span class="user-greeting">Admin: <span class="user-name" id="userName">Admin</span></span>
-                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
-            </div>
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>ADMIN PANEL</h2>
+            <p class="admin-name" id="sidebarAdminName">Admin</p>
         </div>
-    </nav>
+        
+        <nav class="sidebar-nav">
+            <a href="admin.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="admin-users.html" class="nav-item">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">Quản lý Users</span>
+            </a>
+            <a href="admin-products.html" class="nav-item">
+                <span class="nav-icon">🏍️</span>
+                <span class="nav-text">Quản lý Sản phẩm</span>
+            </a>
+            <a href="admin-orders.html" class="nav-item active">
+                <span class="nav-icon">📦</span>
+                <span class="nav-text">Quản lý Đơn hàng</span>
+            </a>
+        </nav>
 
-    <div class="main-container">
-        <h1 class="section-title">Quản lý Đơn hàng</h1>
-        <div id="alertContainer"></div>
+        <div class="sidebar-footer">
+            <a href="home.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Trang chủ</span>
+            </a>
+            <button class="nav-item btn-logout-sidebar" onclick="logout()">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-text">Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
 
-        <!-- Search Bar -->
-        <div class="search-bar">
-            <form class="search-form" onsubmit="searchOrders(event)">
-                <div class="form-group">
-                    <label>Từ khóa</label>
-                    <input type="text" id="searchKeyword" placeholder="Tên khách hàng...">
-                </div>
-                <div class="form-group">
-                    <label>Trạng thái</label>
-                    <select id="searchStatus">
-                        <option value="">Tất cả</option>
-                        <option value="PENDING">Chờ xác nhận</option>
-                        <option value="CONFIRMED">Đã xác nhận</option>
-                        <option value="CANCELLED">Đã hủy</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn-search">Tìm kiếm</button>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn-add" onclick="loadAllOrders()">Tất cả Đơn hàng</button>
-                </div>
+    <!-- Main Content Area -->
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1>Quản lý Đơn hàng</h1>
+            <p>Xem và cập nhật trạng thái đơn hàng</p>
+        </div>
+
+        <div class="admin-content">
+            <div id="alertContainer"></div>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <form class="search-form" onsubmit="searchOrders(event)">
+                    <div class="form-group">
+                        <label>TÊN KHÁCH HÀNG</label>
+                        <input type="text" id="searchKeyword" placeholder="Nhập tên khách hàng...">
+                    </div>
+                    <div class="form-group">
+                        <label>TRẠNG THÁI</label>
+                        <select id="searchStatus">
+                            <option value="">Tất cả</option>
+                            <option value="PENDING">Chờ xác nhận</option>
+                            <option value="CONFIRMED">Đã xác nhận</option>
+                            <option value="CANCELLED">Đã hủy</option>
+                        </select>
+                    </div>
+                <button type="submit" class="btn-search">TÌM KIẾM</button>
+                <button type="button" class="btn-search" onclick="loadAllOrders()">TẤT CẢ</button>
             </form>
         </div>
 
-        <!-- Loading -->
-        <div id="loadingIndicator" class="loading hidden">
-            <div class="spinner"></div>
-            <p>Đang tải dữ liệu...</p>
-        </div>
-
         <!-- Orders Table -->
-        <div id="ordersContainer">
+        <div class="table-wrapper">
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>Mã ĐH</th>
-                        <th>Khách hàng</th>
-                        <th>SĐT</th>
-                        <th>Địa chỉ giao</th>
-                        <th>Tổng tiền</th>
-                        <th>Số mặt hàng</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày đặt</th>
-                        <th>Thao tác</th>
+                        <th>MÃ ĐH</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th>SỐ ĐIỆN THOẠI</th>
+                        <th>ĐỊA CHỈ GIAO</th>
+                        <th>TỔNG TIỀN</th>
+                        <th>SỐ MẶT HÀNG</th>
+                        <th>PTTT</th>
+                        <th>TRẠNG THÁI</th>
+                        <th>NGÀY ĐẶT</th>
+                        <th>HÀNH ĐỘNG</th>
                     </tr>
                 </thead>
                 <tbody id="ordersTableBody">
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 40px;">
+                            <div class="loading-spinner"></div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
-
-        <div id="emptyState" class="empty-state hidden">
-            <h3>Không tìm thấy đơn hàng nào</h3>
-            <p>Hãy thử tìm kiếm với từ khóa khác</p>
-        </div>
     </div>
+</div>
 
     <!-- Update Order Modal -->
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Cập nhật Đơn hàng</h2>
+                <h2>CẬP NHẬT ĐƠN HÀNG</h2>
             </div>
             <div class="modal-body">
                 <form id="orderForm">
                     <input type="hidden" id="orderId">
                     
                     <div class="form-group">
-                        <label>Trạng thái *</label>
+                        <label>TRẠNG THÁI *</label>
                         <select id="orderStatus" required>
                             <option value="PENDING">Chờ xác nhận</option>
                             <option value="CONFIRMED">Đã xác nhận</option>
@@ -110,23 +126,23 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Ghi chú</label>
+                        <label>GHI CHÚ</label>
                         <textarea id="orderNote" rows="3" style="width: 100%; padding: 12px; border: 2px solid var(--color-light-gray);"></textarea>
+                    </div>
+
+                    <div id="orderDetails" style="margin-top: 20px; padding: 20px; background: var(--color-light-gray);">
+                        <!-- Order details will be loaded here -->
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeOrderModal()">Hủy</button>
-                <button class="btn-submit" onclick="submitOrderForm()">Cập nhật</button>
+                <button class="btn-cancel" onclick="closeOrderModal()">HỦY</button>
+                <button class="btn-submit" onclick="submitOrderForm()">CẬP NHẬT</button>
             </div>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Motorbike Shop Admin Panel. All rights reserved.</p>
-    </footer>
-
-    <script src="js/common.js?v=2"></script>
-    <script src="js/admin-orders.js?v=2"></script>
+    <script src="js/common.js?v=3"></script>
+    <script src="js/admin-orders.js?v=3"></script>
 </body>
 </html>

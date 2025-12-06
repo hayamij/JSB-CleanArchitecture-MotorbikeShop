@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkAdminAuth() {
-    const role = sessionStorage.getItem('userRole');
+    const role = sessionStorage.getItem('role');
     if (role !== 'ADMIN') {
         alert('Bạn không có quyền truy cập Admin Panel!');
         window.location.href = 'home.html';
@@ -18,7 +18,10 @@ function checkAdminAuth() {
     
     const username = sessionStorage.getItem('username');
     if (username) {
-        document.getElementById('userName').textContent = username;
+        const adminNameEl = document.getElementById('sidebarAdminName');
+        if (adminNameEl) {
+            adminNameEl.textContent = username;
+        }
     }
     
     return true;
@@ -26,21 +29,21 @@ function checkAdminAuth() {
 
 // Load all users - Use Case: GetAllUsers
 async function loadAllUsers() {
-    showLoading(true);
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div></td></tr>';
+    
     try {
         const response = await fetch(`${API_BASE_URL}/admin/users/all`);
         const data = await response.json();
 
-        showLoading(false);
-
         if (data.success && data.users) {
             displayUsers(data.users);
         } else {
-            showEmptyState();
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Không thể tải danh sách users</td></tr>';
             showAlert(data.errorMessage || 'Không thể tải danh sách users', 'error');
         }
     } catch (error) {
-        showLoading(false);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Lỗi kết nối server</td></tr>';
         console.error('Error loading users:', error);
         showAlert('Lỗi kết nối server', 'error');
     }
@@ -49,7 +52,8 @@ async function loadAllUsers() {
 // Search users - Use Case: SearchUsers
 async function searchUsers(event) {
     event.preventDefault();
-    showLoading(true);
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div></td></tr>';
 
     const keyword = document.getElementById('searchKeyword').value;
     const role = document.getElementById('searchRole').value;
@@ -62,20 +66,14 @@ async function searchUsers(event) {
         const response = await fetch(`${API_BASE_URL}/admin/users/search?${params.toString()}`);
         const data = await response.json();
 
-        showLoading(false);
-
         if (data.success && data.users) {
-            if (data.users.length === 0) {
-                showEmptyState();
-            } else {
-                displayUsers(data.users);
-            }
+            displayUsers(data.users);
         } else {
-            showEmptyState();
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy user</td></tr>';
             showAlert(data.errorMessage || 'Không tìm thấy user', 'error');
         }
     } catch (error) {
-        showLoading(false);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Lỗi kết nối server</td></tr>';
         console.error('Error searching users:', error);
         showAlert('Lỗi kết nối server', 'error');
     }
@@ -84,54 +82,39 @@ async function searchUsers(event) {
 // Display users in table
 function displayUsers(users) {
     const tbody = document.getElementById('usersTableBody');
-    const container = document.getElementById('usersContainer');
-    const emptyState = document.getElementById('emptyState');
-
-    container.classList.remove('hidden');
-    emptyState.classList.add('hidden');
+    
+    if (!users || users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy user nào</td></tr>';
+        return;
+    }
 
     tbody.innerHTML = users.map(user => `
         <tr>
-            <td>${user.userId}</td>
-            <td>${user.userName || 'N/A'}</td>
+            <td><strong>${user.maTaiKhoan}</strong></td>
+            <td><strong>${user.tenDangNhap || 'N/A'}</strong></td>
             <td>${user.email || 'N/A'}</td>
-            <td><span class="status-badge ${user.role === 'ADMIN' ? 'status-confirmed' : 'status-pending'}">${user.role || 'N/A'}</span></td>
-            <td>${user.phone || 'N/A'}</td>
-            <td>${user.address || 'N/A'}</td>
+            <td><span class="status-badge ${user.vaiTro === 'ADMIN' ? 'status-confirmed' : 'status-pending'}">${user.vaiTro || 'N/A'}</span></td>
+            <td>${user.soDienThoai || 'N/A'}</td>
+            <td>${user.diaChi || 'N/A'}</td>
+            <td>
+                <span class="visibility-badge ${user.hoatDong ? 'visibility-visible' : 'visibility-hidden'}">
+                    ${user.hoatDong ? 'Hoạt động' : 'Bị khóa'}
+                </span>
+            </td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-action btn-edit" onclick="editUser(${user.userId})">Sửa</button>
-                    <button class="btn-action btn-delete" onclick="deleteUser(${user.userId}, '${user.userName}')">Xóa</button>
+                    <button class="btn-action btn-edit" onclick="editUser(${user.maTaiKhoan})">Sửa</button>
+                    <button class="btn-action" onclick="toggleUserStatus(${user.maTaiKhoan}, ${user.hoatDong})">${user.hoatDong ? 'Khóa' : 'Mở'}</button>
+                    <button class="btn-action btn-delete" onclick="deleteUser(${user.maTaiKhoan}, '${user.tenDangNhap}')">Xóa</button>
                 </div>
             </td>
         </tr>
     `).join('');
 }
 
-// Show empty state
-function showEmptyState() {
-    document.getElementById('usersContainer').classList.add('hidden');
-    document.getElementById('emptyState').classList.remove('hidden');
-}
-
-// Show loading
-function showLoading(show) {
-    const loading = document.getElementById('loadingIndicator');
-    const container = document.getElementById('usersContainer');
-    const emptyState = document.getElementById('emptyState');
-
-    if (show) {
-        loading.classList.remove('hidden');
-        container.classList.add('hidden');
-        emptyState.classList.add('hidden');
-    } else {
-        loading.classList.add('hidden');
-    }
-}
-
 // Show add user modal
 function showAddUserModal() {
-    document.getElementById('modalTitle').textContent = 'Thêm User';
+    document.getElementById('modalTitle').textContent = 'THÊM USER';
     document.getElementById('userForm').reset();
     document.getElementById('userId').value = '';
     document.getElementById('userModal').classList.add('show');
@@ -189,16 +172,16 @@ async function editUser(userId) {
         const data = await response.json();
         
         if (data.success && data.users) {
-            const user = data.users.find(u => u.userId === userId);
+            const user = data.users.find(u => u.maTaiKhoan === userId);
             if (user) {
-                document.getElementById('modalTitle').textContent = 'Sửa User';
-                document.getElementById('userId').value = user.userId;
-                document.getElementById('userName').value = user.userName || '';
+                document.getElementById('modalTitle').textContent = 'SỬA USER';
+                document.getElementById('userId').value = user.maTaiKhoan;
+                document.getElementById('userName').value = user.tenDangNhap || '';
                 document.getElementById('userEmail').value = user.email || '';
                 document.getElementById('userPassword').value = ''; // Don't show password
-                document.getElementById('userPhone').value = user.phone || '';
-                document.getElementById('userAddress').value = user.address || '';
-                document.getElementById('userRole').value = user.role || 'CUSTOMER';
+                document.getElementById('userPhone').value = user.soDienThoai || '';
+                document.getElementById('userAddress').value = user.diaChi || '';
+                document.getElementById('userRole').value = user.vaiTro || 'CUSTOMER';
                 
                 document.getElementById('userModal').classList.add('show');
             }
@@ -206,6 +189,32 @@ async function editUser(userId) {
     } catch (error) {
         console.error('Error loading user:', error);
         showAlert('Không thể tải thông tin user', 'error');
+    }
+}
+
+// Toggle user status (Lock/Unlock)
+async function toggleUserStatus(userId, currentStatus) {
+    const action = currentStatus ? 'khóa' : 'mở khóa';
+    if (!confirm(`Bạn có chắc muốn ${action} user này?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isActive: !currentStatus })
+        });
+
+        if (response.ok) {
+            showAlert(`${action.charAt(0).toUpperCase() + action.slice(1)} user thành công!`, 'success');
+            loadAllUsers();
+        } else {
+            showAlert(`Không thể ${action} user`, 'error');
+        }
+    } catch (error) {
+        console.error('Error toggling user status:', error);
+        showAlert('Lỗi kết nối server', 'error');
     }
 }
 

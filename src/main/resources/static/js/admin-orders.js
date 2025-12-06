@@ -8,31 +8,42 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkAdminAuth() {
-    const role = sessionStorage.getItem('userRole');
+    const role = sessionStorage.getItem('role');
     if (role !== 'ADMIN') {
         alert('Bạn không có quyền truy cập Admin Panel!');
         window.location.href = 'home.html';
         return false;
     }
     const username = sessionStorage.getItem('username');
-    if (username) document.getElementById('userName').textContent = username;
+    if (username) {
+        const adminNameEl = document.getElementById('sidebarAdminName');
+        if (adminNameEl) {
+            adminNameEl.textContent = username;
+        }
+    }
     return true;
+}
+
+function formatPrice(price) {
+    return price.toLocaleString('vi-VN') + ' đ';
 }
 
 // Use Case: ListAllOrders
 async function loadAllOrders() {
-    showLoading(true);
+    const tbody = document.getElementById('ordersTableBody');
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div></td></tr>';
+    
     try {
         const response = await fetch(`${API_BASE_URL}/admin/orders/all`);
         const data = await response.json();
-        showLoading(false);
+        
         if (data.success && data.orders && data.orders.length > 0) {
             displayOrders(data.orders);
         } else {
-            showEmptyState();
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--color-gray);">Không có đơn hàng nào</td></tr>';
         }
     } catch (error) {
-        showLoading(false);
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--color-gray);">Lỗi kết nối server</td></tr>';
         console.error('Error loading orders:', error);
         showAlert('Lỗi kết nối server', 'error');
     }
@@ -41,7 +52,9 @@ async function loadAllOrders() {
 // Use Case: SearchOrders
 async function searchOrders(event) {
     event.preventDefault();
-    showLoading(true);
+    const tbody = document.getElementById('ordersTableBody');
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div></td></tr>';
+    
     const params = new URLSearchParams();
     const keyword = document.getElementById('searchKeyword').value;
     const status = document.getElementById('searchStatus').value;
@@ -52,14 +65,14 @@ async function searchOrders(event) {
     try {
         const response = await fetch(`${API_BASE_URL}/admin/orders/search?${params.toString()}`);
         const data = await response.json();
-        showLoading(false);
+        
         if (data.success && data.orders && data.orders.length > 0) {
             displayOrders(data.orders);
         } else {
-            showEmptyState();
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy đơn hàng</td></tr>';
         }
     } catch (error) {
-        showLoading(false);
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--color-gray);">Lỗi kết nối server</td></tr>';
         console.error('Error searching orders:', error);
         showAlert('Lỗi kết nối server', 'error');
     }
@@ -67,26 +80,31 @@ async function searchOrders(event) {
 
 function displayOrders(orders) {
     const tbody = document.getElementById('ordersTableBody');
-    const container = document.getElementById('ordersContainer');
-    const emptyState = document.getElementById('emptyState');
-    container.classList.remove('hidden');
-    emptyState.classList.add('hidden');
+    
+    if (!orders || orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--color-gray);">Không có đơn hàng nào</td></tr>';
+        return;
+    }
 
     tbody.innerHTML = orders.map(order => {
-        const statusClass = getStatusClass(order.orderStatus);
+        const statusClass = getStatusClass(order.trangThai);
+        const totalAmount = order.tongTien || 0;
+        const orderDate = order.ngayDat ? new Date(order.ngayDat).toLocaleDateString('vi-VN') : 'N/A';
         return `
         <tr>
-            <td>#${order.orderId}</td>
-            <td>${order.customerName || 'N/A'}</td>
-            <td>${order.customerPhone || 'N/A'}</td>
-            <td>${order.shippingAddress || 'N/A'}</td>
-            <td>${order.formattedTotalAmount || 'N/A'}</td>
-            <td>${order.totalItems || 0} (${order.totalQuantity || 0} sản phẩm)</td>
-            <td><span class="status-badge ${statusClass}">${translateStatus(order.orderStatus)}</span></td>
-            <td>${order.formattedOrderDate || 'N/A'}</td>
+            <td><strong>#${order.maDonHang}</strong></td>
+            <td>${order.tenNguoiNhan || 'N/A'}</td>
+            <td>${order.soDienThoai || 'N/A'}</td>
+            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${order.diaChiGiaoHang || 'N/A'}</td>
+            <td><strong>${formatPrice(totalAmount)}</strong></td>
+            <td>${order.soMatHang || 0} mặt hàng</td>
+            <td>COD</td>
+            <td><span class="status-badge ${statusClass}">${translateStatus(order.trangThai)}</span></td>
+            <td>${orderDate}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-action btn-edit" onclick='editOrder(${JSON.stringify(order)})'>Cập nhật</button>
+                    <button class="btn-action btn-edit" onclick='viewOrder(${order.maDonHang})'>Xem</button>
+                    <button class="btn-action btn-edit" onclick='editOrder(${JSON.stringify(order).replace(/'/g, "&apos;")})'>Cập nhật</button>
                 </div>
             </td>
         </tr>
@@ -112,29 +130,73 @@ function translateStatus(status) {
     }
 }
 
-function showEmptyState() {
-    document.getElementById('ordersContainer').classList.add('hidden');
-    document.getElementById('emptyState').classList.remove('hidden');
+function translatePaymentMethod(method) {
+    switch(method) {
+        case 'CHUYEN_KHOAN': return 'Chuyển khoản';
+        case 'THANH_TOAN_TRUC_TIEP': return 'COD';
+        default: return method || 'COD';
+    }
 }
 
-function showLoading(show) {
-    const loading = document.getElementById('loadingIndicator');
-    const container = document.getElementById('ordersContainer');
-    const emptyState = document.getElementById('emptyState');
-    if (show) {
-        loading.classList.remove('hidden');
-        container.classList.add('hidden');
-        emptyState.classList.add('hidden');
-    } else {
-        loading.classList.add('hidden');
+// View order details
+async function viewOrder(orderId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}`);
+        if (!response.ok) throw new Error('Failed to load order');
+        
+        const data = await response.json();
+        const order = data.order || data;
+        
+        // Show order details in modal
+        const detailsHtml = `
+            <h3 style="margin-bottom: 15px;">CHI TIẾT ĐƠN HÀNG #${order.maDonHang}</h3>
+            <div style="margin-bottom: 10px;"><strong>Khách hàng:</strong> ${order.tenNguoiNhan || 'N/A'}</div>
+            <div style="margin-bottom: 10px;"><strong>SĐT:</strong> ${order.soDienThoai || 'N/A'}</div>
+            <div style="margin-bottom: 10px;"><strong>Địa chỉ:</strong> ${order.diaChiGiaoHang || 'N/A'}</div>
+            <div style="margin-bottom: 10px;"><strong>Trạng thái:</strong> ${translateStatus(order.trangThai)}</div>
+            <div style="margin-bottom: 10px;"><strong>Tổng tiền:</strong> ${formatPrice(order.tongTien || 0)}</div>
+            <h4 style="margin: 15px 0 10px 0;">Sản phẩm:</h4>
+            ${order.sanPham && order.sanPham.length > 0 ? 
+                order.sanPham.map(item => `
+                    <div style="padding: 8px; background: white; margin-bottom: 5px;">
+                        ${item.tenSanPham} - ${item.soLuong}x - ${formatPrice(item.giaBan || 0)}
+                    </div>
+                `).join('') : 
+                '<p>Không có sản phẩm</p>'
+            }
+        `;
+        
+        alert(detailsHtml.replace(/<[^>]*>/g, '\n'));
+        
+    } catch (error) {
+        console.error('Error loading order:', error);
+        showAlert('Không thể tải chi tiết đơn hàng', 'error');
     }
 }
 
 // Use Case: UpdateOrder
 function editOrder(order) {
-    document.getElementById('orderId').value = order.orderId;
-    document.getElementById('orderStatus').value = order.orderStatus || 'PENDING';
+    document.getElementById('orderId').value = order.maDonHang;
+    document.getElementById('orderStatus').value = order.trangThai || 'PENDING';
     document.getElementById('orderNote').value = '';
+    
+    // Load order details into modal
+    const detailsDiv = document.getElementById('orderDetails');
+    if (detailsDiv && order.sanPham) {
+        detailsDiv.innerHTML = `
+            <h4 style="margin-bottom: 10px;">CHI TIẾT ĐƠN HÀNG #${order.maDonHang}</h4>
+            <p><strong>Khách hàng:</strong> ${order.tenNguoiNhan || 'N/A'}</p>
+            <p><strong>SĐT:</strong> ${order.soDienThoai || 'N/A'}</p>
+            <p><strong>Tổng tiền:</strong> ${formatPrice(order.tongTien || 0)}</p>
+            <h5 style="margin-top: 10px;">Sản phẩm:</h5>
+            ${order.sanPham.map(item => `
+                <div style="padding: 8px; background: white; margin-bottom: 5px; border-left: 3px solid black;">
+                    ${item.tenSanPham} - SL: ${item.soLuong} - ${formatPrice(item.giaBan || 0)}
+                </div>
+            `).join('')}
+        `;
+    }
+    
     document.getElementById('orderModal').classList.add('show');
 }
 

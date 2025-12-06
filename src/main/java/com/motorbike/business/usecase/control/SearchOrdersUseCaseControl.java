@@ -77,7 +77,7 @@ public class SearchOrdersUseCaseControl {
                                 dh.getSoDienThoai(),
                                 dh.getDiaChiGiaoHang(),
                                 dh.getTongTien(),
-                                dh.getTrangThai().getMoTa(),
+                                dh.getTrangThai().name(),
                                 dh.getNgayDat(),
                                 dh.getNgayCapNhat(),
                                 soMatHang,

@@ -36,6 +36,8 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
             viewModel.totalQuantity = 0;
             viewModel.items = null;
             viewModel.formattedOrderDate = null;
+            viewModel.paymentMethod = null;
+            viewModel.paymentMethodDisplay = null;
             viewModel.hasError = true;
             viewModel.errorCode = outputData.getErrorCode();
             viewModel.errorMessage = outputData.getErrorMessage();
@@ -85,6 +87,8 @@ public class CheckoutPresenter implements CheckoutOutputBoundary {
         viewModel.totalQuantity = outputData.getTotalQuantity();
         viewModel.items = itemViewModels;
         viewModel.formattedOrderDate = formattedOrderDate;
+        viewModel.paymentMethod = outputData.getPaymentMethod();
+        viewModel.paymentMethodDisplay = outputData.getPaymentMethodDisplay();
         viewModel.hasError = false;
         viewModel.errorCode = null;
         viewModel.errorMessage = null;

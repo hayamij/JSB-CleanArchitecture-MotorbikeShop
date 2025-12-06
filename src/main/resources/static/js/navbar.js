@@ -32,7 +32,7 @@ function initNavbar(activePage = '', requireAuth = true) {
                     <li><a href="home.html" class="${activePage === 'home' ? 'active' : ''}">Trang chủ</a></li>
                     <li>
                         <a href="cart.html" class="${activePage === 'cart' ? 'active' : ''}">
-                            Giỏ hàng <span id="cartItems" class="cart-badge"></span>
+                            Giỏ hàng <span id="cartItems" class="cart-badge">0</span>
                         </a>
                     </li>
                     ${isLoggedIn ? `

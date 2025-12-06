@@ -15,6 +15,7 @@ import com.motorbike.business.dto.order.UpdateOrderInputData;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.UpdateOrderOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 
 public class UpdateOrderUseCaseControlTest {
@@ -85,6 +86,7 @@ public class UpdateOrderUseCaseControlTest {
 					"0912345678",
 					"123 Street",
 					"",
+					PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP,
 					LocalDateTime.now(),
 					LocalDateTime.now()
 				);

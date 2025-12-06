@@ -23,6 +23,7 @@ import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 
 @DisplayName("List All Orders Use Case Tests (no pagination/status/sort/revenue)")
 class ListAllOrdersUseCaseControlTest {
@@ -82,12 +83,12 @@ class ListAllOrdersUseCaseControlTest {
     void testCalculateTotalAmountFromOrderItems() {
         List<DonHang> mockOrders = new ArrayList<>();
         
-        DonHang order1 = new DonHang(1L, "Customer 1", "0123", "Address", null);
+        DonHang order1 = new DonHang(1L, "Customer 1", "0123", "Address", null, PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP);
         order1.setMaDonHang(1L);
         order1.themSanPham(new ChiTietDonHang(1L, "Product 1",
             BigDecimal.valueOf(10000000), 1));
         
-        DonHang order2 = new DonHang(2L, "Customer 2", "0456", "Address", null);
+        DonHang order2 = new DonHang(2L, "Customer 2", "0456", "Address", null, PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP);
         order2.setMaDonHang(2L);
         order2.themSanPham(new ChiTietDonHang(2L, "Product 2",
             BigDecimal.valueOf(20000000), 1));
@@ -176,7 +177,8 @@ class ListAllOrdersUseCaseControlTest {
                 "Customer " + i,
                 "012345678" + i,
                 "Address " + i,
-                "Note " + i
+                "Note " + i,
+                PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP
             );
             order.setMaDonHang((long) i);
             

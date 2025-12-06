@@ -4,98 +4,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Motorbike Shop</title>
-    <link rel="stylesheet" href="css/common.css?v=2">
-    <link rel="stylesheet" href="css/admin.css?v=2">
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/admin.css?v=3">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="admin.html" class="logo">
-                <span>Admin Panel</span>
-            </a>
-
-            <ul class="nav-menu">
-                <li><a href="admin-users.html">Quản lý Users</a></li>
-                <li><a href="admin-motorbikes.html">Quản lý Xe máy</a></li>
-                <li><a href="admin-accessories.html">Quản lý Phụ kiện</a></li>
-                <li><a href="admin-orders.html">Quản lý Đơn hàng</a></li>
-            </ul>
-
-            <div class="user-info">
-                <span class="user-greeting">Admin: <span class="user-name" id="userName">Admin</span></span>
-                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
-            </div>
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>ADMIN PANEL</h2>
+            <p class="admin-name" id="sidebarAdminName">Admin</p>
         </div>
-    </nav>
+        
+        <nav class="sidebar-nav">
+            <a href="admin.html" class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="admin-users.html" class="nav-item">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">Quản lý Users</span>
+            </a>
+            <a href="admin-products.html" class="nav-item">
+                <span class="nav-icon">🏍️</span>
+                <span class="nav-text">Quản lý Sản phẩm</span>
+            </a>
+            <a href="admin-orders.html" class="nav-item">
+                <span class="nav-icon">📦</span>
+                <span class="nav-text">Quản lý Đơn hàng</span>
+            </a>
+        </nav>
 
-    <div class="hero">
-        <h1>Admin Dashboard</h1>
-        <p>Quản lý toàn bộ hệ thống Motorbike Shop</p>
+        <div class="sidebar-footer">
+            <a href="home.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Trang chủ</span>
+            </a>
+            <button class="nav-item btn-logout-sidebar" onclick="logout()">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-text">Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1>Dashboard</h1>
+            <p>Tổng quan hoạt động kinh doanh</p>
+        </div>
+
+        <div class="admin-content">
+            <div id="alertContainer"></div>
+
+            <!-- Revenue Stats -->
+            <section class="dashboard-section">
+                <h2 class="section-title">DOANH THU</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">DOANH THU THÁNG NÀY</div>
+                        <div class="stat-value" id="revenueMonth">0 đ</div>
+                        <div class="stat-change" id="revenueMonthChange">+0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">DOANH THU NĂM NAY</div>
+                        <div class="stat-value" id="revenueYear">0 đ</div>
+                        <div class="stat-change" id="revenueYearChange">+0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">TỔNG DOANH THU</div>
+                        <div class="stat-value" id="revenueAllTime">0 đ</div>
+                        <div class="stat-change positive">All Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">ĐƠN HÀNG THÁNG NÀY</div>
+                        <div class="stat-value" id="ordersMonth">0</div>
+                        <div class="stat-change" id="ordersMonthChange">+0%</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Stats -->
+            <section class="dashboard-section">
+                <h2 class="section-title">THỐNG KÊ HỆ THỐNG</h2>
+                <div class="stats-grid-4">
+                    <div class="stat-card-small">
+                        <div class="stat-label">TỔNG USERS</div>
+                        <div class="stat-number" id="totalUsers">0</div>
+                    </div>
+                    <div class="stat-card-small">
+                        <div class="stat-label">XE MÁY</div>
+                        <div class="stat-number" id="totalMotorbikes">0</div>
+                    </div>
+                    <div class="stat-card-small">
+                        <div class="stat-label">PHỤ KIỆN</div>
+                        <div class="stat-number" id="totalAccessories">0</div>
+                    </div>
+                    <div class="stat-card-small">
+                        <div class="stat-label">ĐƠN HÀNG</div>
+                        <div class="stat-number" id="totalOrders">0</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts and Top Products -->
+            <div class="dashboard-row">
+                <!-- Growth Chart -->
+                <section class="dashboard-section dashboard-chart">
+                    <h2 class="section-title">TĂNG TRƯỞNG DOANH THU</h2>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Top Products -->
+                <section class="dashboard-section dashboard-top">
+                    <h2 class="section-title">SẢN PHẨM BÁN CHẠY</h2>
+                    <div class="top-products-list" id="topProductsList">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Recent Activities -->
+            <section class="dashboard-section">
+                <h2 class="section-title">HOẠT ĐỘNG GẦN ĐÂY</h2>
+                <div class="activities-list" id="activitiesList">
+                    <div class="loading-spinner"></div>
+                </div>
+            </section>
+
+        </div>
     </div>
 
-    <div class="main-container">
-        <div id="alertContainer"></div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Tổng Users</h3>
-                <p class="stat-number" id="totalUsers">0</p>
-                <a href="admin-users.html" class="stat-link">Xem chi tiết →</a>
-            </div>
-
-            <div class="stat-card">
-                <h3>Tổng Xe máy</h3>
-                <p class="stat-number" id="totalMotorbikes">0</p>
-                <a href="admin-motorbikes.html" class="stat-link">Xem chi tiết →</a>
-            </div>
-
-            <div class="stat-card">
-                <h3>Tổng Phụ kiện</h3>
-                <p class="stat-number" id="totalAccessories">0</p>
-                <a href="admin-accessories.html" class="stat-link">Xem chi tiết →</a>
-            </div>
-
-            <div class="stat-card">
-                <h3>Tổng Đơn hàng</h3>
-                <p class="stat-number" id="totalOrders">0</p>
-                <a href="admin-orders.html" class="stat-link">Xem chi tiết →</a>
-            </div>
-        </div>
-
-        <h2 class="section-title">Quản lý nhanh</h2>
-        <div class="card-grid">
-            <a href="admin-users.html" class="feature-card">
-                <h3 class="card-title">👤 Quản lý Users</h3>
-                <p class="card-description">Thêm, sửa, xóa, tìm kiếm người dùng</p>
-                <p class="card-subtitle">Use Cases: GetAllUsers, SearchUsers, CreateUser, UpdateUser, DeleteUser, AddUser</p>
-            </a>
-
-            <a href="admin-motorbikes.html" class="feature-card">
-                <h3 class="card-title">🏍️ Quản lý Xe máy</h3>
-                <p class="card-description">Quản lý danh mục xe máy</p>
-                <p class="card-subtitle">Use Cases: GetAllMotorbikes, SearchMotorbikes, AddMotorbike, UpdateMotorbike, DeleteMotorbike</p>
-            </a>
-
-            <a href="admin-accessories.html" class="feature-card">
-                <h3 class="card-title">🔧 Quản lý Phụ kiện</h3>
-                <p class="card-description">Quản lý danh mục phụ kiện</p>
-                <p class="card-subtitle">Use Cases: GetAllAccessories, SearchAccessories, AddAccessory, UpdateAccessory, DeleteAccessory</p>
-            </a>
-
-            <a href="admin-orders.html" class="feature-card">
-                <h3 class="card-title">📦 Quản lý Đơn hàng</h3>
-                <p class="card-description">Xem và cập nhật trạng thái đơn hàng</p>
-                <p class="card-subtitle">Use Cases: ListAllOrders, SearchOrders, UpdateOrder</p>
-            </a>
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2025 Motorbike Shop Admin Panel. All rights reserved.</p>
-        <p>Clean Architecture - 29 Use Cases Implemented</p>
-    </footer>
-
-    <script src="js/common.js?v=2"></script>
-    <script src="js/admin.js?v=2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/common.js?v=3"></script>
+    <script src="js/admin.js?v=3"></script>
 </body>
 </html>

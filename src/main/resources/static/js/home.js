@@ -4,7 +4,7 @@ let products = [];
 let allProducts = [];
 let currentCategory = 'all';
 let currentPage = 1;
-const itemsPerPage = 16; // 4x4 grid
+const itemsPerPage = 12; // 3x4 grid
 
 async function loadProducts() {
     try {

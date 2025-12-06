@@ -33,6 +33,9 @@ async function loadCartForCheckout() {
     };
 
     document.getElementById('userEmailDisplay').textContent = userEmail || username || 'User';
+    
+    // Autofill shipping information from session storage or last order
+    autofillShippingInfo();
 
     showLoading(true);
 
@@ -70,6 +73,46 @@ async function loadCartForCheckout() {
     } finally {
         showLoading(false);
     }
+}
+
+function autofillShippingInfo() {
+    const username = sessionStorage.getItem('username');
+    const phone = sessionStorage.getItem('phone');
+    const address = sessionStorage.getItem('address');
+    
+    // Try to get saved shipping info from localStorage (from previous orders)
+    const savedShipping = localStorage.getItem('lastShippingInfo');
+    
+    if (savedShipping) {
+        try {
+            const shippingData = JSON.parse(savedShipping);
+            // Use saved info, fallback to session info, then empty
+            document.getElementById('receiverName').value = shippingData.receiverName || username || '';
+            document.getElementById('phoneNumber').value = shippingData.phoneNumber || phone || '';
+            document.getElementById('shippingAddress').value = shippingData.shippingAddress || address || '';
+        } catch (error) {
+            console.error('Error parsing saved shipping info:', error);
+            // Fallback to session info
+            document.getElementById('receiverName').value = username || '';
+            document.getElementById('phoneNumber').value = phone || '';
+            document.getElementById('shippingAddress').value = address || '';
+        }
+    } else {
+        // No saved info, use session storage (from user account)
+        document.getElementById('receiverName').value = username || '';
+        document.getElementById('phoneNumber').value = phone || '';
+        document.getElementById('shippingAddress').value = address || '';
+    }
+}
+
+function saveShippingInfo() {
+    const shippingInfo = {
+        receiverName: document.getElementById('receiverName').value.trim(),
+        phoneNumber: document.getElementById('phoneNumber').value.trim(),
+        shippingAddress: document.getElementById('shippingAddress').value.trim()
+    };
+    
+    localStorage.setItem('lastShippingInfo', JSON.stringify(shippingInfo));
 }
 
 function renderOrderSummary(cart) {
@@ -148,12 +191,42 @@ async function placeOrder() {
         return;
     }
 
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    
+    // If bank transfer, show QR modal
+    if (paymentMethod === 'CHUYEN_KHOAN') {
+        showQRModal();
+        return;
+    }
+    
+    // For COD, proceed directly
+    submitOrder();
+}
+
+function showQRModal() {
+    const modal = document.getElementById('qrModal');
+    modal.classList.add('active');
+}
+
+function cancelPayment() {
+    const modal = document.getElementById('qrModal');
+    modal.classList.remove('active');
+}
+
+function confirmPayment() {
+    const modal = document.getElementById('qrModal');
+    modal.classList.remove('active');
+    submitOrder();
+}
+
+async function submitOrder() {
     const formData = {
         userId: parseInt(currentUser.userId),
         receiverName: document.getElementById('receiverName').value.trim(),
         phoneNumber: document.getElementById('phoneNumber').value.trim(),
         shippingAddress: document.getElementById('shippingAddress').value.trim(),
-        note: document.getElementById('note').value.trim() || null
+        note: document.getElementById('note').value.trim() || null,
+        paymentMethod: document.getElementById('paymentMethod').value
     };
 
     const placeOrderBtn = document.querySelector('.btn-place-order');
@@ -172,6 +245,9 @@ async function placeOrder() {
         const data = await response.json();
 
         if (data.success) {
+            // Save shipping info for next time
+            saveShippingInfo();
+            
             showAlert(data.message || 'Đặt hàng thành công!', 'success');
             
             setTimeout(() => {

@@ -169,6 +169,8 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
                 sessionStorage.setItem('userId', data.userId);
                 sessionStorage.setItem('email', data.email);
                 sessionStorage.setItem('username', data.username);
+                sessionStorage.setItem('phone', data.phone || '');
+                sessionStorage.setItem('address', data.address || '');
                 
                 // Merge guest cart into newly created user account
                 const mergeResult = await mergeGuestCartToUser(data.userId);

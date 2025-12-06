@@ -39,6 +39,9 @@ public class DonHangJpaEntity {
     @Column(name = "ghi_chu", columnDefinition = "TEXT")
     private String ghiChu;
 
+    @Column(name = "phuong_thuc_thanh_toan", length = 50)
+    private String phuongThucThanhToan;
+
     @Column(name = "ngay_dat", nullable = false)
     private LocalDateTime ngayDat;
 
@@ -104,4 +107,8 @@ public class DonHangJpaEntity {
     public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
 
     public void setNgayCapNhat(LocalDateTime ngayCapNhat) {this.ngayCapNhat = ngayCapNhat;}
+
+    public String getPhuongThucThanhToan() {return phuongThucThanhToan;}
+
+    public void setPhuongThucThanhToan(String phuongThucThanhToan) {this.phuongThucThanhToan = phuongThucThanhToan;}
 }

@@ -10,6 +10,7 @@ import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.exceptions.ValidationException;
 import com.motorbike.domain.exceptions.DomainException;
 import java.util.List;
@@ -78,12 +79,22 @@ public class CheckoutUseCaseControl {
         
         if (errorException == null && gioHang != null) {
             try {
+                PhuongThucThanhToan phuongThucThanhToan = PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP;
+                if (inputData.getPaymentMethod() != null) {
+                    try {
+                        phuongThucThanhToan = PhuongThucThanhToan.valueOf(inputData.getPaymentMethod());
+                    } catch (IllegalArgumentException e) {
+                        // Default to COD if invalid payment method
+                    }
+                }
+                
                 DonHang donHang = DonHang.fromGioHang(
                     gioHang,
                     inputData.getReceiverName(),
                     inputData.getPhoneNumber(),
                     inputData.getShippingAddress(),
-                    inputData.getNote()
+                    inputData.getNote(),
+                    phuongThucThanhToan
                 );
                 
                 for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
@@ -117,7 +128,9 @@ public class CheckoutUseCaseControl {
                     savedOrder.getTrangThai().name(),
                     savedOrder.getTongTien(),
                     savedOrder.getDanhSachSanPham().size(),
-                    orderItems
+                    orderItems,
+                    savedOrder.getPhuongThucThanhToan().name(),
+                    savedOrder.getPhuongThucThanhToan().getMoTa()
                 );
             } catch (Exception e) {
                 errorException = e;

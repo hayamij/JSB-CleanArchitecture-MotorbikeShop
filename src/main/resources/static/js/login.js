@@ -62,6 +62,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             sessionStorage.setItem('email', data.email);
             sessionStorage.setItem('username', data.username);
             sessionStorage.setItem('role', data.role);
+            sessionStorage.setItem('phone', data.phone || '');
+            sessionStorage.setItem('address', data.address || '');
             sessionStorage.setItem('cartId', data.cartId);
 
             if (rememberMe) {
@@ -69,6 +71,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 localStorage.setItem('email', data.email);
                 localStorage.setItem('username', data.username);
                 localStorage.setItem('role', data.role);
+                localStorage.setItem('phone', data.phone || '');
+                localStorage.setItem('address', data.address || '');
             }
 
             // Merge guest cart into user cart

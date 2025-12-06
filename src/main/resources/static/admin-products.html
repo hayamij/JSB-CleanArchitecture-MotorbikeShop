@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sản phẩm - Admin Panel</title>
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/admin.css?v=3">
+</head>
+<body>
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>ADMIN PANEL</h2>
+            <p class="admin-name" id="sidebarAdminName">Admin</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="admin.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="admin-users.html" class="nav-item">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">Quản lý Users</span>
+            </a>
+            <a href="admin-products.html" class="nav-item active">
+                <span class="nav-icon">🏍️</span>
+                <span class="nav-text">Quản lý Sản phẩm</span>
+            </a>
+            <a href="admin-orders.html" class="nav-item">
+                <span class="nav-icon">📦</span>
+                <span class="nav-text">Quản lý Đơn hàng</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="home.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Trang chủ</span>
+            </a>
+            <button class="nav-item btn-logout-sidebar" onclick="logout()">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-text">Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1>Quản lý Sản phẩm</h1>
+            <p>Quản lý xe máy và phụ kiện</p>
+        </div>
+
+        <div class="admin-content">
+            <div id="alertContainer"></div>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('motorbikes')">XE MÁY</button>
+                <button class="tab-btn" onclick="switchTab('accessories')">PHỤ KIỆN</button>
+            </div>
+
+            <!-- Motorbikes Tab -->
+            <div id="motorbikesTab" class="tab-content active">
+                <div class="section-actions">
+                    <button class="btn-add" onclick="showAddMotorbikeModal()">+ THÊM XE MÁY</button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <form class="search-form" onsubmit="searchMotorbikes(event)">
+                        <div class="form-group">
+                            <label>TÊN XE</label>
+                            <input type="text" id="searchMotorbikeName" placeholder="Nhập tên xe máy...">
+                        </div>
+                        <div class="form-group">
+                            <label>HÃNG</label>
+                            <input type="text" id="searchMotorbikeBrand" placeholder="Nhập hãng...">
+                        </div>
+                        <button type="submit" class="btn-search">TÌM KIẾM</button>
+                        <button type="button" class="btn-search" onclick="loadAllMotorbikes()">TẤT CẢ</button>
+                    </form>
+                </div>
+
+                <!-- Motorbikes Table -->
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>HÌNH ẢNH</th>
+                                <th>TÊN XE</th>
+                                <th>HÃNG</th>
+                                <th>MÀU SẮC</th>
+                                <th>GIÁ</th>
+                                <th>SỐ LƯỢNG</th>
+                                <th>TRẠNG THÁI</th>
+                                <th>HÀNH ĐỘNG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="motorbikesTableBody">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px;">
+                                    <div class="loading-spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Accessories Tab -->
+            <div id="accessoriesTab" class="tab-content">
+                <div class="section-actions">
+                    <button class="btn-add" onclick="showAddAccessoryModal()">+ THÊM PHỤ KIỆN</button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <form class="search-form" onsubmit="searchAccessories(event)">
+                        <div class="form-group">
+                            <label>TÊN PHỤ KIỆN</label>
+                            <input type="text" id="searchAccessoryName" placeholder="Nhập tên phụ kiện...">
+                        </div>
+                        <div class="form-group">
+                            <label>LOẠI</label>
+                            <input type="text" id="searchAccessoryCategory" placeholder="Nhập loại...">
+                        </div>
+                        <button type="submit" class="btn-search">TÌM KIẾM</button>
+                        <button type="button" class="btn-search" onclick="loadAllAccessories()">TẤT CẢ</button>
+                    </form>
+                </div>
+
+                <!-- Accessories Table -->
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>HÌNH ẢNH</th>
+                                <th>TÊN PHỤ KIỆN</th>
+                                <th>LOẠI</th>
+                                <th>GIÁ</th>
+                                <th>SỐ LƯỢNG</th>
+                                <th>TRẠNG THÁI</th>
+                                <th>HÀNH ĐỘNG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accessoriesTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px;">
+                                    <div class="loading-spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Motorbike Modal -->
+    <div id="motorbikeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="motorbikeModalTitle">THÊM XE MÁY</h2>
+            </div>
+            <div class="modal-body">
+                <form id="motorbikeForm">
+                    <input type="hidden" id="motorbikeId">
+                    
+                    <div class="form-group">
+                        <label>TÊN XE *</label>
+                        <input type="text" id="motorbikeName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>HÃNG *</label>
+                        <input type="text" id="motorbikeBrand" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>MÀU SẮC *</label>
+                        <input type="text" id="motorbikeColor" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>GIÁ *</label>
+                        <input type="number" id="motorbikePrice" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>SỐ LƯỢNG *</label>
+                        <input type="number" id="motorbikeStock" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>LINK HÌNH ẢNH</label>
+                        <input type="text" id="motorbikeImage" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>MÔ TẢ</label>
+                        <textarea id="motorbikeDescription" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeMotorbikeModal()">HỦY</button>
+                <button class="btn-submit" onclick="saveMotorbike()">LƯU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Accessory Modal -->
+    <div id="accessoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="accessoryModalTitle">THÊM PHỤ KIỆN</h2>
+            </div>
+            <div class="modal-body">
+                <form id="accessoryForm">
+                    <input type="hidden" id="accessoryId">
+                    
+                    <div class="form-group">
+                        <label>TÊN PHỤ KIỆN *</label>
+                        <input type="text" id="accessoryName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>LOẠI *</label>
+                        <input type="text" id="accessoryCategory" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>GIÁ *</label>
+                        <input type="number" id="accessoryPrice" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>SỐ LƯỢNG *</label>
+                        <input type="number" id="accessoryStock" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>LINK HÌNH ẢNH</label>
+                        <input type="text" id="accessoryImage" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>MÔ TẢ</label>
+                        <textarea id="accessoryDescription" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeAccessoryModal()">HỦY</button>
+                <button class="btn-submit" onclick="saveAccessory()">LƯU</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js?v=3"></script>
+    <script src="js/admin-products.js?v=3"></script>
+</body>
+</html>

@@ -26,6 +26,7 @@ import com.motorbike.business.usecase.output.CancelOrderOutputBoundary;
 import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 import com.motorbike.domain.entities.XeMay;
@@ -63,6 +64,7 @@ class CancelOrderUseCaseControlTest {
             "0912345678",
             "123 Nguyễn Trãi, Q1, TP.HCM",
             "Giao giờ hành chính",
+            PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP,
             LocalDateTime.now(),
             LocalDateTime.now()
         );
@@ -131,6 +133,7 @@ class CancelOrderUseCaseControlTest {
             "0912345678",
             "123 Nguyễn Trãi, Q1, TP.HCM",
             null,
+            PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP,
             LocalDateTime.now(),
             LocalDateTime.now()
         );
@@ -193,6 +196,7 @@ class CancelOrderUseCaseControlTest {
             "0912345678",
             "123 Nguyễn Trãi, Q1, TP.HCM",
             null,
+            PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP,
             LocalDateTime.now(),
             LocalDateTime.now()
         );
@@ -245,6 +249,7 @@ class CancelOrderUseCaseControlTest {
             "0912345678",
             "123 Nguyễn Trãi, Q1, TP.HCM",
             null,
+            PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP,
             LocalDateTime.now(),
             LocalDateTime.now()
         );

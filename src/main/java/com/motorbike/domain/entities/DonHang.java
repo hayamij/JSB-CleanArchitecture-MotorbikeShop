@@ -17,12 +17,13 @@ public class DonHang {
     private String soDienThoai;
     private String diaChiGiaoHang;
     private String ghiChu;
+    private PhuongThucThanhToan phuongThucThanhToan;
     
     private LocalDateTime ngayDat;
     private LocalDateTime ngayCapNhat;
 
     public DonHang(Long maTaiKhoan, String tenNguoiNhan, String soDienThoai,
-                   String diaChiGiaoHang, String ghiChu) {
+                   String diaChiGiaoHang, String ghiChu, PhuongThucThanhToan phuongThucThanhToan) {
         validateThongTinNguoiNhan(tenNguoiNhan, soDienThoai, diaChiGiaoHang);
         
         this.maTaiKhoan = maTaiKhoan;
@@ -33,6 +34,7 @@ public class DonHang {
         this.soDienThoai = soDienThoai;
         this.diaChiGiaoHang = diaChiGiaoHang;
         this.ghiChu = ghiChu;
+        this.phuongThucThanhToan = phuongThucThanhToan != null ? phuongThucThanhToan : PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP;
         this.ngayDat = LocalDateTime.now();
         this.ngayCapNhat = LocalDateTime.now();
     }
@@ -40,6 +42,7 @@ public class DonHang {
     public DonHang(Long maDonHang, Long maTaiKhoan, List<ChiTietDonHang> danhSachSanPham,
                    BigDecimal tongTien, TrangThaiDonHang trangThai,
                    String tenNguoiNhan, String soDienThoai, String diaChiGiaoHang, String ghiChu,
+                   PhuongThucThanhToan phuongThucThanhToan,
                    LocalDateTime ngayDat, LocalDateTime ngayCapNhat) {
         this.maDonHang = maDonHang;
         this.maTaiKhoan = maTaiKhoan;
@@ -50,6 +53,7 @@ public class DonHang {
         this.soDienThoai = soDienThoai;
         this.diaChiGiaoHang = diaChiGiaoHang;
         this.ghiChu = ghiChu;
+        this.phuongThucThanhToan = phuongThucThanhToan;
         this.ngayDat = ngayDat;
         this.ngayCapNhat = ngayCapNhat;
     }
@@ -142,6 +146,13 @@ public class DonHang {
 
     public static DonHang fromGioHang(GioHang gioHang, String tenNguoiNhan,
                                       String soDienThoai, String diaChiGiaoHang, String ghiChu) {
+        return fromGioHang(gioHang, tenNguoiNhan, soDienThoai, diaChiGiaoHang, ghiChu, 
+                          PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP);
+    }
+
+    public static DonHang fromGioHang(GioHang gioHang, String tenNguoiNhan,
+                                      String soDienThoai, String diaChiGiaoHang, String ghiChu,
+                                      PhuongThucThanhToan phuongThucThanhToan) {
         if (gioHang == null) {
             throw ValidationException.nullCart();
         }
@@ -155,7 +166,8 @@ public class DonHang {
             tenNguoiNhan,
             soDienThoai,
             diaChiGiaoHang,
-            ghiChu
+            ghiChu,
+            phuongThucThanhToan != null ? phuongThucThanhToan : PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP
         );
         
         for (ChiTietGioHang chiTietGioHang : gioHang.getDanhSachSanPham()) {
@@ -179,10 +191,12 @@ public class DonHang {
     public String getSoDienThoai() {return soDienThoai;}
     public String getDiaChiGiaoHang() {return diaChiGiaoHang;}
     public String getGhiChu() {return ghiChu;}
+    public PhuongThucThanhToan getPhuongThucThanhToan() {return phuongThucThanhToan;}
     public LocalDateTime getNgayDat() {return ngayDat;}
     public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
     public void setMaDonHang(Long maDonHang) {this.maDonHang = maDonHang;}
     public void setDanhSachSanPham(List<ChiTietDonHang> danhSachSanPham) {this.danhSachSanPham = danhSachSanPham;}
+    public void setPhuongThucThanhToan(PhuongThucThanhToan phuongThucThanhToan) {this.phuongThucThanhToan = phuongThucThanhToan;}
 
     @Override
     public String toString() {

@@ -16,6 +16,7 @@ import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.output.SearchOrdersOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 
 public class SearchOrdersUseCaseControlTest {
@@ -85,6 +86,7 @@ public class SearchOrdersUseCaseControlTest {
 					"0912345678",
 					"123 Street",
 					"",
+					PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP,
 					LocalDateTime.now(),
 					LocalDateTime.now()
 				);

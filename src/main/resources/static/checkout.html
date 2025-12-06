@@ -99,6 +99,14 @@
                                 placeholder="Ghi chú về đơn hàng của bạn, ví dụ: yêu cầu đặc biệt về giao hàng..."
                             ></textarea>
                         </div>
+
+                        <div class="form-group">
+                            <label for="paymentMethod">Phương thức thanh toán <span class="required">*</span></label>
+                            <select id="paymentMethod" class="form-control" required>
+                                <option value="THANH_TOAN_TRUC_TIEP">Thanh toán khi nhận hàng (COD)</option>
+                                <option value="CHUYEN_KHOAN">Chuyển khoản ngân hàng</option>
+                            </select>
+                        </div>
                     </form>
                 </div>
 
@@ -136,6 +144,23 @@
                         Quay lại giỏ hàng
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="qr-modal">
+        <div class="qr-modal-content">
+            <h3>Quét mã QR để thanh toán</h3>
+            <div class="qr-code-container">
+                <img src="https://img.vietqr.io/image/MB-0866612349-compact.png?amount=1000000&addInfo=MOTORBIKE%20SHOP&accountName=NGUYEN%20VAN%20A" 
+                     alt="QR Code thanh toán" 
+                     id="qrCodeImage">
+            </div>
+            <p class="qr-instruction">Vui lòng quét mã QR bằng ứng dụng ngân hàng của bạn</p>
+            <div class="qr-modal-actions">
+                <button class="btn-qr-confirm" onclick="confirmPayment()">Xác nhận đã thanh toán</button>
+                <button class="btn-qr-cancel" onclick="cancelPayment()">Hủy</button>
             </div>
         </div>
     </div>

@@ -73,6 +73,8 @@ public class RegisterUseCaseControl {
                     savedTaiKhoan.getMaTaiKhoan(),
                     savedTaiKhoan.getEmail(),
                     savedTaiKhoan.getTenDangNhap(),
+                    savedTaiKhoan.getSoDienThoai(),
+                    savedTaiKhoan.getDiaChi(),
                     savedTaiKhoan.getVaiTro(),
                     savedTaiKhoan.getNgayTao()
                 );

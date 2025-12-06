@@ -4,132 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Users - Admin Panel</title>
-    <link rel="stylesheet" href="css/common.css?v=2">
-    <link rel="stylesheet" href="css/admin.css?v=2">
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/admin.css?v=3">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="admin.html" class="logo">
-                <span>Admin Panel</span>
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>ADMIN PANEL</h2>
+            <p class="admin-name" id="sidebarAdminName">Admin</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="admin.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
             </a>
+            <a href="admin-users.html" class="nav-item active">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">Quản lý Users</span>
+            </a>
+            <a href="admin-products.html" class="nav-item">
+                <span class="nav-icon">🏍️</span>
+                <span class="nav-text">Quản lý Sản phẩm</span>
+            </a>
+            <a href="admin-orders.html" class="nav-item">
+                <span class="nav-icon">📦</span>
+                <span class="nav-text">Quản lý Đơn hàng</span>
+            </a>
+        </nav>
 
-            <ul class="nav-menu">
-                <li><a href="admin-users.html" class="active">Quản lý Users</a></li>
-                <li><a href="admin-motorbikes.html">Quản lý Xe máy</a></li>
-                <li><a href="admin-accessories.html">Quản lý Phụ kiện</a></li>
-                <li><a href="admin-orders.html">Quản lý Đơn hàng</a></li>
-            </ul>
+        <div class="sidebar-footer">
+            <a href="home.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Trang chủ</span>
+            </a>
+            <button class="nav-item btn-logout-sidebar" onclick="logout()">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-text">Đăng xuất</span>
+            </button>
+        </div>
+    </aside>
 
-            <div class="user-info">
-                <span class="user-greeting">Admin: <span class="user-name" id="userName">Admin</span></span>
-                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+    <!-- Main Content Area -->
+    <div class="admin-main">
+        <div class="admin-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>Quản lý Users</h1>
+                    <p>Quản lý tất cả người dùng trong hệ thống</p>
+                </div>
+                <button class="btn-add" onclick="showAddUserModal()">+ THÊM USER</button>
             </div>
         </div>
-    </nav>
 
-    <div class="main-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h1 class="section-title" style="margin: 0;">Quản lý Users</h1>
-            <button class="btn-add" onclick="showAddUserModal()">+ Thêm User</button>
-        </div>
+        <div class="admin-content">
+            <div id="alertContainer"></div>
 
-        <div id="alertContainer"></div>
-
-        <!-- Search Bar -->
-        <div class="search-bar">
-            <form class="search-form" onsubmit="searchUsers(event)">
-                <div class="form-group">
-                    <label>Từ khóa</label>
-                    <input type="text" id="searchKeyword" placeholder="Tên, email...">
-                </div>
-                <div class="form-group">
-                    <label>Role</label>
-                    <select id="searchRole">
-                        <option value="">Tất cả</option>
-                        <option value="CUSTOMER">Customer</option>
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <form class="search-form" onsubmit="searchUsers(event)">
+                    <div class="form-group">
+                        <label>TÊN/EMAIL</label>
+                        <input type="text" id="searchKeyword" placeholder="Nhập tên hoặc email...">
+                    </div>
+                    <div class="form-group">
+                        <label>VAI TRÒ</label>
+                        <select id="searchRole">
+                            <option value="">Tất cả</option>
+                            <option value="CUSTOMER">Customer</option>
                         <option value="ADMIN">Admin</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <button type="submit" class="btn-search">Tìm kiếm</button>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="btn-add" onclick="loadAllUsers()">Tất cả Users</button>
-                </div>
+                <button type="submit" class="btn-search">TÌM KIẾM</button>
+                <button type="button" class="btn-search" onclick="loadAllUsers()">TẤT CẢ</button>
             </form>
         </div>
 
-        <!-- Loading -->
-        <div id="loadingIndicator" class="loading hidden">
-            <div class="spinner"></div>
-            <p>Đang tải dữ liệu...</p>
-        </div>
-
         <!-- Users Table -->
-        <div id="usersContainer">
+        <div class="table-wrapper">
             <table class="admin-table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Tên</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Số điện thoại</th>
-                        <th>Địa chỉ</th>
-                        <th>Thao tác</th>
+                        <th>TÊN</th>
+                        <th>EMAIL</th>
+                        <th>VAI TRÒ</th>
+                        <th>SỐ ĐIỆN THOẠI</th>
+                        <th>ĐỊA CHỈ</th>
+                        <th>TRẠNG THÁI</th>
+                        <th>HÀNH ĐỘNG</th>
                     </tr>
                 </thead>
                 <tbody id="usersTableBody">
-                    <!-- Users will be loaded here -->
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px;">
+                            <div class="loading-spinner"></div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
-
-        <!-- Empty State -->
-        <div id="emptyState" class="empty-state hidden">
-            <h3>Không tìm thấy user nào</h3>
-            <p>Hãy thử tìm kiếm với từ khóa khác</p>
-        </div>
     </div>
+</div>
 
     <!-- Add/Edit User Modal -->
     <div id="userModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Thêm User</h2>
+                <h2 id="modalTitle">THÊM USER</h2>
             </div>
             <div class="modal-body">
                 <form id="userForm">
                     <input type="hidden" id="userId">
                     
                     <div class="form-group">
-                        <label>Tên *</label>
+                        <label>TÊN *</label>
                         <input type="text" id="userName" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Email *</label>
+                        <label>EMAIL *</label>
                         <input type="email" id="userEmail" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Mật khẩu *</label>
+                        <label>MẬT KHẨU *</label>
                         <input type="password" id="userPassword" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Số điện thoại</label>
+                        <label>SỐ ĐIỆN THOẠI</label>
                         <input type="text" id="userPhone">
                     </div>
 
                     <div class="form-group">
-                        <label>Địa chỉ</label>
+                        <label>ĐỊA CHỈ</label>
                         <input type="text" id="userAddress">
                     </div>
 
                     <div class="form-group">
-                        <label>Role *</label>
+                        <label>VAI TRÒ *</label>
                         <select id="userRole" required>
                             <option value="CUSTOMER">Customer</option>
                             <option value="ADMIN">Admin</option>
@@ -138,17 +153,13 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeUserModal()">Hủy</button>
-                <button class="btn-submit" onclick="submitUserForm()">Lưu</button>
+                <button class="btn-cancel" onclick="closeUserModal()">HỦY</button>
+                <button class="btn-submit" onclick="submitUserForm()">LƯU</button>
             </div>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Motorbike Shop Admin Panel. All rights reserved.</p>
-    </footer>
-
-    <script src="js/common.js?v=2"></script>
-    <script src="js/admin-users.js?v=2"></script>
+    <script src="js/common.js?v=3"></script>
+    <script src="js/admin-users.js?v=3"></script>
 </body>
 </html>

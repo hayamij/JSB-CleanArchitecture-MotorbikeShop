@@ -2,6 +2,7 @@ package com.motorbike.adapters.repositories;
 
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 import com.motorbike.infrastructure.persistence.jpa.entities.DonHangJpaEntity;
@@ -103,6 +104,15 @@ public class OrderRepositoryAdapter implements OrderRepository {
                 .map(this::itemToDomain)
                 .collect(Collectors.toList());
         
+        PhuongThucThanhToan phuongThucThanhToan = PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP;
+        if (jpaEntity.getPhuongThucThanhToan() != null) {
+            try {
+                phuongThucThanhToan = PhuongThucThanhToan.valueOf(jpaEntity.getPhuongThucThanhToan());
+            } catch (IllegalArgumentException e) {
+                // Default to COD if invalid
+            }
+        }
+        
         DonHang donHang = new DonHang(
                 jpaEntity.getMaDonHang(),
                 jpaEntity.getMaTaiKhoan(),
@@ -113,6 +123,7 @@ public class OrderRepositoryAdapter implements OrderRepository {
                 jpaEntity.getSoDienThoai(),
                 jpaEntity.getDiaChiGiaoHang(),
                 jpaEntity.getGhiChu(),
+                phuongThucThanhToan,
                 jpaEntity.getNgayDat(),
                 jpaEntity.getNgayCapNhat()
         );

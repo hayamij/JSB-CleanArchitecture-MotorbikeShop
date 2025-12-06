@@ -98,6 +98,8 @@ public class LoginUseCaseControl {
                     taiKhoan.getMaTaiKhoan(),
                     taiKhoan.getEmail(),
                     taiKhoan.getTenDangNhap(),
+                    taiKhoan.getSoDienThoai(),
+                    taiKhoan.getDiaChi(),
                     taiKhoan.getVaiTro(),
                     taiKhoan.getLanDangNhapCuoi(),
                     null,

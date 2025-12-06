@@ -36,6 +36,8 @@ public class RegisterPresenter implements RegisterOutputBoundary {
         viewModel.userId = outputData.getUserId();
         viewModel.email = outputData.getEmail();
         viewModel.username = outputData.getUsername();
+        viewModel.phone = outputData.getPhoneNumber();
+        viewModel.address = outputData.getAddress();
         
         viewModel.roleDisplay = formatRoleDisplay(outputData.getRole());
         

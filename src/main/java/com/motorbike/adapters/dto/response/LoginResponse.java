@@ -6,6 +6,8 @@ public class LoginResponse {
     private String email;
     private String username;
     private String role;
+    private String phone;
+    private String address;
     private Long cartId;
     private boolean cartMerged;
     private int mergedItemsCount;
@@ -14,13 +16,15 @@ public class LoginResponse {
     private String errorMessage;
 
     public LoginResponse(boolean success, Long userId, String email, String username,
-                        String role, Long cartId, boolean cartMerged, int mergedItemsCount,
+                        String role, String phone, String address, Long cartId, boolean cartMerged, int mergedItemsCount,
                         String message, String errorCode, String errorMessage) {
         this.success = success;
         this.userId = userId;
         this.email = email;
         this.username = username;
         this.role = role;
+        this.phone = phone;
+        this.address = address;
         this.cartId = cartId;
         this.cartMerged = cartMerged;
         this.mergedItemsCount = mergedItemsCount;
@@ -34,6 +38,8 @@ public class LoginResponse {
     public String getEmail() { return email; }
     public String getUsername() { return username; }
     public String getRole() { return role; }
+    public String getPhone() { return phone; }
+    public String getAddress() { return address; }
     public Long getCartId() { return cartId; }
     public boolean isCartMerged() { return cartMerged; }
     public int getMergedItemsCount() { return mergedItemsCount; }

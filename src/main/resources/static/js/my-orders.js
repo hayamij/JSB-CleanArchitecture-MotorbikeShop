@@ -53,13 +53,20 @@ function displayOrders(orders) {
     
     console.log('Orders data:', orders);
     
+    // Sort by newest first (by orderId descending)
+    const sortedOrders = [...orders].sort((a, b) => {
+        const idA = a.orderId || a.maDonHang || 0;
+        const idB = b.orderId || b.maDonHang || 0;
+        return idB - idA;
+    });
+    
     // Store orders for later use
-    allOrders = orders;
+    allOrders = sortedOrders;
     
     container.classList.remove('hidden');
     emptyState.classList.add('hidden');
     
-    container.innerHTML = orders.map(order => {
+    container.innerHTML = sortedOrders.map(order => {
         console.log('Order:', order);
         
         // Handle different possible field names
@@ -69,11 +76,12 @@ function displayOrders(orders) {
         const customerPhone = order.customerPhone || order.soDienThoai || order.phoneNumber || 'N/A';
         const shippingAddress = order.shippingAddress || order.diaChiGiaoHang || order.address || 'N/A';
         const orderDate = order.formattedOrderDate || order.orderDate || order.ngayDat || 'N/A';
-        const totalAmount = order.formattedTotalAmount || order.totalAmount || order.tongTien || 'N/A';
+        const rawAmount = order.totalAmount || order.tongTien || 0;
+        const totalAmount = typeof rawAmount === 'number' ? rawAmount.toLocaleString('vi-VN') + ' đ' : (order.formattedTotalAmount || 'N/A');
         const totalItems = order.soMatHang || 0;
         
         const statusClass = getStatusClass(status);
-        const canCancel = status === 'PENDING';
+        const canCancel = status === 'CHO_XAC_NHAN' || status === 'PENDING';
         
         return `
         <div class="order-item">
@@ -101,6 +109,10 @@ function displayOrders(orders) {
                 <div class="detail-item">
                     <div class="detail-label">Số lượng</div>
                     <div class="detail-value">${totalItems} mặt hàng</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Thanh toán</div>
+                    <div class="detail-value">${translatePaymentMethod(order.paymentMethod || order.paymentMethodDisplay)}</div>
                 </div>
             </div>
             
@@ -132,19 +144,33 @@ function displayOrders(orders) {
 
 function getStatusClass(status) {
     switch(status) {
-        case 'PENDING': return 'status-pending';
-        case 'CONFIRMED': return 'status-confirmed';
-        case 'CANCELLED': return 'status-cancelled';
+        case 'PENDING':
+        case 'CHO_XAC_NHAN': return 'status-pending';
+        case 'CONFIRMED':
+        case 'DA_XAC_NHAN': return 'status-confirmed';
+        case 'CANCELLED':
+        case 'DA_HUY': return 'status-cancelled';
         default: return 'status-pending';
     }
 }
 
 function translateStatus(status) {
     switch(status) {
-        case 'PENDING': return 'Chờ xác nhận';
-        case 'CONFIRMED': return 'Đã xác nhận';
-        case 'CANCELLED': return 'Đã hủy';
+        case 'PENDING':
+        case 'CHO_XAC_NHAN': return 'Chờ xác nhận';
+        case 'CONFIRMED':
+        case 'DA_XAC_NHAN': return 'Đã xác nhận';
+        case 'CANCELLED':
+        case 'DA_HUY': return 'Đã hủy';
         default: return status;
+    }
+}
+
+function translatePaymentMethod(method) {
+    switch(method) {
+        case 'CHUYEN_KHOAN': return 'Chuyển khoản ngân hàng';
+        case 'THANH_TOAN_TRUC_TIEP': return 'Thanh toán khi nhận hàng (COD)';
+        default: return method || 'COD';
     }
 }
 
@@ -154,8 +180,10 @@ async function cancelOrder(orderId) {
         return;
     }
     
+    const userId = sessionStorage.getItem('userId');
+    
     try {
-        const response = await fetch(`${API_BASE_URL}/user/orders/${orderId}/cancel`, {
+        const response = await fetch(`${API_BASE_URL}/user/orders/${orderId}/cancel?userId=${userId}`, {
             method: 'DELETE'
         });
         const data = await response.json();
@@ -225,7 +253,8 @@ function renderOrderDetail(order) {
     const customerPhone = order.customerPhone || order.soDienThoai || order.phoneNumber || 'N/A';
     const shippingAddress = order.shippingAddress || order.diaChiGiaoHang || order.address || 'N/A';
     const orderDate = order.formattedOrderDate || order.orderDate || order.ngayDat || 'N/A';
-    const totalAmount = order.formattedTotalAmount || order.totalAmount || order.tongTien || 'N/A';
+    const rawAmount = order.totalAmount || order.tongTien || 0;
+    const totalAmount = typeof rawAmount === 'number' ? rawAmount.toLocaleString('vi-VN') : rawAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     const items = order.sanPham || order.items || order.orderItems || order.chiTietDonHang || [];
     
     let productsHtml = '';
@@ -236,23 +265,13 @@ function renderOrderDetail(order) {
             const quantity = item.soLuong || item.quantity || 0;
             const subtotal = item.thanhTien || item.subtotal || 0;
             
-            const formattedPrice = new Intl.NumberFormat('vi-VN', { 
-                style: 'currency', 
-                currency: 'VND' 
-            }).format(price);
-            
-            const formattedSubtotal = new Intl.NumberFormat('vi-VN', { 
-                style: 'currency', 
-                currency: 'VND' 
-            }).format(subtotal);
+            const formattedSubtotal = subtotal.toLocaleString('vi-VN');
             
             return `
                 <div class="detail-product-item">
-                    <div class="detail-product-info">
-                        <div class="detail-product-name">${productName}</div>
-                        <div class="detail-product-price">${formattedPrice} x ${quantity}</div>
-                    </div>
-                    <div class="detail-product-subtotal">${formattedSubtotal}</div>
+                    <div class="detail-product-name">${productName}</div>
+                    <div class="detail-product-quantity">x${quantity}</div>
+                    <div class="detail-product-subtotal">${formattedSubtotal} đ</div>
                 </div>
             `;
         }).join('');
@@ -279,6 +298,10 @@ function renderOrderDetail(order) {
                 <div class="detail-info-item">
                     <div class="detail-info-label">Tổng số lượng</div>
                     <div class="detail-info-value">${items.length} sản phẩm</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Phương thức thanh toán</div>
+                    <div class="detail-info-value">${translatePaymentMethod(order.paymentMethod || order.paymentMethodDisplay)}</div>
                 </div>
             </div>
         </div>

@@ -20,6 +20,7 @@ import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 import com.motorbike.domain.entities.XeMay;
 
@@ -32,7 +33,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Giao trong gio hanh chinh"
+			"Giao trong gio hanh chinh",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -60,7 +62,8 @@ public class CheckoutUseCaseControlTest {
 			"Tran Thi B",
 			"0987654321",
 			"456 Side St",
-			"Goi truoc khi giao"
+			"Goi truoc khi giao",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -86,6 +89,7 @@ public class CheckoutUseCaseControlTest {
 			"Le Van C",
 			"0901234567",
 			"789 Park Ave",
+			null,
 			null
 		);
 		
@@ -132,7 +136,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -158,7 +163,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -184,7 +190,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -210,7 +217,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -236,7 +244,8 @@ public class CheckoutUseCaseControlTest {
 			"",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -262,7 +271,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -288,7 +298,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -314,7 +325,8 @@ public class CheckoutUseCaseControlTest {
 			"A",
 			"1",
 			"X",
-			""
+			"",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -344,6 +356,7 @@ public class CheckoutUseCaseControlTest {
 			longName,
 			longPhone,
 			longAddress,
+			null,
 			null
 		);
 		

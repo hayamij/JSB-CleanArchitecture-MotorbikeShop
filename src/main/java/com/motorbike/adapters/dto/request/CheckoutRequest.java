@@ -6,6 +6,7 @@ public class CheckoutRequest {
     private String phoneNumber;
     private String shippingAddress;
     private String note;
+    private String paymentMethod;
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
@@ -21,4 +22,7 @@ public class CheckoutRequest {
     
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
+    
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 }

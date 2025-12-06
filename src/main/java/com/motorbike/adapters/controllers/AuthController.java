@@ -52,14 +52,14 @@ public class AuthController {
         if (registerViewModel.success) {
             RegisterResponse response = new RegisterResponse(
                 true, registerViewModel.userId, registerViewModel.email,
-                registerViewModel.username, registerViewModel.roleDisplay,
+                registerViewModel.username, registerViewModel.roleDisplay, registerViewModel.phone, registerViewModel.address,
                 registerViewModel.registeredAtDisplay, registerViewModel.autoLoginEnabled,
                 registerViewModel.sessionToken, registerViewModel.message, null, null
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
             RegisterResponse response = new RegisterResponse(
-                false, null, null, null, null, null, false, null, null,
+                false, null, null, null, null, null, null, null, false, null, null,
                 registerViewModel.errorCode, registerViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -78,14 +78,14 @@ public class AuthController {
         if (loginViewModel.success) {
             LoginResponse response = new LoginResponse(
                 true, loginViewModel.userId, loginViewModel.email,
-                loginViewModel.username, loginViewModel.role,
+                loginViewModel.username, loginViewModel.role, loginViewModel.phone, loginViewModel.address,
                 loginViewModel.cartId, loginViewModel.cartMerged, loginViewModel.mergedItemsCount,
                 loginViewModel.message, null, null
             );
             return ResponseEntity.ok(response);
         } else {
             LoginResponse response = new LoginResponse(
-                false, null, null, null, null, null, false, 0, null,
+                false, null, null, null, null, null, null, null, false, 0, null,
                 loginViewModel.errorCode, loginViewModel.errorMessage
             );
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
