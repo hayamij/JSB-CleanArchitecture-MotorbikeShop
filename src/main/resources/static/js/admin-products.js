@@ -324,15 +324,21 @@ async function deleteMotorbike(id) {
         const response = await fetch(`${API_BASE_URL}/admin/motorbikes/${id}/delete`, {
             method: 'DELETE'
         });
-        
-        if (!response.ok) throw new Error('Failed to delete motorbike');
-        
+        let errorMessage = '';
+        if (!response.ok) {
+            try {
+                const data = await response.json();
+                errorMessage = data.errorMessage || data.message || response.statusText;
+            } catch (e) {
+                errorMessage = response.statusText;
+            }
+            throw new Error(errorMessage);
+        }
         showAlert('Xóa xe máy thành công', 'success');
         loadAllMotorbikes();
-        
     } catch (error) {
         console.error('Error deleting motorbike:', error);
-        showAlert('Không thể xóa xe máy', 'error');
+        showAlert('Không thể xóa xe máy: ' + (error.message || 'Lỗi không xác định'), 'error');
     }
 }
 
