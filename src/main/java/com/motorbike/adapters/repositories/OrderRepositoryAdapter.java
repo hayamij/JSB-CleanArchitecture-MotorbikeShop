@@ -1,18 +1,19 @@
 package com.motorbike.adapters.repositories;
 
-import com.motorbike.business.ports.repository.OrderRepository;
-import com.motorbike.domain.entities.DonHang;
-import com.motorbike.domain.entities.ChiTietDonHang;
-import com.motorbike.domain.entities.TrangThaiDonHang;
-import com.motorbike.infrastructure.persistence.jpa.entities.DonHangJpaEntity;
-import com.motorbike.infrastructure.persistence.jpa.entities.ChiTietDonHangJpaEntity;
-import com.motorbike.infrastructure.persistence.jpa.repositories.DonHangJpaRepository;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.motorbike.business.ports.repository.OrderRepository;
+import com.motorbike.domain.entities.ChiTietDonHang;
+import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.TrangThaiDonHang;
+import com.motorbike.infrastructure.persistence.jpa.entities.ChiTietDonHangJpaEntity;
+import com.motorbike.infrastructure.persistence.jpa.entities.DonHangJpaEntity;
+import com.motorbike.infrastructure.persistence.jpa.repositories.DonHangJpaRepository;
 
 @Component
 public class OrderRepositoryAdapter implements OrderRepository {
@@ -47,6 +48,18 @@ public class OrderRepositoryAdapter implements OrderRepository {
     @Override
     public List<DonHang> findAll() {
         return jpaRepository.findAll().stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DonHang> searchForAdmin(String keyword) {
+        String normalized = keyword == null ? "" : keyword.trim();
+        if (normalized.isEmpty()) {
+            return List.of();
+        }
+
+        return jpaRepository.searchAdminOrders(normalized).stream()
                 .map(this::toDomain)
                 .collect(Collectors.toList());
     }

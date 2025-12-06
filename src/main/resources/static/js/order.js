@@ -1,7 +1,15 @@
 const API_BASE_URL = 'http://localhost:8080/api';
 let ordersCache = [];
+let searchDebounceTimer = null;
 
-// On load
+const STATUS_LABEL_FROM_CODE = {
+    'CHO_XAC_NHAN': 'Chờ xác nhận',
+    'DA_XAC_NHAN': 'Đã xác nhận',
+    'DANG_GIAO': 'Đang giao hàng',
+    'DA_GIAO': 'Đã giao hàng',
+    'DA_HUY': 'Đã hủy'
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAdminAccess();
     updateAdminGreeting();
@@ -11,8 +19,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function bindEvents() {
     const refreshBtn = document.getElementById('refreshBtn');
+    const searchInput = document.getElementById('searchInput');
 
-    if (refreshBtn) refreshBtn.addEventListener('click', loadAllOrders);
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            if (searchInput) searchInput.value = '';
+            loadAllOrders();
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value || '';
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => handleSearch(query), 300);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(searchDebounceTimer);
+                handleSearch(searchInput.value || '');
+            }
+        });
+    }
+
 }
 
 function updateAdminGreeting() {
@@ -56,11 +87,41 @@ async function loadAllOrders() {
     }
 }
 
+async function handleSearch(rawQuery) {
+    const query = (rawQuery || '').trim();
+    if (!query) {
+        loadAllOrders();
+        return;
+    }
+
+    setLoading(true);
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/orders/search?query=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (!data.success) {
+            showError(data.errorMessage || data.message || 'Không tìm thấy đơn hàng');
+            ordersCache = [];
+            return;
+        }
+
+        ordersCache = data.orders || [];
+        renderOrders();
+    } catch (err) {
+        console.error(err);
+        showError('Lỗi khi tìm kiếm đơn hàng');
+    } finally {
+        setLoading(false);
+    }
+}
+
 function renderOrders() {
     const tbody = document.getElementById('ordersTableBody');
     if (!tbody) return;
 
-    if (!ordersCache || ordersCache.length === 0) {
+    const filtered = ordersCache || [];
+
+    if (!filtered || filtered.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="8" style="text-align:center; padding: 30px; color:#999;">
@@ -71,18 +132,28 @@ function renderOrders() {
         return;
     }
 
-    tbody.innerHTML = ordersCache.map(order => `
+    tbody.innerHTML = filtered.map(order => {
+        const statusCode = (order.orderStatus || '').toUpperCase();
+        const statusLabel = STATUS_LABEL_FROM_CODE[statusCode] || order.orderStatus || 'N/A';
+        const statusColor = order.statusColor || '';
+
+        const isHex = statusColor.startsWith('#');
+        const badgeStyle = isHex ? `style="background:${statusColor};color:#222;"` : '';
+        const badgeClass = isHex ? 'status-badge' : `status-badge status-${statusColor.toLowerCase()}`;
+
+        return `
         <tr>
             <td><strong>#${order.orderId || 'N/A'}</strong></td>
             <td>${order.customerName || 'N/A'}</td>
             <td>${order.customerPhone || ''}</td>
             <td>${order.shippingAddress || ''}</td>
-            <td><span class="status-badge status-${(order.statusColor || 'gray').toLowerCase()}">${order.orderStatus || 'N/A'}</span></td>
+            <td><span class="${badgeClass}" ${badgeStyle}>${statusLabel}</span></td>
             <td>${order.formattedTotalAmount || formatCurrency(order.totalAmount || 0)}</td>
             <td>${order.formattedOrderDate || formatDate(order.orderDate || '')}</td>
             <td><button class="btn-secondary" style="padding:6px 12px; font-size:0.85em;" onclick="viewOrder(${order.orderId})">Xem</button></td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function showError(msg) {
@@ -99,7 +170,6 @@ function setLoading(isLoading) {
     }
 }
 
-// Helpers
 function formatCurrency(value) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 }

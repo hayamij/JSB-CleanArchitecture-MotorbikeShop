@@ -30,20 +30,12 @@
     </div>
 
     <div class="main-container">
-        <div class="section-header" style="padding-left:0; padding-right:0; border: none;">
+        <div class="section-header order-header">
             <div>
                 <h2 class="section-title" style="margin-top:0">Tất cả đơn hàng</h2>
             </div>
-            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-                <input id="searchInput" type="text" placeholder="Tìm theo tên/điện thoại/địa chỉ" style="padding:10px 12px; border:1px solid var(--color-light-gray,#e0e0e0); min-width:240px;">
-                <select id="statusFilter" style="padding:10px 12px; border:1px solid var(--color-light-gray,#e0e0e0); min-width:160px;">
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="Chờ xác nhận">Chờ xác nhận</option>
-                    <option value="Đã xác nhận">Đã xác nhận</option>
-                    <option value="Đang giao hàng">Đang giao hàng</option>
-                    <option value="Đã giao hàng">Đã giao hàng</option>
-                    <option value="Đã hủy">Đã hủy</option>
-                </select>
+            <div class="order-actions">
+                <input id="searchInput" class="search-input" type="text" placeholder="Tìm theo tên / số điện thoại / địa chỉ / mã đơn">
                 <button class="btn-primary" id="refreshBtn">Làm mới</button>
             </div>
         </div>
