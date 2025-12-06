@@ -200,7 +200,7 @@ public class MotorbikeController {
         if (vm.hasError) {
             return ResponseEntity
                     .badRequest()
-                    .body(vm);
+                    .body(new ErrorResponse(vm.errorCode, vm.errorMessage));
         }
 
         // Trả ra đúng object motorbike, không phải số 1 nữa
