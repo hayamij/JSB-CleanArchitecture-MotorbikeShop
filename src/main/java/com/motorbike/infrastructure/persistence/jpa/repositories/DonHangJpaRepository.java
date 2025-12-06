@@ -33,4 +33,20 @@ public interface DonHangJpaRepository extends JpaRepository<DonHangJpaEntity, Lo
     
     
     long countByMaTaiKhoanAndTrangThai(Long userId, String trangThai);
+
+
+    @Query("""
+            SELECT DISTINCT d
+            FROM DonHangJpaEntity d
+            LEFT JOIN FETCH d.danhSachSanPham p
+            WHERE LOWER(CONCAT(d.maDonHang, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               OR LOWER(CONCAT(d.maTaiKhoan, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               OR LOWER(d.tenNguoiNhan) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               OR LOWER(d.soDienThoai) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               OR LOWER(d.diaChiGiaoHang) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               OR LOWER(d.trangThai) LIKE LOWER(CONCAT('%', :keyword, '%'))
+               OR (p.tenSanPham IS NOT NULL AND LOWER(p.tenSanPham) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            ORDER BY d.ngayDat DESC
+            """)
+    List<DonHangJpaEntity> searchAdminOrders(@Param("keyword") String keyword);
 }

@@ -1,13 +1,12 @@
 package com.motorbike.business.usecase.control;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.Test;
 
 import com.motorbike.adapters.presenters.CheckoutPresenter;
@@ -477,6 +476,11 @@ public class CheckoutUseCaseControlTest {
 		
 		@Override
 		public List<DonHang> findAll() {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public List<DonHang> searchForAdmin(String keyword) {
 			return new ArrayList<>();
 		}
 		

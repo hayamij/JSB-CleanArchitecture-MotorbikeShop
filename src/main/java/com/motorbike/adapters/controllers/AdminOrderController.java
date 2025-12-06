@@ -14,12 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.motorbike.adapters.dto.response.ListAllOrdersResponse;
 import com.motorbike.adapters.dto.response.OrderDetailResponse;
+import com.motorbike.adapters.dto.response.SearchAdminOrderResponse;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
 import com.motorbike.adapters.viewmodels.OrderDetailViewModel;
+import com.motorbike.adapters.viewmodels.SearchAdminOrderViewModel;
 import com.motorbike.business.dto.listallorders.ListAllOrdersInputData;
 import com.motorbike.business.dto.orderdetail.OrderDetailInputData;
+import com.motorbike.business.dto.searchadminorder.SearchAdminOrderInputData;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
 import com.motorbike.business.usecase.control.OrderDetailUseCaseControl;
+import com.motorbike.business.usecase.control.SearchAdminOrderUseCaseControl;
 
 @RestController
 @RequestMapping("/api/admin/orders")
@@ -29,16 +33,22 @@ public class AdminOrderController {
     private final ListAllOrdersViewModel listAllOrdersViewModel;
     private final OrderDetailUseCaseControl orderDetailUseCase;
     private final OrderDetailViewModel orderDetailViewModel;
+    private final SearchAdminOrderUseCaseControl searchAdminOrderUseCase;
+    private final SearchAdminOrderViewModel searchAdminOrderViewModel;
 
     @Autowired
     public AdminOrderController(ListAllOrdersUseCaseControl listAllOrdersUseCase,
                                 ListAllOrdersViewModel listAllOrdersViewModel,
                                 OrderDetailUseCaseControl orderDetailUseCase,
-                                OrderDetailViewModel orderDetailViewModel) {
+                                OrderDetailViewModel orderDetailViewModel,
+                                SearchAdminOrderUseCaseControl searchAdminOrderUseCase,
+                                SearchAdminOrderViewModel searchAdminOrderViewModel) {
         this.listAllOrdersUseCase = listAllOrdersUseCase;
         this.listAllOrdersViewModel = listAllOrdersViewModel;
         this.orderDetailUseCase = orderDetailUseCase;
         this.orderDetailViewModel = orderDetailViewModel;
+        this.searchAdminOrderUseCase = searchAdminOrderUseCase;
+        this.searchAdminOrderViewModel = searchAdminOrderViewModel;
     }
     @GetMapping("/all")
     public ResponseEntity<ListAllOrdersResponse> listAllOrders() {
@@ -158,6 +168,59 @@ public class AdminOrderController {
                 new ArrayList<>(),
                 orderDetailViewModel.errorCode,
                 orderDetailViewModel.errorMessage
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<SearchAdminOrderResponse> searchOrders(@org.springframework.web.bind.annotation.RequestParam String query) {
+        // Admin tìm kiếm tất cả đơn hàng
+        SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(query);
+
+        // Gọi use case
+        searchAdminOrderUseCase.execute(inputData);
+
+        // Nếu thành công
+        if (searchAdminOrderViewModel.success) {
+            List<SearchAdminOrderResponse.OrderItemResponse> orderResponses = new ArrayList<>();
+
+            if (searchAdminOrderViewModel.orders != null) {
+                for (SearchAdminOrderViewModel.OrderItemViewModel item : searchAdminOrderViewModel.orders) {
+                    orderResponses.add(new SearchAdminOrderResponse.OrderItemResponse(
+                            item.orderId,
+                            item.customerId,
+                            item.customerName,
+                            item.customerPhone,
+                            item.shippingAddress,
+                            item.orderStatus,
+                            item.formattedTotalAmount,
+                            item.totalItems,
+                            item.totalQuantity,
+                            item.formattedOrderDate,
+                            item.statusColor
+                    ));
+                }
+            }
+
+            SearchAdminOrderResponse response = new SearchAdminOrderResponse(
+                true,
+                orderResponses,
+                searchAdminOrderViewModel.message,
+                null,
+                null
+            );
+
+            return ResponseEntity.ok(response);
+        }
+
+        // Nếu thất bại
+        SearchAdminOrderResponse errorResponse = new SearchAdminOrderResponse(
+            false,
+            new ArrayList<>(),
+            searchAdminOrderViewModel.message,
+            searchAdminOrderViewModel.errorCode,
+            searchAdminOrderViewModel.errorMessage
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
