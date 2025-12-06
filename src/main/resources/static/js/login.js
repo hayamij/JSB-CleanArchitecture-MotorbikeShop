@@ -69,14 +69,31 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 localStorage.setItem('username', data.username);
             }
 
+            console.log('✅ Đăng nhập thành công');
+            console.log('Role từ API:', data.role);
+            console.log('Role lưu trong sessionStorage:', sessionStorage.getItem('role'));
+
             showAlert('Đăng nhập thành công! Đang chuyển hướng...', 'success');
 
             if (data.cartMerged) {
                 showAlert(`Đã hợp nhất ${data.mergedItemsCount} sản phẩm vào giỏ hàng`, 'success');
             }
 
+            // Chuyển hướng dựa trên vai trò
+            const role = data.role ? String(data.role).trim().toUpperCase() : '';
+            console.log('Role đã format:', role);
+            
+            const isAdmin = role.includes('ADMIN') || 
+                           role.includes('QUẢN TRỊ') ||
+                           role.includes('ADMIN_ROLE') ||
+                           role.includes('ROLE_ADMIN');
+            const redirectUrl = isAdmin ? 'home-admin.html' : 'home.html';
+            
+            console.log('Is Admin?', isAdmin);
+            console.log('Chuyển hướng đến:', redirectUrl);
+
             setTimeout(() => {
-                window.location.href = 'home.html';
+                window.location.href = redirectUrl;
             }, 1500);
         } else {
             showAlert(data.errorMessage || 'Đăng nhập thất bại', 'error');

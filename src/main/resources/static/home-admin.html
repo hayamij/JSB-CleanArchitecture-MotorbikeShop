@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Motorbike Shop</title>
+    <link rel="stylesheet" href="css/common.css?v=2">
+    <link rel="stylesheet" href="css/home-admin.css?v=2">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home-admin.html" class="logo"><span>Motorbike Shop - Admin</span></a>
+            <ul class="nav-menu">
+                <li><a href="home-admin.html" class="active">Dashboard</a></li>
+                <li><a href="#products">Sản phẩm</a></li>
+                <li><a href="order.html">Đơn hàng</a></li>
+                <li><a href="#users">Người dùng</a></li>
+            </ul>
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span class="user-name" id="adminName">Admin</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Admin Dashboard</h1>
+        <p>Quản lý cửa hàng xe máy và phụ kiện</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Statistics Section -->
+        <h2 class="section-title">Thống kê tổng quan</h2>
+        <p class="section-subtitle">Cập nhật thông tin quản lý hệ thống</p>
+
+        <div class="card-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <h3>Tổng doanh thu</h3>
+                    <p class="stat-value" id="totalRevenue">0 ₫</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-info">
+                    <h3>Tổng sản phẩm</h3>
+                    <p class="stat-value" id="totalProducts">0</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3>Người dùng</h3>
+                    <p class="stat-value" id="totalUsers">0</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🛒</div>
+                <div class="stat-info">
+                    <h3>Đơn hàng chờ xác nhận</h3>
+                    <p class="stat-value" id="pendingOrders">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <section class="admin-section" id="products">
+            <div class="section-header">
+                <h2 class="section-title">Quản lý sản phẩm</h2>
+                <button class="btn-primary" onclick="goToProductManagement()">➕ Thêm sản phẩm</button>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 30px; color: #999;">Đang tải...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section class="admin-section" id="orders">
+            <div class="section-header">
+                <h2 class="section-title">Đơn hàng gần đây</h2>
+                <a href="order.html" class="btn-secondary">📋 Xem tất cả</a>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã DH</th>
+                            <th>Khách hàng</th>
+                            <th>Trạng thái</th>
+                            <th>Tổng tiền</th>
+                            <th>Ngày đặt</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 30px; color: #999;">Đang tải...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section class="admin-section" id="users">
+            <div class="section-header">
+                <h2 class="section-title">Người dùng</h2>
+                <a href="#" class="btn-secondary">👥 Quản lý quyền</a>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 30px; color: #999;">Đang tải...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
+        <p>Hệ thống quản lý cửa hàng xe máy - Clean Architecture</p>
+    </footer>
+
+    <script src="js/common.js?v=2"></script>
+    <script src="js/home-admin.js?v=2"></script>
+</body>
+</html>
