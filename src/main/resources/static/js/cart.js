@@ -1,5 +1,20 @@
 // Cart Page JavaScript
 
+/**
+ * WARNING: CLEAN ARCHITECTURE VIOLATION
+ * 
+ * This file contains business logic for guest cart management, including:
+ * - Price calculations (subtotal, total)
+ * - Stock validation
+ * - Cart item management
+ * 
+ * TODO (Phase 2): Move guest cart logic to backend Use Cases
+ * - Create GuestCartSession on backend
+ * - Backend should calculate all prices and totals
+ * - Frontend should only display data from API
+ * - See materials/todo.txt section IV.4 for details
+ */
+
 let currentCart = null;
 
 async function loadCart() {

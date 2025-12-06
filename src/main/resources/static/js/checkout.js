@@ -1,5 +1,19 @@
 // Checkout Page JavaScript
 
+/**
+ * WARNING: CLEAN ARCHITECTURE VIOLATION
+ * 
+ * This file contains form validation business logic that should be on backend:
+ * - Phone number format validation
+ * - Address length validation
+ * - Required field validation
+ * 
+ * NOTE: Frontend validation is acceptable for UX (instant feedback),
+ * but backend MUST validate again. Never trust client data.
+ * 
+ * TODO: Ensure backend Use Cases validate all fields independently
+ */
+
 let currentCart = null;
 let currentUser = null;
 

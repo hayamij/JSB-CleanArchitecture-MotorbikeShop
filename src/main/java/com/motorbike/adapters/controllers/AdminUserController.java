@@ -14,7 +14,7 @@ import com.motorbike.adapters.viewmodels.SearchUsersViewModel;
 import com.motorbike.adapters.viewmodels.DeleteUserViewModel;
 import com.motorbike.adapters.viewmodels.AddUserViewModel;
 import com.motorbike.adapters.viewmodels.UpdateUserViewModel;
-import com.motorbike.domain.entities.VaiTro;
+import com.motorbike.adapters.util.RoleConverter;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -132,7 +132,6 @@ public class AdminUserController {
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody Map<String, Object> request) {
         String roleStr = (String) request.get("role");
-        VaiTro role = "ADMIN".equals(roleStr) ? VaiTro.ADMIN : VaiTro.CUSTOMER;
         Boolean active = request.get("active") != null ? (Boolean) request.get("active") : true;
         
         AddUserInputData input = new AddUserInputData(
@@ -142,10 +141,9 @@ public class AdminUserController {
             (String) request.get("password"),
             (String) request.get("phone"),
             (String) request.get("address"),
-            role,
+            RoleConverter.fromString(roleStr),
             active
         );
-        
         addUserUseCase.execute(input);
 
         if (addUserViewModel.hasError) {
@@ -171,7 +169,6 @@ public class AdminUserController {
             @RequestBody Map<String, Object> request) {
         
         String roleStr = (String) request.get("role");
-        VaiTro role = "ADMIN".equals(roleStr) ? VaiTro.ADMIN : VaiTro.CUSTOMER;
         Boolean active = request.get("active") != null ? (Boolean) request.get("active") : true;
         
         UpdateUserInputData input = new UpdateUserInputData(
@@ -180,7 +177,7 @@ public class AdminUserController {
             (String) request.get("email"),
             (String) request.get("phone"),
             (String) request.get("address"),
-            role,
+            RoleConverter.fromString(roleStr),
             active
         );
         

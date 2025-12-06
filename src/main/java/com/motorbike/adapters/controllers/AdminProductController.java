@@ -5,6 +5,7 @@ import com.motorbike.business.usecase.input.UpdateMotorbikeInputBoundary;
 import com.motorbike.business.usecase.input.AddAccessoryInputBoundary;
 import com.motorbike.business.usecase.input.UpdateAccessoryInputBoundary;
 import com.motorbike.business.usecase.input.DeleteAccessoryInputBoundary;
+import com.motorbike.business.usecase.input.ToggleProductVisibilityInputBoundary;
 import com.motorbike.business.usecase.control.SearchOrdersUseCaseControl;
 import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
@@ -12,9 +13,8 @@ import com.motorbike.business.dto.accessory.AddAccessoryInputData;
 import com.motorbike.business.dto.accessory.UpdateAccessoryInputData;
 import com.motorbike.business.dto.accessory.DeleteAccessoryInputData;
 import com.motorbike.business.dto.order.SearchOrdersInputData;
+import com.motorbike.business.dto.product.ToggleProductVisibilityInputData;
 import com.motorbike.adapters.viewmodels.*;
-import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.domain.entities.SanPham;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +44,8 @@ public class AdminProductController {
     private final SearchOrdersUseCaseControl searchOrdersUseCase;
     private final SearchOrdersViewModel searchOrdersViewModel;
     
-    private final ProductRepository productRepository;
+    private final ToggleProductVisibilityInputBoundary toggleProductVisibilityUseCase;
+    private final ToggleProductVisibilityViewModel toggleProductVisibilityViewModel;
 
     public AdminProductController(
             DeleteMotorbikeInputBoundary deleteMotorbikeUseCase,
@@ -59,7 +60,8 @@ public class AdminProductController {
             DeleteAccessoryViewModel deleteAccessoryViewModel,
             SearchOrdersUseCaseControl searchOrdersUseCase,
             SearchOrdersViewModel searchOrdersViewModel,
-            ProductRepository productRepository) {
+            ToggleProductVisibilityInputBoundary toggleProductVisibilityUseCase,
+            ToggleProductVisibilityViewModel toggleProductVisibilityViewModel) {
         this.deleteMotorbikeUseCase = deleteMotorbikeUseCase;
         this.deleteMotorbikeViewModel = deleteMotorbikeViewModel;
         this.updateMotorbikeUseCase = updateMotorbikeUseCase;
@@ -72,7 +74,8 @@ public class AdminProductController {
         this.deleteAccessoryViewModel = deleteAccessoryViewModel;
         this.searchOrdersUseCase = searchOrdersUseCase;
         this.searchOrdersViewModel = searchOrdersViewModel;
-        this.productRepository = productRepository;
+        this.toggleProductVisibilityUseCase = toggleProductVisibilityUseCase;
+        this.toggleProductVisibilityViewModel = toggleProductVisibilityViewModel;
     }
 
     // Use Case: DeleteMotorbike
@@ -233,53 +236,43 @@ public class AdminProductController {
     // Toggle product visibility (Ẩn/Hiện sản phẩm)
     @PatchMapping("/motorbikes/{id}/visibility")
     public ResponseEntity<?> toggleMotorbikeVisibility(@PathVariable Long id) {
-        try {
-            SanPham product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
-            
-            // Sử dụng domain method để toggle visibility
-            if (product.isConHang()) {
-                product.ngungKinhDoanh();
-            } else {
-                product.khoiPhucKinhDoanh();
-            }
-            
-            productRepository.save(product);
-            
+        ToggleProductVisibilityInputData input = new ToggleProductVisibilityInputData(id);
+        toggleProductVisibilityUseCase.execute(input);
+        
+        if (toggleProductVisibilityViewModel.success) {
             return ResponseEntity.ok(Map.of(
                 "success", true, 
-                "message", product.isConHang() ? "Hiện sản phẩm thành công" : "Ẩn sản phẩm thành công",
-                "isVisible", product.isConHang()
+                "message", toggleProductVisibilityViewModel.message,
+                "isVisible", toggleProductVisibilityViewModel.isVisible
             ));
-        } catch (Exception e) {
+        } else {
             return ResponseEntity.status(400)
-                .body(Map.of("success", false, "errorMessage", e.getMessage()));
+                .body(Map.of(
+                    "success", false, 
+                    "errorCode", toggleProductVisibilityViewModel.errorCode,
+                    "errorMessage", toggleProductVisibilityViewModel.errorMessage
+                ));
         }
     }
 
     @PatchMapping("/accessories/{id}/visibility")
     public ResponseEntity<?> toggleAccessoryVisibility(@PathVariable Long id) {
-        try {
-            SanPham product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phụ kiện"));
-            
-            // Sử dụng domain method để toggle visibility
-            if (product.isConHang()) {
-                product.ngungKinhDoanh();
-            } else {
-                product.khoiPhucKinhDoanh();
-            }
-            
-            productRepository.save(product);
-            
+        ToggleProductVisibilityInputData input = new ToggleProductVisibilityInputData(id);
+        toggleProductVisibilityUseCase.execute(input);
+        
+        if (toggleProductVisibilityViewModel.success) {
             return ResponseEntity.ok(Map.of(
                 "success", true, 
-                "message", product.isConHang() ? "Hiện phụ kiện thành công" : "Ẩn phụ kiện thành công",
-                "isVisible", product.isConHang()
+                "message", toggleProductVisibilityViewModel.message,
+                "isVisible", toggleProductVisibilityViewModel.isVisible
             ));
-        } catch (Exception e) {
+        } else {
             return ResponseEntity.status(400)
-                .body(Map.of("success", false, "errorMessage", e.getMessage()));
+                .body(Map.of(
+                    "success", false, 
+                    "errorCode", toggleProductVisibilityViewModel.errorCode,
+                    "errorMessage", toggleProductVisibilityViewModel.errorMessage
+                ));
         }
     }
 }

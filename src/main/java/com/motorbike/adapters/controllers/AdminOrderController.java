@@ -13,14 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.motorbike.adapters.dto.response.ListAllOrdersResponse;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
 import com.motorbike.adapters.viewmodels.UpdateOrderViewModel;
+import com.motorbike.adapters.viewmodels.GetOrderDetailViewModel;
+import com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel;
 import com.motorbike.business.dto.listallorders.ListAllOrdersInputData;
 import com.motorbike.business.dto.order.UpdateOrderInputData;
-import com.motorbike.business.ports.repository.OrderRepository;
+import com.motorbike.business.dto.order.GetOrderDetailInputData;
+import com.motorbike.business.dto.order.GetValidOrderStatusesInputData;
+import com.motorbike.business.usecase.input.GetOrderDetailInputBoundary;
+import com.motorbike.business.usecase.input.GetValidOrderStatusesInputBoundary;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateOrderUseCaseControl;
-import com.motorbike.domain.entities.PhuongThucThanhToan;
-import com.motorbike.domain.entities.ChiTietDonHang;
-import com.motorbike.domain.entities.DonHang;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +44,10 @@ public class AdminOrderController {
     private final ListAllOrdersViewModel listAllOrdersViewModel;
     private final UpdateOrderUseCaseControl updateOrderUseCase;
     private final UpdateOrderViewModel updateOrderViewModel;
-    private final OrderRepository orderRepository;
+    private final GetOrderDetailInputBoundary getOrderDetailUseCase;
+    private final GetOrderDetailViewModel getOrderDetailViewModel;
+    private final GetValidOrderStatusesInputBoundary getValidOrderStatusesUseCase;
+    private final GetValidOrderStatusesViewModel getValidOrderStatusesViewModel;
 
     @Autowired
     public AdminOrderController(
@@ -50,13 +55,19 @@ public class AdminOrderController {
             ListAllOrdersViewModel listAllOrdersViewModel,
             UpdateOrderUseCaseControl updateOrderUseCase,
             UpdateOrderViewModel updateOrderViewModel,
-            OrderRepository orderRepository) 
+            GetOrderDetailInputBoundary getOrderDetailUseCase,
+            GetOrderDetailViewModel getOrderDetailViewModel,
+            GetValidOrderStatusesInputBoundary getValidOrderStatusesUseCase,
+            GetValidOrderStatusesViewModel getValidOrderStatusesViewModel) 
     {
         this.listAllOrdersUseCase = listAllOrdersUseCase;
         this.listAllOrdersViewModel = listAllOrdersViewModel;
         this.updateOrderUseCase = updateOrderUseCase;
         this.updateOrderViewModel = updateOrderViewModel;
-        this.orderRepository = orderRepository;
+        this.getOrderDetailUseCase = getOrderDetailUseCase;
+        this.getOrderDetailViewModel = getOrderDetailViewModel;
+        this.getValidOrderStatusesUseCase = getValidOrderStatusesUseCase;
+        this.getValidOrderStatusesViewModel = getValidOrderStatusesViewModel;
     }
     @GetMapping("/all")
     public ResponseEntity<ListAllOrdersResponse> listAllOrders() {
@@ -118,105 +129,63 @@ public class AdminOrderController {
     
     @GetMapping("/{orderId}")
     public ResponseEntity<Map<String, Object>> getOrderDetail(@PathVariable Long orderId) {
-        try {
-            Optional<DonHang> orderOpt = orderRepository.findById(orderId);
-            
-            if (!orderOpt.isPresent()) {
-                Map<String, Object> error = new HashMap<>();
-                error.put("success", false);
-                error.put("message", "Không tìm thấy đơn hàng");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-            }
-            
-            DonHang order = orderOpt.get();
-            NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            
+        GetOrderDetailInputData inputData = new GetOrderDetailInputData(orderId);
+        getOrderDetailUseCase.execute(inputData);
+        
+        if (getOrderDetailViewModel.success) {
             Map<String, Object> orderData = new HashMap<>();
-            orderData.put("orderId", order.getMaDonHang());
-            orderData.put("customerId", order.getMaTaiKhoan());
-            orderData.put("customerName", order.getTenNguoiNhan());
-            orderData.put("customerPhone", order.getSoDienThoai());
-            orderData.put("shippingAddress", order.getDiaChiGiaoHang());
-            orderData.put("orderStatus", order.getTrangThai().getMoTa()); // Use formatted description
-            orderData.put("orderStatusCode", order.getTrangThai().name()); // Keep code for form submission
-            orderData.put("formattedTotalAmount", currencyFormat.format(order.getTongTien()));
-            orderData.put("totalAmount", order.getTongTien());
-            orderData.put("formattedOrderDate", order.getNgayDat().format(dateFormatter));
-            orderData.put("note", order.getGhiChu());
-            orderData.put("paymentMethod", order.getPhuongThucThanhToan().name());
-            orderData.put("paymentMethodText", order.getPhuongThucThanhToan() == PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP ? "COD" : "Chuyển khoản");
+            orderData.put("orderId", getOrderDetailViewModel.orderDetail.orderId);
+            orderData.put("customerId", getOrderDetailViewModel.orderDetail.customerId);
+            orderData.put("customerName", getOrderDetailViewModel.orderDetail.customerName);
+            orderData.put("customerPhone", getOrderDetailViewModel.orderDetail.customerPhone);
+            orderData.put("shippingAddress", getOrderDetailViewModel.orderDetail.shippingAddress);
+            orderData.put("orderStatus", getOrderDetailViewModel.orderDetail.orderStatus);
+            orderData.put("orderStatusCode", getOrderDetailViewModel.orderDetail.orderStatusCode);
+            orderData.put("formattedTotalAmount", getOrderDetailViewModel.orderDetail.formattedTotalAmount);
+            orderData.put("formattedOrderDate", getOrderDetailViewModel.orderDetail.formattedOrderDate);
+            orderData.put("note", getOrderDetailViewModel.orderDetail.note);
+            orderData.put("paymentMethod", getOrderDetailViewModel.orderDetail.paymentMethod);
+            orderData.put("paymentMethodText", getOrderDetailViewModel.orderDetail.paymentMethodText);
             
-            // Add order items
             List<Map<String, Object>> items = new ArrayList<>();
-            for (ChiTietDonHang item : order.getDanhSachSanPham()) {
+            for (GetOrderDetailViewModel.OrderItemDisplay item : getOrderDetailViewModel.orderDetail.items) {
                 Map<String, Object> itemData = new HashMap<>();
-                itemData.put("productId", item.getMaSanPham());
-                itemData.put("productName", item.getTenSanPham());
-                itemData.put("quantity", item.getSoLuong());
-                itemData.put("price", item.getGiaBan());
-                itemData.put("formattedPrice", currencyFormat.format(item.getGiaBan()));
-                itemData.put("subtotal", item.getThanhTien());
-                itemData.put("formattedSubtotal", currencyFormat.format(item.getThanhTien()));
+                itemData.put("productId", item.productId);
+                itemData.put("productName", item.productName);
+                itemData.put("quantity", item.quantity);
+                itemData.put("formattedPrice", item.formattedPrice);
+                itemData.put("formattedSubtotal", item.formattedSubtotal);
                 items.add(itemData);
             }
             orderData.put("items", items);
-            orderData.put("totalItems", order.getDanhSachSanPham().size());
+            orderData.put("totalItems", getOrderDetailViewModel.orderDetail.totalItems);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("order", orderData);
             
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } else {
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            error.put("message", getOrderDetailViewModel.errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
     
+    // TODO: Create GetTopProductsUseCaseControl for this functionality
+    // This method is temporarily disabled because it violates Clean Architecture
+    // by accessing OrderRepository directly from Controller
+    /*
     @GetMapping("/stats/top-products")
     public ResponseEntity<Map<String, Object>> getTopProducts() {
-        try {
-            List<DonHang> orders = orderRepository.findAll();
-            Map<String, Integer> productSales = new HashMap<>();
-            
-            for (DonHang order : orders) {
-                if (order.getTrangThai().name().equals("DA_XAC_NHAN") || 
-                    order.getTrangThai().name().equals("DANG_GIAO") ||
-                    order.getTrangThai().name().equals("DA_GIAO")) {
-                    
-                    for (ChiTietDonHang item : order.getDanhSachSanPham()) {
-                        String productName = item.getTenSanPham();
-                        productSales.put(productName, productSales.getOrDefault(productName, 0) + item.getSoLuong());
-                    }
-                }
-            }
-            
-            // Sort and get top 5
-            List<Map<String, Object>> topProducts = productSales.entrySet().stream()
-                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
-                .limit(5)
-                .map(entry -> {
-                    Map<String, Object> product = new HashMap<>();
-                    product.put("name", entry.getKey());
-                    product.put("sold", entry.getValue());
-                    return product;
-                })
-                .collect(java.util.stream.Collectors.toList());
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("products", topProducts);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
+        // VIOLATION: Direct repository access - need to create Use Case
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("message", "Feature temporarily unavailable - needs Use Case implementation");
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(error);
     }
+    */
     
     @PostMapping("/{orderId}/update")
     public ResponseEntity<Map<String, Object>> updateOrder(
@@ -245,6 +214,45 @@ public class AdminOrderController {
             error.put("success", false);
             error.put("errorMessage", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    
+    @GetMapping("/{orderId}/valid-statuses")
+    public ResponseEntity<Map<String, Object>> getValidOrderStatuses(@PathVariable Long orderId) {
+        // First get the current order to know its status
+        GetOrderDetailInputData orderInputData = new GetOrderDetailInputData(orderId);
+        getOrderDetailUseCase.execute(orderInputData);
+        
+        if (!getOrderDetailViewModel.success) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", getOrderDetailViewModel.errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+        
+        // Get valid statuses for current order status
+        String currentStatus = getOrderDetailViewModel.orderDetail.orderStatusCode;
+        GetValidOrderStatusesInputData inputData = new GetValidOrderStatusesInputData(currentStatus);
+        getValidOrderStatusesUseCase.execute(inputData);
+        
+        if (getValidOrderStatusesViewModel.success) {
+            List<Map<String, String>> statuses = new ArrayList<>();
+            for (GetValidOrderStatusesViewModel.StatusOption option : getValidOrderStatusesViewModel.validStatuses) {
+                Map<String, String> status = new HashMap<>();
+                status.put("code", option.code);
+                status.put("display", option.display);
+                statuses.add(status);
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("validStatuses", statuses);
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", getValidOrderStatusesViewModel.errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 }

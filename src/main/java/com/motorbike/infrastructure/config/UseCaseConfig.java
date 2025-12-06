@@ -680,4 +680,91 @@ public com.motorbike.business.usecase.output.CreateUserOutputBoundary createUser
         return new com.motorbike.adapters.presenters.UpdateOrderPresenter(viewModel);
     }
 
+    // GetAllProducts Use Case
+    @Bean
+    @RequestScope
+    public com.motorbike.adapters.viewmodels.GetAllProductsViewModel getAllProductsViewModel() {
+        return new com.motorbike.adapters.viewmodels.GetAllProductsViewModel();
     }
+
+    @Bean
+    public com.motorbike.business.usecase.input.GetAllProductsInputBoundary getAllProductsUseCase(
+            com.motorbike.business.usecase.output.GetAllProductsOutputBoundary presenter,
+            ProductRepository productRepository
+    ) {
+        return new com.motorbike.business.usecase.control.GetAllProductsUseCaseControl(presenter, productRepository);
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.output.GetAllProductsOutputBoundary getAllProductsPresenter(
+            com.motorbike.adapters.viewmodels.GetAllProductsViewModel viewModel
+    ) {
+        return new com.motorbike.adapters.presenters.GetAllProductsPresenter(viewModel);
+    }
+
+    // GetOrderDetail Use Case
+    @Bean
+    @RequestScope
+    public com.motorbike.adapters.viewmodels.GetOrderDetailViewModel getOrderDetailViewModel() {
+        return new com.motorbike.adapters.viewmodels.GetOrderDetailViewModel();
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.input.GetOrderDetailInputBoundary getOrderDetailUseCase(
+            com.motorbike.business.usecase.output.GetOrderDetailOutputBoundary presenter,
+            OrderRepository orderRepository
+    ) {
+        return new com.motorbike.business.usecase.control.GetOrderDetailUseCaseControl(presenter, orderRepository);
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.output.GetOrderDetailOutputBoundary getOrderDetailPresenter(
+            com.motorbike.adapters.viewmodels.GetOrderDetailViewModel viewModel
+    ) {
+        return new com.motorbike.adapters.presenters.GetOrderDetailPresenter(viewModel);
+    }
+
+    // GetValidOrderStatuses Use Case
+    @Bean
+    @RequestScope
+    public com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel getValidOrderStatusesViewModel() {
+        return new com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel();
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.input.GetValidOrderStatusesInputBoundary getValidOrderStatusesUseCase(
+            com.motorbike.business.usecase.output.GetValidOrderStatusesOutputBoundary presenter
+    ) {
+        return new com.motorbike.business.usecase.control.GetValidOrderStatusesUseCaseControl(presenter);
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.output.GetValidOrderStatusesOutputBoundary getValidOrderStatusesPresenter(
+            com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel viewModel
+    ) {
+        return new com.motorbike.adapters.presenters.GetValidOrderStatusesPresenter(viewModel);
+    }
+
+    // ToggleProductVisibility Use Case
+    @Bean
+    @RequestScope
+    public com.motorbike.adapters.viewmodels.ToggleProductVisibilityViewModel toggleProductVisibilityViewModel() {
+        return new com.motorbike.adapters.viewmodels.ToggleProductVisibilityViewModel();
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.input.ToggleProductVisibilityInputBoundary toggleProductVisibilityUseCase(
+            com.motorbike.business.usecase.output.ToggleProductVisibilityOutputBoundary presenter,
+            ProductRepository productRepository
+    ) {
+        return new com.motorbike.business.usecase.control.ToggleProductVisibilityUseCaseControl(presenter, productRepository);
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.output.ToggleProductVisibilityOutputBoundary toggleProductVisibilityPresenter(
+            com.motorbike.adapters.viewmodels.ToggleProductVisibilityViewModel viewModel
+    ) {
+        return new com.motorbike.adapters.presenters.ToggleProductVisibilityPresenter(viewModel);
+    }
+
+}

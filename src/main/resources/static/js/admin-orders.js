@@ -191,20 +191,22 @@ function translateStatusCode(statusCode) {
     }
 }
 
-// Business logic: Determine valid next statuses based on current status
-function getValidNextStatuses(currentStatus) {
-    switch(currentStatus) {
-        case 'CHO_XAC_NHAN':
-            return ['DA_XAC_NHAN', 'DA_HUY'];
-        case 'DA_XAC_NHAN':
-            return ['DANG_GIAO', 'DA_HUY'];
-        case 'DANG_GIAO':
-            return ['DA_GIAO', 'DA_HUY'];
-        case 'DA_GIAO':
-        case 'DA_HUY':
-            return []; // Cannot change from these statuses
-        default:
+// Fetch valid next statuses from backend (business logic moved to backend)
+async function getValidNextStatuses(orderId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/valid-statuses`);
+        if (!response.ok) throw new Error('Failed to fetch valid statuses');
+        
+        const data = await response.json();
+        if (!data.success) {
+            console.error('Failed to get valid statuses:', data.message);
             return [];
+        }
+        
+        return data.validStatuses || [];
+    } catch (error) {
+        console.error('Error fetching valid statuses:', error);
+        return [];
     }
 }
 
@@ -302,7 +304,7 @@ async function editOrder(order) {
         document.getElementById('orderId').value = fullOrder.orderId;
         document.getElementById('orderNote').value = fullOrder.note || '';
         
-        // Populate status dropdown based on business rules
+        // Populate status dropdown based on business rules from backend
         const statusSelect = document.getElementById('orderStatus');
         const currentStatusCode = fullOrder.orderStatusCode; // Backend now sends both code and text
         const currentStatusText = fullOrder.orderStatus;
@@ -315,12 +317,12 @@ async function editOrder(order) {
         currentOption.selected = true;
         statusSelect.appendChild(currentOption);
         
-        // Add valid next statuses based on business logic
-        const validNextStatuses = getValidNextStatuses(currentStatusCode);
-        validNextStatuses.forEach(statusCode => {
+        // Fetch and add valid next statuses from backend (business logic on server)
+        const validNextStatuses = await getValidNextStatuses(fullOrder.orderId);
+        validNextStatuses.forEach(statusOption => {
             const option = document.createElement('option');
-            option.value = statusCode;
-            option.textContent = translateStatusCode(statusCode);
+            option.value = statusOption.code;
+            option.textContent = statusOption.display;
             statusSelect.appendChild(option);
         });
         
