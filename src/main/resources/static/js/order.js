@@ -111,8 +111,7 @@ function formatDate(dateString) {
 }
 
 function viewOrder(orderId) {
-    alert(`Xem đơn hàng #${orderId}`);
-    // TODO: điều hướng tới trang chi tiết nếu có
+    window.location.href = `order-detail.html?orderId=${orderId}&from=admin`;
 }
 
 function logout() {

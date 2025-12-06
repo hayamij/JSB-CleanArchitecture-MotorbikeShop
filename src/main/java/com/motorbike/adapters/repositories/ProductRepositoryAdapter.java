@@ -1,16 +1,17 @@
 package com.motorbike.adapters.repositories;
 
-import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.domain.entities.SanPham;
-import com.motorbike.domain.entities.XeMay;
-import com.motorbike.domain.entities.PhuKienXeMay;
-import com.motorbike.infrastructure.persistence.jpa.entities.SanPhamJpaEntity;
-import com.motorbike.infrastructure.persistence.jpa.entities.XeMayJpaEntity;
-import com.motorbike.infrastructure.persistence.jpa.entities.PhuKienXeMayJpaEntity;
-import com.motorbike.infrastructure.persistence.jpa.repositories.SanPhamJpaRepository;
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.entities.XeMay;
+import com.motorbike.infrastructure.persistence.jpa.entities.PhuKienXeMayJpaEntity;
+import com.motorbike.infrastructure.persistence.jpa.entities.SanPhamJpaEntity;
+import com.motorbike.infrastructure.persistence.jpa.entities.XeMayJpaEntity;
+import com.motorbike.infrastructure.persistence.jpa.repositories.SanPhamJpaRepository;
 
 @Component
 public class ProductRepositoryAdapter implements ProductRepository {
@@ -99,6 +100,7 @@ public class ProductRepositoryAdapter implements ProductRepository {
             jpa.setHinhAnh(xeMay.getHinhAnh());
             jpa.setSoLuongTonKho(xeMay.getSoLuongTonKho());
             jpa.setConHang(xeMay.isConHang());
+            jpa.setLoaiSanPham("XE_MAY");  // FIX: Set loaiSanPham
             jpa.setHangXe(xeMay.getHangXe());
             jpa.setDongXe(xeMay.getDongXe());
             jpa.setMauSac(xeMay.getMauSac());
@@ -116,6 +118,7 @@ public class ProductRepositoryAdapter implements ProductRepository {
             jpa.setHinhAnh(phuKien.getHinhAnh());
             jpa.setSoLuongTonKho(phuKien.getSoLuongTonKho());
             jpa.setConHang(phuKien.isConHang());
+            jpa.setLoaiSanPham("PHU_KIEN");  // FIX: Set loaiSanPham
             jpa.setLoaiPhuKien(phuKien.getLoaiPhuKien());
             jpa.setThuongHieu(phuKien.getThuongHieu());
             jpa.setChatLieu(phuKien.getChatLieu());

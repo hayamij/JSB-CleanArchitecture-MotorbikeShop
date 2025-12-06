@@ -331,6 +331,11 @@ body {
     color: #92400e;
 }
 
+.status-purple {
+    background: #e9d5ff;
+    color: #6b21a8;
+}
+
 .status-green {
     background: #d1fae5;
     color: #065f46;

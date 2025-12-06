@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng</title>
+    <link rel="stylesheet" href="css/common.css?v=2">
+    <link rel="stylesheet" href="css/order-detail.css?v=1">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" id="backLink" class="logo">⬅ Quay lại</a>
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span class="user-name" id="userName">User</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="page-header">
+            <div>
+                <p class="eyebrow">Chi tiết đơn hàng</p>
+                <h1 id="orderIdHeading">Đơn hàng #...</h1>
+                <p id="orderDate" class="subtext"></p>
+            </div>
+            <div class="status-pill" id="statusPill">---</div>
+        </header>
+
+        <div id="errorBox" class="error-box hidden"></div>
+
+        <section class="order-info-section">
+            <div class="section-title">Thông tin giao hàng</div>
+            <div class="order-summary" id="orderSummary">
+                <div class="summary-card">
+                    <div class="label">Người nhận</div>
+                    <div class="value" id="receiverName">--</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Số điện thoại</div>
+                    <div class="value" id="phoneNumber">--</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Địa chỉ giao hàng</div>
+                    <div class="value" id="shippingAddress">--</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Tổng tiền</div>
+                    <div class="value strong" id="totalAmount">--</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Số sản phẩm</div>
+                    <div class="value" id="totalItems">--</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Tổng số lượng</div>
+                    <div class="value" id="totalQuantity">--</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="order-note" id="orderNoteSection">
+            <div class="label">Ghi chú đơn hàng</div>
+            <div class="value" id="orderNote">Không có</div>
+        </section>
+
+        <section class="items-section">
+            <div class="section-title">Chi tiết sản phẩm</div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        <tr><td colspan="5" style="text-align:center; padding:20px; color:#999;">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="order-actions" id="orderActionsSection" style="display: none;">
+            <button class="btn-cancel" id="cancelOrderBtn">Hủy đơn hàng</button>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
+        <p>Hệ thống quản lý cửa hàng xe máy - Clean Architecture</p>
+    </footer>
+
+    <script src="js/common.js?v=2"></script>
+    <script src="js/order-detail.js?v=1"></script>
+</body>
+</html>
