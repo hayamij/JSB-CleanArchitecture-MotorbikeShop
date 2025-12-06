@@ -46,6 +46,10 @@ public class DomainException extends RuntimeException {
     public static DomainException emailAlreadyExists(String email) {
         return new DomainException("Email đã được sử dụng: " + email, "EMAIL_EXISTS");
     }
+
+    public static DomainException orderNotFound(Long orderId) {
+        return new DomainException("Không tìm thấy đơn hàng: " + orderId, "ORDER_NOT_FOUND");
+    }
     
     // ===== CART & ORDER =====
     public static DomainException emptyCart() {

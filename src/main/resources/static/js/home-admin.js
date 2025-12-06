@@ -279,8 +279,8 @@ function deleteProduct(productId) {
 }
 
 function viewOrder(orderId) {
-    alert(`Xem đơn hàng #${orderId}`);
-    // window.location.href = `order-detail.html?id=${orderId}`;
+    if (!orderId) return;
+    window.location.href = `order-detail.html?orderId=${orderId}&from=admin`;
 }
 
 function editUser(userId) {

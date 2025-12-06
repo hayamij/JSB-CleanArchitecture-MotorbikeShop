@@ -8,13 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.motorbike.adapters.dto.response.ListAllOrdersResponse;
+import com.motorbike.adapters.dto.response.OrderDetailResponse;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
+import com.motorbike.adapters.viewmodels.OrderDetailViewModel;
 import com.motorbike.business.dto.listallorders.ListAllOrdersInputData;
+import com.motorbike.business.dto.orderdetail.OrderDetailInputData;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
+import com.motorbike.business.usecase.control.OrderDetailUseCaseControl;
 
 @RestController
 @RequestMapping("/api/admin/orders")
@@ -22,12 +27,18 @@ import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
 public class AdminOrderController {
     private final ListAllOrdersUseCaseControl listAllOrdersUseCase;
     private final ListAllOrdersViewModel listAllOrdersViewModel;
+    private final OrderDetailUseCaseControl orderDetailUseCase;
+    private final OrderDetailViewModel orderDetailViewModel;
 
     @Autowired
-    public AdminOrderController(ListAllOrdersUseCaseControl listAllOrdersUseCase,ListAllOrdersViewModel listAllOrdersViewModel) 
-    {
+    public AdminOrderController(ListAllOrdersUseCaseControl listAllOrdersUseCase,
+                                ListAllOrdersViewModel listAllOrdersViewModel,
+                                OrderDetailUseCaseControl orderDetailUseCase,
+                                OrderDetailViewModel orderDetailViewModel) {
         this.listAllOrdersUseCase = listAllOrdersUseCase;
         this.listAllOrdersViewModel = listAllOrdersViewModel;
+        this.orderDetailUseCase = orderDetailUseCase;
+        this.orderDetailViewModel = orderDetailViewModel;
     }
     @GetMapping("/all")
     public ResponseEntity<ListAllOrdersResponse> listAllOrders() {
@@ -83,5 +94,73 @@ public class AdminOrderController {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDetailResponse> getOrderDetail(@PathVariable Long orderId) {
+        OrderDetailInputData inputData = OrderDetailInputData.forAdmin(orderId);
+        orderDetailUseCase.execute(inputData);
+
+        if (orderDetailViewModel.success) {
+            List<OrderDetailResponse.OrderItemResponse> itemResponses = new ArrayList<>();
+            if (orderDetailViewModel.items != null) {
+                for (OrderDetailViewModel.OrderItemViewModel item : orderDetailViewModel.items) {
+                    itemResponses.add(new OrderDetailResponse.OrderItemResponse(
+                            item.orderItemId,
+                            item.productId,
+                            item.productName,
+                            item.formattedUnitPrice,
+                            item.quantity,
+                            item.formattedLineTotal
+                    ));
+                }
+            }
+
+            OrderDetailResponse response = new OrderDetailResponse(
+                    true,
+                    orderDetailViewModel.message,
+                    orderDetailViewModel.orderId,
+                    orderDetailViewModel.customerId,
+                    orderDetailViewModel.receiverName,
+                    orderDetailViewModel.phoneNumber,
+                    orderDetailViewModel.shippingAddress,
+                    orderDetailViewModel.orderStatus,
+                    orderDetailViewModel.statusColor,
+                    orderDetailViewModel.formattedTotalAmount,
+                    orderDetailViewModel.totalItems,
+                    orderDetailViewModel.totalQuantity,
+                    orderDetailViewModel.note,
+                    orderDetailViewModel.formattedOrderDate,
+                    orderDetailViewModel.formattedUpdatedDate,
+                    itemResponses,
+                    null,
+                    null
+            );
+
+            return ResponseEntity.ok(response);
+        }
+
+        OrderDetailResponse errorResponse = new OrderDetailResponse(
+                false,
+                orderDetailViewModel.message,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                0,
+                null,
+                null,
+                null,
+                new ArrayList<>(),
+                orderDetailViewModel.errorCode,
+                orderDetailViewModel.errorMessage
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 }
 

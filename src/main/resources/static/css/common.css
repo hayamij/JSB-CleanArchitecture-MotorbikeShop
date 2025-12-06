@@ -30,6 +30,103 @@ body {
     color: var(--color-dark-gray);
 }
 
+/* Navbar & Footer base styles so pages without their own navbar CSS still look correct */
+.navbar {
+    background: var(--color-white, #ffffff);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 3px solid var(--color-black, #000000);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--color-black, #000000);
+    text-decoration: none;
+    transition: all var(--transition-base, 0.3s ease);
+}
+
+.logo:hover { transform: scale(1.03); }
+
+.nav-menu {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    align-items: center;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: var(--color-dark-gray, #2a2a2a);
+    font-weight: 600;
+    position: relative;
+    padding: 5px 0;
+    transition: color var(--transition-base, 0.3s ease);
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--color-black, #000000);
+    transition: width var(--transition-base, 0.3s ease);
+}
+
+.nav-menu a:hover,
+.nav-menu a.active { color: var(--color-black, #000000); }
+
+.nav-menu a:hover::after,
+.nav-menu a.active::after { width: 100%; }
+
+.user-info { display: flex; align-items: center; gap: 12px; }
+.user-greeting { font-weight: 600; }
+.user-name { font-weight: 700; color: var(--color-black, #000000); }
+
+.btn-logout {
+    padding: 8px 16px;
+    background: var(--color-white, #ffffff);
+    color: var(--color-black, #000000);
+    border: 2px solid var(--color-black, #000000);
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: all var(--transition-base, 0.3s ease);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-logout:hover {
+    background: var(--color-black, #000000);
+    color: var(--color-white, #ffffff);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+footer {
+    text-align: center;
+    padding: 20px 10px;
+    color: var(--color-gray, #666666);
+    font-size: 0.9em;
+    margin-top: 30px;
+}
+
 /* Alert Styles */
 .alert {
     padding: 16px 20px;

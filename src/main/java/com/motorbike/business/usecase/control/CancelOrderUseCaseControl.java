@@ -104,7 +104,6 @@ public class CancelOrderUseCaseControl {
         if (errorException != null) {
             String errorCode = "SYSTEM_ERROR";
             String message = errorException.getMessage();
-            
             if (errorException instanceof ValidationException) {
                 errorCode = ((ValidationException) errorException).getErrorCode();
             } else if (errorException instanceof DomainException) {

@@ -29,6 +29,8 @@ function checkAuthAndLoadOrders() {
         return;
     }
 
+    showCancelSuccessIfNeeded();
+
     loadMyOrders(userId);
 }
 
@@ -64,6 +66,56 @@ async function loadMyOrders(userId) {
     } finally {
         hideLoading();
     }
+}
+
+// Custom confirm modal (reuse style across site)
+let confirmModalOverlay = null;
+
+function ensureConfirmModal() {
+    if (confirmModalOverlay) return confirmModalOverlay;
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal" role="dialog" aria-modal="true">
+            <h3 class="modal-title">Xác nhận hủy đơn</h3>
+            <p class="modal-message" id="confirmMessage">Bạn có chắc chắn?</p>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="confirmCancelBtn">Để sau</button>
+                <button type="button" class="btn-danger" id="confirmOkBtn">Hủy đơn</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    confirmModalOverlay = overlay;
+    return overlay;
+}
+
+function showConfirmModal(message) {
+    return new Promise(resolve => {
+        const overlay = ensureConfirmModal();
+        const msgEl = overlay.querySelector('#confirmMessage');
+        const okBtn = overlay.querySelector('#confirmOkBtn');
+        const cancelBtn = overlay.querySelector('#confirmCancelBtn');
+
+        msgEl.textContent = message || 'Bạn có chắc chắn?';
+        overlay.classList.add('show');
+
+        const cleanup = (result) => {
+            overlay.classList.remove('show');
+            document.removeEventListener('keydown', onEsc);
+            resolve(result);
+        };
+
+        const onEsc = (e) => {
+            if (e.key === 'Escape') {
+                cleanup(false);
+            }
+        };
+
+        okBtn.onclick = () => cleanup(true);
+        cancelBtn.onclick = () => cleanup(false);
+        document.addEventListener('keydown', onEsc);
+    });
 }
 
 // Display orders list
@@ -139,15 +191,27 @@ function createOrderCard(order) {
         </div>
     `;
 
+    card.addEventListener('click', (e) => {
+        if (e.target.closest('[data-action]')) return;
+        goToDetailPage(order.orderId);
+    });
+    card.style.cursor = 'pointer';
+
     if (canCancelOrder) {
         const editBtn = card.querySelector('[data-action="edit-shipping"]');
         const cancelBtn = card.querySelector('[data-action="cancel-order"]');
 
         if (editBtn) {
-            editBtn.addEventListener('click', () => goToEditPage(order.orderId));
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                goToEditPage(order.orderId);
+            });
         }
         if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => cancelOrder(order.orderId));
+            cancelBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cancelOrder(order.orderId);
+            });
         }
     }
 
@@ -161,6 +225,10 @@ function goToEditPage(orderId) {
         return;
     }
     window.location.href = `edit-order.html?orderId=${orderId}`;
+}
+
+function goToDetailPage(orderId) {
+    window.location.href = `order-detail.html?orderId=${orderId}&from=user`;
 }
 
 // Update statistics
@@ -221,11 +289,22 @@ function showAlert(message, type = 'success') {
     }, 3000);
 }
 
+// Hiển thị thông báo hủy thành công khi quay lại từ trang chi tiết
+function showCancelSuccessIfNeeded() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cancelSuccess') === '1') {
+        showAlert('Đơn hàng đã được hủy thành công!', 'success');
+        // Xóa query để tránh hiện lại khi refresh
+        params.delete('cancelSuccess');
+        const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+        window.history.replaceState({}, '', newUrl);
+    }
+}
+
 // Cancel order function
 async function cancelOrder(orderId) {
-    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng #' + orderId + '?')) {
-        return;
-    }
+    const confirmed = await showConfirmModal(`Bạn có chắc chắn muốn hủy đơn hàng #${orderId}?`);
+    if (!confirmed) return;
 
     const userId = sessionStorage.getItem('userId');
     if (!userId) {
@@ -245,8 +324,15 @@ async function cancelOrder(orderId) {
             })
         });
 
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Cancel error response:', errorText);
+            showAlert('Không thể hủy đơn hàng. Vui lòng thử lại!', 'error');
+            return;
+        }
+
         const data = await response.json();
-        console.log('Cancel response:', data); // Debug log
+        console.log('Cancel response:', data);
 
         if (data.success) {
             showAlert('Đơn hàng đã được hủy thành công!', 'success');

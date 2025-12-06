@@ -1,0 +1,363 @@
+/* Order Detail Page Styles */
+
+body {
+    background: var(--color-light-gray, #e0e0e0);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: calc(100vh - 200px);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.page-header > div:first-child {
+    flex: 1;
+    min-width: 300px;
+}
+
+.eyebrow {
+    font-size: 0.85em;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #888;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+}
+
+.page-header h1 {
+    margin: 0 0 6px 0;
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #000;
+}
+
+.subtext {
+    margin: 0;
+    color: #666;
+    font-size: 0.95em;
+}
+
+.status-pill {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 160px;
+    text-align: center;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.order-info-section {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.section-title {
+    font-weight: 700;
+    font-size: 1.3em;
+    color: #000;
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #000;
+}
+
+.order-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.summary-card {
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    padding: 16px;
+    transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+    background: #fff;
+    border-color: #d0d0d0;
+}
+
+.summary-card .label {
+    font-size: 0.8em;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.summary-card .value {
+    font-size: 1em;
+    color: #222;
+    word-break: break-word;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.summary-card .value.strong {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #000;
+}
+
+.order-note {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.order-note .label {
+    font-size: 0.85em;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.order-note .value {
+    color: #222;
+    line-height: 1.6;
+    font-size: 1em;
+}
+
+.order-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin: 16px 0 0;
+    padding: 0;
+}
+
+.btn-cancel {
+    padding: 10px 18px;
+    background: #e60202;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.btn-cancel:hover {
+    background: #B22222;
+    box-shadow: 0 4px 12px rgba(230, 2, 2, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-cancel:active {
+    transform: translateY(0);
+}
+
+/* Confirm modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 16px;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    border: 1px solid #e5e7eb;
+}
+
+.modal-title {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #000;
+}
+
+.modal-message {
+    margin: 0 0 20px 0;
+    color: #4b5563;
+    line-height: 1.5;
+    font-size: 0.95em;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-secondary {
+    padding: 10px 16px;
+    background: #f3f4f6;
+    color: #111827;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-danger {
+    padding: 10px 16px;
+    background: #e60202;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: #B22222;
+    box-shadow: 0 4px 12px rgba(230, 2, 2, 0.25);
+}
+
+.items-section {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.items-section .section-title {
+    margin-bottom: 20px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: left;
+}
+
+.data-table th {
+    background: #fafafa;
+    font-size: 0.9em;
+    color: #555;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table td {
+    color: #333;
+    font-size: 0.95em;
+}
+
+.error-box {
+    margin: 20px 0;
+    padding: 16px;
+    border-radius: 8px;
+    color: #fff;
+    background: #e74c3c;
+    border: 1px solid #c0392b;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 15px;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .status-pill {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .page-header h1 {
+        font-size: 1.8em;
+    }
+    
+    .order-summary {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+    }
+    
+    .summary-card {
+        padding: 12px;
+    }
+    
+    .order-info-section,
+    .order-note,
+    .items-section {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .section-title {
+        font-size: 1.1em;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px;
+        font-size: 0.85em;
+    }
+}

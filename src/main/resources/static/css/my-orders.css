@@ -246,27 +246,33 @@ footer p {
 }
 
 .status-ORANGE {
-    background: #FF8C00;
+    background: #fef3c7;
+    color: #92400e;
 }
 
 .status-BLUE {
-    background: #4169E1;
+    background: #dbeafe;
+    color: #1e3a8a;
 }
 
 .status-PURPLE {
-    background: #8B008B;
+    background: #e9d5ff;
+    color: #6b21a8;
 }
 
 .status-GREEN {
-    background: #228B22;
+    background: #d1fae5;
+    color: #065f46;
 }
 
 .status-RED {
-    background: #DC143C;
+    background: #fee2e2;
+    color: #7f1d1d;
 }
 
 .status-GRAY {
-    background: #696969;
+    background: #e5e7eb;
+    color: #374151;
 }
 
 .order-body {
@@ -319,7 +325,7 @@ footer p {
 
 .btn-cancel {
     padding: 10px 20px;
-    background: #DC143C;
+    background: #e60202;
     color: var(--color-white);
     border: none;
     cursor: pointer;
@@ -354,6 +360,85 @@ footer p {
     background: #B22222;
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
+}
+
+/* Confirm modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 16px;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    border: 1px solid #e5e7eb;
+}
+
+.modal-title {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #000;
+}
+
+.modal-message {
+    margin: 0 0 20px 0;
+    color: #4b5563;
+    line-height: 1.5;
+    font-size: 0.95em;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-secondary {
+    padding: 10px 16px;
+    background: #f3f4f6;
+    color: #111827;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-danger {
+    padding: 10px 16px;
+    background: #e60202;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: #B22222;
+    box-shadow: 0 4px 12px rgba(230, 2, 2, 0.25);
 }
 
 .order-date {

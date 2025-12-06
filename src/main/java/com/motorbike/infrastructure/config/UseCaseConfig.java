@@ -13,6 +13,7 @@ import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
 import com.motorbike.adapters.presenters.GetAllMotorbikesPresenter;
 import com.motorbike.adapters.presenters.ListAllOrdersPresenter;
 import com.motorbike.adapters.presenters.LoginPresenter;
+import com.motorbike.adapters.presenters.OrderDetailPresenter;
 import com.motorbike.adapters.presenters.ProductDetailPresenter;
 import com.motorbike.adapters.presenters.RegisterPresenter;
 import com.motorbike.adapters.presenters.SearchAccessoriesPresenter;
@@ -31,6 +32,7 @@ import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
 import com.motorbike.adapters.viewmodels.LoginViewModel;
+import com.motorbike.adapters.viewmodels.OrderDetailViewModel;
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.adapters.viewmodels.RegisterViewModel;
 import com.motorbike.adapters.viewmodels.SearchAccessoriesViewModel;
@@ -54,6 +56,7 @@ import com.motorbike.business.usecase.control.GetAllMotorbikesUseCaseControl;
 import com.motorbike.business.usecase.control.GetProductDetailUseCaseControl;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
 import com.motorbike.business.usecase.control.LoginUseCaseControl;
+import com.motorbike.business.usecase.control.OrderDetailUseCaseControl;
 import com.motorbike.business.usecase.control.RegisterUseCaseControl;
 import com.motorbike.business.usecase.control.SearchAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
@@ -77,6 +80,7 @@ import com.motorbike.business.usecase.output.GetAllMotorbikesOutputBoundary;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
+import com.motorbike.business.usecase.output.OrderDetailOutputBoundary;
 import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
@@ -255,6 +259,25 @@ public com.motorbike.business.usecase.output.ListMyOrdersOutputBoundary listMyOr
         com.motorbike.adapters.viewmodels.ListMyOrdersViewModel listMyOrdersViewModel) {
     return new com.motorbike.adapters.presenters.ListMyOrdersPresenter(listMyOrdersViewModel);
 }
+
+@Bean
+@RequestScope
+public OrderDetailViewModel orderDetailViewModel() {
+    return new OrderDetailViewModel();
+}
+
+@Bean
+public OrderDetailUseCaseControl orderDetailUseCase(
+        OrderDetailOutputBoundary orderDetailPresenter,
+        OrderRepository orderRepository) {
+    return new OrderDetailUseCaseControl(orderDetailPresenter, orderRepository);
+}
+
+@Bean
+public OrderDetailOutputBoundary orderDetailPresenter(OrderDetailViewModel orderDetailViewModel) {
+    return new OrderDetailPresenter(orderDetailViewModel);
+}
+
 
 @Bean
 @RequestScope
