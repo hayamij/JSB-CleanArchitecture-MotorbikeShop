@@ -35,6 +35,7 @@ public class RegisterUseCaseControl {
                 throw ValidationException.invalidInput();
             }
             TaiKhoan.checkInputForRegister(
+                inputData.getName(),
                 inputData.getEmail(),
                 inputData.getUsername(),
                 inputData.getPassword(),
@@ -49,6 +50,9 @@ public class RegisterUseCaseControl {
                 if (userRepository.existsByEmail(inputData.getEmail())) {
                     throw DomainException.emailAlreadyExists(inputData.getEmail());
                 }
+                if (userRepository.existsByUsername(inputData.getUsername())) {
+                    throw DomainException.usernameAlreadyExists(inputData.getUsername());
+                }
             } catch (Exception e) {
                 errorException = e;
             }
@@ -57,6 +61,7 @@ public class RegisterUseCaseControl {
         if (errorException == null) {
             try {
                 TaiKhoan taiKhoan = new TaiKhoan(
+                    inputData.getName(),
                     inputData.getEmail(),
                     inputData.getUsername(),
                     inputData.getPassword(),

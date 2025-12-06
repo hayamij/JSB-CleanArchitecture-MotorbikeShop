@@ -22,8 +22,8 @@ public class DomainException extends RuntimeException {
     }
     
     // ===== ENTITY NOT FOUND =====
-    public static DomainException userNotFound(String email) {
-        return new DomainException("Không tìm thấy tài khoản với email: " + email, "USER_NOT_FOUND");
+    public static DomainException userNotFound(String identifier) {
+        return new DomainException("Không tìm thấy tài khoản với thông tin: " + identifier, "USER_NOT_FOUND");
     }
     
     public static DomainException productNotFound(String productId) {
@@ -45,6 +45,10 @@ public class DomainException extends RuntimeException {
     
     public static DomainException emailAlreadyExists(String email) {
         return new DomainException("Email đã được sử dụng: " + email, "EMAIL_EXISTS");
+    }
+    
+    public static DomainException usernameAlreadyExists(String username) {
+        return new DomainException("Tên đăng nhập đã được sử dụng: " + username, "USERNAME_EXISTS");
     }
     
     // ===== CART & ORDER =====

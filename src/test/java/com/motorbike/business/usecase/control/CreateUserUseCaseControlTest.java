@@ -20,6 +20,7 @@ public class CreateUserUseCaseControlTest {
 	@Test
 	public void testExecute_ValidUser_Success() {
 		CreateUserInputData inputData = new CreateUserInputData(
+			"Nguyễn Văn Test",
 			"newuser@test.com",
 			"newuser",
 			"password123",
@@ -43,6 +44,7 @@ public class CreateUserUseCaseControlTest {
 	@Test
 	public void testExecute_DuplicateEmail() {
 		CreateUserInputData inputData = new CreateUserInputData(
+			"Trần Văn B",
 			"existing@test.com",
 			"user",
 			"password123",
@@ -78,35 +80,44 @@ public class CreateUserUseCaseControlTest {
 	private static class MockUserRepository implements UserRepository {
 		private Long nextId = 1L;
 
-		@Override
-		public Optional<TaiKhoan> findByEmail(String email) {
-			if ("existing@test.com".equals(email)) {
-				LocalDateTime now = LocalDateTime.now();
-				return Optional.of(new TaiKhoan(
-					1L,
-					"existing@test.com",
-					"existing",
-					"password",
-					"0912345678",
-					"123 Street",
-					VaiTro.CUSTOMER,
-					true,
-					now,
-					now,
-					null
-				));
-			}
-			return Optional.empty();
+	@Override
+	public Optional<TaiKhoan> findByEmail(String email) {
+		if ("existing@test.com".equals(email)) {
+			LocalDateTime now = LocalDateTime.now();
+			return Optional.of(new TaiKhoan(
+				1L,
+				"Existing User",
+				"existing@test.com",
+				"existing",
+				"password",
+				"0912345678",
+				"123 Street",
+				VaiTro.CUSTOMER,
+				true,
+				now,
+				now,
+				null
+			));
 		}
+		return Optional.empty();
+	}
 
-		@Override
-		public Optional<TaiKhoan> findById(Long id) {
-			return Optional.empty();
-		}
+	@Override
+	public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+		return findByEmail(username);
+	}
 
-		@Override
+	@Override
+	public Optional<TaiKhoan> findById(Long id) {
+		return Optional.empty();
+	}		@Override
 		public boolean existsByEmail(String email) {
 			return "existing@test.com".equals(email);
+		}
+
+		@Override
+		public boolean existsByUsername(String username) {
+			return false;
 		}
 
 		@Override

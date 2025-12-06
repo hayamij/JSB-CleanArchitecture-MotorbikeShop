@@ -25,6 +25,19 @@ public class UserRepositoryAdapter implements UserRepository {
     }
     
     @Override
+    public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+        // Try to find by username first
+        Optional<TaiKhoanJpaEntity> result = jpaRepository.findByTenDangNhap(username);
+        if (result.isPresent()) {
+            return result.map(this::toDomain);
+        }
+        
+        // Try to find by email
+        result = jpaRepository.findByEmail(username);
+        return result.map(this::toDomain);
+    }
+    
+    @Override
     public Optional<TaiKhoan> findById(Long id) {
         return jpaRepository.findById(id)
                 .map(this::toDomain);
@@ -40,6 +53,11 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public boolean existsByEmail(String email) {
         return jpaRepository.existsByEmail(email);
+    }
+    
+    @Override
+    public boolean existsByUsername(String username) {
+        return jpaRepository.existsByTenDangNhap(username);
     }
     
     @Override
@@ -71,6 +89,7 @@ public class UserRepositoryAdapter implements UserRepository {
     public java.util.List<TaiKhoan> searchUsers(String keyword) {
         return jpaRepository.findAll().stream()
                 .filter(entity -> 
+                    (entity.getHoTen() != null && entity.getHoTen().toLowerCase().contains(keyword.toLowerCase())) ||
                     entity.getEmail().toLowerCase().contains(keyword.toLowerCase()) ||
                     entity.getTenDangNhap().toLowerCase().contains(keyword.toLowerCase()) ||
                     (entity.getSoDienThoai() != null && entity.getSoDienThoai().contains(keyword))
@@ -83,6 +102,7 @@ public class UserRepositoryAdapter implements UserRepository {
     private TaiKhoan toDomain(TaiKhoanJpaEntity jpaEntity) {
         return new TaiKhoan(
                 jpaEntity.getMaTaiKhoan(),
+                jpaEntity.getHoTen(),
                 jpaEntity.getEmail(),
                 jpaEntity.getTenDangNhap(),
                 jpaEntity.getMatKhau(),
@@ -99,6 +119,7 @@ public class UserRepositoryAdapter implements UserRepository {
     private TaiKhoanJpaEntity toJpaEntity(TaiKhoan domain) {
         TaiKhoanJpaEntity jpa = new TaiKhoanJpaEntity();
         jpa.setMaTaiKhoan(domain.getMaTaiKhoan());
+        jpa.setHoTen(domain.getHoTen());
         jpa.setEmail(domain.getEmail());
         jpa.setTenDangNhap(domain.getTenDangNhap());
         jpa.setMatKhau(domain.getMatKhau());

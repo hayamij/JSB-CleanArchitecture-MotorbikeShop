@@ -31,11 +31,11 @@ function setLoading(loading) {
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const rememberMe = document.getElementById('rememberMe').checked;
 
-    if (!email || !password) {
+    if (!username || !password) {
         showAlert('Vui lòng điền đầy đủ thông tin', 'error');
         return;
     }
@@ -49,7 +49,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                email: email,
+                username: username,
                 password: password
             })
         });
@@ -109,9 +109,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 });
 
 window.onload = function() {
-    const savedEmail = localStorage.getItem('email');
-    if (savedEmail) {
-        document.getElementById('email').value = savedEmail;
+    const savedUsername = localStorage.getItem('username') || localStorage.getItem('email');
+    if (savedUsername) {
+        document.getElementById('username').value = savedUsername;
         document.getElementById('rememberMe').checked = true;
     }
 };

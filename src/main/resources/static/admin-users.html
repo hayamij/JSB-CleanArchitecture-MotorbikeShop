@@ -70,14 +70,32 @@
                     </div>
                     <div class="form-group">
                         <label>VAI TRÒ</label>
-                        <select id="searchRole">
+                        <select id="searchRole" onchange="applyFilters()">
                             <option value="">Tất cả</option>
                             <option value="CUSTOMER">Customer</option>
-                        <option value="ADMIN">Admin</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-search">TÌM KIẾM</button>
-                <button type="button" class="btn-search" onclick="loadAllUsers()">TẤT CẢ</button>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>TRẠNG THÁI</label>
+                        <select id="searchStatus" onchange="applyFilters()">
+                            <option value="">Tất cả</option>
+                            <option value="active">Hoạt động</option>
+                            <option value="locked">Đã khóa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>SẮP XẾP</label>
+                        <select id="sortOrder" onchange="applyFilters()">
+                            <option value="newest">Mới nhất</option>
+                            <option value="oldest">Cũ nhất</option>
+                            <option value="name-asc">Tên A-Z</option>
+                            <option value="name-desc">Tên Z-A</option>
+                            <option value="email-asc">Email A-Z</option>
+                            <option value="email-desc">Email Z-A</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-search">TÌM KIẾM</button>
             </form>
         </div>
 
@@ -87,18 +105,22 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>TÊN</th>
+                        <th>HỌ VÀ TÊN</th>
+                        <th>TÊN ĐĂNG NHẬP</th>
                         <th>EMAIL</th>
-                        <th>VAI TRÒ</th>
                         <th>SỐ ĐIỆN THOẠI</th>
                         <th>ĐỊA CHỈ</th>
+                        <th>VAI TRÒ</th>
                         <th>TRẠNG THÁI</th>
+                        <th>NGÀY TẠO</th>
+                        <th>CẬP NHẬT</th>
+                        <th>ĐĂNG NHẬP CUỐI</th>
                         <th>HÀNH ĐỘNG</th>
                     </tr>
                 </thead>
                 <tbody id="usersTableBody">
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 40px;">
+                        <td colspan="12" style="text-align: center; padding: 40px;">
                             <div class="loading-spinner"></div>
                         </td>
                     </tr>
@@ -119,7 +141,12 @@
                     <input type="hidden" id="userId">
                     
                     <div class="form-group">
-                        <label>TÊN *</label>
+                        <label>HỌ VÀ TÊN *</label>
+                        <input type="text" id="userFullName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>TÊN ĐĂNG NHẬP *</label>
                         <input type="text" id="userName" required>
                     </div>
 

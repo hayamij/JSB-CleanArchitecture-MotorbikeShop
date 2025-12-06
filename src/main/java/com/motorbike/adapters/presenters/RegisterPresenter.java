@@ -107,6 +107,7 @@ public class RegisterPresenter implements RegisterOutputBoundary {
             case "EMPTY_USERNAME":
             case "USERNAME_TOO_SHORT":
             case "USERNAME_TOO_LONG":
+            case "USERNAME_EXISTS":
                 viewModel.usernameError = formatErrorMessage(errorCode, null);
                 break;
             
@@ -152,6 +153,9 @@ public class RegisterPresenter implements RegisterOutputBoundary {
         switch (errorCode) {
             case "EMAIL_ALREADY_EXISTS":
                 return "Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.";
+            
+            case "USERNAME_EXISTS":
+                return "Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên đăng nhập khác.";
             
             case "PASSWORD_MISMATCH":
                 return "Mật khẩu xác nhận không khớp. Vui lòng nhập lại.";

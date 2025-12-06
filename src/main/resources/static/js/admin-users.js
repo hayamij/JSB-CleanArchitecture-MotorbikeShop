@@ -30,20 +30,21 @@ function checkAdminAuth() {
 // Load all users - Use Case: GetAllUsers
 async function loadAllUsers() {
     const tbody = document.getElementById('usersTableBody');
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div></td></tr>';
     
     try {
         const response = await fetch(`${API_BASE_URL}/admin/users/all`);
         const data = await response.json();
 
         if (data.success && data.users) {
-            displayUsers(data.users);
+            allUsersData = data.users;
+            applyFilters();
         } else {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Không thể tải danh sách users</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--color-gray);">Không thể tải danh sách users</td></tr>';
             showAlert(data.errorMessage || 'Không thể tải danh sách users', 'error');
         }
     } catch (error) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Lỗi kết nối server</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--color-gray);">Lỗi kết nối server</td></tr>';
         console.error('Error loading users:', error);
         showAlert('Lỗi kết nối server', 'error');
     }
@@ -53,7 +54,7 @@ async function loadAllUsers() {
 async function searchUsers(event) {
     event.preventDefault();
     const tbody = document.getElementById('usersTableBody');
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 40px;"><div class="loading-spinner"></div></td></tr>';
 
     const keyword = document.getElementById('searchKeyword').value;
     const role = document.getElementById('searchRole').value;
@@ -67,16 +68,65 @@ async function searchUsers(event) {
         const data = await response.json();
 
         if (data.success && data.users) {
-            displayUsers(data.users);
+            allUsersData = data.users;
+            applyFilters();
         } else {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy user</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy user</td></tr>';
             showAlert(data.errorMessage || 'Không tìm thấy user', 'error');
         }
     } catch (error) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Lỗi kết nối server</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--color-gray);">Lỗi kết nối server</td></tr>';
         console.error('Error searching users:', error);
         showAlert('Lỗi kết nối server', 'error');
     }
+}
+
+// Store original users data for filtering
+let allUsersData = [];
+
+// Apply filters and sorting
+function applyFilters() {
+    if (allUsersData.length === 0) return;
+    
+    const roleFilter = document.getElementById('searchRole').value;
+    const statusFilter = document.getElementById('searchStatus').value;
+    const sortOrder = document.getElementById('sortOrder').value;
+    
+    let filtered = [...allUsersData];
+    
+    // Filter by role
+    if (roleFilter) {
+        filtered = filtered.filter(u => u.vaiTro === roleFilter);
+    }
+    
+    // Filter by status
+    if (statusFilter === 'active') {
+        filtered = filtered.filter(u => u.hoatDong === true);
+    } else if (statusFilter === 'locked') {
+        filtered = filtered.filter(u => u.hoatDong === false);
+    }
+    
+    // Sort
+    filtered.sort((a, b) => {
+        switch(sortOrder) {
+            case 'newest':
+                return new Date(b.ngayTao) - new Date(a.ngayTao);
+            case 'oldest':
+                return new Date(a.ngayTao) - new Date(b.ngayTao);
+            case 'name-asc':
+                return (a.hoTen || '').localeCompare(b.hoTen || '', 'vi');
+            case 'name-desc':
+                return (b.hoTen || '').localeCompare(a.hoTen || '', 'vi');
+            case 'email-asc':
+                return (a.email || '').localeCompare(b.email || '');
+            case 'email-desc':
+                return (b.email || '').localeCompare(a.email || '');
+            default:
+                return 0;
+        }
+    });
+    
+    displayUsers(filtered);
 }
 
 // Display users in table
@@ -84,28 +134,32 @@ function displayUsers(users) {
     const tbody = document.getElementById('usersTableBody');
     
     if (!users || users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy user nào</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy user nào</td></tr>';
         return;
     }
 
     tbody.innerHTML = users.map(user => `
         <tr>
             <td><strong>${user.maTaiKhoan}</strong></td>
-            <td><strong>${user.tenDangNhap || 'N/A'}</strong></td>
+            <td><strong>${user.hoTen || 'N/A'}</strong></td>
+            <td>${user.tenDangNhap || 'N/A'}</td>
             <td>${user.email || 'N/A'}</td>
-            <td><span class="status-badge ${user.vaiTro === 'ADMIN' ? 'status-confirmed' : 'status-pending'}">${user.vaiTro || 'N/A'}</span></td>
             <td>${user.soDienThoai || 'N/A'}</td>
-            <td>${user.diaChi || 'N/A'}</td>
+            <td title="${user.diaChi || 'Chưa có'}">${user.diaChi ? (user.diaChi.length > 30 ? user.diaChi.substring(0, 30) + '...' : user.diaChi) : 'N/A'}</td>
+            <td><span class="status-badge ${user.vaiTro === 'ADMIN' ? 'status-confirmed' : 'status-pending'}">${user.vaiTro || 'N/A'}</span></td>
             <td>
                 <span class="visibility-badge ${user.hoatDong ? 'visibility-visible' : 'visibility-hidden'}">
-                    ${user.hoatDong ? 'Hoạt động' : 'Bị khóa'}
+                    ${user.hoatDong ? 'HOẠT ĐỘNG' : 'BỊ KHÓA'}
                 </span>
             </td>
+            <td><small>${formatDateTime(user.ngayTao)}</small></td>
+            <td><small>${formatDateTime(user.ngayCapNhat)}</small></td>
+            <td><small>${user.lanDangNhapCuoi ? formatDateTime(user.lanDangNhapCuoi) : '<em>Chưa đăng nhập</em>'}</small></td>
             <td>
                 <div class="action-buttons">
                     <button class="btn-action btn-edit" onclick="editUser(${user.maTaiKhoan})">Sửa</button>
                     <button class="btn-action" onclick="toggleUserStatus(${user.maTaiKhoan}, ${user.hoatDong})">${user.hoatDong ? 'Khóa' : 'Mở'}</button>
-                    <button class="btn-action btn-delete" onclick="deleteUser(${user.maTaiKhoan}, '${user.tenDangNhap}')">Xóa</button>
+                    <button class="btn-action btn-delete" onclick="deleteUser(${user.maTaiKhoan}, '${user.hoTen || user.tenDangNhap}')">Xóa</button>
                 </div>
             </td>
         </tr>
@@ -131,7 +185,8 @@ async function submitUserForm() {
     const isEdit = userId !== '';
 
     const userData = {
-        name: document.getElementById('userName').value,
+        name: document.getElementById('userFullName').value,
+        username: document.getElementById('userName').value,
         email: document.getElementById('userEmail').value,
         password: document.getElementById('userPassword').value,
         phone: document.getElementById('userPhone').value,
@@ -176,6 +231,7 @@ async function editUser(userId) {
             if (user) {
                 document.getElementById('modalTitle').textContent = 'SỬA USER';
                 document.getElementById('userId').value = user.maTaiKhoan;
+                document.getElementById('userFullName').value = user.hoTen || '';
                 document.getElementById('userName').value = user.tenDangNhap || '';
                 document.getElementById('userEmail').value = user.email || '';
                 document.getElementById('userPassword').value = ''; // Don't show password
@@ -254,4 +310,22 @@ function showAlert(message, type) {
     setTimeout(() => {
         alertContainer.innerHTML = '';
     }, 3000);
+}
+
+// Format DateTime helper
+function formatDateTime(dateTimeString) {
+    if (!dateTimeString) return 'N/A';
+    
+    try {
+        const date = new Date(dateTimeString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    } catch (e) {
+        return 'N/A';
+    }
 }

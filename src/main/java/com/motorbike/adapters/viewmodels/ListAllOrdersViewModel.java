@@ -24,15 +24,19 @@ public class ListAllOrdersViewModel {
         public final String shippingAddress;
         public final String orderStatus;
         public final String formattedTotalAmount;
+        public final java.math.BigDecimal totalAmount;
         public final int totalItems;
         public final int totalQuantity;
         public final String formattedOrderDate;
+        public final java.time.LocalDateTime orderDate;
         public final String statusColor;
+        public final String paymentMethodText;
 
         public OrderItemViewModel(Long orderId, Long customerId, String customerName, String customerPhone,
                                  String shippingAddress, String orderStatus, String formattedTotalAmount,
-                                 int totalItems, int totalQuantity, String formattedOrderDate,
-                                 String statusColor) {
+                                 java.math.BigDecimal totalAmount, int totalItems, int totalQuantity, 
+                                 String formattedOrderDate, java.time.LocalDateTime orderDate,
+                                 String statusColor, String paymentMethodText) {
             this.orderId = orderId;
             this.customerId = customerId;
             this.customerName = customerName;
@@ -40,10 +44,13 @@ public class ListAllOrdersViewModel {
             this.shippingAddress = shippingAddress;
             this.orderStatus = orderStatus;
             this.formattedTotalAmount = formattedTotalAmount;
+            this.totalAmount = totalAmount;
             this.totalItems = totalItems;
             this.totalQuantity = totalQuantity;
             this.formattedOrderDate = formattedOrderDate;
+            this.orderDate = orderDate;
             this.statusColor = statusColor;
+            this.paymentMethodText = paymentMethodText;
         }
     }
 }

@@ -67,10 +67,15 @@ public class DeleteUserUseCaseControlTest {
 		}
 
 		@Override
+		public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+			return findByEmail(username);
+		}
+
+		@Override
 		public Optional<TaiKhoan> findById(Long id) {
 			if (id == 1L) {
 				return Optional.of(new TaiKhoan(
-					1L, "user@test.com", "user", "password", "0912345678",
+					1L, "Test User", "user@test.com", "user", "password", "0912345678",
 					"123 Street", VaiTro.CUSTOMER, true,
 					LocalDateTime.now(), LocalDateTime.now(), null
 				));
@@ -80,6 +85,11 @@ public class DeleteUserUseCaseControlTest {
 
 		@Override
 		public boolean existsByEmail(String email) {
+			return false;
+		}
+
+		@Override
+		public boolean existsByUsername(String username) {
 			return false;
 		}
 

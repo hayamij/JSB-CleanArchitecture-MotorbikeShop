@@ -84,7 +84,16 @@ function calculateRevenueStats(orders) {
     let ordersPrevMonth = 0;
     
     orders.forEach(order => {
-        if (order.status === 'CONFIRMED') {
+        // Check status - backend returns formatted status like "Đã xác nhận"
+        const isConfirmed = order.orderStatus && (
+            order.orderStatus.includes('xác nhận') || 
+            order.orderStatus.includes('giao') ||
+            order.orderStatus === 'DA_XAC_NHAN' ||
+            order.orderStatus === 'DANG_GIAO' ||
+            order.orderStatus === 'DA_GIAO'
+        );
+        
+        if (isConfirmed) {
             const orderDate = new Date(order.orderDate);
             const orderMonth = orderDate.getMonth();
             const orderYear = orderDate.getFullYear();
@@ -149,34 +158,14 @@ function updateGrowthIndicator(elementId, growth) {
 // Load top products
 async function loadTopProducts() {
     try {
-        const ordersResponse = await fetch(`${API_BASE_URL}/admin/orders/all`);
-        if (!ordersResponse.ok) return;
+        const response = await fetch(`${API_BASE_URL}/admin/orders/stats/top-products`);
+        if (!response.ok) return;
         
-        const ordersData = await ordersResponse.json();
-        const orders = ordersData.orders || [];
-        
-        // Count product sales
-        const productSales = {};
-        
-        orders.forEach(order => {
-            if (order.status === 'CONFIRMED' && order.orderItems) {
-                order.orderItems.forEach(item => {
-                    const productName = item.productName || 'Unknown';
-                    if (!productSales[productName]) {
-                        productSales[productName] = 0;
-                    }
-                    productSales[productName] += item.quantity || 0;
-                });
-            }
-        });
-        
-        // Sort and get top 5
-        const topProducts = Object.entries(productSales)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
-        
-        renderTopProducts(topProducts);
-        
+        const data = await response.json();
+        if (data.success && data.products) {
+            const topProducts = data.products.map(p => [p.name, p.sold]);
+            renderTopProducts(topProducts);
+        }
     } catch (error) {
         console.error('Error loading top products:', error);
     }
@@ -237,7 +226,7 @@ function renderActivities(orders) {
             <div class="activity-item">
                 <div class="activity-time">${timeStr}<br>${dateStr}</div>
                 <div class="activity-desc">
-                    Đơn hàng #${order.orderId} - ${order.status === 'CONFIRMED' ? 'Đã xác nhận' : order.status === 'PENDING' ? 'Chờ xác nhận' : 'Đã hủy'} - ${formatPrice(order.totalAmount || 0)}
+                    Đơn hàng #${order.orderId} - ${order.orderStatus || 'N/A'} - ${order.formattedTotalAmount || formatPrice(order.totalAmount || 0)}
                 </div>
                 <div class="activity-user">${order.customerName || 'N/A'}</div>
             </div>
@@ -259,7 +248,16 @@ async function loadRevenueChart() {
         const currentDate = new Date();
         
         orders.forEach(order => {
-            if (order.status === 'CONFIRMED') {
+            // Check if order is confirmed (same logic as statistics)
+            const isConfirmed = order.orderStatus && (
+                order.orderStatus.includes('xác nhận') || 
+                order.orderStatus.includes('giao') ||
+                order.orderStatus === 'DA_XAC_NHAN' ||
+                order.orderStatus === 'DANG_GIAO' ||
+                order.orderStatus === 'DA_GIAO'
+            );
+            
+            if (isConfirmed && order.orderDate) {
                 const orderDate = new Date(order.orderDate);
                 const monthDiff = (currentDate.getFullYear() - orderDate.getFullYear()) * 12 
                     + (currentDate.getMonth() - orderDate.getMonth());

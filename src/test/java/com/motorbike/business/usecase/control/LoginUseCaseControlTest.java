@@ -160,7 +160,7 @@ public class LoginUseCaseControlTest {
 	}
 	
 	@Test
-	public void testExecute_InvalidEmailFormat() {
+	public void testExecute_LoginWithUsername() {
 		LoginInputData inputData = new LoginInputData("notanemail", "password123");
 		
 		UserRepository userRepo = new MockUserRepository();
@@ -172,8 +172,8 @@ public class LoginUseCaseControlTest {
 		LoginUseCaseControl control = new LoginUseCaseControl(outputBoundary, userRepo, cartRepo);
 		control.execute(inputData);
 		
-		assertEquals(false, viewModel.success);
-		assertEquals(true, viewModel.hasError);
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
 	}
 	
 	@Test
@@ -271,7 +271,7 @@ public class LoginUseCaseControlTest {
 			
 			if (email.equals("locked@test.com")) {
 				TaiKhoan lockedAccount = new TaiKhoan(
-					3L, email, "lockeduser", "password123",
+					3L, "Locked User", email, "lockeduser", "password123",
 					"0912345678", "123 Street", VaiTro.CUSTOMER,
 					false, LocalDateTime.now(), LocalDateTime.now(), null
 				);
@@ -280,7 +280,7 @@ public class LoginUseCaseControlTest {
 			
 			if (email.equals("admin@test.com")) {
 				TaiKhoan admin = new TaiKhoan(
-					2L, email, "admin", "admin123",
+					2L, "Admin User", email, "admin", "admin123",
 					"0912345678", "123 Street", VaiTro.ADMIN,
 					true, LocalDateTime.now(), LocalDateTime.now(), null
 				);
@@ -288,11 +288,16 @@ public class LoginUseCaseControlTest {
 			}
 			
 			TaiKhoan user = new TaiKhoan(
-				1L, email, "testuser", "password123",
+				1L, "Test User", email, "testuser", "password123",
 				"0912345678", "123 Street", VaiTro.CUSTOMER,
 				true, LocalDateTime.now(), LocalDateTime.now(), null
 			);
 			return Optional.of(user);
+		}
+		
+		@Override
+		public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+			return findByEmail(username);
 		}
 		
 		@Override
@@ -303,6 +308,11 @@ public class LoginUseCaseControlTest {
 		@Override
 		public boolean existsByEmail(String email) {
 			return !email.equals("notfound@test.com");
+		}
+		
+		@Override
+		public boolean existsByUsername(String username) {
+			return false;
 		}
 		
 		@Override

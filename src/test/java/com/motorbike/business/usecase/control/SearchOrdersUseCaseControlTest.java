@@ -136,18 +136,26 @@ public class SearchOrdersUseCaseControlTest {
 	}
 
 	private static class MockUserRepository implements UserRepository {
-		@Override
-		public Optional<com.motorbike.domain.entities.TaiKhoan> findByEmail(String email) {
-			return Optional.empty();
-		}
+	@Override
+	public Optional<com.motorbike.domain.entities.TaiKhoan> findByEmail(String email) {
+		return Optional.empty();
+	}
 
-		@Override
-		public Optional<com.motorbike.domain.entities.TaiKhoan> findById(Long id) {
-			return Optional.empty();
-		}
+	@Override
+	public Optional<com.motorbike.domain.entities.TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+		return findByEmail(username);
+	}
 
-		@Override
+	@Override
+	public Optional<com.motorbike.domain.entities.TaiKhoan> findById(Long id) {
+		return Optional.empty();
+	}		@Override
 		public boolean existsByEmail(String email) {
+			return false;
+		}
+
+		@Override
+		public boolean existsByUsername(String username) {
 			return false;
 		}
 

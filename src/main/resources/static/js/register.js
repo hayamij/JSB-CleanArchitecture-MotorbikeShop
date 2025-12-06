@@ -63,6 +63,14 @@ function validateForm() {
         showValidationError('name', '');
     }
 
+    const username = document.getElementById('username').value.trim();
+    if (!username || username.length < 3) {
+        showValidationError('username', 'Tên đăng nhập phải có ít nhất 3 ký tự');
+        isValid = false;
+    } else {
+        showValidationError('username', '');
+    }
+
     const email = document.getElementById('email').value.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -142,6 +150,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
     const formData = {
         name: document.getElementById('name').value.trim(),
+        username: document.getElementById('username').value.trim(),
         email: document.getElementById('email').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         address: document.getElementById('address').value.trim(),

@@ -71,7 +71,7 @@ public class SearchUsersUseCaseControlTest {
 			List<TaiKhoan> users = new ArrayList<>();
 			if ("admin".equalsIgnoreCase(keyword)) {
 				users.add(new TaiKhoan(
-					1L, "admin@test.com", "admin", "password", "0912345678",
+					1L, "Admin User", "admin@test.com", "admin", "password", "0912345678",
 					"123 Admin Street", VaiTro.ADMIN, true,
 					LocalDateTime.now(), LocalDateTime.now(), null
 				));
@@ -79,18 +79,26 @@ public class SearchUsersUseCaseControlTest {
 			return users;
 		}
 
-		@Override
-		public Optional<TaiKhoan> findByEmail(String email) {
-			return Optional.empty();
-		}
+	@Override
+	public Optional<TaiKhoan> findByEmail(String email) {
+		return Optional.empty();
+	}
 
-		@Override
-		public Optional<TaiKhoan> findById(Long id) {
-			return Optional.empty();
-		}
+	@Override
+	public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+		return findByEmail(username);
+	}
 
-		@Override
+	@Override
+	public Optional<TaiKhoan> findById(Long id) {
+		return Optional.empty();
+	}		@Override
 		public boolean existsByEmail(String email) {
+			return false;
+		}
+
+		@Override
+		public boolean existsByUsername(String username) {
 			return false;
 		}
 
@@ -107,12 +115,12 @@ public class SearchUsersUseCaseControlTest {
 		public List<TaiKhoan> findAll() {
 			List<TaiKhoan> users = new ArrayList<>();
 			users.add(new TaiKhoan(
-				1L, "admin@test.com", "admin", "password", "0912345678",
+				1L, "Admin User", "admin@test.com", "admin", "password", "0912345678",
 				"123 Admin Street", VaiTro.ADMIN, true,
 				LocalDateTime.now(), LocalDateTime.now(), null
 			));
 			users.add(new TaiKhoan(
-				2L, "customer@test.com", "customer", "password", "0987654321",
+				2L, "Customer User", "customer@test.com", "customer", "password", "0987654321",
 				"456 Customer Street", VaiTro.CUSTOMER, true,
 				LocalDateTime.now(), LocalDateTime.now(), null
 			));

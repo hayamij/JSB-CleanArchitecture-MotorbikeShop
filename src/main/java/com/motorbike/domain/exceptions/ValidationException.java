@@ -24,6 +24,10 @@ public class ValidationException extends IllegalArgumentException {
         return new ValidationException("Email không hợp lệ", "INVALID_EMAIL");
     }
     
+    public static ValidationException emptyLoginIdentifier() {
+        return new ValidationException("Vui lòng nhập email, tên đăng nhập hoặc số điện thoại", "EMPTY_LOGIN_IDENTIFIER");
+    }
+    
     // ===== VALIDATION METHODS - PASSWORD =====
     public static ValidationException emptyPassword() {
         return new ValidationException("Mật khẩu không được để trống", "EMPTY_PASSWORD");
@@ -44,6 +48,14 @@ public class ValidationException extends IllegalArgumentException {
     }
     
     // ===== VALIDATION METHODS - USER =====
+    public static ValidationException emptyFullName() {
+        return new ValidationException("Họ và tên không được để trống", "EMPTY_FULL_NAME");
+    }
+    
+    public static ValidationException fullNameTooShort() {
+        return new ValidationException("Họ và tên phải có ít nhất 2 ký tự", "FULL_NAME_TOO_SHORT");
+    }
+    
     public static ValidationException emptyUsername() {
         return new ValidationException("Tên đăng nhập không được rỗng", "EMPTY_USERNAME");
     }

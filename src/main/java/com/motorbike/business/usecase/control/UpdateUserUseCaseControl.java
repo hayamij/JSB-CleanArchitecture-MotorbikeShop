@@ -35,6 +35,7 @@ public class UpdateUserUseCaseControl implements UpdateUserInputBoundary {
             }
             
             TaiKhoan.checkInput(inputData.getMaTaiKhoan());
+            TaiKhoan.validateHoTen(inputData.getHoTen());
             TaiKhoan.validateEmail(inputData.getEmail());
             TaiKhoan.validateSoDienThoai(inputData.getSoDienThoai());
             
@@ -55,6 +56,9 @@ public class UpdateUserUseCaseControl implements UpdateUserInputBoundary {
         // Step 3: Update user entity
         if (errorException == null && taiKhoan != null) {
             try {
+                // Update hoTen
+                taiKhoan.setHoTen(inputData.getHoTen());
+                
                 // Check if email is changed and already exists
                 if (!taiKhoan.getEmail().equals(inputData.getEmail())) {
                     if (userRepository.existsByEmail(inputData.getEmail())) {

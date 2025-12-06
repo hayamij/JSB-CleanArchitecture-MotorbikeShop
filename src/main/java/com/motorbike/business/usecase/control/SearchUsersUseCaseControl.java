@@ -41,6 +41,7 @@ public class SearchUsersUseCaseControl implements SearchUsersInputBoundary {
                     .filter(u -> input.hoatDong == null || u.isHoatDong() == input.hoatDong)
                     .map(u -> new UserItem(
                             u.getMaTaiKhoan(),
+                            u.getHoTen(),
                             u.getEmail(),
                             u.getTenDangNhap(),
                             u.getSoDienThoai(),

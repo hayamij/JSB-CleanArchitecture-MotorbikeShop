@@ -34,6 +34,7 @@ public class GetAllUsersUseCaseControl implements GetAllUsersInputBoundary {
             List<UserItem> users = allUsers.stream()
                     .map(u -> new UserItem(
                             u.getMaTaiKhoan(),
+                            u.getHoTen(),
                             u.getEmail(),
                             u.getTenDangNhap(),
                             u.getSoDienThoai(),

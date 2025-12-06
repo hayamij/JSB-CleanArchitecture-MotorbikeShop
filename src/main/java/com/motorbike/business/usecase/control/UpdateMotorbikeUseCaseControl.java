@@ -71,7 +71,7 @@ public class UpdateMotorbikeUseCaseControl implements UpdateMotorbikeInputBounda
                 xeMay.setMoTa(inputData.getMoTa());
                 xeMay.capNhatGia(inputData.getGia());
                 xeMay.setHinhAnh(inputData.getHinhAnh());
-                xeMay.tangTonKho(inputData.getSoLuongTonKho() - xeMay.getSoLuongTonKho());
+                xeMay.setSoLuongTonKho(inputData.getSoLuongTonKho());
                 xeMay.setHangXe(inputData.getHangXe());
                 xeMay.setDongXe(inputData.getDongXe());
                 xeMay.setMauSac(inputData.getMauSac());

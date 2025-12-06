@@ -1,6 +1,7 @@
 package com.motorbike.business.dto.register;
 
 public class RegisterInputData {
+    private final String name;
     private final String email;
     private final String username;
     private final String password;
@@ -8,8 +9,9 @@ public class RegisterInputData {
     private final String phoneNumber;
     private final String address;
 
-    public RegisterInputData(String email, String username, String password,
+    public RegisterInputData(String name, String email, String username, String password,
                             String confirmPassword, String phoneNumber) {
+        this.name = name;
         this.email = email;
         this.username = username;
         this.password = password;
@@ -18,8 +20,9 @@ public class RegisterInputData {
         this.address = null;
     }
 
-    public RegisterInputData(String email, String username, String password,
+    public RegisterInputData(String name, String email, String username, String password,
                             String confirmPassword, String phoneNumber, String address) {
+        this.name = name;
         this.email = email;
         this.username = username;
         this.password = password;
@@ -27,6 +30,8 @@ public class RegisterInputData {
         this.phoneNumber = phoneNumber;
         this.address = address;
     }
+
+    public String getName() {return name;}
 
     public String getEmail() {return email;}
 

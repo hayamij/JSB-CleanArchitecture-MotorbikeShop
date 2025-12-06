@@ -117,20 +117,38 @@ public class LoginPresenter implements LoginOutputBoundary {
         }
         
         switch (errorCode) {
+            case "USER_NOT_FOUND":
+                return "Không tìm thấy tài khoản. Vui lòng kiểm tra lại email, tên đăng nhập hoặc số điện thoại.";
+            
             case "EMAIL_NOT_FOUND":
                 return "Email không tồn tại trong hệ thống. Vui lòng kiểm tra lại hoặc đăng ký tài khoản mới.";
             
+            case "WRONG_PASSWORD":
             case "INVALID_PASSWORD":
                 return "Mật khẩu không chính xác. Vui lòng thử lại.";
             
+            case "ACCOUNT_LOCKED":
             case "USER_INACTIVE":
-                return "Tài khoản đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.";
+                return "Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.";
+            
+            case "EMPTY_LOGIN_IDENTIFIER":
+                return "Vui lòng nhập email, tên đăng nhập hoặc số điện thoại.";
             
             case "EMPTY_EMAIL":
                 return "Vui lòng nhập địa chỉ email.";
             
+            case "EMPTY_USERNAME":
+                return "Vui lòng nhập tên đăng nhập.";
+            
+            case "EMPTY_PHONE":
+                return "Vui lòng nhập số điện thoại.";
+            
+            case "INVALID_EMAIL":
             case "INVALID_EMAIL_FORMAT":
                 return "Định dạng email không hợp lệ. Vui lòng nhập đúng định dạng (vd: user@example.com).";
+            
+            case "INVALID_PHONE_FORMAT":
+                return "Số điện thoại không đúng định dạng (VD: 0912345678 hoặc +84912345678).";
             
             case "EMPTY_PASSWORD":
                 return "Vui lòng nhập mật khẩu.";
@@ -138,6 +156,7 @@ public class LoginPresenter implements LoginOutputBoundary {
             case "PASSWORD_TOO_SHORT":
                 return "Mật khẩu phải có ít nhất 6 ký tự.";
             
+            case "INVALID_INPUT":
             case "NULL_INPUT":
                 return "Dữ liệu đầu vào không hợp lệ.";
             

@@ -82,6 +82,7 @@ public class ProductController {
                 productMap.put("stock", product.getSoLuongTonKho());
                 productMap.put("imageUrl", product.getHinhAnh());
                 productMap.put("createdDate", product.getNgayTao());
+                productMap.put("available", product.isConHang());
                 
                 if (product instanceof XeMay) {
                     XeMay xeMay = (XeMay) product;

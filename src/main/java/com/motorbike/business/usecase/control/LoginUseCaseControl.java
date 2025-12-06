@@ -34,15 +34,16 @@ public class LoginUseCaseControl {
             if (inputData == null) {
                 throw ValidationException.invalidInput();
             }
-            TaiKhoan.checkInputForLogin(inputData.getEmail(), inputData.getPassword());
+            // Validate login input (hỗ trợ email/username)
+            TaiKhoan.checkInputForLogin(inputData.getUsername(), inputData.getPassword());
         } catch (Exception e) {
             errorException = e;
         }
         
         if (errorException == null) {
             try {
-                taiKhoan = userRepository.findByEmail(inputData.getEmail())
-                    .orElseThrow(() -> DomainException.userNotFound(inputData.getEmail()));
+                taiKhoan = userRepository.findByUsernameOrEmailOrPhone(inputData.getUsername())
+                    .orElseThrow(() -> DomainException.userNotFound(inputData.getUsername()));
                 
                 if (!taiKhoan.kiemTraMatKhau(inputData.getPassword())) {
                     throw DomainException.wrongPassword();

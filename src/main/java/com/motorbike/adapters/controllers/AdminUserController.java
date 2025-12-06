@@ -136,6 +136,7 @@ public class AdminUserController {
         Boolean active = request.get("active") != null ? (Boolean) request.get("active") : true;
         
         AddUserInputData input = new AddUserInputData(
+            (String) request.get("name"),
             (String) request.get("email"),
             (String) request.get("username"),
             (String) request.get("password"),
@@ -175,6 +176,7 @@ public class AdminUserController {
         
         UpdateUserInputData input = new UpdateUserInputData(
             userId,
+            (String) request.get("name"),
             (String) request.get("email"),
             (String) request.get("phone"),
             (String) request.get("address"),

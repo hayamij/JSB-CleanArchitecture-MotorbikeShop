@@ -39,8 +39,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         RegisterInputData inputData = new RegisterInputData(
-            request.getEmail(),
             request.getName(),
+            request.getEmail(),
+            request.getUsername(),
             request.getPassword(),
             request.getConfirmPassword(),
             request.getPhone(),
@@ -69,7 +70,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginInputData inputData = new LoginInputData(
-            request.getEmail(),
+            request.getUsername(),
             request.getPassword()
         );
         

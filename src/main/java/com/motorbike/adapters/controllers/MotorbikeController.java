@@ -127,7 +127,11 @@ public class MotorbikeController {
                     .body(new ErrorResponse(addMotorbikeViewModel.errorCode, addMotorbikeViewModel.errorMessage));
         }
 
-        return ResponseEntity.ok(addMotorbikeViewModel);
+        return ResponseEntity.ok(java.util.Map.of(
+            "success", true,
+            "productId", addMotorbikeViewModel.maSanPham,
+            "message", addMotorbikeViewModel.successMessage
+        ));
 
     }
 

@@ -374,7 +374,7 @@ body {
     background: var(--color-white);
     box-shadow: var(--shadow-md);
     border-collapse: collapse;
-    margin: 24px 0;
+    margin: 0;
 }
 
 .admin-table thead {
@@ -439,6 +439,28 @@ body {
     background: var(--color-black);
 }
 
+/* Badge Styles */
+.badge {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.badge-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-secondary {
+    background: #f5f5f5;
+    color: #757575;
+}
+
 /* Search Bar */
 .search-bar {
     background: var(--color-white);
@@ -473,6 +495,8 @@ body {
     background: var(--color-white);
     font-size: 1em;
     transition: border var(--transition-fast);
+    height: 48px;
+    box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -489,6 +513,8 @@ body {
     cursor: pointer;
     font-weight: 600;
     transition: all var(--transition-fast);
+    height: 48px;
+    box-sizing: border-box;
 }
 
 .btn-search:hover {

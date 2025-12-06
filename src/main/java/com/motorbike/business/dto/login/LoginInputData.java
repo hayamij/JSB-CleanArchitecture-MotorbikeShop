@@ -1,24 +1,24 @@
 package com.motorbike.business.dto.login;
 
 public class LoginInputData {
-    private final String email;
+    private final String username;  // Can be username, email, or phone
     private final String password;
     
     private final Long guestCartId;
 
-    public LoginInputData(String email, String password) {
-        this.email = email;
+    public LoginInputData(String username, String password) {
+        this.username = username;
         this.password = password;
         this.guestCartId = null;
     }
 
-    public LoginInputData(String email, String password, Long guestCartId) {
-        this.email = email;
+    public LoginInputData(String username, String password, Long guestCartId) {
+        this.username = username;
         this.password = password;
         this.guestCartId = guestCartId;
     }
 
-    public String getEmail() {return email;}
+    public String getUsername() {return username;}
 
     public String getPassword() {return password;}
 

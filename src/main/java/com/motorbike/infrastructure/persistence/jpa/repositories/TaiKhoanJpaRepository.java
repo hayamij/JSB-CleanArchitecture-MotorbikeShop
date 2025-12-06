@@ -16,6 +16,9 @@ public interface TaiKhoanJpaRepository extends JpaRepository<TaiKhoanJpaEntity, 
     Optional<TaiKhoanJpaEntity> findByTenDangNhap(String tenDangNhap);
     
     
+    Optional<TaiKhoanJpaEntity> findBySoDienThoai(String soDienThoai);
+    
+    
     boolean existsByEmail(String email);
     
     

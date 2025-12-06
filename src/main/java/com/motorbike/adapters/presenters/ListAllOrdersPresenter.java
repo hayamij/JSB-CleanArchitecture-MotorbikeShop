@@ -41,12 +41,15 @@ public class ListAllOrdersPresenter implements ListAllOrdersOutputBoundary {
                     order.getCustomerName(),
                     order.getCustomerPhone(),
                     order.getShippingAddress(),
-                    formatOrderStatus(order.getOrderStatus()),
+                    formatOrderStatus(order.getOrderStatus()), // Format status for display
                     VND_FORMAT.format(order.getTotalAmount()),
+                    order.getTotalAmount(), // Raw amount for calculations
                     order.getTotalItems(),
                     order.getTotalQuantity(),
                     order.getOrderDate().format(DATE_FORMATTER),
-                    getStatusColor(order.getOrderStatus())
+                    order.getOrderDate(), // Raw date for calculations
+                    getStatusColor(order.getOrderStatus()),
+                    formatPaymentMethod(order.getPaymentMethod())
             ));
         }
 
@@ -107,6 +110,18 @@ public class ListAllOrdersPresenter implements ListAllOrdersOutputBoundary {
                 return "RED";
             default:
                 return "GRAY";
+        }
+    }
+
+    private String formatPaymentMethod(String paymentMethod) {
+        if (paymentMethod == null) return "COD";
+        switch (paymentMethod) {
+            case "THANH_TOAN_TRUC_TIEP":
+                return "COD";
+            case "CHUYEN_KHOAN":
+                return "Chuyển khoản";
+            default:
+                return paymentMethod;
         }
     }
 }

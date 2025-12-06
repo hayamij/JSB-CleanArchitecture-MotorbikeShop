@@ -6,15 +6,15 @@ import com.motorbike.business.usecase.input.AddAccessoryInputBoundary;
 import com.motorbike.business.usecase.input.UpdateAccessoryInputBoundary;
 import com.motorbike.business.usecase.input.DeleteAccessoryInputBoundary;
 import com.motorbike.business.usecase.control.SearchOrdersUseCaseControl;
-import com.motorbike.business.usecase.control.UpdateOrderUseCaseControl;
 import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
 import com.motorbike.business.dto.accessory.AddAccessoryInputData;
 import com.motorbike.business.dto.accessory.UpdateAccessoryInputData;
 import com.motorbike.business.dto.accessory.DeleteAccessoryInputData;
 import com.motorbike.business.dto.order.SearchOrdersInputData;
-import com.motorbike.business.dto.order.UpdateOrderInputData;
 import com.motorbike.adapters.viewmodels.*;
+import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.domain.entities.SanPham;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +44,7 @@ public class AdminProductController {
     private final SearchOrdersUseCaseControl searchOrdersUseCase;
     private final SearchOrdersViewModel searchOrdersViewModel;
     
-    private final UpdateOrderUseCaseControl updateOrderUseCase;
-    private final UpdateOrderViewModel updateOrderViewModel;
+    private final ProductRepository productRepository;
 
     public AdminProductController(
             DeleteMotorbikeInputBoundary deleteMotorbikeUseCase,
@@ -60,8 +59,7 @@ public class AdminProductController {
             DeleteAccessoryViewModel deleteAccessoryViewModel,
             SearchOrdersUseCaseControl searchOrdersUseCase,
             SearchOrdersViewModel searchOrdersViewModel,
-            UpdateOrderUseCaseControl updateOrderUseCase,
-            UpdateOrderViewModel updateOrderViewModel) {
+            ProductRepository productRepository) {
         this.deleteMotorbikeUseCase = deleteMotorbikeUseCase;
         this.deleteMotorbikeViewModel = deleteMotorbikeViewModel;
         this.updateMotorbikeUseCase = updateMotorbikeUseCase;
@@ -74,8 +72,7 @@ public class AdminProductController {
         this.deleteAccessoryViewModel = deleteAccessoryViewModel;
         this.searchOrdersUseCase = searchOrdersUseCase;
         this.searchOrdersViewModel = searchOrdersViewModel;
-        this.updateOrderUseCase = updateOrderUseCase;
-        this.updateOrderViewModel = updateOrderViewModel;
+        this.productRepository = productRepository;
     }
 
     // Use Case: DeleteMotorbike
@@ -97,19 +94,32 @@ public class AdminProductController {
     // Use Case: UpdateMotorbike
     @PostMapping("/motorbikes/{id}/update")
     public ResponseEntity<?> updateMotorbike(@PathVariable Long id, @RequestBody Map<String, Object> request) {
-        UpdateMotorbikeInputData input = new UpdateMotorbikeInputData(
-            id,
-            (String) request.get("name"),
-            (String) request.get("description"),
-            new BigDecimal(request.get("price").toString()),
-            (String) request.get("imageUrl"),
-            (Integer) request.get("stock"),
-            (String) request.get("brand"),
-            (String) request.get("model"),
-            (String) request.get("color"),
-            (Integer) request.get("year"),
-            (Integer) request.get("displacement")
-        );
+        System.out.println("Received update request for motorbike ID: " + id);
+        System.out.println("Request body: " + request);
+        
+        UpdateMotorbikeInputData input;
+        try {
+            input = new UpdateMotorbikeInputData(
+                id,
+                (String) request.get("name"),
+                (String) request.get("description"),
+                new BigDecimal(request.get("price").toString()),
+                (String) request.get("imageUrl"),
+                request.get("stock") != null ? ((Number) request.get("stock")).intValue() : 0,
+                (String) request.get("brand"),
+                (String) request.get("model"),
+                (String) request.get("color"),
+                request.get("year") != null ? ((Number) request.get("year")).intValue() : 0,
+                request.get("displacement") != null ? ((Number) request.get("displacement")).intValue() : 0
+            );
+        } catch (Exception e) {
+            System.err.println("Error parsing request: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(400)
+                    .body(Map.of("success", false,
+                        "errorCode", "INVALID_REQUEST",
+                        "errorMessage", "Dữ liệu không hợp lệ: " + e.getMessage()));
+        }
         
         updateMotorbikeUseCase.execute(input);
 
@@ -220,24 +230,56 @@ public class AdminProductController {
         ));
     }
 
-    // Use Case: UpdateOrder
-    @PostMapping("/orders/{orderId}/update")
-    public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody Map<String, Object> request) {
-        UpdateOrderInputData input = new UpdateOrderInputData(
-            orderId,
-            (String) request.get("status"),
-            (String) request.get("note")
-        );
-        
-        updateOrderUseCase.execute(input);
-
-        if (updateOrderViewModel.hasError) {
+    // Toggle product visibility (Ẩn/Hiện sản phẩm)
+    @PatchMapping("/motorbikes/{id}/visibility")
+    public ResponseEntity<?> toggleMotorbikeVisibility(@PathVariable Long id) {
+        try {
+            SanPham product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
+            
+            // Sử dụng domain method để toggle visibility
+            if (product.isConHang()) {
+                product.ngungKinhDoanh();
+            } else {
+                product.khoiPhucKinhDoanh();
+            }
+            
+            productRepository.save(product);
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true, 
+                "message", product.isConHang() ? "Hiện sản phẩm thành công" : "Ẩn sản phẩm thành công",
+                "isVisible", product.isConHang()
+            ));
+        } catch (Exception e) {
             return ResponseEntity.status(400)
-                    .body(Map.of("success", false,
-                        "errorCode", updateOrderViewModel.errorCode,
-                        "errorMessage", updateOrderViewModel.errorMessage));
+                .body(Map.of("success", false, "errorMessage", e.getMessage()));
         }
+    }
 
-        return ResponseEntity.ok(Map.of("success", true, "message", updateOrderViewModel.message));
+    @PatchMapping("/accessories/{id}/visibility")
+    public ResponseEntity<?> toggleAccessoryVisibility(@PathVariable Long id) {
+        try {
+            SanPham product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phụ kiện"));
+            
+            // Sử dụng domain method để toggle visibility
+            if (product.isConHang()) {
+                product.ngungKinhDoanh();
+            } else {
+                product.khoiPhucKinhDoanh();
+            }
+            
+            productRepository.save(product);
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true, 
+                "message", product.isConHang() ? "Hiện phụ kiện thành công" : "Ẩn phụ kiện thành công",
+                "isVisible", product.isConHang()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(400)
+                .body(Map.of("success", false, "errorMessage", e.getMessage()));
+        }
     }
 }

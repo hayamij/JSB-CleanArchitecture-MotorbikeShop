@@ -31,6 +31,7 @@ public class CreateUserUseCaseControl {
             }
             
             TaiKhoan.checkInputForRegister(
+                inputData.getHoTen(),
                 inputData.getEmail(),
                 inputData.getTenDangNhap(),
                 inputData.getMatKhau(),
@@ -48,6 +49,7 @@ public class CreateUserUseCaseControl {
         if (errorException == null) {
             try {
                 TaiKhoan taiKhoan = new TaiKhoan(
+                    inputData.getHoTen(),
                     inputData.getEmail(),
                     inputData.getTenDangNhap(),
                     inputData.getMatKhau(),

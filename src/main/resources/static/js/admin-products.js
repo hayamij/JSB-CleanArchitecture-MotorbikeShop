@@ -3,6 +3,8 @@
 const API_BASE_URL = 'http://localhost:8080/api';
 let currentEditingMotorbikeId = null;
 let currentEditingAccessoryId = null;
+let allMotorbikesData = [];
+let allAccessoriesData = [];
 
 // Check admin authentication
 function checkAdminAuth() {
@@ -50,11 +52,15 @@ function switchTab(tab) {
 // Load all motorbikes
 async function loadAllMotorbikes() {
     try {
-        const response = await fetch(`${API_BASE_URL}/motorbikes`);
-        if (!response.ok) throw new Error('Failed to load motorbikes');
+        const response = await fetch(`${API_BASE_URL}/products`);
+        if (!response.ok) throw new Error('Failed to load products');
         
-        const motorbikes = await response.json();
-        renderMotorbikes(motorbikes);
+        const products = await response.json();
+        allMotorbikesData = products.filter(p => p.category === 'XE_MAY');
+        
+        // Populate filter dropdowns
+        populateMotorbikeFilters();
+        applyMotorbikeFilters();
         
     } catch (error) {
         console.error('Error loading motorbikes:', error);
@@ -62,33 +68,88 @@ async function loadAllMotorbikes() {
     }
 }
 
+// Populate filter dropdowns
+function populateMotorbikeFilters() {
+    const brands = [...new Set(allMotorbikesData.map(m => m.brand))].filter(Boolean).sort();
+    const colors = [...new Set(allMotorbikesData.map(m => m.color))].filter(Boolean).sort();
+    
+    const brandSelect = document.getElementById('filterMotorbikeBrand');
+    const colorSelect = document.getElementById('filterMotorbikeColor');
+    
+    brandSelect.innerHTML = '<option value="">Tất cả</option>' + 
+        brands.map(b => `<option value="${b}">${b}</option>`).join('');
+    
+    colorSelect.innerHTML = '<option value="">Tất cả</option>' + 
+        colors.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+// Apply filters and sorting
+function applyMotorbikeFilters() {
+    if (allMotorbikesData.length === 0) return;
+    
+    const keyword = document.getElementById('searchMotorbikeName').value.toLowerCase();
+    const brandFilter = document.getElementById('filterMotorbikeBrand').value;
+    const colorFilter = document.getElementById('filterMotorbikeColor').value;
+    const availabilityFilter = document.getElementById('filterMotorbikeAvailability').value;
+    const sortOrder = document.getElementById('sortMotorbikeOrder').value;
+    
+    let filtered = [...allMotorbikesData];
+    
+    // Filter by keyword
+    if (keyword) {
+        filtered = filtered.filter(m => 
+            (m.name || '').toLowerCase().includes(keyword) ||
+            (m.brand || '').toLowerCase().includes(keyword) ||
+            (m.model || '').toLowerCase().includes(keyword)
+        );
+    }
+    
+    // Filter by brand
+    if (brandFilter) {
+        filtered = filtered.filter(m => m.brand === brandFilter);
+    }
+    
+    // Filter by color
+    if (colorFilter) {
+        filtered = filtered.filter(m => m.color === colorFilter);
+    }
+    
+    // Filter by availability
+    if (availabilityFilter) {
+        if (availabilityFilter === 'available') {
+            filtered = filtered.filter(m => m.available === true);
+        } else if (availabilityFilter === 'hidden') {
+            filtered = filtered.filter(m => m.available === false);
+        }
+    }
+    
+    // Sort
+    filtered.sort((a, b) => {
+        switch(sortOrder) {
+            case 'newest':
+            case 'oldest':
+                const dateA = new Date(a.createdDate);
+                const dateB = new Date(b.createdDate);
+                return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+            case 'price-high':
+            case 'price-low':
+                return sortOrder === 'price-high' ? b.price - a.price : a.price - b.price;
+            case 'name-asc':
+                return (a.name || '').localeCompare(b.name || '', 'vi');
+            case 'name-desc':
+                return (b.name || '').localeCompare(a.name || '', 'vi');
+            default:
+                return 0;
+        }
+    });
+    
+    renderMotorbikes(filtered);
+}
+
 // Search motorbikes
-async function searchMotorbikes(event) {
+function searchMotorbikes(event) {
     event.preventDefault();
-    
-    const name = document.getElementById('searchMotorbikeName').value.trim();
-    const brand = document.getElementById('searchMotorbikeBrand').value.trim();
-    
-    if (!name && !brand) {
-        loadAllMotorbikes();
-        return;
-    }
-    
-    try {
-        let url = `${API_BASE_URL}/motorbikes/search?`;
-        if (name) url += `name=${encodeURIComponent(name)}&`;
-        if (brand) url += `brand=${encodeURIComponent(brand)}&`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to search motorbikes');
-        
-        const motorbikes = await response.json();
-        renderMotorbikes(motorbikes);
-        
-    } catch (error) {
-        console.error('Error searching motorbikes:', error);
-        showAlert('Không thể tìm kiếm xe máy', 'error');
-    }
+    applyMotorbikeFilters();
 }
 
 // Render motorbikes table
@@ -96,35 +157,38 @@ function renderMotorbikes(motorbikes) {
     const tbody = document.getElementById('motorbikesTableBody');
     
     if (!motorbikes || motorbikes.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy xe máy nào</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy xe máy nào</td></tr>';
         return;
     }
     
-    tbody.innerHTML = motorbikes.map(bike => `
+    tbody.innerHTML = motorbikes.map(bike => {
+        const createdDate = bike.createdDate ? new Date(bike.createdDate).toLocaleDateString('vi-VN') : 'N/A';
+        return `
         <tr>
-            <td>${bike.motorbikeId}</td>
+            <td><strong>#${bike.id}</strong></td>
             <td>
-                ${bike.imageUrl ? `<img src="${bike.imageUrl}" class="product-thumbnail" alt="${bike.name}">` : 'N/A'}
+                ${bike.imageUrl ? `<img src="${bike.imageUrl}" class="product-thumbnail" alt="${bike.name}">` : '<div class="no-image">Chưa có ảnh</div>'}
             </td>
             <td><strong>${bike.name}</strong></td>
             <td>${bike.brand || 'N/A'}</td>
+            <td>${bike.model || 'N/A'}</td>
             <td>${bike.color || 'N/A'}</td>
+            <td>${bike.year || 'N/A'}</td>
+            <td>${bike.engineCapacity ? bike.engineCapacity + ' cc' : 'N/A'}</td>
             <td><strong>${formatPrice(bike.price)}</strong></td>
-            <td>${bike.stockQuantity || 0}</td>
-            <td>
-                <span class="visibility-badge ${bike.isVisible ? 'visibility-visible' : 'visibility-hidden'}">
-                    ${bike.isVisible ? 'Hiển thị' : 'Ẩn'}
-                </span>
-            </td>
+            <td>${bike.stock || 0}</td>
+            <td><span class="badge ${bike.available ? 'badge-success' : 'badge-secondary'}">${bike.available ? 'Hiển thị' : 'Đã ẩn'}</span></td>
+            <td>${createdDate}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-action btn-edit" onclick="editMotorbike(${bike.motorbikeId})">Sửa</button>
-                    <button class="btn-action" onclick="toggleMotorbikeVisibility(${bike.motorbikeId}, ${bike.isVisible})">${bike.isVisible ? 'Ẩn' : 'Hiện'}</button>
-                    <button class="btn-action btn-delete" onclick="deleteMotorbike(${bike.motorbikeId})">Xóa</button>
+                    <button class="btn-action btn-edit" onclick="editMotorbike(${bike.id})">Sửa</button>
+                    <button class="btn-action ${!bike.available ? 'btn-secondary' : ''}" onclick="toggleMotorbikeVisibility(${bike.id}, ${bike.available})">${bike.available ? 'Ẩn' : 'Hiện'}</button>
+                    <button class="btn-action btn-delete" onclick="deleteMotorbike(${bike.id})">Xóa</button>
                 </div>
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Show add motorbike modal
@@ -137,76 +201,88 @@ function showAddMotorbikeModal() {
 }
 
 // Edit motorbike
-async function editMotorbike(id) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/motorbikes/${id}`);
-        if (!response.ok) throw new Error('Failed to load motorbike');
-        
-        const bike = await response.json();
-        currentEditingMotorbikeId = id;
-        
-        document.getElementById('motorbikeModalTitle').textContent = 'SỬA XE MÁY';
-        document.getElementById('motorbikeId').value = bike.motorbikeId;
-        document.getElementById('motorbikeName').value = bike.name || '';
-        document.getElementById('motorbikeBrand').value = bike.brand || '';
-        document.getElementById('motorbikeColor').value = bike.color || '';
-        document.getElementById('motorbikePrice').value = bike.price || 0;
-        document.getElementById('motorbikeStock').value = bike.stockQuantity || 0;
-        document.getElementById('motorbikeImage').value = bike.imageUrl || '';
-        document.getElementById('motorbikeDescription').value = bike.description || '';
-        
-        document.getElementById('motorbikeModal').classList.add('show');
-        
-    } catch (error) {
-        console.error('Error loading motorbike:', error);
-        showAlert('Không thể tải thông tin xe máy', 'error');
+function editMotorbike(id) {
+    const bike = allMotorbikesData.find(m => m.id === id);
+    if (!bike) {
+        showAlert('Không tìm thấy xe máy', 'error');
+        return;
     }
+    
+    currentEditingMotorbikeId = id;
+    
+    document.getElementById('motorbikeModalTitle').textContent = 'SỬA XE MÁY';
+    document.getElementById('motorbikeId').value = bike.id;
+    document.getElementById('motorbikeName').value = bike.name || '';
+    document.getElementById('motorbikeBrand').value = bike.brand || '';
+    document.getElementById('motorbikeModel').value = bike.model || '';
+    document.getElementById('motorbikeColor').value = bike.color || '';
+    document.getElementById('motorbikeYear').value = bike.year || new Date().getFullYear();
+    document.getElementById('motorbikeDisplacement').value = bike.engineCapacity || 0;
+    document.getElementById('motorbikePrice').value = bike.price || 0;
+    document.getElementById('motorbikeStock').value = bike.stock || 0;
+    document.getElementById('motorbikeImage').value = bike.imageUrl || '';
+    document.getElementById('motorbikeDescription').value = bike.description || '';
+    
+    document.getElementById('motorbikeModal').classList.add('show');
 }
 
 // Save motorbike
 async function saveMotorbike() {
     const name = document.getElementById('motorbikeName').value.trim();
     const brand = document.getElementById('motorbikeBrand').value.trim();
+    const model = document.getElementById('motorbikeModel').value.trim();
     const color = document.getElementById('motorbikeColor').value.trim();
+    const year = parseInt(document.getElementById('motorbikeYear').value);
+    const displacement = parseInt(document.getElementById('motorbikeDisplacement').value);
     const price = parseFloat(document.getElementById('motorbikePrice').value);
     const stock = parseInt(document.getElementById('motorbikeStock').value);
     const image = document.getElementById('motorbikeImage').value.trim();
     const description = document.getElementById('motorbikeDescription').value.trim();
     
-    if (!name || !brand || !color || isNaN(price) || isNaN(stock)) {
+    if (!name || !brand || !model || !color || isNaN(year) || isNaN(displacement) || isNaN(price) || isNaN(stock)) {
         showAlert('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
         return;
     }
     
     const motorbikeData = {
         name,
-        brand,
-        color,
+        description,
         price,
-        stockQuantity: stock,
         imageUrl: image || null,
-        description: description || null
+        stock,
+        brand,
+        model,
+        color,
+        year,
+        displacement
     };
+    
+    console.log('Saving motorbike data:', JSON.stringify(motorbikeData, null, 2));
+    console.log('Current editing ID:', currentEditingMotorbikeId);
     
     try {
         let response;
         if (currentEditingMotorbikeId) {
             // Update
-            response = await fetch(`${API_BASE_URL}/admin/motorbikes/${currentEditingMotorbikeId}`, {
-                method: 'PUT',
+            response = await fetch(`${API_BASE_URL}/admin/motorbikes/${currentEditingMotorbikeId}/update`, {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(motorbikeData)
             });
         } else {
             // Create
-            response = await fetch(`${API_BASE_URL}/admin/motorbikes`, {
+            response = await fetch(`${API_BASE_URL}/motorbikes/add`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(motorbikeData)
             });
         }
         
-        if (!response.ok) throw new Error('Failed to save motorbike');
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Server error:', errorData);
+            throw new Error(errorData.errorMessage || 'Failed to save motorbike');
+        }
         
         showAlert(currentEditingMotorbikeId ? 'Cập nhật xe máy thành công' : 'Thêm xe máy thành công', 'success');
         closeMotorbikeModal();
@@ -214,7 +290,7 @@ async function saveMotorbike() {
         
     } catch (error) {
         console.error('Error saving motorbike:', error);
-        showAlert('Không thể lưu xe máy', 'error');
+        showAlert('Không thể lưu xe máy: ' + error.message, 'error');
     }
 }
 
@@ -245,7 +321,7 @@ async function deleteMotorbike(id) {
     if (!confirm('Bạn có chắc chắn muốn xóa xe máy này?')) return;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/motorbikes/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/admin/motorbikes/${id}/delete`, {
             method: 'DELETE'
         });
         
@@ -272,11 +348,15 @@ function closeMotorbikeModal() {
 // Load all accessories
 async function loadAllAccessories() {
     try {
-        const response = await fetch(`${API_BASE_URL}/accessories`);
-        if (!response.ok) throw new Error('Failed to load accessories');
+        const response = await fetch(`${API_BASE_URL}/products`);
+        if (!response.ok) throw new Error('Failed to load products');
         
-        const accessories = await response.json();
-        renderAccessories(accessories);
+        const products = await response.json();
+        allAccessoriesData = products.filter(p => p.category === 'PHU_KIEN');
+        
+        // Populate filter dropdowns
+        populateAccessoryFilters();
+        applyAccessoryFilters();
         
     } catch (error) {
         console.error('Error loading accessories:', error);
@@ -284,33 +364,88 @@ async function loadAllAccessories() {
     }
 }
 
+// Populate filter dropdowns
+function populateAccessoryFilters() {
+    const types = [...new Set(allAccessoriesData.map(a => a.type))].filter(Boolean).sort();
+    const brands = [...new Set(allAccessoriesData.map(a => a.brand))].filter(Boolean).sort();
+    
+    const typeSelect = document.getElementById('filterAccessoryType');
+    const brandSelect = document.getElementById('filterAccessoryBrand');
+    
+    typeSelect.innerHTML = '<option value="">Tất cả</option>' + 
+        types.map(t => `<option value="${t}">${t}</option>`).join('');
+    
+    brandSelect.innerHTML = '<option value="">Tất cả</option>' + 
+        brands.map(b => `<option value="${b}">${b}</option>`).join('');
+}
+
+// Apply filters and sorting
+function applyAccessoryFilters() {
+    if (allAccessoriesData.length === 0) return;
+    
+    const keyword = document.getElementById('searchAccessoryName').value.toLowerCase();
+    const typeFilter = document.getElementById('filterAccessoryType').value;
+    const brandFilter = document.getElementById('filterAccessoryBrand').value;
+    const availabilityFilter = document.getElementById('filterAccessoryAvailability').value;
+    const sortOrder = document.getElementById('sortAccessoryOrder').value;
+    
+    let filtered = [...allAccessoriesData];
+    
+    // Filter by keyword
+    if (keyword) {
+        filtered = filtered.filter(a => 
+            (a.name || '').toLowerCase().includes(keyword) ||
+            (a.type || '').toLowerCase().includes(keyword) ||
+            (a.brand || '').toLowerCase().includes(keyword)
+        );
+    }
+    
+    // Filter by type
+    if (typeFilter) {
+        filtered = filtered.filter(a => a.type === typeFilter);
+    }
+    
+    // Filter by brand
+    if (brandFilter) {
+        filtered = filtered.filter(a => a.brand === brandFilter);
+    }
+    
+    // Filter by availability
+    if (availabilityFilter) {
+        if (availabilityFilter === 'available') {
+            filtered = filtered.filter(a => a.available === true);
+        } else if (availabilityFilter === 'hidden') {
+            filtered = filtered.filter(a => a.available === false);
+        }
+    }
+    
+    // Sort
+    filtered.sort((a, b) => {
+        switch(sortOrder) {
+            case 'newest':
+            case 'oldest':
+                const dateA = new Date(a.createdDate);
+                const dateB = new Date(b.createdDate);
+                return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+            case 'price-high':
+            case 'price-low':
+                return sortOrder === 'price-high' ? b.price - a.price : a.price - b.price;
+            case 'name-asc':
+                return (a.name || '').localeCompare(b.name || '', 'vi');
+            case 'name-desc':
+                return (b.name || '').localeCompare(a.name || '', 'vi');
+            default:
+                return 0;
+        }
+    });
+    
+    renderAccessories(filtered);
+}
+
 // Search accessories
-async function searchAccessories(event) {
+function searchAccessories(event) {
     event.preventDefault();
-    
-    const name = document.getElementById('searchAccessoryName').value.trim();
-    const category = document.getElementById('searchAccessoryCategory').value.trim();
-    
-    if (!name && !category) {
-        loadAllAccessories();
-        return;
-    }
-    
-    try {
-        let url = `${API_BASE_URL}/accessories/search?`;
-        if (name) url += `name=${encodeURIComponent(name)}&`;
-        if (category) url += `category=${encodeURIComponent(category)}&`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to search accessories');
-        
-        const accessories = await response.json();
-        renderAccessories(accessories);
-        
-    } catch (error) {
-        console.error('Error searching accessories:', error);
-        showAlert('Không thể tìm kiếm phụ kiện', 'error');
-    }
+    applyAccessoryFilters();
 }
 
 // Render accessories table
@@ -318,34 +453,37 @@ function renderAccessories(accessories) {
     const tbody = document.getElementById('accessoriesTableBody');
     
     if (!accessories || accessories.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy phụ kiện nào</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 40px; color: var(--color-gray);">Không tìm thấy phụ kiện nào</td></tr>';
         return;
     }
     
-    tbody.innerHTML = accessories.map(acc => `
+    tbody.innerHTML = accessories.map(acc => {
+        const createdDate = acc.createdDate ? new Date(acc.createdDate).toLocaleDateString('vi-VN') : 'N/A';
+        return `
         <tr>
-            <td>${acc.accessoryId}</td>
+            <td><strong>#${acc.id}</strong></td>
             <td>
-                ${acc.imageUrl ? `<img src="${acc.imageUrl}" class="product-thumbnail" alt="${acc.name}">` : 'N/A'}
+                ${acc.imageUrl ? `<img src="${acc.imageUrl}" class="product-thumbnail" alt="${acc.name}">` : '<div class="no-image">Chưa có ảnh</div>'}
             </td>
             <td><strong>${acc.name}</strong></td>
-            <td>${acc.category || 'N/A'}</td>
+            <td>${acc.type || 'N/A'}</td>
+            <td>${acc.brand || 'N/A'}</td>
+            <td>${acc.material || 'N/A'}</td>
+            <td>${acc.size || 'N/A'}</td>
             <td><strong>${formatPrice(acc.price)}</strong></td>
-            <td>${acc.stockQuantity || 0}</td>
-            <td>
-                <span class="visibility-badge ${acc.isVisible ? 'visibility-visible' : 'visibility-hidden'}">
-                    ${acc.isVisible ? 'Hiển thị' : 'Ẩn'}
-                </span>
-            </td>
+            <td>${acc.stock || 0}</td>
+            <td><span class="badge ${acc.available ? 'badge-success' : 'badge-secondary'}">${acc.available ? 'Hiển thị' : 'Đã ẩn'}</span></td>
+            <td>${createdDate}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-action btn-edit" onclick="editAccessory(${acc.accessoryId})">Sửa</button>
-                    <button class="btn-action" onclick="toggleAccessoryVisibility(${acc.accessoryId}, ${acc.isVisible})">${acc.isVisible ? 'Ẩn' : 'Hiện'}</button>
-                    <button class="btn-action btn-delete" onclick="deleteAccessory(${acc.accessoryId})">Xóa</button>
+                    <button class="btn-action btn-edit" onclick="editAccessory(${acc.id})">Sửa</button>
+                    <button class="btn-action ${!acc.available ? 'btn-secondary' : ''}" onclick="toggleAccessoryVisibility(${acc.id}, ${acc.available})">${acc.available ? 'Ẩn' : 'Hiện'}</button>
+                    <button class="btn-action btn-delete" onclick="deleteAccessory(${acc.id})">Xóa</button>
                 </div>
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Show add accessory modal
@@ -358,66 +496,71 @@ function showAddAccessoryModal() {
 }
 
 // Edit accessory
-async function editAccessory(id) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/accessories/${id}`);
-        if (!response.ok) throw new Error('Failed to load accessory');
-        
-        const acc = await response.json();
-        currentEditingAccessoryId = id;
-        
-        document.getElementById('accessoryModalTitle').textContent = 'SỬA PHỤ KIỆN';
-        document.getElementById('accessoryId').value = acc.accessoryId;
-        document.getElementById('accessoryName').value = acc.name || '';
-        document.getElementById('accessoryCategory').value = acc.category || '';
-        document.getElementById('accessoryPrice').value = acc.price || 0;
-        document.getElementById('accessoryStock').value = acc.stockQuantity || 0;
-        document.getElementById('accessoryImage').value = acc.imageUrl || '';
-        document.getElementById('accessoryDescription').value = acc.description || '';
-        
-        document.getElementById('accessoryModal').classList.add('show');
-        
-    } catch (error) {
-        console.error('Error loading accessory:', error);
-        showAlert('Không thể tải thông tin phụ kiện', 'error');
+function editAccessory(id) {
+    const acc = allAccessoriesData.find(a => a.id === id);
+    if (!acc) {
+        showAlert('Không tìm thấy phụ kiện', 'error');
+        return;
     }
+    
+    currentEditingAccessoryId = id;
+    
+    document.getElementById('accessoryModalTitle').textContent = 'SỬA PHỤ KIỆN';
+    document.getElementById('accessoryId').value = acc.id;
+    document.getElementById('accessoryName').value = acc.name || '';
+    document.getElementById('accessoryType').value = acc.type || '';
+    document.getElementById('accessoryBrand').value = acc.brand || '';
+    document.getElementById('accessoryMaterial').value = acc.material || '';
+    document.getElementById('accessorySize').value = acc.size || '';
+    document.getElementById('accessoryPrice').value = acc.price || 0;
+    document.getElementById('accessoryStock').value = acc.stock || 0;
+    document.getElementById('accessoryImage').value = acc.imageUrl || '';
+    document.getElementById('accessoryDescription').value = acc.description || '';
+    
+    document.getElementById('accessoryModal').classList.add('show');
 }
 
 // Save accessory
 async function saveAccessory() {
     const name = document.getElementById('accessoryName').value.trim();
-    const category = document.getElementById('accessoryCategory').value.trim();
+    const type = document.getElementById('accessoryType').value.trim();
+    const brand = document.getElementById('accessoryBrand').value.trim();
+    const material = document.getElementById('accessoryMaterial').value.trim();
+    const size = document.getElementById('accessorySize').value.trim();
     const price = parseFloat(document.getElementById('accessoryPrice').value);
     const stock = parseInt(document.getElementById('accessoryStock').value);
     const image = document.getElementById('accessoryImage').value.trim();
     const description = document.getElementById('accessoryDescription').value.trim();
     
-    if (!name || !category || isNaN(price) || isNaN(stock)) {
+    if (!name || !type || !brand || !material || !size || isNaN(price) || isNaN(stock)) {
         showAlert('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
         return;
     }
     
     const accessoryData = {
         name,
-        category,
+        description,
         price,
-        stockQuantity: stock,
         imageUrl: image || null,
-        description: description || null
+        stock,
+        loaiPhuKien: type,
+        thuongHieu: brand,
+        chatLieu: material,
+        kichThuoc: size
     };
     
     try {
         let response;
         if (currentEditingAccessoryId) {
             // Update
-            response = await fetch(`${API_BASE_URL}/admin/accessories/${currentEditingAccessoryId}`, {
-                method: 'PUT',
+            response = await fetch(`${API_BASE_URL}/admin/accessories/${currentEditingAccessoryId}/update`, {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(accessoryData)
             });
         } else {
             // Create
-            response = await fetch(`${API_BASE_URL}/admin/accessories`, {
+            response = await fetch(`${API_BASE_URL}/admin/accessories/add`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(accessoryData)
@@ -463,7 +606,7 @@ async function deleteAccessory(id) {
     if (!confirm('Bạn có chắc chắn muốn xóa phụ kiện này?')) return;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/accessories/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/admin/accessories/${id}/delete`, {
             method: 'DELETE'
         });
         
@@ -490,5 +633,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkAdminAuth()) {
         loadAllMotorbikes();
         loadAllAccessories();
+        
+        // Add real-time search for motorbikes
+        const motorbikeSearch = document.getElementById('searchMotorbikeName');
+        if (motorbikeSearch) {
+            motorbikeSearch.addEventListener('input', applyMotorbikeFilters);
+        }
+        
+        // Add real-time search for accessories
+        const accessorySearch = document.getElementById('searchAccessoryName');
+        if (accessorySearch) {
+            accessorySearch.addEventListener('input', applyAccessoryFilters);
+        }
     }
 });

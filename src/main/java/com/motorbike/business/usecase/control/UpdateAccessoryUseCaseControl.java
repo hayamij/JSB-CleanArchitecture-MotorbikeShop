@@ -62,7 +62,7 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
                 phuKien.setMoTa(inputData.getMoTa());
                 phuKien.capNhatGia(inputData.getGia());
                 phuKien.setHinhAnh(inputData.getHinhAnh());
-                phuKien.tangTonKho(inputData.getSoLuongTonKho() - phuKien.getSoLuongTonKho());
+                phuKien.setSoLuongTonKho(inputData.getSoLuongTonKho());
                 phuKien.setLoaiPhuKien(inputData.getLoaiPhuKien());
                 phuKien.setThuongHieu(inputData.getThuongHieu());
                 phuKien.setChatLieu(inputData.getChatLieu());

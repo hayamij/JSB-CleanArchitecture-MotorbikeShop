@@ -76,11 +76,36 @@
                             <input type="text" id="searchMotorbikeName" placeholder="Nhập tên xe máy...">
                         </div>
                         <div class="form-group">
-                            <label>HÃNG</label>
-                            <input type="text" id="searchMotorbikeBrand" placeholder="Nhập hãng...">
+                            <label>HÃNG XE</label>
+                            <select id="filterMotorbikeBrand" onchange="applyMotorbikeFilters()">
+                                <option value="">Tất cả</option>
+                            </select>
                         </div>
-                        <button type="submit" class="btn-search">TÌM KIẾM</button>
-                        <button type="button" class="btn-search" onclick="loadAllMotorbikes()">TẤT CẢ</button>
+                        <div class="form-group">
+                            <label>MÀU SẮC</label>
+                            <select id="filterMotorbikeColor" onchange="applyMotorbikeFilters()">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>TRẠNG THÁI</label>
+                            <select id="filterMotorbikeAvailability" onchange="applyMotorbikeFilters()">
+                                <option value="">Tất cả</option>
+                                <option value="available">Hiển thị</option>
+                                <option value="hidden">Đã ẩn</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>SẮP XẾP</label>
+                            <select id="sortMotorbikeOrder" onchange="applyMotorbikeFilters()">
+                                <option value="newest">Mới nhất</option>
+                                <option value="oldest">Cũ nhất</option>
+                                <option value="price-high">Giá cao nhất</option>
+                                <option value="price-low">Giá thấp nhất</option>
+                                <option value="name-asc">Tên A-Z</option>
+                                <option value="name-desc">Tên Z-A</option>
+                            </select>
+                        </div>
                     </form>
                 </div>
 
@@ -93,10 +118,14 @@
                                 <th>HÌNH ẢNH</th>
                                 <th>TÊN XE</th>
                                 <th>HÃNG</th>
+                                <th>DÒNG XE</th>
                                 <th>MÀU SẮC</th>
+                                <th>NĂM SX</th>
+                                <th>DUNG TÍCH</th>
                                 <th>GIÁ</th>
-                                <th>SỐ LƯỢNG</th>
+                                <th>TỔN KHO</th>
                                 <th>TRẠNG THÁI</th>
+                                <th>NGÀY TẠO</th>
                                 <th>HÀNH ĐỘNG</th>
                             </tr>
                         </thead>
@@ -125,11 +154,36 @@
                             <input type="text" id="searchAccessoryName" placeholder="Nhập tên phụ kiện...">
                         </div>
                         <div class="form-group">
-                            <label>LOẠI</label>
-                            <input type="text" id="searchAccessoryCategory" placeholder="Nhập loại...">
+                            <label>LOẠI PHỤ KIỆN</label>
+                            <select id="filterAccessoryType" onchange="applyAccessoryFilters()">
+                                <option value="">Tất cả</option>
+                            </select>
                         </div>
-                        <button type="submit" class="btn-search">TÌM KIẾM</button>
-                        <button type="button" class="btn-search" onclick="loadAllAccessories()">TẤT CẢ</button>
+                        <div class="form-group">
+                            <label>THƯƠNG HIỆU</label>
+                            <select id="filterAccessoryBrand" onchange="applyAccessoryFilters()">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>TRẠNG THÁI</label>
+                            <select id="filterAccessoryAvailability" onchange="applyAccessoryFilters()">
+                                <option value="">Tất cả</option>
+                                <option value="available">Hiển thị</option>
+                                <option value="hidden">Đã ẩn</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>SẮP XẾP</label>
+                            <select id="sortAccessoryOrder" onchange="applyAccessoryFilters()">
+                                <option value="newest">Mới nhất</option>
+                                <option value="oldest">Cũ nhất</option>
+                                <option value="price-high">Giá cao nhất</option>
+                                <option value="price-low">Giá thấp nhất</option>
+                                <option value="name-asc">Tên A-Z</option>
+                                <option value="name-desc">Tên Z-A</option>
+                            </select>
+                        </div>
                     </form>
                 </div>
 
@@ -142,9 +196,13 @@
                                 <th>HÌNH ẢNH</th>
                                 <th>TÊN PHỤ KIỆN</th>
                                 <th>LOẠI</th>
+                                <th>THƯƠNG HIỆU</th>
+                                <th>CHẤT LIỆU</th>
+                                <th>KÍCH THƯỚC</th>
                                 <th>GIÁ</th>
-                                <th>SỐ LƯỢNG</th>
+                                <th>TỔN KHO</th>
                                 <th>TRẠNG THÁI</th>
+                                <th>NGÀY TẠO</th>
                                 <th>HÀNH ĐỘNG</th>
                             </tr>
                         </thead>
@@ -182,8 +240,23 @@
                     </div>
 
                     <div class="form-group">
+                        <label>DÒNG XE *</label>
+                        <input type="text" id="motorbikeModel" required>
+                    </div>
+
+                    <div class="form-group">
                         <label>MÀU SẮC *</label>
                         <input type="text" id="motorbikeColor" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>NĂM SẢN XUẤT *</label>
+                        <input type="number" id="motorbikeYear" required min="2000" max="2030">
+                    </div>
+
+                    <div class="form-group">
+                        <label>DUNG TÍCH (cc) *</label>
+                        <input type="number" id="motorbikeDisplacement" required min="0">
                     </div>
 
                     <div class="form-group">
@@ -231,7 +304,22 @@
 
                     <div class="form-group">
                         <label>LOẠI *</label>
-                        <input type="text" id="accessoryCategory" required>
+                        <input type="text" id="accessoryType" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>THƯƠNG HIỆU *</label>
+                        <input type="text" id="accessoryBrand" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CHẤT LIỆU *</label>
+                        <input type="text" id="accessoryMaterial" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>KÍCH THƯỚC *</label>
+                        <input type="text" id="accessorySize" required>
                     </div>
 
                     <div class="form-group">

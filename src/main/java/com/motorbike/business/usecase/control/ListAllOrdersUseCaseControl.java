@@ -69,7 +69,8 @@ public class ListAllOrdersUseCaseControl {
                                         .mapToInt(item -> item.getSoLuong())
                                         .sum(),
                                 donHang.getNgayDat(),
-                                donHang.getGhiChu()
+                                donHang.getGhiChu(),
+                                donHang.getPhuongThucThanhToan().name()
                         ))
                         .collect(Collectors.toList());
 

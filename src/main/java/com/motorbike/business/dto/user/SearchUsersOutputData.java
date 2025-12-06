@@ -45,6 +45,7 @@ public class SearchUsersOutputData {
 
     public static class UserItem {
         private final Long maTaiKhoan;
+        private final String hoTen;
         private final String email;
         private final String tenDangNhap;
         private final String soDienThoai;
@@ -56,6 +57,7 @@ public class SearchUsersOutputData {
         private final LocalDateTime lanDangNhapCuoi;
 
         public UserItem(Long maTaiKhoan,
+                       String hoTen,
                        String email,
                        String tenDangNhap,
                        String soDienThoai,
@@ -66,6 +68,7 @@ public class SearchUsersOutputData {
                        LocalDateTime ngayCapNhat,
                        LocalDateTime lanDangNhapCuoi) {
             this.maTaiKhoan = maTaiKhoan;
+            this.hoTen = hoTen;
             this.email = email;
             this.tenDangNhap = tenDangNhap;
             this.soDienThoai = soDienThoai;
@@ -78,6 +81,7 @@ public class SearchUsersOutputData {
         }
 
         public Long getMaTaiKhoan() { return maTaiKhoan; }
+        public String getHoTen() { return hoTen; }
         public String getEmail() { return email; }
         public String getTenDangNhap() { return tenDangNhap; }
         public String getSoDienThoai() { return soDienThoai; }

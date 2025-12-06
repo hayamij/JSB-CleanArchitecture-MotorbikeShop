@@ -10,10 +10,16 @@ public interface UserRepository {
     Optional<TaiKhoan> findByEmail(String email);
     
     
+    Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username);
+    
+    
     Optional<TaiKhoan> findById(Long id);
     
     
     boolean existsByEmail(String email);
+    
+    
+    boolean existsByUsername(String username);
     
     
     TaiKhoan save(TaiKhoan taiKhoan);

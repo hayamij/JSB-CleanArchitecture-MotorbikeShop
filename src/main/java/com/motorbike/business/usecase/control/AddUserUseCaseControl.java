@@ -35,6 +35,7 @@ public class AddUserUseCaseControl implements AddUserInputBoundary {
             }
             
             TaiKhoan.checkInputForRegister(
+                inputData.getHoTen(),
                 inputData.getEmail(),
                 inputData.getTenDangNhap(),
                 inputData.getMatKhau(),
@@ -54,6 +55,7 @@ public class AddUserUseCaseControl implements AddUserInputBoundary {
         if (errorException == null) {
             try {
                 taiKhoan = new TaiKhoan(
+                    inputData.getHoTen(),
                     inputData.getEmail(),
                     inputData.getTenDangNhap(),
                     inputData.getMatKhau(),
