@@ -25,6 +25,9 @@ public interface OrderRepository {
 
     
     List<DonHang> findAll();
+
+
+    List<DonHang> searchForAdmin(String keyword);
     
     
     void deleteById(Long orderId);
