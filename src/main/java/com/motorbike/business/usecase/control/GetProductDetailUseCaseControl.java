@@ -1,4 +1,7 @@
+
 package com.motorbike.business.usecase.control;
+
+import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
 
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
@@ -10,7 +13,7 @@ import com.motorbike.domain.exceptions.DomainException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class GetProductDetailUseCaseControl {
+public class GetProductDetailUseCaseControl implements GetProductDetailInputBoundary {
     
     private final GetProductDetailOutputBoundary outputBoundary;
     private final ProductRepository productRepository;

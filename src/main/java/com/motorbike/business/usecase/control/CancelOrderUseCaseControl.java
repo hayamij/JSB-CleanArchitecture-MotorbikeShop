@@ -1,4 +1,6 @@
+
 package com.motorbike.business.usecase.control;
+import com.motorbike.business.usecase.input.CancelOrderInputBoundary;
 
 import java.math.BigDecimal;
 
@@ -14,7 +16,7 @@ import com.motorbike.domain.entities.TrangThaiDonHang;
 import com.motorbike.domain.exceptions.DomainException;
 import com.motorbike.domain.exceptions.ValidationException;
 
-public class CancelOrderUseCaseControl {
+public class CancelOrderUseCaseControl implements CancelOrderInputBoundary {
     
     private final CancelOrderOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;
@@ -29,6 +31,7 @@ public class CancelOrderUseCaseControl {
         this.productRepository = productRepository;
     }
     
+    @Override
     public void execute(CancelOrderInputData inputData) {
         CancelOrderOutputData outputData = null;
         Exception errorException = null;

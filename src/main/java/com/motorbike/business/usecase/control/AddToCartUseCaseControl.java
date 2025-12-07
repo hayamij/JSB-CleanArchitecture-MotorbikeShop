@@ -11,8 +11,10 @@ import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.exceptions.DomainException;
 import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.business.usecase.input.AddToCartInputBoundary;
 
-public class AddToCartUseCaseControl {
+
+public class AddToCartUseCaseControl implements AddToCartInputBoundary {
     
     private final AddToCartOutputBoundary outputBoundary;
     private final CartRepository cartRepository;

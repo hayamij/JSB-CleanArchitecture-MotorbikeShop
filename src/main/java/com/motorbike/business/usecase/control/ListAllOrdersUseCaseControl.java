@@ -6,13 +6,14 @@ import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.business.usecase.input.ListAllOrdersInputBoundary;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListAllOrdersUseCaseControl {
+public class ListAllOrdersUseCaseControl implements ListAllOrdersInputBoundary {
     
     private final ListAllOrdersOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;

@@ -1,4 +1,6 @@
+
 package com.motorbike.business.usecase.control;
+import com.motorbike.business.usecase.input.ViewCartInputBoundary;
 
 import com.motorbike.business.dto.viewcart.ViewCartInputData;
 import com.motorbike.business.dto.viewcart.ViewCartOutputData;
@@ -12,7 +14,7 @@ import com.motorbike.domain.exceptions.ValidationException;
 import java.util.List;
 import java.util.ArrayList;
 
-public class ViewCartUseCaseControl {
+public class ViewCartUseCaseControl implements ViewCartInputBoundary {
     
     private final ViewCartOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
@@ -27,6 +29,7 @@ public class ViewCartUseCaseControl {
         this.productRepository = productRepository;
     }
     
+    @Override
     public void execute(ViewCartInputData inputData) {
         ViewCartOutputData outputData = null;
         Exception errorException = null;

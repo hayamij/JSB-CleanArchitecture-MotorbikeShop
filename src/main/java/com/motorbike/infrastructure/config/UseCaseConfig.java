@@ -150,7 +150,7 @@ public class UseCaseConfig {
     public com.motorbike.business.usecase.input.GetProductDetailInputBoundary getProductDetailUseCase(
             GetProductDetailOutputBoundary productDetailPresenter,
             ProductRepository productRepository) {
-        return (com.motorbike.business.usecase.input.GetProductDetailInputBoundary) new GetProductDetailUseCaseControl(productDetailPresenter, productRepository);
+        return new GetProductDetailUseCaseControl(productDetailPresenter, productRepository);
     }
     
     @Bean
@@ -202,8 +202,9 @@ public class UseCaseConfig {
             CartRepository cartRepository,
             ProductRepository productRepository,
             OrderRepository orderRepository) {
-        return (com.motorbike.business.usecase.input.CheckoutInputBoundary) new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository, orderRepository);
+        return new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository, orderRepository);
     }
+    
     
     @Bean
     public CheckoutOutputBoundary checkoutPresenter(CheckoutViewModel checkoutViewModel) {
@@ -245,6 +246,14 @@ public class UseCaseConfig {
     @Bean
     public CancelOrderOutputBoundary cancelOrderPresenter(CancelOrderViewModel cancelOrderViewModel) {
         return new CancelOrderPresenter(cancelOrderViewModel);
+    }
+
+    @Bean
+    public com.motorbike.business.usecase.control.CancelOrderUseCaseControl cancelOrderUseCaseControl(
+            CancelOrderOutputBoundary cancelOrderPresenter,
+            OrderRepository orderRepository,
+            ProductRepository productRepository) {
+        return new CancelOrderUseCaseControl(cancelOrderPresenter, orderRepository, productRepository);
     }
 
     //motorbike use case beans

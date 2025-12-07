@@ -7,10 +7,11 @@ import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
+import com.motorbike.business.usecase.input.LoginInputBoundary;
 import com.motorbike.domain.exceptions.*;
 import java.util.Optional;
 
-public class LoginUseCaseControl {
+public class LoginUseCaseControl implements LoginInputBoundary{
     
     private final LoginOutputBoundary outputBoundary;
     private final UserRepository userRepository;

@@ -9,9 +9,10 @@ import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.exceptions.DomainException;
 import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.business.usecase.input.RegisterInputBoundary;
 import com.motorbike.domain.exceptions.SystemException;
 
-public class RegisterUseCaseControl {
+public class RegisterUseCaseControl implements RegisterInputBoundary {
     
     private final RegisterOutputBoundary outputBoundary;
     private final UserRepository userRepository;

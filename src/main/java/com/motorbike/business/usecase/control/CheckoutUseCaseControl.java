@@ -1,4 +1,7 @@
+
 package com.motorbike.business.usecase.control;
+
+import com.motorbike.business.usecase.input.CheckoutInputBoundary;
 
 import com.motorbike.business.dto.checkout.CheckoutInputData;
 import com.motorbike.business.dto.checkout.CheckoutOutputData;
@@ -16,7 +19,7 @@ import com.motorbike.domain.exceptions.DomainException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CheckoutUseCaseControl {
+public class CheckoutUseCaseControl implements CheckoutInputBoundary {
     
     private final CheckoutOutputBoundary outputBoundary;
     private final CartRepository cartRepository;

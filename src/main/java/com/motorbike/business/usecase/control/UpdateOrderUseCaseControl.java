@@ -6,9 +6,10 @@ import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.UpdateOrderOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.TrangThaiDonHang;
+import com.motorbike.business.usecase.input.UpdateOrderInputBoundary;
 import com.motorbike.domain.exceptions.*;
 
-public class UpdateOrderUseCaseControl {
+public class UpdateOrderUseCaseControl implements UpdateOrderInputBoundary {
     
     private final UpdateOrderOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;

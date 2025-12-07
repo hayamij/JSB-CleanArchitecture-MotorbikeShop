@@ -1,4 +1,6 @@
+
 package com.motorbike.business.usecase.control;
+import com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary;
 
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityInputData;
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityOutputData;
@@ -12,7 +14,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateCartQuantityUseCaseControl {
+public class UpdateCartQuantityUseCaseControl implements UpdateCartQuantityInputBoundary {
     
     private final UpdateCartQuantityOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
@@ -24,6 +26,7 @@ public class UpdateCartQuantityUseCaseControl {
         this.cartRepository = cartRepository;
     }
     
+    @Override
     public void execute(UpdateCartQuantityInputData inputData) {
         UpdateCartQuantityOutputData outputData = null;
         Exception errorException = null;
