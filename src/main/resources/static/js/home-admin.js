@@ -88,6 +88,9 @@ async function loadDashboardData() {
         
         // Load users
         await loadUsers();
+
+        // Load motorbikes
+        await loadMotorbikes();
     } catch (error) {
         console.error('Error loading dashboard data:', error);
     }
@@ -296,3 +299,82 @@ function logout() {
     localStorage.removeItem('username');
     window.location.href = 'login.html';
 }
+
+// Load motorbikes
+async function loadMotorbikes() {
+    try {
+        // ✅ Dùng API đang có: /api/motorbikes
+        const response = await fetch(`${API_BASE_URL}/motorbikes`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP status ${response.status}`);
+        }
+
+        // ✅ Backend trả về MẢNG motorbike, không phải { motorbikes: [...] }
+        const data = await response.json();
+
+        const tbody = document.getElementById('motorbikeTableBody');
+
+        // Nếu không phải mảng hoặc rỗng
+        if (!Array.isArray(data) || data.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #999; padding: 20px;">
+                        Không có dữ liệu xe máy
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        // ✅ Dùng nhiều tên field khác nhau cho chắc: tenXe / tenSanPham / name,...
+        tbody.innerHTML = data.slice(0, 10).map(bike => {
+            const id = bike.id ?? bike.maSanPham ?? 'N/A';
+            const ten =
+                bike.tenXe ||
+                bike.tenSanPham ||
+                bike.name ||
+                'N/A';
+            const hang =
+                bike.hangXe ||
+                bike.brand ||
+                'N/A';
+            const dong =
+                bike.dongXe ||
+                bike.model ||
+                'N/A';
+            const dungTich =
+                bike.dungTich ||
+                bike.displacement ||
+                'N/A';
+            const giaRaw =
+                bike.gia ||
+                bike.price ||
+                bike.giaBan ||
+                0;
+
+            return `
+                <tr>
+                    <td>${id}</td>
+                    <td>${ten}</td>
+                    <td>${hang}</td>
+                    <td>${dong}</td>
+                    <td>${dungTich}</td>
+                    <td>${formatCurrency(giaRaw)}</td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error("Error loading motorbikes:", error);
+        const tbody = document.getElementById('motorbikeTableBody');
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #e74c3c; padding: 20px;">
+                        Lỗi tải dữ liệu xe máy
+                    </td>
+                </tr>`;
+        }
+    }
+}
+

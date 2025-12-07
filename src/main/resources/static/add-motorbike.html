@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm xe máy | Admin</title>
+
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/motorbikes-admin.css?v=3">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home-admin.html" class="logo">Motorbike Shop - Admin</a>
+            <ul class="nav-menu">
+                <li><a href="home-admin.html">Dashboard</a></li>
+                <li><a href="motorbikes-admin.html" class="active">Xe máy</a></li>
+                <li><a href="order.html">Đơn hàng</a></li>
+                <li><a href="#">Người dùng</a></li>
+            </ul>
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span id="adminName">Admin</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Thêm xe máy mới</h1>
+        <p>Điền thông tin sản phẩm vào biểu mẫu bên dưới</p>
+    </div>
+
+    <div class="main-container">
+
+        <div class="admin-section">
+            <div class="section-header">
+                <h2 class="section-title">Thông tin xe máy</h2>
+
+                <div>
+                    <a href="motorbikes-admin.html" class="btn-secondary">⬅ Quay lại</a>
+                </div>
+            </div>
+
+            <div class="form-wrapper" style="padding: 30px;">
+
+                <form id="addMotorbikeForm">
+
+                    <div class="form-grid">
+
+                        <!-- Tên xe -->
+                        <div class="form-group">
+                            <label>Tên xe *</label>
+                            <input type="text" id="name" required>
+                        </div>
+
+                        <!-- Giá -->
+                        <div class="form-group">
+                            <label>Giá *</label>
+                            <input type="number" id="price" required>
+                        </div>
+
+                        <!-- Hãng -->
+                        <div class="form-group">
+                            <label>Hãng *</label>
+                            <input type="text" id="brand" required>
+                        </div>
+
+                        <!-- Dòng xe -->
+                        <div class="form-group">
+                            <label>Dòng xe *</label>
+                            <input type="text" id="model" required>
+                        </div>
+
+                        <!-- Màu sắc -->
+                        <div class="form-group">
+                            <label>Màu sắc *</label>
+                            <input type="text" id="color" required>
+                        </div>
+
+                        <!-- Năm sản xuất -->
+                        <div class="form-group">
+                            <label>Năm sản xuất *</label>
+                            <input type="number" id="year" required min="1990" max="2030">
+                        </div>
+
+                        <!-- Dung tích -->
+                        <div class="form-group">
+                            <label>Dung tích (cc) *</label>
+                            <input type="number" id="displacement" required min="50">
+                        </div>
+
+                        <!-- Tồn kho -->
+                        <div class="form-group">
+                            <label>Tồn kho *</label>
+                            <input type="number" id="stock" required min="0">
+                        </div>
+
+                        <!-- Hình ảnh -->
+                        <div class="form-group" style="grid-column: 1 / 3;">
+                            <label>URL hình ảnh *</label>
+                            <input type="text" id="imageUrl" required>
+                        </div>
+
+                        <!-- Mô tả -->
+                        <div class="form-group" style="grid-column: 1 / 3;">
+                            <label>Mô tả *</label>
+                            <textarea id="description" rows="4" required></textarea>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 20px;">
+                        ➕ Thêm xe máy
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="js/common.js?v=3"></script>
+    <script src="js/add-motorbike.js?v=1"></script>
+
+</body>
+</html>
