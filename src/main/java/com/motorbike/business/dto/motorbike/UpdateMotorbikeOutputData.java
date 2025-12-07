@@ -28,10 +28,17 @@ public class UpdateMotorbikeOutputData {
         public int year;
         public int displacement;
 
-        public MotorbikeItem(Long id, String name, String description,
-                             java.math.BigDecimal price, int stock,
-                             String imageUrl, String brand, String model,
-                             String color, int year, int displacement) {
+        public MotorbikeItem(Long id,
+                             String name,
+                             String description,
+                             java.math.BigDecimal price,
+                             int stock,
+                             String imageUrl,
+                             String brand,
+                             String model,
+                             String color,
+                             int year,
+                             int displacement) {
             this.id = id;
             this.name = name;
             this.description = description;
@@ -44,5 +51,20 @@ public class UpdateMotorbikeOutputData {
             this.year = year;
             this.displacement = displacement;
         }
+    }
+
+    // ============================
+    // Getter hỗ trợ cho UseCase & Test
+    // ============================
+    public MotorbikeItem getMotorbike() {
+        return motorbike;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

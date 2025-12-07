@@ -74,4 +74,25 @@ public class AddMotorbikeOutputData {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
+
+        // ============================
+    // Getter hỗ trợ cho test
+    // ============================
+    public boolean isSuccess() {
+        // Quy ước: nếu không có errorCode thì coi như thành công
+        return this.errorCode == null;
+    }
+
+    public String getErrorCode() {
+        return this.errorCode;
+    }
+
+    public String getErrorMessage() {
+        return this.errorMessage;
+    }
+
+    public MotorbikeItem getMotorbike() {
+        return this.motorbike;
+    }
+
 }

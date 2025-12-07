@@ -18,10 +18,19 @@ public class UpdateMotorbikeInputData {
     public Integer year;
     public Integer displacement;
 
-    public UpdateMotorbikeInputData(Long id, String name, String description,
-                                    BigDecimal price, String imageUrl,
-                                    int stock, String brand, String model,
-                                    String color, int year, int displacement) {
+    public UpdateMotorbikeInputData(
+            Long id,
+            String name,
+            String description,
+            BigDecimal price,
+            String imageUrl,
+            Integer stock,
+            String brand,
+            String model,
+            String color,
+            Integer year,
+            Integer displacement
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
