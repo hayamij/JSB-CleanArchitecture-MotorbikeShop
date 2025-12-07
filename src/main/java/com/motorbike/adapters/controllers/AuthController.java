@@ -2,8 +2,8 @@ package com.motorbike.adapters.controllers;
 
 import com.motorbike.business.dto.login.LoginInputData;
 import com.motorbike.business.dto.register.RegisterInputData;
-import com.motorbike.business.usecase.control.LoginUseCaseControl;
-import com.motorbike.business.usecase.control.RegisterUseCaseControl;
+import com.motorbike.business.usecase.input.LoginInputBoundary;
+import com.motorbike.business.usecase.input.RegisterInputBoundary;
 import com.motorbike.adapters.viewmodels.LoginViewModel;
 import com.motorbike.adapters.viewmodels.RegisterViewModel;
 import com.motorbike.adapters.dto.request.RegisterRequest;
@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    private final LoginUseCaseControl loginUseCase;
-    private final RegisterUseCaseControl registerUseCase;
+    private final LoginInputBoundary loginUseCase;
+    private final RegisterInputBoundary registerUseCase;
     private final LoginViewModel loginViewModel;
     private final RegisterViewModel registerViewModel;
 
     @Autowired
-    public AuthController(LoginUseCaseControl loginUseCase,
-                         RegisterUseCaseControl registerUseCase,
+    public AuthController(LoginInputBoundary loginUseCase,
+                         RegisterInputBoundary registerUseCase,
                          LoginViewModel loginViewModel,
                          RegisterViewModel registerViewModel) {
         this.loginUseCase = loginUseCase;

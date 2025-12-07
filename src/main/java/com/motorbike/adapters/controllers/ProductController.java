@@ -2,7 +2,7 @@ package com.motorbike.adapters.controllers;
 
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.usecase.input.GetAllProductsInputBoundary;
-import com.motorbike.business.usecase.control.GetProductDetailUseCaseControl;
+import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.adapters.viewmodels.GetAllProductsViewModel;
 import com.motorbike.adapters.dto.response.ProductDetailResponse;
@@ -20,13 +20,13 @@ import java.util.HashMap;
 @CrossOrigin(origins = "*")
 public class ProductController {
 
-    private final GetProductDetailUseCaseControl getProductDetailUseCase;
+    private final GetProductDetailInputBoundary getProductDetailUseCase;
     private final ProductDetailViewModel productDetailViewModel;
     private final GetAllProductsInputBoundary getAllProductsUseCase;
     private final GetAllProductsViewModel getAllProductsViewModel;
 
     @Autowired
-    public ProductController(GetProductDetailUseCaseControl getProductDetailUseCase,
+    public ProductController(GetProductDetailInputBoundary getProductDetailUseCase,
                             ProductDetailViewModel productDetailViewModel,
                             GetAllProductsInputBoundary getAllProductsUseCase,
                             GetAllProductsViewModel getAllProductsViewModel) {

@@ -121,11 +121,11 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public LoginUseCaseControl loginUseCase(
+    public com.motorbike.business.usecase.input.LoginInputBoundary loginUseCase(
             LoginOutputBoundary loginPresenter,
             UserRepository userRepository,
             CartRepository cartRepository) {
-        return new LoginUseCaseControl(loginPresenter, userRepository, cartRepository);
+        return (com.motorbike.business.usecase.input.LoginInputBoundary) new LoginUseCaseControl(loginPresenter, userRepository, cartRepository);
     }
     
     @Bean
@@ -134,11 +134,11 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public RegisterUseCaseControl registerUseCase(
+    public com.motorbike.business.usecase.input.RegisterInputBoundary registerUseCase(
             RegisterOutputBoundary registerPresenter,
             UserRepository userRepository,
             CartRepository cartRepository) {
-        return new RegisterUseCaseControl(registerPresenter, userRepository, cartRepository);
+        return (com.motorbike.business.usecase.input.RegisterInputBoundary) new RegisterUseCaseControl(registerPresenter, userRepository, cartRepository);
     }
     
     @Bean
@@ -147,10 +147,10 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public GetProductDetailUseCaseControl getProductDetailUseCase(
+    public com.motorbike.business.usecase.input.GetProductDetailInputBoundary getProductDetailUseCase(
             GetProductDetailOutputBoundary productDetailPresenter,
             ProductRepository productRepository) {
-        return new GetProductDetailUseCaseControl(productDetailPresenter, productRepository);
+        return (com.motorbike.business.usecase.input.GetProductDetailInputBoundary) new GetProductDetailUseCaseControl(productDetailPresenter, productRepository);
     }
     
     @Bean
@@ -159,11 +159,11 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public AddToCartUseCaseControl addToCartUseCase(
+    public com.motorbike.business.usecase.input.AddToCartInputBoundary addToCartUseCase(
             AddToCartOutputBoundary addToCartPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        return new AddToCartUseCaseControl(addToCartPresenter, cartRepository, productRepository);
+        return (com.motorbike.business.usecase.input.AddToCartInputBoundary) new AddToCartUseCaseControl(addToCartPresenter, cartRepository, productRepository);
     }
     
     @Bean
@@ -172,11 +172,11 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public ViewCartUseCaseControl viewCartUseCase(
+    public com.motorbike.business.usecase.input.ViewCartInputBoundary viewCartUseCase(
             ViewCartOutputBoundary viewCartPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository);
+        return (com.motorbike.business.usecase.input.ViewCartInputBoundary) new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository);
     }
     
     @Bean
@@ -185,10 +185,10 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public UpdateCartQuantityUseCaseControl updateCartQuantityUseCase(
+    public com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary updateCartQuantityUseCase(
             UpdateCartQuantityOutputBoundary updateCartQuantityPresenter,
             CartRepository cartRepository) {
-        return new UpdateCartQuantityUseCaseControl(updateCartQuantityPresenter, cartRepository);
+        return (com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary) new UpdateCartQuantityUseCaseControl(updateCartQuantityPresenter, cartRepository);
     }
     
     @Bean
@@ -197,12 +197,12 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public CheckoutUseCaseControl checkoutUseCase(
+    public com.motorbike.business.usecase.input.CheckoutInputBoundary checkoutUseCase(
             CheckoutOutputBoundary checkoutPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository,
             OrderRepository orderRepository) {
-        return new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository, orderRepository);
+        return (com.motorbike.business.usecase.input.CheckoutInputBoundary) new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository, orderRepository);
     }
     
     @Bean
@@ -217,10 +217,10 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public ListAllOrdersUseCaseControl listAllOrdersUseCase(
+    public com.motorbike.business.usecase.input.ListAllOrdersInputBoundary listAllOrdersUseCase(
             ListAllOrdersOutputBoundary listAllOrdersPresenter,
             OrderRepository orderRepository) {
-        return new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository);
+        return (com.motorbike.business.usecase.input.ListAllOrdersInputBoundary) new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository);
     }
 
     @Bean
@@ -235,11 +235,11 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public CancelOrderUseCaseControl cancelOrderUseCase(
+    public com.motorbike.business.usecase.input.CancelOrderInputBoundary cancelOrderUseCase(
             CancelOrderOutputBoundary cancelOrderPresenter,
             OrderRepository orderRepository,
             ProductRepository productRepository) {
-        return new CancelOrderUseCaseControl(cancelOrderPresenter, orderRepository, productRepository);
+        return (com.motorbike.business.usecase.input.CancelOrderInputBoundary) new CancelOrderUseCaseControl(cancelOrderPresenter, orderRepository, productRepository);
     }
 
     @Bean

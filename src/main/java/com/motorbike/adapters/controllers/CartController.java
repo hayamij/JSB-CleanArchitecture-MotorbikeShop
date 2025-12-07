@@ -3,9 +3,9 @@ package com.motorbike.adapters.controllers;
 import com.motorbike.business.dto.addtocart.AddToCartInputData;
 import com.motorbike.business.dto.viewcart.ViewCartInputData;
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityInputData;
-import com.motorbike.business.usecase.control.AddToCartUseCaseControl;
-import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
-import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
+import com.motorbike.business.usecase.input.AddToCartInputBoundary;
+import com.motorbike.business.usecase.input.ViewCartInputBoundary;
+import com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
 import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
@@ -25,17 +25,17 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class CartController {
 
-    private final AddToCartUseCaseControl addToCartUseCase;
-    private final ViewCartUseCaseControl viewCartUseCase;
-    private final UpdateCartQuantityUseCaseControl updateCartQuantityUseCase;
+    private final AddToCartInputBoundary addToCartUseCase;
+    private final ViewCartInputBoundary viewCartUseCase;
+    private final UpdateCartQuantityInputBoundary updateCartQuantityUseCase;
     private final AddToCartViewModel addToCartViewModel;
     private final ViewCartViewModel viewCartViewModel;
     private final UpdateCartQuantityViewModel updateCartQuantityViewModel;
 
     @Autowired
-    public CartController(AddToCartUseCaseControl addToCartUseCase,
-                         ViewCartUseCaseControl viewCartUseCase,
-                         UpdateCartQuantityUseCaseControl updateCartQuantityUseCase,
+    public CartController(AddToCartInputBoundary addToCartUseCase,
+                         ViewCartInputBoundary viewCartUseCase,
+                         UpdateCartQuantityInputBoundary updateCartQuantityUseCase,
                          AddToCartViewModel addToCartViewModel,
                          ViewCartViewModel viewCartViewModel,
                          UpdateCartQuantityViewModel updateCartQuantityViewModel) {

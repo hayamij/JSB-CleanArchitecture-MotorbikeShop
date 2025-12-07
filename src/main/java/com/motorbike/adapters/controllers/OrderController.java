@@ -1,7 +1,7 @@
 package com.motorbike.adapters.controllers;
 
 import com.motorbike.business.dto.checkout.CheckoutInputData;
-import com.motorbike.business.usecase.control.CheckoutUseCaseControl;
+import com.motorbike.business.usecase.input.CheckoutInputBoundary;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
 import com.motorbike.adapters.dto.request.CheckoutRequest;
 import com.motorbike.adapters.dto.response.CheckoutResponse;
@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 public class OrderController {
 
-    private final CheckoutUseCaseControl checkoutUseCase;
+    private final CheckoutInputBoundary checkoutUseCase;
     private final CheckoutViewModel checkoutViewModel;
 
     @Autowired
-    public OrderController(CheckoutUseCaseControl checkoutUseCase,
+    public OrderController(CheckoutInputBoundary checkoutUseCase,
                           CheckoutViewModel checkoutViewModel) {
         this.checkoutUseCase = checkoutUseCase;
         this.checkoutViewModel = checkoutViewModel;

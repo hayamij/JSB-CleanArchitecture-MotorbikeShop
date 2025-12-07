@@ -21,8 +21,8 @@ import com.motorbike.business.dto.order.GetOrderDetailInputData;
 import com.motorbike.business.dto.order.GetValidOrderStatusesInputData;
 import com.motorbike.business.usecase.input.GetOrderDetailInputBoundary;
 import com.motorbike.business.usecase.input.GetValidOrderStatusesInputBoundary;
-import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
-import com.motorbike.business.usecase.control.UpdateOrderUseCaseControl;
+import com.motorbike.business.usecase.input.ListAllOrdersInputBoundary;
+import com.motorbike.business.usecase.input.UpdateOrderInputBoundary;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,9 +40,9 @@ import java.util.Optional;
 @RequestMapping("/api/admin/orders")
 @CrossOrigin(origins = "*")
 public class AdminOrderController {
-    private final ListAllOrdersUseCaseControl listAllOrdersUseCase;
+    private final ListAllOrdersInputBoundary listAllOrdersUseCase;
     private final ListAllOrdersViewModel listAllOrdersViewModel;
-    private final UpdateOrderUseCaseControl updateOrderUseCase;
+    private final UpdateOrderInputBoundary updateOrderUseCase;
     private final UpdateOrderViewModel updateOrderViewModel;
     private final GetOrderDetailInputBoundary getOrderDetailUseCase;
     private final GetOrderDetailViewModel getOrderDetailViewModel;
@@ -52,10 +52,10 @@ public class AdminOrderController {
     private final com.motorbike.adapters.viewmodels.GetTopProductsViewModel getTopProductsViewModel;
 
     @Autowired
-    public AdminOrderController(
-            ListAllOrdersUseCaseControl listAllOrdersUseCase,
+        public AdminOrderController(
+            ListAllOrdersInputBoundary listAllOrdersUseCase,
             ListAllOrdersViewModel listAllOrdersViewModel,
-            UpdateOrderUseCaseControl updateOrderUseCase,
+            UpdateOrderInputBoundary updateOrderUseCase,
             UpdateOrderViewModel updateOrderViewModel,
             GetOrderDetailInputBoundary getOrderDetailUseCase,
             GetOrderDetailViewModel getOrderDetailViewModel,

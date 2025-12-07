@@ -14,19 +14,18 @@ import com.motorbike.adapters.dto.request.CancelOrderRequest;
 import com.motorbike.adapters.dto.response.CancelOrderResponse;
 import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
 import com.motorbike.business.dto.cancelorder.CancelOrderInputData;
-import com.motorbike.business.usecase.control.CancelOrderUseCaseControl;
+import com.motorbike.business.usecase.input.CancelOrderInputBoundary;
 
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin(origins = "*")
 public class UserOderController {
-    private final CancelOrderUseCaseControl cancelOrderUseCase;
+    private final CancelOrderInputBoundary cancelOrderUseCase;
     private final CancelOrderViewModel cancelOrderViewModel;
     @Autowired
     public UserOderController(
-            CancelOrderUseCaseControl cancelOrderUseCase,
+            CancelOrderInputBoundary cancelOrderUseCase,
             CancelOrderViewModel cancelOrderViewModel) {
-        
         this.cancelOrderUseCase = cancelOrderUseCase;
         this.cancelOrderViewModel = cancelOrderViewModel;
     }
