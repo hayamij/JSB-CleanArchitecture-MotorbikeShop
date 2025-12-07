@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách xe máy - Motorbike Shop</title>
+    <link rel="stylesheet" href="css/common.css?v=2">
+    <link rel="stylesheet" href="css/home.css?v=2"> <!-- dùng lại CSS của home -->
+    <link rel="stylesheet" href="css/motorbikes-search.css?v=1">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home.html" class="logo">Motorbike Shop</a>
+
+            <ul class="nav-menu">
+                <li><a href="home.html">Trang chủ</a></li>
+                <li><a class="active" href="motorbikes.html">Xe máy</a></li>
+                <li><a href="cart.html">Giỏ hàng</a></li>
+                <li><a href="my-orders.html">Đơn hàng</a></li>
+            </ul>
+
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span id="userName">User</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <h2 class="section-title">Danh sách xe máy</h2>
+        <p class="section-subtitle">Tất cả các dòng xe hiện có tại cửa hàng</p>
+
+        <div class="search-container">
+          <div class="search-row">
+              <input type="text" id="keyword" placeholder="Tìm theo tên xe...">
+              <input type="text" id="brand" placeholder="Hãng xe (Honda, Yamaha...)">
+              <input type="text" id="model" placeholder="Dòng xe (Winner X, Vision...)">
+          </div>
+
+          <div class="search-row">
+              <input type="text" id="color" placeholder="Màu sắc (Đỏ, Trắng...)">
+              <input type="number" id="minCC" placeholder="Dung tích min (cc)">
+              <input type="number" id="maxCC" placeholder="Dung tích max (cc)">
+          </div>
+
+          <button class="btn-search" onclick="searchMotorbikes()">Tìm kiếm</button>
+        </div>
+
+
+        <div id="productsList" class="products-grid"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="js/common.js?v=2"></script>
+    <script src="js/home.js?v=2"></script>
+    <script src="js/motorbikes.js?v=2"></script>
+    <script src="js/motorbikes-search.js?v=1"></script>
+</body>
+</html>

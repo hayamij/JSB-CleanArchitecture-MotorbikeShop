@@ -14,7 +14,8 @@
             <a href="home-admin.html" class="logo"><span>Motorbike Shop - Admin</span></a>
             <ul class="nav-menu">
                 <li><a href="home-admin.html" class="active">Dashboard</a></li>
-                <li><a href="#products">Sản phẩm</a></li>
+                <li><a href="#motorbikes">Xe máy</a></li>
+                <li><a href="#products">Phụ kiện</a></li>
                 <li><a href="order.html">Đơn hàng</a></li>
                 <li><a href="#users">Người dùng</a></li>
             </ul>
@@ -71,18 +72,50 @@
             </div>
         </div>
 
-        <!-- Products Section -->
-        <section class="admin-section" id="products">
+        <!-- Motorbikes Section (Xe máy) -->
+        <section class="admin-section" id="motorbikes">
             <div class="section-header">
-                <h2 class="section-title">Quản lý sản phẩm</h2>
-                <button class="btn-primary" onclick="goToProductManagement()">➕ Thêm sản phẩm</button>
+                <h2 class="section-title">Quản lý xe máy</h2>
+                <a href="motorbikes-admin.html" class="btn-secondary">🏍 Xem danh sách</a>
             </div>
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Mã SP</th>
-                            <th>Tên sản phẩm</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên xe</th>
+                            <th>Hãng</th>
+                            <th>Dòng xe</th>
+                            <th>Dung tích (cc)</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="motorbikeTableBody">
+                        <tr>
+                            <td colspan="10" style="text-align:center; padding: 30px; color:#999;">
+                                Đang tải dữ liệu...
+                            </td>
+                        </tr>
+                    </tbody>
+
+
+                </table>
+            </div>
+        </section>
+
+        <!-- Products Section (dùng lại cho PHỤ KIỆN, giữ nguyên id để JS hoạt động) -->
+        <section class="admin-section" id="products">
+            <div class="section-header">
+                <h2 class="section-title">Quản lý phụ kiện</h2>
+                <button class="btn-primary" onclick="goToProductManagement()">➕ Thêm phụ kiện</button>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Tên phụ kiện</th>
                             <th>Danh mục</th>
                             <th>Giá</th>
                             <th>Số lượng</th>

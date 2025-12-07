@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý xe máy | Admin</title>
+
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/motorbikes-admin.css?v=1">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home-admin.html" class="logo">Motorbike Shop - Admin</a>
+            <ul class="nav-menu">
+                <li><a href="home-admin.html">Dashboard</a></li>
+                <li><a href="motorbikes-admin.html" class="active">Xe máy</a></li>
+                <li><a href="order.html">Đơn hàng</a></li>
+                <li><a href="#">Người dùng</a></li>
+            </ul>
+            <div class="user-info">
+                <span class="user-greeting">Xin chào, <span id="adminName">Admin</span></span>
+                <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Danh sách xe máy</h1>
+        <p>Quản lý toàn bộ xe máy trong hệ thống</p>
+    </div>
+
+    <div class="search-box">
+
+      <div class="search-grid">
+
+          <input id="keyword" class="search-input" placeholder="Tìm theo tên xe...">
+
+          <input id="brand" class="search-input" placeholder="Hãng xe (Honda, Yamaha...)">
+
+          <input id="model" class="search-input" placeholder="Dòng xe (Winner X, Vision...)">
+
+          <input id="color" class="search-input" placeholder="Màu sắc (Đỏ, Trắng...)">
+
+          <input id="minCC" type="number" class="search-input" placeholder="Dung tích min (cc)">
+
+          <input id="maxCC" type="number" class="search-input" placeholder="Dung tích max (cc)">
+      </div>
+
+      <button class="btn-primary search-btn" onclick="searchMotorbikes()">Tìm kiếm</button>
+    </div>
+
+
+    <div class="main-container">
+        <div class="admin-section">
+
+            <div class="section-header">
+                <h2 class="section-title">Danh sách xe máy</h2>
+
+                <div>
+                    <a href="home-admin.html" class="btn-secondary" style="margin-right: 8px;">
+                        ⬅ Về Dashboard
+                    </a>
+
+                    <a href="add-motorbike.html" class="btn-primary btn-add" >
+                        ➕ Thêm sản phẩm
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên xe</th>
+                            <th>Hãng</th>
+                            <th>Dòng xe</th>
+                            <th>Dung tích (cc)</th>
+                            <th>Năm</th>
+                            <th>Tồn kho</th>
+                            <th>Giá</th>
+                            <th class="actions-col">Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="motorbikeTableBody">
+                        <tr>
+                            <td colspan="9" style="text-align:center; padding: 30px; color:#999;">
+                                Đang tải dữ liệu...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Motorbike Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="js/common.js?v=3"></script>
+    <script src="js/motorbikes-admin.js?v=3"></script>
+
+</body>
+</html>
