@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.DeleteMotorbikeOutputData;
@@ -14,9 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DeleteMotorbikeUseCaseControlTest {
 
-    // =======================
-    // Mock Presenter
-    // =======================
     private static class MockPresenter implements DeleteMotorbikeOutputBoundary {
         public DeleteMotorbikeOutputData received;
 
@@ -26,9 +23,6 @@ class DeleteMotorbikeUseCaseControlTest {
         }
     }
 
-    // =======================
-    // Mock Repository
-    // =======================
     private static class MockRepo implements MotorbikeRepository {
 
         public Map<Long, XeMay> store = new HashMap<>();
@@ -62,15 +56,11 @@ class DeleteMotorbikeUseCaseControlTest {
         }
     }
 
-    // ----------------------------------------------------------
-    // 1) Xóa thành công
-    // ----------------------------------------------------------
     @Test
     void testDelete_Success() {
         MockPresenter presenter = new MockPresenter();
         MockRepo repo = new MockRepo();
 
-        // Tạo 1 xe có đủ thông tin, dùng đúng constructor của XeMay
         XeMay xe = new XeMay(
                 "Test Name",
                 "Test Desc",
@@ -100,9 +90,6 @@ class DeleteMotorbikeUseCaseControlTest {
         assertFalse(repo.store.containsKey(1L));
     }
 
-    // ----------------------------------------------------------
-    // 2) Không tìm thấy → NOT_FOUND
-    // ----------------------------------------------------------
     @Test
     void testDelete_NotFound() {
         MockPresenter presenter = new MockPresenter();
@@ -120,9 +107,6 @@ class DeleteMotorbikeUseCaseControlTest {
         assertEquals("Motorbike not found", presenter.received.errorMessage);
     }
 
-    // ----------------------------------------------------------
-    // 3) Repository ném exception → SYSTEM_ERROR
-    // ----------------------------------------------------------
     @Test
     void testDelete_RepositoryThrows() {
         MockPresenter presenter = new MockPresenter();

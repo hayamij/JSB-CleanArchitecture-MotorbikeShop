@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -87,9 +87,7 @@ class CancelOrderUseCaseControlTest {
             LocalDateTime.now(), LocalDateTime.now(),
             "Mũ bảo hiểm", "Royal", "ABS + EPS", "L"
         );
-        // Step 2.1: tìm thấy đơn
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-        // Step 2.2.2.2: hoàn kho
         when(productRepository.findById(productId1)).thenReturn(Optional.of(motorbike));
         when(productRepository.findById(productId2)).thenReturn(Optional.of(helmet));
         when(productRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -106,7 +104,6 @@ class CancelOrderUseCaseControlTest {
         verify(productRepository, times(2)).findById(any());
         verify(productRepository, times(2)).save(any());
         verify(orderRepository).save(any(DonHang.class));
-        // Step 3: trả kết quả
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -125,7 +122,6 @@ class CancelOrderUseCaseControlTest {
         Long orderId = 1L;
         Long userId = 2L;
 
-        // Step 2.1: Tìm thấy đơn
         DonHang order = new DonHang(
             orderId, userId, null,
             BigDecimal.valueOf(30000000),
@@ -140,13 +136,11 @@ class CancelOrderUseCaseControlTest {
 
         useCase.execute(input);
 
-        // Step 2.2.1: quyền hợp lệ → nhưng không được hoàn kho vì status sai
         verify(orderRepository).findById(orderId);
         verify(productRepository, never()).findById(any());
         verify(productRepository, never()).save(any());
         verify(orderRepository, never()).save(any());
 
-        // Step 3: trả lỗi
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
 
@@ -163,20 +157,17 @@ class CancelOrderUseCaseControlTest {
         Long orderId = 10L;
         Long userId = 20L;
 
-        // Step 2: Không tìm thấy đơn hàng
         when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
         CancelOrderInputData input = new CancelOrderInputData(orderId, userId, "Hủy đơn");
 
         useCase.execute(input);
 
-        // Không được kiểm tra quyền
         verify(orderRepository).findById(orderId);
         verify(productRepository, never()).findById(any());
         verify(productRepository, never()).save(any());
         verify(orderRepository, never()).save(any());
 
-        // Step 3: trả lỗi
         ArgumentCaptor<CancelOrderOutputData> captor = ArgumentCaptor.forClass(CancelOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
 
@@ -194,7 +185,6 @@ void testCancelOrder_KB2_NoPermission() {
     Long ownerId = 2L;       // chủ đơn
     Long wrongUserId = 999L; // user không có quyền
 
-    // Step 2.1: tìm thấy đơn
     DonHang order = new DonHang(
         orderId, ownerId, null,
         BigDecimal.valueOf(20000000),
@@ -209,7 +199,6 @@ void testCancelOrder_KB2_NoPermission() {
 
     useCase.execute(input);
 
-    // Không được kiểm tra trạng thái nếu quyền sai
     verify(orderRepository).findById(orderId);
     verify(productRepository, never()).findById(any());
     verify(productRepository, never()).save(any());

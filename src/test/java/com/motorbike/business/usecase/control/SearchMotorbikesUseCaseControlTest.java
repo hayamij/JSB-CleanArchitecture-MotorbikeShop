@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.SearchMotorbikesInputData;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesOutputData;
@@ -16,9 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SearchMotorbikesUseCaseControlTest {
 
-    // ==========================
-    // Mock Presenter
-    // ==========================
     private static class MockPresenter implements SearchMotorbikesOutputBoundary {
         public SearchMotorbikesOutputData receivedData;
 
@@ -28,9 +25,6 @@ class SearchMotorbikesUseCaseControlTest {
         }
     }
 
-    // ==========================
-    // Mock MotorbikeRepository
-    // ==========================
     private static class MockMotorbikeRepository implements MotorbikeRepository {
 
         private final List<XeMay> data;
@@ -54,8 +48,6 @@ class SearchMotorbikesUseCaseControlTest {
             return data;
         }
 
-        // Các method còn lại của MotorbikeRepository
-        // (định nghĩa vừa đủ cho compiler, usecase không dùng tới)
 
         @Override
         public Optional<XeMay> findById(Long id) {
@@ -69,15 +61,10 @@ class SearchMotorbikesUseCaseControlTest {
 
         @Override
         public void deleteById(Long id) {
-            // no-op
         }
 
-        // ❌ KHÔNG có existsById trong interface → đừng override
-        // Nếu bạn lỡ thêm thì xóa hẳn method này:
-        // public boolean existsById(Long id) { return false; }
     }
 
-    // Helper: tạo danh sách mẫu
     private List<XeMay> sampleData() {
         List<XeMay> list = new ArrayList<>();
 
@@ -103,9 +90,6 @@ class SearchMotorbikesUseCaseControlTest {
         return list;
     }
 
-    // --------------------------------------------------------------
-    // 1) Tất cả filter = null → trả về toàn bộ xe
-    // --------------------------------------------------------------
     @Test
     void testSearch_AllNullFilters_ReturnsAll() {
         MockPresenter presenter = new MockPresenter();
@@ -121,9 +105,6 @@ class SearchMotorbikesUseCaseControlTest {
         assertEquals(3, presenter.receivedData.motorbikes.size());
     }
 
-    // --------------------------------------------------------------
-    // 2) Keyword filter
-    // --------------------------------------------------------------
     @Test
     void testSearch_ByKeyword() {
         MockPresenter presenter = new MockPresenter();
@@ -139,9 +120,6 @@ class SearchMotorbikesUseCaseControlTest {
         assertTrue(presenter.receivedData.motorbikes.get(0).name.toLowerCase().contains("exciter"));
     }
 
-    // --------------------------------------------------------------
-    // 3) Brand + CC Range
-    // --------------------------------------------------------------
     @Test
     void testSearch_ByBrandAndCCRange() {
         MockPresenter presenter = new MockPresenter();
@@ -160,9 +138,6 @@ class SearchMotorbikesUseCaseControlTest {
         assertEquals(155, result.displacement);
     }
 
-    // --------------------------------------------------------------
-    // 4) Không tìm thấy xe phù hợp
-    // --------------------------------------------------------------
     @Test
     void testSearch_NoResult() {
         MockPresenter presenter = new MockPresenter();
@@ -177,9 +152,6 @@ class SearchMotorbikesUseCaseControlTest {
         assertEquals(0, presenter.receivedData.motorbikes.size());
     }
 
-    // --------------------------------------------------------------
-    // 5) Repository ném exception → SYSTEM_ERROR
-    // --------------------------------------------------------------
     @Test
     void testSearch_RepositoryException() {
         MockPresenter presenter = new MockPresenter();

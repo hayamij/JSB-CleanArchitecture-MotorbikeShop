@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.GetAllMotorbikesOutputData;
 import com.motorbike.business.dto.motorbike.GetAllMotorbikesOutputData.MotorbikeItem;
@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GetAllMotorbikesUseCaseControlTest {
 
-    // Mock Presenter
     private static class MockPresenter implements GetAllMotorbikesOutputBoundary {
         public GetAllMotorbikesOutputData receivedData;
 
@@ -27,7 +26,6 @@ class GetAllMotorbikesUseCaseControlTest {
         }
     }
 
-    // Mock Product Repository
     private static class MockProductRepository implements ProductRepository {
 
         private final List<SanPham> products;
@@ -61,9 +59,6 @@ class GetAllMotorbikesUseCaseControlTest {
         public SanPham save(SanPham product) { return null; }
     }
 
-    // --------------------------------------------------------------
-    // 1) SUCCESS: Return all motorbikes
-    // --------------------------------------------------------------
     @Test
     void testGetAllMotorbikes_Success() {
 
@@ -100,9 +95,6 @@ class GetAllMotorbikesUseCaseControlTest {
         assertEquals("Honda Wave", item1.getName());
     }
 
-    // --------------------------------------------------------------
-    // 2) Non-motorbike products must be ignored
-    // --------------------------------------------------------------
     @Test
     void testGetAllMotorbikes_IgnoreNonMotorbikeProducts() {
 
@@ -131,9 +123,6 @@ class GetAllMotorbikesUseCaseControlTest {
         assertEquals("Honda Wave", presenter.receivedData.getMotorbikes().get(0).getName());
     }
 
-    // --------------------------------------------------------------
-    // 3) Empty list
-    // --------------------------------------------------------------
     @Test
     void testGetAllMotorbikes_EmptyList() {
 
@@ -148,9 +137,6 @@ class GetAllMotorbikesUseCaseControlTest {
         assertEquals(0, presenter.receivedData.getMotorbikes().size());
     }
 
-    // --------------------------------------------------------------
-    // 4) Repository throws exception → SYSTEM_ERROR
-    // --------------------------------------------------------------
     @Test
     void testGetAllMotorbikes_RepositoryThrowsException() {
 

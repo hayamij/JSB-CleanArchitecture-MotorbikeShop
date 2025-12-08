@@ -57,7 +57,6 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
             return true;
         }
 
-        // Tìm kiếm theo keyword trong tên hoặc mô tả
         if (criteria.keyword != null && !criteria.keyword.isEmpty()) {
             String keyword = criteria.keyword.toLowerCase();
             boolean matchesName = accessory.getTenSanPham().toLowerCase().contains(keyword);
@@ -68,7 +67,6 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
             }
         }
 
-        // Lọc theo loại phụ kiện
         if (criteria.type != null && !criteria.type.isEmpty()) {
             if (accessory.getLoaiPhuKien() == null || 
                 !accessory.getLoaiPhuKien().equalsIgnoreCase(criteria.type)) {
@@ -76,7 +74,6 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
             }
         }
 
-        // Lọc theo thương hiệu
         if (criteria.brand != null && !criteria.brand.isEmpty()) {
             if (accessory.getThuongHieu() == null || 
                 !accessory.getThuongHieu().equalsIgnoreCase(criteria.brand)) {
@@ -84,7 +81,6 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
             }
         }
 
-        // Lọc theo chất liệu
         if (criteria.material != null && !criteria.material.isEmpty()) {
             if (accessory.getChatLieu() == null || 
                 !accessory.getChatLieu().equalsIgnoreCase(criteria.material)) {
@@ -92,14 +88,12 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
             }
         }
 
-        // Lọc theo khoảng giá tối thiểu
         if (criteria.minPrice != null) {
             if (accessory.getGia().doubleValue() < criteria.minPrice) {
                 return false;
             }
         }
 
-        // Lọc theo khoảng giá tối đa
         if (criteria.maxPrice != null) {
             if (accessory.getGia().doubleValue() > criteria.maxPrice) {
                 return false;

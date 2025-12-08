@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.UpdateMotorbikeOutputData;
@@ -17,9 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UpdateMotorbikeUseCaseControlTest {
 
-    // =======================
-    // Mock Presenter
-    // =======================
     private static class MockPresenter implements UpdateMotorbikeOutputBoundary {
         public UpdateMotorbikeOutputData received;
 
@@ -29,9 +26,6 @@ class UpdateMotorbikeUseCaseControlTest {
         }
     }
 
-    // =======================
-    // Mock Repository
-    // =======================
     private static class MockRepo implements MotorbikeRepository {
 
         public List<XeMay> store = new ArrayList<>();
@@ -62,9 +56,6 @@ class UpdateMotorbikeUseCaseControlTest {
         public void deleteById(Long id) {}
     }
 
-    // ----------------------------------------------------
-    // 1) Update thành công
-    // ----------------------------------------------------
     @Test
     void testUpdate_Success() {
         MockPresenter presenter = new MockPresenter();
@@ -105,9 +96,6 @@ class UpdateMotorbikeUseCaseControlTest {
         assertEquals(10, item.stock);
     }
 
-    // ----------------------------------------------------
-    // 2) Không tìm thấy → NOT_FOUND
-    // ----------------------------------------------------
     @Test
     void testUpdate_NotFound() {
         MockPresenter presenter = new MockPresenter();
@@ -127,9 +115,6 @@ class UpdateMotorbikeUseCaseControlTest {
         assertEquals("Motorbike not found", presenter.received.getErrorMessage());
     }
 
-    // ----------------------------------------------------
-    // 3) Update chỉ 1 field → không thay đổi field khác
-    // ----------------------------------------------------
     @Test
     void testUpdate_OnlyOneField() {
         MockPresenter presenter = new MockPresenter();
@@ -166,9 +151,6 @@ class UpdateMotorbikeUseCaseControlTest {
         assertEquals("New Desc", item.description); // thay đổi
     }
 
-    // ----------------------------------------------------
-    // 4) Repo ném exception → SYSTEM_ERROR
-    // ----------------------------------------------------
     @Test
     void testUpdate_RepositoryThrows() {
         MockPresenter presenter = new MockPresenter();

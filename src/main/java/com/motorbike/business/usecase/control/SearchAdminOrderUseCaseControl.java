@@ -27,7 +27,6 @@ public class SearchAdminOrderUseCaseControl {
         SearchAdminOrderOutputData outputData = null;
         Exception errorException = null;
 
-        // Validate input
         try {
             if (inputData == null || !inputData.isAdmin()) {
                 throw ValidationException.invalidInput();
@@ -39,7 +38,6 @@ public class SearchAdminOrderUseCaseControl {
             errorException = e;
         }
 
-        // Search orders from repository
         List<DonHang> matchedOrders = null;
         if (errorException == null) {
             try {
@@ -50,7 +48,6 @@ public class SearchAdminOrderUseCaseControl {
             }
         }
 
-        // Search and filter orders
         if (errorException == null && matchedOrders != null) {
             try {
                 List<OrderItemData> orderItems = matchedOrders.stream()
@@ -78,7 +75,6 @@ public class SearchAdminOrderUseCaseControl {
             }
         }
 
-        // Handle error
         if (errorException != null) {
             String errorCode = "SYSTEM_ERROR";
             String message = errorException.getMessage();

@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,7 +40,6 @@ class ListMyOrdersUseCaseControlTest {
 
     @Test
     void execute_WithValidUserId_ShouldReturnUserOrders() {
-        // Arrange
         Long userId = 1L;
         ListMyOrdersInputData inputData = ListMyOrdersInputData.forUser(userId);
 
@@ -73,10 +72,8 @@ class ListMyOrdersUseCaseControlTest {
 
         ArgumentCaptor<ListMyOrdersOutputData> captor = ArgumentCaptor.forClass(ListMyOrdersOutputData.class);
 
-        // Act
         useCase.execute(inputData);
 
-        // Assert
         verify(mockOutputBoundary).present(captor.capture());
         ListMyOrdersOutputData output = captor.getValue();
 
@@ -84,21 +81,17 @@ class ListMyOrdersUseCaseControlTest {
         assertFalse(output.isEmpty());
         assertEquals(2, output.getOrders().size());
         
-        // Verify order is sorted by date descending (order1 is newer)
         assertEquals(101L, output.getOrders().get(0).getOrderId());
         assertEquals(102L, output.getOrders().get(1).getOrderId());
     }
 
     @Test
     void execute_WithNullUserId_ShouldReturnError() {
-        // Arrange
         ListMyOrdersInputData inputData = ListMyOrdersInputData.forUser(null);
         ArgumentCaptor<ListMyOrdersOutputData> captor = ArgumentCaptor.forClass(ListMyOrdersOutputData.class);
 
-        // Act
         useCase.execute(inputData);
 
-        // Assert
         verify(mockOutputBoundary).present(captor.capture());
         ListMyOrdersOutputData output = captor.getValue();
 
@@ -109,13 +102,10 @@ class ListMyOrdersUseCaseControlTest {
 
     @Test
     void execute_WithNullInputData_ShouldReturnError() {
-        // Arrange
         ArgumentCaptor<ListMyOrdersOutputData> captor = ArgumentCaptor.forClass(ListMyOrdersOutputData.class);
 
-        // Act
         useCase.execute(null);
 
-        // Assert
         verify(mockOutputBoundary).present(captor.capture());
         ListMyOrdersOutputData output = captor.getValue();
 
@@ -125,17 +115,14 @@ class ListMyOrdersUseCaseControlTest {
 
     @Test
     void execute_WhenUserHasNoOrders_ShouldReturnEmptyList() {
-        // Arrange
         Long userId = 1L;
         ListMyOrdersInputData inputData = ListMyOrdersInputData.forUser(userId);
         
         when(mockOrderRepository.findByUserId(userId)).thenReturn(new ArrayList<>());
         ArgumentCaptor<ListMyOrdersOutputData> captor = ArgumentCaptor.forClass(ListMyOrdersOutputData.class);
 
-        // Act
         useCase.execute(inputData);
 
-        // Assert
         verify(mockOutputBoundary).present(captor.capture());
         ListMyOrdersOutputData output = captor.getValue();
 
@@ -146,17 +133,14 @@ class ListMyOrdersUseCaseControlTest {
 
     @Test
     void execute_WhenRepositoryThrowsException_ShouldReturnError() {
-        // Arrange
         Long userId = 1L;
         ListMyOrdersInputData inputData = ListMyOrdersInputData.forUser(userId);
         
         when(mockOrderRepository.findByUserId(userId)).thenThrow(new RuntimeException("Database error"));
         ArgumentCaptor<ListMyOrdersOutputData> captor = ArgumentCaptor.forClass(ListMyOrdersOutputData.class);
 
-        // Act
         useCase.execute(inputData);
 
-        // Assert
         verify(mockOutputBoundary).present(captor.capture());
         ListMyOrdersOutputData output = captor.getValue();
 
@@ -167,7 +151,6 @@ class ListMyOrdersUseCaseControlTest {
 
     @Test
     void execute_ShouldOnlyReturnOrdersForSpecificUser() {
-        // Arrange
         Long userId = 1L;
         ListMyOrdersInputData inputData = ListMyOrdersInputData.forUser(userId);
 
@@ -188,10 +171,8 @@ class ListMyOrdersUseCaseControlTest {
 
         ArgumentCaptor<ListMyOrdersOutputData> captor = ArgumentCaptor.forClass(ListMyOrdersOutputData.class);
 
-        // Act
         useCase.execute(inputData);
 
-        // Assert
         verify(mockOrderRepository).findByUserId(userId);
         verify(mockOrderRepository, never()).findAll();
         

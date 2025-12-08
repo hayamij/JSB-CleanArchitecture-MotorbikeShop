@@ -27,7 +27,6 @@ public class AddMotorbikeUseCaseControl implements AddMotorbikeInputBoundary {
         AddMotorbikeOutputData outputData;
     
         try {
-            // 1) Validate cơ bản
             if (input.name == null || input.name.isBlank()) {
                 throw new IllegalArgumentException("Product name cannot be empty");
             }
@@ -38,7 +37,6 @@ public class AddMotorbikeUseCaseControl implements AddMotorbikeInputBoundary {
                 throw new IllegalArgumentException("Stock must be >= 0");
             }
     
-            // 2) Tìm xem đã có xe trùng chưa
             XeMay existing = motorbikeRepository
                     .findAllMotorbikes()
                     .stream()
@@ -56,14 +54,10 @@ public class AddMotorbikeUseCaseControl implements AddMotorbikeInputBoundary {
             XeMay saved;
     
             if (existing != null) {
-                // 3A) ĐÃ CÓ XE → CỘNG THÊM TỒN KHO
                 existing.setSoLuongTonKho(existing.getSoLuongTonKho() + input.stock);
-    
-                // vì existing đã có id, MotorbikeRepository.save() sẽ UPDATE, không INSERT mới
                 saved = motorbikeRepository.save(existing);
     
             } else {
-                // 3B) CHƯA CÓ XE → TẠO XE MỚI
                 XeMay xeMay = new XeMay(
                         input.name,
                         input.description,
@@ -80,7 +74,6 @@ public class AddMotorbikeUseCaseControl implements AddMotorbikeInputBoundary {
                 saved = motorbikeRepository.save(xeMay);
             }
     
-            // 4) Build output từ bản ghi đã lưu (saved)
             MotorbikeItem item = new MotorbikeItem(
                     saved.getMaSanPham(),
                     saved.getTenSanPham(),
@@ -98,11 +91,9 @@ public class AddMotorbikeUseCaseControl implements AddMotorbikeInputBoundary {
             outputData = new AddMotorbikeOutputData(item);
     
         } catch (Exception e) {
-            // Có lỗi bất kỳ → trả về SYSTEM_ERROR
             outputData = new AddMotorbikeOutputData("SYSTEM_ERROR", e.getMessage());
         }
     
-        // 5) Gọi presenter
         outputBoundary.present(outputData);
     }
     

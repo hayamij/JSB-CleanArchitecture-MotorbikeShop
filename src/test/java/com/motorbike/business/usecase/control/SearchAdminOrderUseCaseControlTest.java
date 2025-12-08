@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,7 +40,6 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_WithValidAdminQuery_ShouldReturnMatchingOrders() {
-        // Arrange
         String searchQuery = "nguyen";
         
         DonHang order1 = createTestOrder(1L, 1L, "Nguyen Van A", "0123456789", TrangThaiDonHang.CHO_XAC_NHAN);
@@ -51,10 +50,8 @@ class SearchAdminOrderUseCaseControlTest {
         
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(searchQuery);
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -65,13 +62,10 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_WithEmptyQuery_ShouldReturnValidationError() {
-        // Arrange
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin("");
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -82,13 +76,10 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_WithNullQuery_ShouldReturnValidationError() {
-        // Arrange
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(null);
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -99,17 +90,14 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_NoMatches_ShouldReturnEmptyList() {
-        // Arrange
         String searchQuery = "xyz123notfound";
         
         when(orderRepository.searchForAdmin(searchQuery)).thenReturn(List.of());
         
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(searchQuery);
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -120,7 +108,6 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_ByPhoneNumber_ShouldReturnMatchingOrders() {
-        // Arrange
         String searchQuery = "0123";
         
         DonHang order1 = createTestOrder(1L, 1L, "Nguyen Van A", "0123456789", TrangThaiDonHang.CHO_XAC_NHAN);
@@ -131,10 +118,8 @@ class SearchAdminOrderUseCaseControlTest {
         
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(searchQuery);
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -145,7 +130,6 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_ByProductName_ShouldReturnMatchingOrders() {
-        // Arrange
         String searchQuery = "honda";
         
         List<ChiTietDonHang> items = new ArrayList<>();
@@ -172,10 +156,8 @@ class SearchAdminOrderUseCaseControlTest {
         
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(searchQuery);
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -186,7 +168,6 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_ByStatus_ShouldReturnMatchingOrders() {
-        // Arrange
         String searchQuery = "cho_xac_nhan";
         
         DonHang order1 = createTestOrder(1L, 1L, "Nguyen Van A", "0123456789", TrangThaiDonHang.CHO_XAC_NHAN);
@@ -197,10 +178,8 @@ class SearchAdminOrderUseCaseControlTest {
         
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(searchQuery);
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -211,7 +190,6 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_ByOrderId_ShouldReturnMatchingOrders() {
-        // Arrange
         String searchQuery = "1";
         
         DonHang order1 = createTestOrder(1L, 1L, "Nguyen Van A", "0923456789", TrangThaiDonHang.CHO_XAC_NHAN);
@@ -222,10 +200,8 @@ class SearchAdminOrderUseCaseControlTest {
         
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(searchQuery);
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         
@@ -236,7 +212,6 @@ class SearchAdminOrderUseCaseControlTest {
 
     @Test
     void testSearchOrder_ByCustomerId_ShouldReturnMatchingOrders() {
-        // Arrange
         String searchQuery = "2";
         
         DonHang order1 = createTestOrder(1L, 1L, "Nguyen Van A", "0123456789", TrangThaiDonHang.CHO_XAC_NHAN);
@@ -247,10 +222,8 @@ class SearchAdminOrderUseCaseControlTest {
         
         SearchAdminOrderInputData inputData = SearchAdminOrderInputData.forAdmin(searchQuery);
         
-        // Act
         useCase.execute(inputData);
         
-        // Assert
         ArgumentCaptor<SearchAdminOrderOutputData> captor = ArgumentCaptor.forClass(SearchAdminOrderOutputData.class);
         verify(outputBoundary).present(captor.capture());
         

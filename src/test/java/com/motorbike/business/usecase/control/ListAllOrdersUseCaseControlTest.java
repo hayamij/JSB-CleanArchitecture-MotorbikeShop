@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -105,7 +105,6 @@ class ListAllOrdersUseCaseControlTest {
         verify(outputBoundary).present(captor.capture());
         
         ListAllOrdersOutputData output = captor.getValue();
-        // Sum total amounts from returned order items
         BigDecimal sum = BigDecimal.ZERO;
         for (ListAllOrdersOutputData.OrderItemData oi : output.getOrders()) {
             sum = sum.add(oi.getTotalAmount());

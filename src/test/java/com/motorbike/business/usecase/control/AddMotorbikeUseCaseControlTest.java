@@ -1,4 +1,4 @@
-package com.motorbike.business.usecase.control;
+﻿package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.AddMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.AddMotorbikeOutputData;
@@ -15,9 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AddMotorbikeUseCaseControlTest {
 
-    // =======================
-    // Mock Presenter
-    // =======================
     private static class MockPresenter implements AddMotorbikeOutputBoundary {
         public AddMotorbikeOutputData receivedData;
 
@@ -27,9 +24,6 @@ class AddMotorbikeUseCaseControlTest {
         }
     }
 
-    // =======================
-    // Mock MotorbikeRepository
-    // =======================
     private static class MockMotorbikeRepository implements MotorbikeRepository {
 
         public final List<XeMay> store = new ArrayList<>();
@@ -76,9 +70,6 @@ class AddMotorbikeUseCaseControlTest {
         public void deleteById(Long id) {}
     }
 
-    // ----------------------------------------------------------
-    // 1) Thêm xe mới thành công
-    // ----------------------------------------------------------
     @Test
     void testAddMotorbike_New_Success() {
         MockPresenter presenter = new MockPresenter();
@@ -110,9 +101,6 @@ class AddMotorbikeUseCaseControlTest {
         assertEquals("Winner X", presenter.receivedData.getMotorbike().name);
     }
 
-    // ----------------------------------------------------------
-    // 2) Đã tồn tại xe → cộng thêm tồn kho
-    // ----------------------------------------------------------
     @Test
     void testAddMotorbike_Existing_UpdateStock() {
         MockPresenter presenter = new MockPresenter();
@@ -156,9 +144,6 @@ class AddMotorbikeUseCaseControlTest {
         assertEquals(12, presenter.receivedData.getMotorbike().stock);
     }
 
-    // ----------------------------------------------------------
-    // 3) Name không hợp lệ → lỗi validate
-    // ----------------------------------------------------------
     @Test
     void testAddMotorbike_InvalidName() {
         MockPresenter presenter = new MockPresenter();
@@ -188,9 +173,6 @@ class AddMotorbikeUseCaseControlTest {
         assertNotNull(presenter.receivedData.getErrorMessage());
     }
 
-    // ----------------------------------------------------------
-    // 4) Price <= 0 → lỗi validate
-    // ----------------------------------------------------------
     @Test
     void testAddMotorbike_InvalidPrice() {
         MockPresenter presenter = new MockPresenter();
@@ -220,9 +202,6 @@ class AddMotorbikeUseCaseControlTest {
         assertNotNull(presenter.receivedData.getErrorMessage());
     }
 
-    // ----------------------------------------------------------
-    // 5) Repository ném exception → SYSTEM_ERROR
-    // ----------------------------------------------------------
     @Test
     void testAddMotorbike_RepositoryThrows() {
         MockPresenter presenter = new MockPresenter();
