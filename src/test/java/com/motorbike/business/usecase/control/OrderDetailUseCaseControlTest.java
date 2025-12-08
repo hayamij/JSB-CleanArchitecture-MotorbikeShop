@@ -1,4 +1,4 @@
-﻿package com.motorbike.business.usecase.control;
+package com.motorbike.business.usecase.control;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

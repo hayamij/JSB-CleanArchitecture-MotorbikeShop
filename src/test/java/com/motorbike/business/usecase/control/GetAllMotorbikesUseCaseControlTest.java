@@ -1,4 +1,4 @@
-﻿package com.motorbike.business.usecase.control;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.GetAllMotorbikesOutputData;
 import com.motorbike.business.dto.motorbike.GetAllMotorbikesOutputData.MotorbikeItem;

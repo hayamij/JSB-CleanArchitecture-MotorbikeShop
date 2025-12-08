@@ -1,4 +1,4 @@
-﻿package com.motorbike.business.usecase.control;
+package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.DeleteMotorbikeOutputData;
