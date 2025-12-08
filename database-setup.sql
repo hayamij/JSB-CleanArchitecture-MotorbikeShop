@@ -248,12 +248,12 @@ GO
 -- Sample users
 SET IDENTITY_INSERT tai_khoan ON;
 INSERT INTO tai_khoan (ma_tai_khoan, ho_ten, email, ten_dang_nhap, mat_khau, so_dien_thoai, dia_chi, vai_tro) VALUES
-(1, N'Quản Trị Viên', N'admin@motorbike.com', N'admin', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0901234567', N'Ba Dinh, Ha Noi', N'ADMIN'),
+(6, N'Quản Trị Viên', N'admin@motorbike.com', N'admin', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0901234567', N'Ba Dinh, Ha Noi', N'ADMIN'),
 (2, N'Nguyễn Văn A', N'customer1@gmail.com', N'customer1', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0912345678', N'TP.HCM', N'CUSTOMER'),
 (3, N'Trần Thị B', N'customer2@gmail.com', N'customer2', N'$2a$10$eImiTXuWVxfM37uY4JANjOhsjpKCwCNR.kUOCpljHhSuZ2qvBVeGG', N'0923456789', N'Da Nang', N'CUSTOMER'),
 (4, N'Admin Two', N'admin@gmail.com', N'admin2', N'123', N'0909999999', N'Ba Dinh, Ha Noi', N'ADMIN'),
 (5, N'Lê Văn C', N'user@gmail.com', N'user1', N'user', N'0911111111', N'TP.HCM', N'CUSTOMER'),
-(6, N'Nguyen Quang Tuan Phuong', N'nqtuanp2005@gmail.com', N'hayami', N'123456', N'0369164853', N'Ba Dinh, Hanoi', N'CUSTOMER'),
+(1, N'Nguyen Quang Tuan Phuong', N'nqtuanp2005@gmail.com', N'hayami', N'123456', N'0369164853', N'Ba Dinh, Hanoi', N'CUSTOMER'),
 (7, N'Phạm Thị D', N'phuong@gmail.com', N'hayamij', N'123456', N'0369164853', N'120 Yen Lang', N'CUSTOMER');
 SET IDENTITY_INSERT tai_khoan OFF;
 GO
@@ -461,7 +461,7 @@ GO
 SET IDENTITY_INSERT gio_hang ON;
 INSERT INTO gio_hang (ma_gio_hang, ma_tai_khoan, tong_tien) VALUES
 (1, 2, 0.00),
-(2, 3, 0.00);
+(3, 1, 0.00);
 SET IDENTITY_INSERT gio_hang OFF;
 GO
 
