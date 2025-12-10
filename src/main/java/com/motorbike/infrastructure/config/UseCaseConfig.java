@@ -1,79 +1,166 @@
 package com.motorbike.infrastructure.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.annotation.RequestScope;
-
-import com.motorbike.adapters.presenters.CreateUserPresenter;
+import com.motorbike.adapters.presenters.AddAccessoryPresenter;
 import com.motorbike.adapters.presenters.AddMotorbikePresenter;
-import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
-import com.motorbike.business.usecase.control.AddMotorbikeUseCaseControl;
-import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
-import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
 import com.motorbike.adapters.presenters.AddToCartPresenter;
+import com.motorbike.adapters.presenters.AddUserPresenter;
 import com.motorbike.adapters.presenters.CancelOrderPresenter;
 import com.motorbike.adapters.presenters.CheckoutPresenter;
 import com.motorbike.adapters.presenters.CreateAccessoryPresenter;
+import com.motorbike.adapters.presenters.CreateUserPresenter;
+import com.motorbike.adapters.presenters.DeleteAccessoryPresenter;
+import com.motorbike.adapters.presenters.DeleteMotorbikePresenter;
+import com.motorbike.adapters.presenters.DeleteUserPresenter;
+import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
 import com.motorbike.adapters.presenters.GetAllMotorbikesPresenter;
+import com.motorbike.adapters.presenters.GetAllProductsPresenter;
+import com.motorbike.adapters.presenters.GetAllUsersPresenter;
+import com.motorbike.adapters.presenters.GetOrderDetailPresenter;
+import com.motorbike.adapters.presenters.GetTopProductsPresenter;
+import com.motorbike.adapters.presenters.GetValidOrderStatusesPresenter;
 import com.motorbike.adapters.presenters.ListAllOrdersPresenter;
 import com.motorbike.adapters.presenters.LoginPresenter;
 import com.motorbike.adapters.presenters.ProductDetailPresenter;
 import com.motorbike.adapters.presenters.RegisterPresenter;
+import com.motorbike.adapters.presenters.SearchAccessoriesPresenter;
 import com.motorbike.adapters.presenters.SearchMotorbikesPresenter;
+import com.motorbike.adapters.presenters.SearchOrdersPresenter;
+import com.motorbike.adapters.presenters.SearchUsersPresenter;
+import com.motorbike.adapters.presenters.ToggleProductVisibilityPresenter;
+import com.motorbike.adapters.presenters.UpdateAccessoryPresenter;
 import com.motorbike.adapters.presenters.UpdateCartQuantityPresenter;
+import com.motorbike.adapters.presenters.UpdateMotorbikePresenter;
+import com.motorbike.adapters.presenters.UpdateOrderPresenter;
+import com.motorbike.adapters.presenters.UpdateUserPresenter;
 import com.motorbike.adapters.presenters.ViewCartPresenter;
 import com.motorbike.adapters.repositories.MotorbikeRepositoryAdapter;
-import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
-import com.motorbike.adapters.presenters.SearchAccessoriesPresenter;
+import com.motorbike.adapters.viewmodels.AddAccessoryViewModel;
+import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
+import com.motorbike.adapters.viewmodels.AddUserViewModel;
 import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
+import com.motorbike.adapters.viewmodels.CreateAccessoryViewModel;
+import com.motorbike.adapters.viewmodels.CreateUserViewModel;
+import com.motorbike.adapters.viewmodels.DeleteAccessoryViewModel;
+import com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel;
+import com.motorbike.adapters.viewmodels.DeleteUserViewModel;
+import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
+import com.motorbike.adapters.viewmodels.GetAllProductsViewModel;
+import com.motorbike.adapters.viewmodels.GetAllUsersViewModel;
+import com.motorbike.adapters.viewmodels.GetOrderDetailViewModel;
+import com.motorbike.adapters.viewmodels.GetTopProductsViewModel;
+import com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
 import com.motorbike.adapters.viewmodels.LoginViewModel;
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.adapters.viewmodels.RegisterViewModel;
-import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
-import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
-import com.motorbike.adapters.viewmodels.ViewCartViewModel;
-import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.SearchAccessoriesViewModel;
+import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
+import com.motorbike.adapters.viewmodels.SearchOrdersViewModel;
+import com.motorbike.adapters.viewmodels.SearchUsersViewModel;
+import com.motorbike.adapters.viewmodels.ToggleProductVisibilityViewModel;
+import com.motorbike.adapters.viewmodels.UpdateAccessoryViewModel;
+import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
+import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
+import com.motorbike.adapters.viewmodels.UpdateOrderViewModel;
+import com.motorbike.adapters.viewmodels.UpdateUserViewModel;
+import com.motorbike.adapters.viewmodels.ViewCartViewModel;
+import com.motorbike.business.ports.repository.AccessoryRepository;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.UserRepository;
+import com.motorbike.business.usecase.control.AddAccessoryUseCaseControl;
+import com.motorbike.business.usecase.control.AddMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.AddToCartUseCaseControl;
+import com.motorbike.business.usecase.control.AddUserUseCaseControl;
 import com.motorbike.business.usecase.control.CancelOrderUseCaseControl;
 import com.motorbike.business.usecase.control.CheckoutUseCaseControl;
+import com.motorbike.business.usecase.control.CreateAccessoryUseCaseControl;
+import com.motorbike.business.usecase.control.CreateUserUseCaseControl;
+import com.motorbike.business.usecase.control.DeleteAccessoryUseCaseControl;
+import com.motorbike.business.usecase.control.DeleteMotorbikeUseCaseControl;
+import com.motorbike.business.usecase.control.DeleteUserUseCaseControl;
+import com.motorbike.business.usecase.control.GetAllAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.GetAllMotorbikesUseCaseControl;
+import com.motorbike.business.usecase.control.GetAllProductsUseCaseControl;
+import com.motorbike.business.usecase.control.GetAllUsersUseCaseControl;
+import com.motorbike.business.usecase.control.GetOrderDetailUseCaseControl;
 import com.motorbike.business.usecase.control.GetProductDetailUseCaseControl;
+import com.motorbike.business.usecase.control.GetTopProductsUseCaseControl;
+import com.motorbike.business.usecase.control.GetValidOrderStatusesUseCaseControl;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
 import com.motorbike.business.usecase.control.LoginUseCaseControl;
 import com.motorbike.business.usecase.control.RegisterUseCaseControl;
-import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
-import com.motorbike.business.usecase.control.GetAllAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.SearchAccessoriesUseCaseControl;
+import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
+import com.motorbike.business.usecase.control.SearchOrdersUseCaseControl;
+import com.motorbike.business.usecase.control.SearchUsersUseCaseControl;
+import com.motorbike.business.usecase.control.ToggleProductVisibilityUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateAccessoryUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateOrderUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateUserUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
-import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
-import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.AddToCartInputBoundary;
+import com.motorbike.business.usecase.input.CancelOrderInputBoundary;
+import com.motorbike.business.usecase.input.CheckoutInputBoundary;
+import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
 import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
+import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.GetAllProductsInputBoundary;
+import com.motorbike.business.usecase.input.GetOrderDetailInputBoundary;
+import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
+import com.motorbike.business.usecase.input.GetValidOrderStatusesInputBoundary;
+import com.motorbike.business.usecase.input.ListAllOrdersInputBoundary;
+import com.motorbike.business.usecase.input.LoginInputBoundary;
+import com.motorbike.business.usecase.input.RegisterInputBoundary;
 import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
+import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.ToggleProductVisibilityInputBoundary;
+import com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary;
+import com.motorbike.business.usecase.input.ViewCartInputBoundary;
+import com.motorbike.business.usecase.output.AddAccessoryOutputBoundary;
+import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
+import com.motorbike.business.usecase.output.AddUserOutputBoundary;
 import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 import com.motorbike.business.usecase.output.CancelOrderOutputBoundary;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
+import com.motorbike.business.usecase.output.CreateAccessoryOutputBoundary;
+import com.motorbike.business.usecase.output.CreateUserOutputBoundary;
+import com.motorbike.business.usecase.output.DeleteAccessoryOutputBoundary;
+import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
+import com.motorbike.business.usecase.output.DeleteUserOutputBoundary;
+import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.GetAllMotorbikesOutputBoundary;
+import com.motorbike.business.usecase.output.GetAllProductsOutputBoundary;
+import com.motorbike.business.usecase.output.GetAllUsersOutputBoundary;
+import com.motorbike.business.usecase.output.GetOrderDetailOutputBoundary;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
+import com.motorbike.business.usecase.output.GetTopProductsOutputBoundary;
+import com.motorbike.business.usecase.output.GetValidOrderStatusesOutputBoundary;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.business.usecase.output.RegisterOutputBoundary;
-import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
-import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
+import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
+import com.motorbike.business.usecase.output.SearchOrdersOutputBoundary;
+import com.motorbike.business.usecase.output.SearchUsersOutputBoundary;
+import com.motorbike.business.usecase.output.ToggleProductVisibilityOutputBoundary;
+import com.motorbike.business.usecase.output.UpdateAccessoryOutputBoundary;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
+import com.motorbike.business.usecase.output.UpdateMotorbikeOutputBoundary;
+import com.motorbike.business.usecase.output.UpdateOrderOutputBoundary;
+import com.motorbike.business.usecase.output.UpdateUserOutputBoundary;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
 import com.motorbike.infrastructure.persistence.jpa.repositories.XeMayJpaRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.annotation.RequestScope;
 
 @Configuration
 public class UseCaseConfig {
@@ -121,11 +208,11 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public com.motorbike.business.usecase.input.LoginInputBoundary loginUseCase(
+    public LoginInputBoundary loginUseCase(
             LoginOutputBoundary loginPresenter,
             UserRepository userRepository,
             CartRepository cartRepository) {
-        return (com.motorbike.business.usecase.input.LoginInputBoundary) new LoginUseCaseControl(loginPresenter, userRepository, cartRepository);
+        return new LoginUseCaseControl(loginPresenter, userRepository, cartRepository);
     }
     
     @Bean
@@ -134,11 +221,11 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public com.motorbike.business.usecase.input.RegisterInputBoundary registerUseCase(
+    public RegisterInputBoundary registerUseCase(
             RegisterOutputBoundary registerPresenter,
             UserRepository userRepository,
             CartRepository cartRepository) {
-        return (com.motorbike.business.usecase.input.RegisterInputBoundary) new RegisterUseCaseControl(registerPresenter, userRepository, cartRepository);
+        return new RegisterUseCaseControl(registerPresenter, userRepository, cartRepository);
     }
     
     @Bean
@@ -147,7 +234,7 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public com.motorbike.business.usecase.input.GetProductDetailInputBoundary getProductDetailUseCase(
+    public GetProductDetailInputBoundary getProductDetailUseCase(
             GetProductDetailOutputBoundary productDetailPresenter,
             ProductRepository productRepository) {
         return new GetProductDetailUseCaseControl(productDetailPresenter, productRepository);
@@ -159,11 +246,11 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public com.motorbike.business.usecase.input.AddToCartInputBoundary addToCartUseCase(
+    public AddToCartInputBoundary addToCartUseCase(
             AddToCartOutputBoundary addToCartPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        return (com.motorbike.business.usecase.input.AddToCartInputBoundary) new AddToCartUseCaseControl(addToCartPresenter, cartRepository, productRepository);
+        return new AddToCartUseCaseControl(addToCartPresenter, cartRepository, productRepository);
     }
     
     @Bean
@@ -172,11 +259,11 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public com.motorbike.business.usecase.input.ViewCartInputBoundary viewCartUseCase(
+    public ViewCartInputBoundary viewCartUseCase(
             ViewCartOutputBoundary viewCartPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository) {
-        return (com.motorbike.business.usecase.input.ViewCartInputBoundary) new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository);
+        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository);
     }
     
     @Bean
@@ -185,10 +272,10 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary updateCartQuantityUseCase(
+    public UpdateCartQuantityInputBoundary updateCartQuantityUseCase(
             UpdateCartQuantityOutputBoundary updateCartQuantityPresenter,
             CartRepository cartRepository) {
-        return (com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary) new UpdateCartQuantityUseCaseControl(updateCartQuantityPresenter, cartRepository);
+        return new UpdateCartQuantityUseCaseControl(updateCartQuantityPresenter, cartRepository);
     }
     
     @Bean
@@ -197,7 +284,7 @@ public class UseCaseConfig {
     }
     
     @Bean
-    public com.motorbike.business.usecase.input.CheckoutInputBoundary checkoutUseCase(
+    public CheckoutInputBoundary checkoutUseCase(
             CheckoutOutputBoundary checkoutPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository,
@@ -218,10 +305,10 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public com.motorbike.business.usecase.input.ListAllOrdersInputBoundary listAllOrdersUseCase(
+    public ListAllOrdersInputBoundary listAllOrdersUseCase(
             ListAllOrdersOutputBoundary listAllOrdersPresenter,
             OrderRepository orderRepository) {
-        return (com.motorbike.business.usecase.input.ListAllOrdersInputBoundary) new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository);
+        return new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository);
     }
 
     @Bean
@@ -236,11 +323,11 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public com.motorbike.business.usecase.input.CancelOrderInputBoundary cancelOrderUseCase(
+    public CancelOrderInputBoundary cancelOrderUseCase(
             CancelOrderOutputBoundary cancelOrderPresenter,
             OrderRepository orderRepository,
             ProductRepository productRepository) {
-        return (com.motorbike.business.usecase.input.CancelOrderInputBoundary) new CancelOrderUseCaseControl(cancelOrderPresenter, orderRepository, productRepository);
+        return new CancelOrderUseCaseControl(cancelOrderPresenter, orderRepository, productRepository);
     }
 
     @Bean
@@ -249,7 +336,7 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.CancelOrderUseCaseControl cancelOrderUseCaseControl(
+    public CancelOrderUseCaseControl cancelOrderUseCaseControl(
             CancelOrderOutputBoundary cancelOrderPresenter,
             OrderRepository orderRepository,
             ProductRepository productRepository) {
@@ -392,411 +479,411 @@ public class UseCaseConfig {
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.GetAllUsersViewModel getAllUsersViewModel() {
-        return new com.motorbike.adapters.viewmodels.GetAllUsersViewModel();
+    public GetAllUsersViewModel getAllUsersViewModel() {
+        return new GetAllUsersViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.GetAllUsersUseCaseControl getAllUsersUseCase(
-            com.motorbike.business.usecase.output.GetAllUsersOutputBoundary presenter,
+    public GetAllUsersUseCaseControl getAllUsersUseCase(
+            GetAllUsersOutputBoundary presenter,
             UserRepository userRepository
     ) {
-        return new com.motorbike.business.usecase.control.GetAllUsersUseCaseControl(presenter, userRepository);
+        return new GetAllUsersUseCaseControl(presenter, userRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.GetAllUsersOutputBoundary getAllUsersPresenter(
-            com.motorbike.adapters.viewmodels.GetAllUsersViewModel viewModel
+    public GetAllUsersOutputBoundary getAllUsersPresenter(
+            GetAllUsersViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.GetAllUsersPresenter(viewModel);
+        return new GetAllUsersPresenter(viewModel);
     }
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.SearchUsersViewModel searchUsersViewModel() {
-        return new com.motorbike.adapters.viewmodels.SearchUsersViewModel();
+    public SearchUsersViewModel searchUsersViewModel() {
+        return new SearchUsersViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.SearchUsersUseCaseControl searchUsersUseCase(
-            com.motorbike.business.usecase.output.SearchUsersOutputBoundary presenter,
+    public SearchUsersUseCaseControl searchUsersUseCase(
+            SearchUsersOutputBoundary presenter,
             UserRepository userRepository
     ) {
-        return new com.motorbike.business.usecase.control.SearchUsersUseCaseControl(presenter, userRepository);
+        return new SearchUsersUseCaseControl(presenter, userRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.SearchUsersOutputBoundary searchUsersPresenter(
-            com.motorbike.adapters.viewmodels.SearchUsersViewModel viewModel
+    public SearchUsersOutputBoundary searchUsersPresenter(
+            SearchUsersViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.SearchUsersPresenter(viewModel);
+        return new SearchUsersPresenter(viewModel);
     }
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.DeleteUserViewModel deleteUserViewModel() {
-        return new com.motorbike.adapters.viewmodels.DeleteUserViewModel();
+    public DeleteUserViewModel deleteUserViewModel() {
+        return new DeleteUserViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.DeleteUserUseCaseControl deleteUserUseCase(
-            com.motorbike.business.usecase.output.DeleteUserOutputBoundary presenter,
+    public DeleteUserUseCaseControl deleteUserUseCase(
+            DeleteUserOutputBoundary presenter,
             UserRepository userRepository
     ) {
-        return new com.motorbike.business.usecase.control.DeleteUserUseCaseControl(presenter, userRepository);
+        return new DeleteUserUseCaseControl(presenter, userRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.DeleteUserOutputBoundary deleteUserPresenter(
-            com.motorbike.adapters.viewmodels.DeleteUserViewModel viewModel
+    public DeleteUserOutputBoundary deleteUserPresenter(
+            DeleteUserViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.DeleteUserPresenter(viewModel);
+        return new DeleteUserPresenter(viewModel);
     }
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.AddUserViewModel addUserViewModel() {
-        return new com.motorbike.adapters.viewmodels.AddUserViewModel();
+    public AddUserViewModel addUserViewModel() {
+        return new AddUserViewModel();
     }
 
 @Bean
 @RequestScope
-public com.motorbike.adapters.viewmodels.CreateUserViewModel createUserViewModel() {
-    return new com.motorbike.adapters.viewmodels.CreateUserViewModel();
+public CreateUserViewModel createUserViewModel() {
+    return new CreateUserViewModel();
 }
 
 @Bean
-public com.motorbike.business.usecase.control.AddUserUseCaseControl addUserUseCase(
-        com.motorbike.business.usecase.output.AddUserOutputBoundary presenter,
+public AddUserUseCaseControl addUserUseCase(
+        AddUserOutputBoundary presenter,
         UserRepository userRepository
 ) {
-    return new com.motorbike.business.usecase.control.AddUserUseCaseControl(presenter, userRepository);
+    return new AddUserUseCaseControl(presenter, userRepository);
 }
 
 @Bean
-public com.motorbike.business.usecase.output.AddUserOutputBoundary addUserOutputBoundary(
-        com.motorbike.adapters.viewmodels.AddUserViewModel viewModel
+public AddUserOutputBoundary addUserOutputBoundary(
+        AddUserViewModel viewModel
 ) {
-    return new com.motorbike.adapters.presenters.AddUserPresenter(viewModel);
+    return new AddUserPresenter(viewModel);
 }
 
 @Bean
-public com.motorbike.business.usecase.control.CreateUserUseCaseControl createUserUseCaseControl(
-        com.motorbike.business.usecase.output.CreateUserOutputBoundary presenter,
+public CreateUserUseCaseControl createUserUseCaseControl(
+        CreateUserOutputBoundary presenter,
         UserRepository userRepository
 ) {
-    return new com.motorbike.business.usecase.control.CreateUserUseCaseControl(presenter, userRepository);
+    return new CreateUserUseCaseControl(presenter, userRepository);
 }
 
 @Bean
-public com.motorbike.business.usecase.output.CreateUserOutputBoundary createUserPresenter(
-        com.motorbike.adapters.viewmodels.CreateUserViewModel viewModel
+public CreateUserOutputBoundary createUserPresenter(
+        CreateUserViewModel viewModel
 ) {
     return new CreateUserPresenter(viewModel);
 }    @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.UpdateUserViewModel updateUserViewModel() {
-        return new com.motorbike.adapters.viewmodels.UpdateUserViewModel();
+    public UpdateUserViewModel updateUserViewModel() {
+        return new UpdateUserViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.UpdateUserUseCaseControl updateUserUseCase(
-            com.motorbike.business.usecase.output.UpdateUserOutputBoundary presenter,
+    public UpdateUserUseCaseControl updateUserUseCase(
+            UpdateUserOutputBoundary presenter,
             UserRepository userRepository
     ) {
-        return new com.motorbike.business.usecase.control.UpdateUserUseCaseControl(presenter, userRepository);
+        return new UpdateUserUseCaseControl(presenter, userRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.UpdateUserOutputBoundary updateUserPresenter(
-            com.motorbike.adapters.viewmodels.UpdateUserViewModel viewModel
+    public UpdateUserOutputBoundary updateUserPresenter(
+            UpdateUserViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.UpdateUserPresenter(viewModel);
+        return new UpdateUserPresenter(viewModel);
     }
 
     // ===== MOTORBIKE MANAGEMENT USE CASES =====
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel deleteMotorbikeViewModel() {
-        return new com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel();
+    public DeleteMotorbikeViewModel deleteMotorbikeViewModel() {
+        return new DeleteMotorbikeViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.DeleteMotorbikeUseCaseControl deleteMotorbikeUseCase(
-            com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary presenter,
+    public DeleteMotorbikeUseCaseControl deleteMotorbikeUseCase(
+            DeleteMotorbikeOutputBoundary presenter,
             ProductRepository productRepository
     ) {
-        return new com.motorbike.business.usecase.control.DeleteMotorbikeUseCaseControl(presenter, productRepository);
+        return new DeleteMotorbikeUseCaseControl(presenter, productRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary deleteMotorbikePresenter(
-            com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel viewModel
+    public DeleteMotorbikeOutputBoundary deleteMotorbikePresenter(
+            DeleteMotorbikeViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.DeleteMotorbikePresenter(viewModel);
+        return new DeleteMotorbikePresenter(viewModel);
     }
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel updateMotorbikeViewModel() {
-        return new com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel();
+    public UpdateMotorbikeViewModel updateMotorbikeViewModel() {
+        return new UpdateMotorbikeViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl updateMotorbikeUseCase(
-            com.motorbike.business.usecase.output.UpdateMotorbikeOutputBoundary presenter,
+    public UpdateMotorbikeUseCaseControl updateMotorbikeUseCase(
+            UpdateMotorbikeOutputBoundary presenter,
             ProductRepository productRepository
     ) {
-        return new com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl(presenter, productRepository);
+        return new UpdateMotorbikeUseCaseControl(presenter, productRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.UpdateMotorbikeOutputBoundary updateMotorbikePresenter(
-            com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel viewModel
+    public UpdateMotorbikeOutputBoundary updateMotorbikePresenter(
+            UpdateMotorbikeViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.UpdateMotorbikePresenter(viewModel);
+        return new UpdateMotorbikePresenter(viewModel);
     }
 
     // ===== ACCESSORY MANAGEMENT USE CASES =====
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.AddAccessoryViewModel addAccessoryViewModel() {
-        return new com.motorbike.adapters.viewmodels.AddAccessoryViewModel();
+    public AddAccessoryViewModel addAccessoryViewModel() {
+        return new AddAccessoryViewModel();
     }
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.CreateAccessoryViewModel createAccessoryViewModel() {
-        return new com.motorbike.adapters.viewmodels.CreateAccessoryViewModel();
+    public CreateAccessoryViewModel createAccessoryViewModel() {
+        return new CreateAccessoryViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.CreateAccessoryUseCaseControl createAccessoryUseCaseControl(
-            com.motorbike.business.usecase.output.CreateAccessoryOutputBoundary presenter,
+    public CreateAccessoryUseCaseControl createAccessoryUseCaseControl(
+            CreateAccessoryOutputBoundary presenter,
             ProductRepository productRepository
     ) {
-        return new com.motorbike.business.usecase.control.CreateAccessoryUseCaseControl(presenter, productRepository);
+        return new CreateAccessoryUseCaseControl(presenter, productRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.AddAccessoryUseCaseControl addAccessoryUseCase(
-            com.motorbike.business.usecase.output.AddAccessoryOutputBoundary presenter,
-            com.motorbike.business.ports.repository.AccessoryRepository accessoryRepository
+    public AddAccessoryUseCaseControl addAccessoryUseCase(
+            AddAccessoryOutputBoundary presenter,
+            AccessoryRepository accessoryRepository
     ) {
-        return new com.motorbike.business.usecase.control.AddAccessoryUseCaseControl(presenter, accessoryRepository);
+        return new AddAccessoryUseCaseControl(presenter, accessoryRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.AddAccessoryOutputBoundary addAccessoryOutputBoundary(
-            com.motorbike.adapters.viewmodels.AddAccessoryViewModel viewModel
+    public AddAccessoryOutputBoundary addAccessoryOutputBoundary(
+            AddAccessoryViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.AddAccessoryPresenter(viewModel);
+        return new AddAccessoryPresenter(viewModel);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.CreateAccessoryOutputBoundary createAccessoryPresenter(
-            com.motorbike.adapters.viewmodels.CreateAccessoryViewModel viewModel
+    public CreateAccessoryOutputBoundary createAccessoryPresenter(
+            CreateAccessoryViewModel viewModel
     ) {
         return new CreateAccessoryPresenter(viewModel);
     }
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.UpdateAccessoryViewModel updateAccessoryViewModel() {
-        return new com.motorbike.adapters.viewmodels.UpdateAccessoryViewModel();
+    public UpdateAccessoryViewModel updateAccessoryViewModel() {
+        return new UpdateAccessoryViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.UpdateAccessoryUseCaseControl updateAccessoryUseCase(
-            com.motorbike.business.usecase.output.UpdateAccessoryOutputBoundary presenter,
+    public UpdateAccessoryUseCaseControl updateAccessoryUseCase(
+            UpdateAccessoryOutputBoundary presenter,
             ProductRepository productRepository
     ) {
-        return new com.motorbike.business.usecase.control.UpdateAccessoryUseCaseControl(presenter, productRepository);
+        return new UpdateAccessoryUseCaseControl(presenter, productRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.UpdateAccessoryOutputBoundary updateAccessoryPresenter(
-            com.motorbike.adapters.viewmodels.UpdateAccessoryViewModel viewModel
+    public UpdateAccessoryOutputBoundary updateAccessoryPresenter(
+            UpdateAccessoryViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.UpdateAccessoryPresenter(viewModel);
+        return new UpdateAccessoryPresenter(viewModel);
     }
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.DeleteAccessoryViewModel deleteAccessoryViewModel() {
-        return new com.motorbike.adapters.viewmodels.DeleteAccessoryViewModel();
+    public DeleteAccessoryViewModel deleteAccessoryViewModel() {
+        return new DeleteAccessoryViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.DeleteAccessoryUseCaseControl deleteAccessoryUseCase(
-            com.motorbike.business.usecase.output.DeleteAccessoryOutputBoundary presenter,
+    public DeleteAccessoryUseCaseControl deleteAccessoryUseCase(
+            DeleteAccessoryOutputBoundary presenter,
             ProductRepository productRepository
     ) {
-        return new com.motorbike.business.usecase.control.DeleteAccessoryUseCaseControl(presenter, productRepository);
+        return new DeleteAccessoryUseCaseControl(presenter, productRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.DeleteAccessoryOutputBoundary deleteAccessoryPresenter(
-            com.motorbike.adapters.viewmodels.DeleteAccessoryViewModel viewModel
+    public DeleteAccessoryOutputBoundary deleteAccessoryPresenter(
+            DeleteAccessoryViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.DeleteAccessoryPresenter(viewModel);
+        return new DeleteAccessoryPresenter(viewModel);
     }
 
     // ===== ORDER MANAGEMENT USE CASES =====
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.SearchOrdersViewModel searchOrdersViewModel() {
-        return new com.motorbike.adapters.viewmodels.SearchOrdersViewModel();
+    public SearchOrdersViewModel searchOrdersViewModel() {
+        return new SearchOrdersViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.SearchOrdersUseCaseControl searchOrdersUseCase(
-            com.motorbike.business.usecase.output.SearchOrdersOutputBoundary presenter,
+    public SearchOrdersUseCaseControl searchOrdersUseCase(
+            SearchOrdersOutputBoundary presenter,
             OrderRepository orderRepository,
             UserRepository userRepository
     ) {
-        return new com.motorbike.business.usecase.control.SearchOrdersUseCaseControl(presenter, orderRepository, userRepository);
+        return new SearchOrdersUseCaseControl(presenter, orderRepository, userRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.SearchOrdersOutputBoundary searchOrdersPresenter(
-            com.motorbike.adapters.viewmodels.SearchOrdersViewModel viewModel
+    public SearchOrdersOutputBoundary searchOrdersPresenter(
+            SearchOrdersViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.SearchOrdersPresenter(viewModel);
+        return new SearchOrdersPresenter(viewModel);
     }
 
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.UpdateOrderViewModel updateOrderViewModel() {
-        return new com.motorbike.adapters.viewmodels.UpdateOrderViewModel();
+    public UpdateOrderViewModel updateOrderViewModel() {
+        return new UpdateOrderViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.UpdateOrderUseCaseControl updateOrderUseCase(
-            com.motorbike.business.usecase.output.UpdateOrderOutputBoundary presenter,
+    public UpdateOrderUseCaseControl updateOrderUseCase(
+            UpdateOrderOutputBoundary presenter,
             OrderRepository orderRepository
     ) {
-        return new com.motorbike.business.usecase.control.UpdateOrderUseCaseControl(presenter, orderRepository);
+        return new UpdateOrderUseCaseControl(presenter, orderRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.UpdateOrderOutputBoundary updateOrderPresenter(
-            com.motorbike.adapters.viewmodels.UpdateOrderViewModel viewModel
+    public UpdateOrderOutputBoundary updateOrderPresenter(
+            UpdateOrderViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.UpdateOrderPresenter(viewModel);
+        return new UpdateOrderPresenter(viewModel);
     }
 
     // GetAllProducts Use Case
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.GetAllProductsViewModel getAllProductsViewModel() {
-        return new com.motorbike.adapters.viewmodels.GetAllProductsViewModel();
+    public GetAllProductsViewModel getAllProductsViewModel() {
+        return new GetAllProductsViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.input.GetAllProductsInputBoundary getAllProductsUseCase(
-            com.motorbike.business.usecase.output.GetAllProductsOutputBoundary presenter,
+    public GetAllProductsInputBoundary getAllProductsUseCase(
+            GetAllProductsOutputBoundary presenter,
             ProductRepository productRepository
     ) {
-        return new com.motorbike.business.usecase.control.GetAllProductsUseCaseControl(presenter, productRepository);
+        return new GetAllProductsUseCaseControl(presenter, productRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.GetAllProductsOutputBoundary getAllProductsPresenter(
-            com.motorbike.adapters.viewmodels.GetAllProductsViewModel viewModel
+    public GetAllProductsOutputBoundary getAllProductsPresenter(
+            GetAllProductsViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.GetAllProductsPresenter(viewModel);
+        return new GetAllProductsPresenter(viewModel);
     }
 
     // GetOrderDetail Use Case
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.GetOrderDetailViewModel getOrderDetailViewModel() {
-        return new com.motorbike.adapters.viewmodels.GetOrderDetailViewModel();
+    public GetOrderDetailViewModel getOrderDetailViewModel() {
+        return new GetOrderDetailViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.input.GetOrderDetailInputBoundary getOrderDetailUseCase(
-            com.motorbike.business.usecase.output.GetOrderDetailOutputBoundary presenter,
+    public GetOrderDetailInputBoundary getOrderDetailUseCase(
+            GetOrderDetailOutputBoundary presenter,
             OrderRepository orderRepository
     ) {
-        return new com.motorbike.business.usecase.control.GetOrderDetailUseCaseControl(presenter, orderRepository);
+        return new GetOrderDetailUseCaseControl(presenter, orderRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.GetOrderDetailOutputBoundary getOrderDetailPresenter(
-            com.motorbike.adapters.viewmodels.GetOrderDetailViewModel viewModel
+    public GetOrderDetailOutputBoundary getOrderDetailPresenter(
+            GetOrderDetailViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.GetOrderDetailPresenter(viewModel);
+        return new GetOrderDetailPresenter(viewModel);
     }
 
     // GetValidOrderStatuses Use Case
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel getValidOrderStatusesViewModel() {
-        return new com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel();
+    public GetValidOrderStatusesViewModel getValidOrderStatusesViewModel() {
+        return new GetValidOrderStatusesViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.input.GetValidOrderStatusesInputBoundary getValidOrderStatusesUseCase(
-            com.motorbike.business.usecase.output.GetValidOrderStatusesOutputBoundary presenter
+    public GetValidOrderStatusesInputBoundary getValidOrderStatusesUseCase(
+            GetValidOrderStatusesOutputBoundary presenter
     ) {
-        return new com.motorbike.business.usecase.control.GetValidOrderStatusesUseCaseControl(presenter);
+        return new GetValidOrderStatusesUseCaseControl(presenter);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.GetValidOrderStatusesOutputBoundary getValidOrderStatusesPresenter(
-            com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel viewModel
+    public GetValidOrderStatusesOutputBoundary getValidOrderStatusesPresenter(
+            GetValidOrderStatusesViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.GetValidOrderStatusesPresenter(viewModel);
+        return new GetValidOrderStatusesPresenter(viewModel);
     }
 
     // ToggleProductVisibility Use Case
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.ToggleProductVisibilityViewModel toggleProductVisibilityViewModel() {
-        return new com.motorbike.adapters.viewmodels.ToggleProductVisibilityViewModel();
+    public ToggleProductVisibilityViewModel toggleProductVisibilityViewModel() {
+        return new ToggleProductVisibilityViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.input.ToggleProductVisibilityInputBoundary toggleProductVisibilityUseCase(
-            com.motorbike.business.usecase.output.ToggleProductVisibilityOutputBoundary presenter,
+    public ToggleProductVisibilityInputBoundary toggleProductVisibilityUseCase(
+            ToggleProductVisibilityOutputBoundary presenter,
             ProductRepository productRepository
     ) {
-        return new com.motorbike.business.usecase.control.ToggleProductVisibilityUseCaseControl(presenter, productRepository);
+        return new ToggleProductVisibilityUseCaseControl(presenter, productRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.ToggleProductVisibilityOutputBoundary toggleProductVisibilityPresenter(
-            com.motorbike.adapters.viewmodels.ToggleProductVisibilityViewModel viewModel
+    public ToggleProductVisibilityOutputBoundary toggleProductVisibilityPresenter(
+            ToggleProductVisibilityViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.ToggleProductVisibilityPresenter(viewModel);
+        return new ToggleProductVisibilityPresenter(viewModel);
     }
 
     // ==================== GET TOP PRODUCTS USE CASE ====================
     
     @Bean
     @RequestScope
-    public com.motorbike.adapters.viewmodels.GetTopProductsViewModel getTopProductsViewModel() {
-        return new com.motorbike.adapters.viewmodels.GetTopProductsViewModel();
+    public GetTopProductsViewModel getTopProductsViewModel() {
+        return new GetTopProductsViewModel();
     }
 
     @Bean
-    public com.motorbike.business.usecase.control.GetTopProductsUseCaseControl getTopProductsUseCase(
-            com.motorbike.business.usecase.output.GetTopProductsOutputBoundary presenter,
+    public GetTopProductsUseCaseControl getTopProductsUseCase(
+            GetTopProductsOutputBoundary presenter,
             OrderRepository orderRepository
     ) {
-        return new com.motorbike.business.usecase.control.GetTopProductsUseCaseControl(presenter, orderRepository);
+        return new GetTopProductsUseCaseControl(presenter, orderRepository);
     }
 
     @Bean
-    public com.motorbike.business.usecase.output.GetTopProductsOutputBoundary getTopProductsPresenter(
-            com.motorbike.adapters.viewmodels.GetTopProductsViewModel viewModel
+    public GetTopProductsOutputBoundary getTopProductsPresenter(
+            GetTopProductsViewModel viewModel
     ) {
-        return new com.motorbike.adapters.presenters.GetTopProductsPresenter(viewModel);
+        return new GetTopProductsPresenter(viewModel);
     }
 
 }
