@@ -1,5 +1,9 @@
 package com.motorbike.infrastructure.config;
 
+import com.motorbike.adapters.presenters.ListMyOrdersPresenter;
+import com.motorbike.adapters.viewmodels.ListMyOrdersViewModel;
+import com.motorbike.business.usecase.control.ListMyOrdersUseCaseControl;
+import com.motorbike.business.usecase.output.ListMyOrdersOutputBoundary;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.annotation.RequestScope;
@@ -95,49 +99,49 @@ import com.motorbike.infrastructure.persistence.jpa.repositories.XeMayJpaReposit
 
 @Configuration
 public class UseCaseConfig {
-    
+
     @Bean
     @RequestScope
     public LoginViewModel loginViewModel() {
         return new LoginViewModel();
     }
-    
+
     @Bean
     @RequestScope
     public RegisterViewModel registerViewModel() {
         return new RegisterViewModel();
     }
-    
+
     @Bean
     @RequestScope
     public ProductDetailViewModel productDetailViewModel() {
         return new ProductDetailViewModel();
     }
-    
+
     @Bean
     @RequestScope
     public AddToCartViewModel addToCartViewModel() {
         return new AddToCartViewModel();
     }
-    
+
     @Bean
     @RequestScope
     public ViewCartViewModel viewCartViewModel() {
         return new ViewCartViewModel();
     }
-    
+
     @Bean
     @RequestScope
     public UpdateCartQuantityViewModel updateCartQuantityViewModel() {
         return new UpdateCartQuantityViewModel();
     }
-    
+
     @Bean
     @RequestScope
     public CheckoutViewModel checkoutViewModel() {
         return new CheckoutViewModel();
     }
-    
+
     @Bean
     public LoginUseCaseControl loginUseCase(
             LoginOutputBoundary loginPresenter,
@@ -145,12 +149,12 @@ public class UseCaseConfig {
             CartRepository cartRepository) {
         return new LoginUseCaseControl(loginPresenter, userRepository, cartRepository);
     }
-    
+
     @Bean
     public LoginOutputBoundary loginPresenter(LoginViewModel loginViewModel) {
         return new LoginPresenter(loginViewModel);
     }
-    
+
     @Bean
     public RegisterUseCaseControl registerUseCase(
             RegisterOutputBoundary registerPresenter,
@@ -158,24 +162,24 @@ public class UseCaseConfig {
             CartRepository cartRepository) {
         return new RegisterUseCaseControl(registerPresenter, userRepository, cartRepository);
     }
-    
+
     @Bean
     public RegisterOutputBoundary registerPresenter(RegisterViewModel registerViewModel) {
         return new RegisterPresenter(registerViewModel);
     }
-    
+
     @Bean
     public GetProductDetailUseCaseControl getProductDetailUseCase(
             GetProductDetailOutputBoundary productDetailPresenter,
             ProductRepository productRepository) {
         return new GetProductDetailUseCaseControl(productDetailPresenter, productRepository);
     }
-    
+
     @Bean
     public GetProductDetailOutputBoundary productDetailPresenter(ProductDetailViewModel productDetailViewModel) {
         return new ProductDetailPresenter(productDetailViewModel);
     }
-    
+
     @Bean
     public AddToCartUseCaseControl addToCartUseCase(
             AddToCartOutputBoundary addToCartPresenter,
@@ -183,12 +187,12 @@ public class UseCaseConfig {
             ProductRepository productRepository) {
         return new AddToCartUseCaseControl(addToCartPresenter, cartRepository, productRepository);
     }
-    
+
     @Bean
     public AddToCartOutputBoundary addToCartPresenter(AddToCartViewModel addToCartViewModel) {
         return new AddToCartPresenter(addToCartViewModel);
     }
-    
+
     @Bean
     public ViewCartUseCaseControl viewCartUseCase(
             ViewCartOutputBoundary viewCartPresenter,
@@ -196,24 +200,24 @@ public class UseCaseConfig {
             ProductRepository productRepository) {
         return new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository);
     }
-    
+
     @Bean
     public ViewCartOutputBoundary viewCartPresenter(ViewCartViewModel viewCartViewModel) {
         return new ViewCartPresenter(viewCartViewModel);
     }
-    
+
     @Bean
     public UpdateCartQuantityUseCaseControl updateCartQuantityUseCase(
             UpdateCartQuantityOutputBoundary updateCartQuantityPresenter,
             CartRepository cartRepository) {
         return new UpdateCartQuantityUseCaseControl(updateCartQuantityPresenter, cartRepository);
     }
-    
+
     @Bean
     public UpdateCartQuantityOutputBoundary updateCartQuantityPresenter(UpdateCartQuantityViewModel updateCartQuantityViewModel) {
         return new UpdateCartQuantityPresenter(updateCartQuantityViewModel);
     }
-    
+
     @Bean
     public CheckoutUseCaseControl checkoutUseCase(
             CheckoutOutputBoundary checkoutPresenter,
@@ -222,292 +226,292 @@ public class UseCaseConfig {
             OrderRepository orderRepository) {
         return new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository, orderRepository);
     }
-    
+
     @Bean
     public CheckoutOutputBoundary checkoutPresenter(CheckoutViewModel checkoutViewModel) {
         return new CheckoutPresenter(checkoutViewModel);
     }
-@Bean
-@RequestScope
-public ListAllOrdersViewModel listAllOrdersViewModel() {
-    return new ListAllOrdersViewModel();
-}
+    @Bean
+    @RequestScope
+    public ListAllOrdersViewModel listAllOrdersViewModel() {
+        return new ListAllOrdersViewModel();
+    }
 
-@Bean
-public ListAllOrdersUseCaseControl listAllOrdersUseCase(
-        ListAllOrdersOutputBoundary listAllOrdersPresenter,
-        OrderRepository orderRepository) {
-    return new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository);
-}
+    @Bean
+    public ListAllOrdersUseCaseControl listAllOrdersUseCase(
+            ListAllOrdersOutputBoundary listAllOrdersPresenter,
+            OrderRepository orderRepository) {
+        return new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository);
+    }
 
-@Bean
-public ListAllOrdersOutputBoundary listAllOrdersPresenter(ListAllOrdersViewModel listAllOrdersViewModel) {
-    return new ListAllOrdersPresenter(listAllOrdersViewModel);
-}
+    @Bean
+    public ListAllOrdersOutputBoundary listAllOrdersPresenter(ListAllOrdersViewModel listAllOrdersViewModel) {
+        return new ListAllOrdersPresenter(listAllOrdersViewModel);
+    }
 
-@Bean
-@RequestScope
-public SearchAdminOrderViewModel searchAdminOrderViewModel() {
-    return new SearchAdminOrderViewModel();
-}
+    @Bean
+    @RequestScope
+    public SearchAdminOrderViewModel searchAdminOrderViewModel() {
+        return new SearchAdminOrderViewModel();
+    }
 
-@Bean
-public SearchAdminOrderUseCaseControl searchAdminOrderUseCase(
-        SearchAdminOrderOutputBoundary searchAdminOrderPresenter,
-        OrderRepository orderRepository) {
-    return new SearchAdminOrderUseCaseControl(searchAdminOrderPresenter, orderRepository);
-}
+    @Bean
+    public SearchAdminOrderUseCaseControl searchAdminOrderUseCase(
+            SearchAdminOrderOutputBoundary searchAdminOrderPresenter,
+            OrderRepository orderRepository) {
+        return new SearchAdminOrderUseCaseControl(searchAdminOrderPresenter, orderRepository);
+    }
 
-@Bean
-public SearchAdminOrderOutputBoundary searchAdminOrderPresenter(SearchAdminOrderViewModel searchAdminOrderViewModel) {
-    return new SearchAdminOrderPresenter(searchAdminOrderViewModel);
-}
+    @Bean
+    public SearchAdminOrderOutputBoundary searchAdminOrderPresenter(SearchAdminOrderViewModel searchAdminOrderViewModel) {
+        return new SearchAdminOrderPresenter(searchAdminOrderViewModel);
+    }
 
-@Bean
-@RequestScope
-public com.motorbike.adapters.viewmodels.ListMyOrdersViewModel listMyOrdersViewModel() {
-    return new com.motorbike.adapters.viewmodels.ListMyOrdersViewModel();
-}
+    @Bean
+    @RequestScope
+    public ListMyOrdersViewModel listMyOrdersViewModel() {
+        return new ListMyOrdersViewModel();
+    }
 
-@Bean
-public com.motorbike.business.usecase.control.ListMyOrdersUseCaseControl listMyOrdersUseCase(
-        com.motorbike.business.usecase.output.ListMyOrdersOutputBoundary listMyOrdersPresenter,
-        OrderRepository orderRepository) {
-    return new com.motorbike.business.usecase.control.ListMyOrdersUseCaseControl(listMyOrdersPresenter, orderRepository);
-}
+    @Bean
+    public ListMyOrdersUseCaseControl listMyOrdersUseCase(
+            ListMyOrdersOutputBoundary listMyOrdersPresenter,
+            OrderRepository orderRepository) {
+        return new ListMyOrdersUseCaseControl(listMyOrdersPresenter, orderRepository);
+    }
 
-@Bean
-public com.motorbike.business.usecase.output.ListMyOrdersOutputBoundary listMyOrdersPresenter(
-        com.motorbike.adapters.viewmodels.ListMyOrdersViewModel listMyOrdersViewModel) {
-    return new com.motorbike.adapters.presenters.ListMyOrdersPresenter(listMyOrdersViewModel);
-}
+    @Bean
+    public ListMyOrdersOutputBoundary listMyOrdersPresenter(
+            ListMyOrdersViewModel listMyOrdersViewModel) {
+        return new ListMyOrdersPresenter(listMyOrdersViewModel);
+    }
 
-@Bean
-@RequestScope
-public OrderDetailViewModel orderDetailViewModel() {
-    return new OrderDetailViewModel();
-}
+    @Bean
+    @RequestScope
+    public OrderDetailViewModel orderDetailViewModel() {
+        return new OrderDetailViewModel();
+    }
 
-@Bean
-public OrderDetailUseCaseControl orderDetailUseCase(
-        OrderDetailOutputBoundary orderDetailPresenter,
-        OrderRepository orderRepository) {
-    return new OrderDetailUseCaseControl(orderDetailPresenter, orderRepository);
-}
+    @Bean
+    public OrderDetailUseCaseControl orderDetailUseCase(
+            OrderDetailOutputBoundary orderDetailPresenter,
+            OrderRepository orderRepository) {
+        return new OrderDetailUseCaseControl(orderDetailPresenter, orderRepository);
+    }
 
-@Bean
-public OrderDetailOutputBoundary orderDetailPresenter(OrderDetailViewModel orderDetailViewModel) {
-    return new OrderDetailPresenter(orderDetailViewModel);
-}
+    @Bean
+    public OrderDetailOutputBoundary orderDetailPresenter(OrderDetailViewModel orderDetailViewModel) {
+        return new OrderDetailPresenter(orderDetailViewModel);
+    }
 
 
-@Bean
-@RequestScope
-public CancelOrderViewModel cancelOrderViewModel() {
-    return new CancelOrderViewModel();
-}
+    @Bean
+    @RequestScope
+    public CancelOrderViewModel cancelOrderViewModel() {
+        return new CancelOrderViewModel();
+    }
 
-@Bean
-public CancelOrderUseCaseControl cancelOrderUseCase(
-        CancelOrderOutputBoundary cancelOrderPresenter,
-        OrderRepository orderRepository,
-        ProductRepository productRepository) {
-    return new CancelOrderUseCaseControl(cancelOrderPresenter, orderRepository, productRepository);
-}
+    @Bean
+    public CancelOrderUseCaseControl cancelOrderUseCase(
+            CancelOrderOutputBoundary cancelOrderPresenter,
+            OrderRepository orderRepository,
+            ProductRepository productRepository) {
+        return new CancelOrderUseCaseControl(cancelOrderPresenter, orderRepository, productRepository);
+    }
 
-@Bean
-public CancelOrderOutputBoundary cancelOrderPresenter(CancelOrderViewModel cancelOrderViewModel) {
-    return new CancelOrderPresenter(cancelOrderViewModel);
-}
+    @Bean
+    public CancelOrderOutputBoundary cancelOrderPresenter(CancelOrderViewModel cancelOrderViewModel) {
+        return new CancelOrderPresenter(cancelOrderViewModel);
+    }
 
-@Bean
-@RequestScope
-public UpdateOrderInforViewModel updateOrderInforViewModel() {
-    return new UpdateOrderInforViewModel();
-}
+    @Bean
+    @RequestScope
+    public UpdateOrderInforViewModel updateOrderInforViewModel() {
+        return new UpdateOrderInforViewModel();
+    }
 
-@Bean
-public UpdateOrderInforUseCaseControl updateOrderInforUseCase(
-        UpdateOrderInforOutputBoundary updateOrderInforPresenter,
-        OrderRepository orderRepository) {
-    return new UpdateOrderInforUseCaseControl(updateOrderInforPresenter, orderRepository);
-}
+    @Bean
+    public UpdateOrderInforUseCaseControl updateOrderInforUseCase(
+            UpdateOrderInforOutputBoundary updateOrderInforPresenter,
+            OrderRepository orderRepository) {
+        return new UpdateOrderInforUseCaseControl(updateOrderInforPresenter, orderRepository);
+    }
 
-@Bean
-public UpdateOrderInforOutputBoundary updateOrderInforPresenter(UpdateOrderInforViewModel updateOrderInforViewModel) {
-    return new UpdateOrderInforPresenter(updateOrderInforViewModel);
-}
+    @Bean
+    public UpdateOrderInforOutputBoundary updateOrderInforPresenter(UpdateOrderInforViewModel updateOrderInforViewModel) {
+        return new UpdateOrderInforPresenter(updateOrderInforViewModel);
+    }
 
 //motorbike use case beans
 
-@Bean
-@RequestScope
-public GetAllMotorbikesViewModel getAllMotorbikesViewModel() {
-    return new GetAllMotorbikesViewModel();
-}
+    @Bean
+    @RequestScope
+    public GetAllMotorbikesViewModel getAllMotorbikesViewModel() {
+        return new GetAllMotorbikesViewModel();
+    }
 
-@Bean
-public GetAllMotorbikesUseCaseControl getAllMotorbikesUseCase(
-        GetAllMotorbikesOutputBoundary presenter,
-        ProductRepository productRepository
-) {
-    return new GetAllMotorbikesUseCaseControl(presenter, productRepository);
-}
+    @Bean
+    public GetAllMotorbikesUseCaseControl getAllMotorbikesUseCase(
+            GetAllMotorbikesOutputBoundary presenter,
+            ProductRepository productRepository
+    ) {
+        return new GetAllMotorbikesUseCaseControl(presenter, productRepository);
+    }
 
-@Bean
-public GetAllMotorbikesOutputBoundary getAllMotorbikesPresenter(
-        GetAllMotorbikesViewModel viewModel
-) {
-    return new GetAllMotorbikesPresenter(viewModel);
-}
+    @Bean
+    public GetAllMotorbikesOutputBoundary getAllMotorbikesPresenter(
+            GetAllMotorbikesViewModel viewModel
+    ) {
+        return new GetAllMotorbikesPresenter(viewModel);
+    }
 
-@Bean
-public GetAllMotorbikesInputBoundary getAllMotorbikesInputBoundary(
-        GetAllMotorbikesUseCaseControl useCase
-) {
-    return useCase;
-}
+    @Bean
+    public GetAllMotorbikesInputBoundary getAllMotorbikesInputBoundary(
+            GetAllMotorbikesUseCaseControl useCase
+    ) {
+        return useCase;
+    }
 
 //search motorbike use case beans
 
-@Bean
-public SearchMotorbikesInputBoundary searchMotorbikesUseCase(
-        SearchMotorbikesOutputBoundary outputBoundary,
-        MotorbikeRepository motorbikeRepository
-) {
-    return new SearchMotorbikesUseCaseControl(outputBoundary, motorbikeRepository);
-}
+    @Bean
+    public SearchMotorbikesInputBoundary searchMotorbikesUseCase(
+            SearchMotorbikesOutputBoundary outputBoundary,
+            MotorbikeRepository motorbikeRepository
+    ) {
+        return new SearchMotorbikesUseCaseControl(outputBoundary, motorbikeRepository);
+    }
 
-@Bean
-public SearchMotorbikesOutputBoundary searchMotorbikesOutputBoundary(
-        SearchMotorbikesViewModel viewModel
-) {
-    return new SearchMotorbikesPresenter(viewModel);
-}
+    @Bean
+    public SearchMotorbikesOutputBoundary searchMotorbikesOutputBoundary(
+            SearchMotorbikesViewModel viewModel
+    ) {
+        return new SearchMotorbikesPresenter(viewModel);
+    }
 
-@Bean
-public SearchMotorbikesViewModel searchMotorbikesViewModel() {
-    return new SearchMotorbikesViewModel();
-}
+    @Bean
+    public SearchMotorbikesViewModel searchMotorbikesViewModel() {
+        return new SearchMotorbikesViewModel();
+    }
 
 // ADD MOTORBIKE USE CASE BEANS
 
-@Bean
-@RequestScope
-public AddMotorbikeViewModel addMotorbikeViewModel() {
-    return new AddMotorbikeViewModel();
-}
+    @Bean
+    @RequestScope
+    public AddMotorbikeViewModel addMotorbikeViewModel() {
+        return new AddMotorbikeViewModel();
+    }
 
-@Bean
-public AddMotorbikeOutputBoundary addMotorbikePresenter(
-        AddMotorbikeViewModel viewModel
-) {
-    return new AddMotorbikePresenter(viewModel);
-}
+    @Bean
+    public AddMotorbikeOutputBoundary addMotorbikePresenter(
+            AddMotorbikeViewModel viewModel
+    ) {
+        return new AddMotorbikePresenter(viewModel);
+    }
 
-@Bean
-public AddMotorbikeUseCaseControl addMotorbikeUseCase(
-        AddMotorbikeOutputBoundary presenter,
-        MotorbikeRepository motorbikeRepository
-) {
-    return new AddMotorbikeUseCaseControl(presenter, motorbikeRepository);
-}
+    @Bean
+    public AddMotorbikeUseCaseControl addMotorbikeUseCase(
+            AddMotorbikeOutputBoundary presenter,
+            MotorbikeRepository motorbikeRepository
+    ) {
+        return new AddMotorbikeUseCaseControl(presenter, motorbikeRepository);
+    }
 
-@Bean
-@RequestScope
-public GetAllAccessoriesViewModel getAllAccessoriesViewModel() {
-    return new GetAllAccessoriesViewModel();
-}
+    @Bean
+    @RequestScope
+    public GetAllAccessoriesViewModel getAllAccessoriesViewModel() {
+        return new GetAllAccessoriesViewModel();
+    }
 
-@Bean
-public GetAllAccessoriesUseCaseControl getAllAccessoriesUseCase(
-        GetAllAccessoriesOutputBoundary presenter,
-        ProductRepository productRepository
-) {
-    return new GetAllAccessoriesUseCaseControl(presenter, productRepository);
-}
+    @Bean
+    public GetAllAccessoriesUseCaseControl getAllAccessoriesUseCase(
+            GetAllAccessoriesOutputBoundary presenter,
+            ProductRepository productRepository
+    ) {
+        return new GetAllAccessoriesUseCaseControl(presenter, productRepository);
+    }
 
-@Bean
-public GetAllAccessoriesOutputBoundary getAllAccessoriesPresenter(
-        GetAllAccessoriesViewModel viewModel
-) {
-    return new GetAllAccessoriesPresenter(viewModel);
-}
+    @Bean
+    public GetAllAccessoriesOutputBoundary getAllAccessoriesPresenter(
+            GetAllAccessoriesViewModel viewModel
+    ) {
+        return new GetAllAccessoriesPresenter(viewModel);
+    }
 
-@Bean
-public GetAllAccessoriesInputBoundary getAllAccessoriesInputBoundary(
-        GetAllAccessoriesUseCaseControl useCase
-) {
-    return useCase;
-}
+    @Bean
+    public GetAllAccessoriesInputBoundary getAllAccessoriesInputBoundary(
+            GetAllAccessoriesUseCaseControl useCase
+    ) {
+        return useCase;
+    }
 
-@Bean
-public MotorbikeRepository motorbikeRepository(
-        XeMayJpaRepository jpaRepository
-) {
-    return new MotorbikeRepositoryAdapter(jpaRepository);
-}
+    @Bean
+    public MotorbikeRepository motorbikeRepository(
+            XeMayJpaRepository jpaRepository
+    ) {
+        return new MotorbikeRepositoryAdapter(jpaRepository);
+    }
 
-@Bean
-public SearchAccessoriesInputBoundary searchAccessoriesUseCase(
-        SearchAccessoriesOutputBoundary outputBoundary,
-        ProductRepository productRepository
-) {
-    return new SearchAccessoriesUseCaseControl(outputBoundary, productRepository);
-}
+    @Bean
+    public SearchAccessoriesInputBoundary searchAccessoriesUseCase(
+            SearchAccessoriesOutputBoundary outputBoundary,
+            ProductRepository productRepository
+    ) {
+        return new SearchAccessoriesUseCaseControl(outputBoundary, productRepository);
+    }
 
-@Bean
-public SearchAccessoriesOutputBoundary searchAccessoriesOutputBoundary(
-        SearchAccessoriesViewModel viewModel
-) {
-    return new SearchAccessoriesPresenter(viewModel);
-}
+    @Bean
+    public SearchAccessoriesOutputBoundary searchAccessoriesOutputBoundary(
+            SearchAccessoriesViewModel viewModel
+    ) {
+        return new SearchAccessoriesPresenter(viewModel);
+    }
 
-@Bean
-public SearchAccessoriesViewModel searchAccessoriesViewModel() {
-    return new SearchAccessoriesViewModel();
-}
+    @Bean
+    public SearchAccessoriesViewModel searchAccessoriesViewModel() {
+        return new SearchAccessoriesViewModel();
+    }
 
 // UPDATE MOTORBIKE USE CASE BEANS
-@Bean
-public UpdateMotorbikeInputBoundary updateMotorbikeUseCase(
-        UpdateMotorbikePresenter presenter,
-        MotorbikeRepository motorbikeRepository
-) {
-    return new UpdateMotorbikeUseCaseControl(presenter, motorbikeRepository);
-}
+    @Bean
+    public UpdateMotorbikeInputBoundary updateMotorbikeUseCase(
+            UpdateMotorbikePresenter presenter,
+            MotorbikeRepository motorbikeRepository
+    ) {
+        return new UpdateMotorbikeUseCaseControl(presenter, motorbikeRepository);
+    }
 
 
-@Bean
-@RequestScope
-public UpdateMotorbikeViewModel updateMotorbikeViewModel() {
-    return new UpdateMotorbikeViewModel();
-}
+    @Bean
+    @RequestScope
+    public UpdateMotorbikeViewModel updateMotorbikeViewModel() {
+        return new UpdateMotorbikeViewModel();
+    }
 
-@Bean
-public UpdateMotorbikePresenter updateMotorbikePresenter(UpdateMotorbikeViewModel viewModel) {
-    return new UpdateMotorbikePresenter(viewModel);
-}
+    @Bean
+    public UpdateMotorbikePresenter updateMotorbikePresenter(UpdateMotorbikeViewModel viewModel) {
+        return new UpdateMotorbikePresenter(viewModel);
+    }
 
 // DELETE MOTORBIKE USE CASE BEANS
-@Bean
-@RequestScope
-public DeleteMotorbikeViewModel deleteMotorbikeViewModel() {
-    return new DeleteMotorbikeViewModel();
-}
+    @Bean
+    @RequestScope
+    public DeleteMotorbikeViewModel deleteMotorbikeViewModel() {
+        return new DeleteMotorbikeViewModel();
+    }
 
-@Bean
-public DeleteMotorbikeOutputBoundary deleteMotorbikePresenter(DeleteMotorbikeViewModel vm) {
-    return new DeleteMotorbikePresenter(vm);
-}
+    @Bean
+    public DeleteMotorbikeOutputBoundary deleteMotorbikePresenter(DeleteMotorbikeViewModel vm) {
+        return new DeleteMotorbikePresenter(vm);
+    }
 
-@Bean
-public DeleteMotorbikeInputBoundary deleteMotorbikeUseCase(
-        DeleteMotorbikeOutputBoundary presenter,
-        MotorbikeRepository motorbikeRepository
-) {
-    return new DeleteMotorbikeUseCaseControl(presenter, motorbikeRepository);
-}
+    @Bean
+    public DeleteMotorbikeInputBoundary deleteMotorbikeUseCase(
+            DeleteMotorbikeOutputBoundary presenter,
+            MotorbikeRepository motorbikeRepository
+    ) {
+        return new DeleteMotorbikeUseCaseControl(presenter, motorbikeRepository);
+    }
 
 
 
