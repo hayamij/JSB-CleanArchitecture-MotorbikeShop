@@ -8,7 +8,10 @@ public class MotorbikeShopApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(MotorbikeShopApplication.class, args);
+        System.out.println("==================================");
         System.out.println("Server: http://localhost:8080");
+        System.out.println("API doc: http://localhost:8080/swagger-ui/index.html");
+        System.out.println("==================================");
         System.out.println("default admin account:");
         System.out.println("username: admin2 (admin@gmail.com)");
         System.out.println("password: 123");

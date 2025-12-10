@@ -77,13 +77,10 @@ public class AdminOrderController {
     }
     @GetMapping("/all")
     public ResponseEntity<ListAllOrdersResponse> listAllOrders() {
-// InputData mới: lấy tất cả đơn hàng, không filter
     ListAllOrdersInputData inputData = ListAllOrdersInputData.getAllOrders();
 
-    // Gọi use case
     listAllOrdersUseCase.execute(inputData);
 
-    // Nếu thành công
     if (listAllOrdersViewModel.success) {
 
         List<ListAllOrdersResponse.OrderItemResponse> orderResponses = new ArrayList<>();
@@ -109,7 +106,6 @@ public class AdminOrderController {
             }
         }
 
-        // Response chỉ có success + orders + message
         ListAllOrdersResponse response = new ListAllOrdersResponse(
             true,
             orderResponses,
@@ -121,7 +117,6 @@ public class AdminOrderController {
         return ResponseEntity.ok(response);
     }
 
-    // Nếu thất bại
         ListAllOrdersResponse errorResponse = new ListAllOrdersResponse(
             false,
             new ArrayList<>(),
@@ -181,7 +176,6 @@ public class AdminOrderController {
     
     @GetMapping("/stats/top-products")
     public ResponseEntity<Map<String, Object>> getTopProducts() {
-        // Default limit: top 10 products
         com.motorbike.business.dto.topproducts.GetTopProductsInputData inputData = 
                 new com.motorbike.business.dto.topproducts.GetTopProductsInputData(10);
         
@@ -240,7 +234,6 @@ public class AdminOrderController {
     
     @GetMapping("/{orderId}/valid-statuses")
     public ResponseEntity<Map<String, Object>> getValidOrderStatuses(@PathVariable Long orderId) {
-        // First get the current order to know its status
         GetOrderDetailInputData orderInputData = new GetOrderDetailInputData(orderId);
         getOrderDetailUseCase.execute(orderInputData);
         
@@ -251,7 +244,6 @@ public class AdminOrderController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
         
-        // Get valid statuses for current order status
         String currentStatus = getOrderDetailViewModel.orderDetail.orderStatusCode;
         GetValidOrderStatusesInputData inputData = new GetValidOrderStatusesInputData(currentStatus);
         getValidOrderStatusesUseCase.execute(inputData);
