@@ -18,6 +18,10 @@ import com.motorbike.adapters.presenters.GetAllUsersPresenter;
 import com.motorbike.adapters.presenters.GetOrderDetailPresenter;
 import com.motorbike.adapters.presenters.GetTopProductsPresenter;
 import com.motorbike.adapters.presenters.GetValidOrderStatusesPresenter;
+import com.motorbike.adapters.presenters.ImportMotorbikesPresenter;
+import com.motorbike.adapters.presenters.ImportAccessoriesPresenter;
+import com.motorbike.adapters.presenters.ExportMotorbikesPresenter;
+import com.motorbike.adapters.presenters.ExportAccessoriesPresenter;
 import com.motorbike.adapters.presenters.ListAllOrdersPresenter;
 import com.motorbike.adapters.presenters.LoginPresenter;
 import com.motorbike.adapters.presenters.ProductDetailPresenter;
@@ -52,6 +56,10 @@ import com.motorbike.adapters.viewmodels.GetAllUsersViewModel;
 import com.motorbike.adapters.viewmodels.GetOrderDetailViewModel;
 import com.motorbike.adapters.viewmodels.GetTopProductsViewModel;
 import com.motorbike.adapters.viewmodels.GetValidOrderStatusesViewModel;
+import com.motorbike.adapters.viewmodels.ImportMotorbikesViewModel;
+import com.motorbike.adapters.viewmodels.ImportAccessoriesViewModel;
+import com.motorbike.adapters.viewmodels.ExportMotorbikesViewModel;
+import com.motorbike.adapters.viewmodels.ExportAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
 import com.motorbike.adapters.viewmodels.LoginViewModel;
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
@@ -67,6 +75,8 @@ import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.UpdateOrderViewModel;
 import com.motorbike.adapters.viewmodels.UpdateUserViewModel;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
+import com.motorbike.business.ports.parser.ExcelParser;
+import com.motorbike.business.ports.exporter.ExcelExporter;
 import com.motorbike.business.ports.repository.AccessoryRepository;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
@@ -92,6 +102,10 @@ import com.motorbike.business.usecase.control.GetOrderDetailUseCaseControl;
 import com.motorbike.business.usecase.control.GetProductDetailUseCaseControl;
 import com.motorbike.business.usecase.control.GetTopProductsUseCaseControl;
 import com.motorbike.business.usecase.control.GetValidOrderStatusesUseCaseControl;
+import com.motorbike.business.usecase.control.ImportMotorbikesUseCaseControl;
+import com.motorbike.business.usecase.control.ImportAccessoriesUseCaseControl;
+import com.motorbike.business.usecase.control.ExportMotorbikesUseCaseControl;
+import com.motorbike.business.usecase.control.ExportAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
 import com.motorbike.business.usecase.control.LoginUseCaseControl;
 import com.motorbike.business.usecase.control.RegisterUseCaseControl;
@@ -116,6 +130,10 @@ import com.motorbike.business.usecase.input.GetAllProductsInputBoundary;
 import com.motorbike.business.usecase.input.GetOrderDetailInputBoundary;
 import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
 import com.motorbike.business.usecase.input.GetValidOrderStatusesInputBoundary;
+import com.motorbike.business.usecase.input.ImportMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.ImportAccessoriesInputBoundary;
+import com.motorbike.business.usecase.input.ExportMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.ExportAccessoriesInputBoundary;
 import com.motorbike.business.usecase.input.ListAllOrdersInputBoundary;
 import com.motorbike.business.usecase.input.LoginInputBoundary;
 import com.motorbike.business.usecase.input.RegisterInputBoundary;
@@ -143,6 +161,10 @@ import com.motorbike.business.usecase.output.GetOrderDetailOutputBoundary;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.business.usecase.output.GetTopProductsOutputBoundary;
 import com.motorbike.business.usecase.output.GetValidOrderStatusesOutputBoundary;
+import com.motorbike.business.usecase.output.ImportMotorbikesOutputBoundary;
+import com.motorbike.business.usecase.output.ImportAccessoriesOutputBoundary;
+import com.motorbike.business.usecase.output.ExportMotorbikesOutputBoundary;
+import com.motorbike.business.usecase.output.ExportAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.business.usecase.output.RegisterOutputBoundary;
@@ -417,6 +439,134 @@ public class UseCaseConfig {
             MotorbikeRepository motorbikeRepository
     ) {
         return new AddMotorbikeUseCaseControl(presenter, motorbikeRepository);
+    }
+
+    // IMPORT MOTORBIKES USE CASE BEANS
+
+    @Bean
+    @RequestScope
+    public ImportMotorbikesViewModel importMotorbikesViewModel() {
+        return new ImportMotorbikesViewModel();
+    }
+
+    @Bean
+    public ImportMotorbikesOutputBoundary importMotorbikesPresenter(
+            ImportMotorbikesViewModel viewModel
+    ) {
+        return new ImportMotorbikesPresenter(viewModel);
+    }
+
+    @Bean
+    public ImportMotorbikesUseCaseControl importMotorbikesUseCase(
+            ImportMotorbikesOutputBoundary presenter,
+            MotorbikeRepository motorbikeRepository,
+            ExcelParser excelParser
+    ) {
+        return new ImportMotorbikesUseCaseControl(presenter, motorbikeRepository, excelParser);
+    }
+
+    @Bean
+    public ImportMotorbikesInputBoundary importMotorbikesInputBoundary(
+            ImportMotorbikesUseCaseControl useCase
+    ) {
+        return useCase;
+    }
+
+    // ============================
+    // IMPORT ACCESSORIES USE CASE
+    // ============================
+
+    @Bean
+    @RequestScope
+    public ImportAccessoriesViewModel importAccessoriesViewModel() {
+        return new ImportAccessoriesViewModel();
+    }
+
+    @Bean
+    public ImportAccessoriesOutputBoundary importAccessoriesPresenter(
+            ImportAccessoriesViewModel viewModel
+    ) {
+        return new ImportAccessoriesPresenter(viewModel);
+    }
+
+    @Bean
+    public ImportAccessoriesUseCaseControl importAccessoriesUseCase(
+            ImportAccessoriesOutputBoundary presenter,
+            AccessoryRepository accessoryRepository,
+            ExcelParser excelParser
+    ) {
+        return new ImportAccessoriesUseCaseControl(presenter, accessoryRepository, excelParser);
+    }
+
+    @Bean
+    public ImportAccessoriesInputBoundary importAccessoriesInputBoundary(
+            ImportAccessoriesUseCaseControl useCase
+    ) {
+        return useCase;
+    }
+
+    // ============================
+    // EXPORT MOTORBIKES USE CASE
+    // ============================
+    @Bean
+    @RequestScope
+    public ExportMotorbikesViewModel exportMotorbikesViewModel() {
+        return new ExportMotorbikesViewModel();
+    }
+
+    @Bean
+    public ExportMotorbikesOutputBoundary exportMotorbikesPresenter(
+            ExportMotorbikesViewModel viewModel
+    ) {
+        return new ExportMotorbikesPresenter(viewModel);
+    }
+
+    @Bean
+    public ExportMotorbikesUseCaseControl exportMotorbikesUseCase(
+            ExportMotorbikesOutputBoundary presenter,
+            MotorbikeRepository motorbikeRepository,
+            ExcelExporter excelExporter
+    ) {
+        return new ExportMotorbikesUseCaseControl(presenter, motorbikeRepository, excelExporter);
+    }
+
+    @Bean
+    public ExportMotorbikesInputBoundary exportMotorbikesInputBoundary(
+            ExportMotorbikesUseCaseControl useCase
+    ) {
+        return useCase;
+    }
+
+    // ============================
+    // EXPORT ACCESSORIES USE CASE
+    // ============================
+    @Bean
+    @RequestScope
+    public ExportAccessoriesViewModel exportAccessoriesViewModel() {
+        return new ExportAccessoriesViewModel();
+    }
+
+    @Bean
+    public ExportAccessoriesOutputBoundary exportAccessoriesPresenter(
+            ExportAccessoriesViewModel viewModel
+    ) {
+        return new ExportAccessoriesPresenter(viewModel);
+    }
+
+    @Bean
+    public ExportAccessoriesUseCaseControl exportAccessoriesUseCase(
+            ExportAccessoriesOutputBoundary presenter,
+            AccessoryRepository accessoryRepository,
+            ExcelExporter excelExporter
+    ) {
+        return new ExportAccessoriesUseCaseControl(presenter, accessoryRepository, excelExporter);
+    }
+
+    @Bean
+    public ExportAccessoriesInputBoundary exportAccessoriesInputBoundary(
+            ExportAccessoriesUseCaseControl useCase
+    ) {
+        return useCase;
     }
 
     @Bean

@@ -26,4 +26,7 @@ public interface AccessoryRepository {
     
     // Tìm kiếm phụ kiện với các tiêu chí
     List<PhuKienXeMay> search(String keyword, String loaiPhuKien, String thuongHieu);
+    
+    // Thêm hàng loạt phụ kiện (bulk insert)
+    List<PhuKienXeMay> saveAll(List<PhuKienXeMay> phuKienList);
 }

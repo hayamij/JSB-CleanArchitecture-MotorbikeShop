@@ -62,6 +62,19 @@ public class MotorbikeRepositoryAdapter implements MotorbikeRepository {
                 .map(this::toDomain)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public List<XeMay> saveAll(List<XeMay> xeMayList) {
+        List<XeMayJpaEntity> entities = xeMayList.stream()
+                .map(this::toJpaEntity)
+                .collect(Collectors.toList());
+        
+        List<XeMayJpaEntity> savedEntities = xeMayJpaRepository.saveAll(entities);
+        
+        return savedEntities.stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
 
     // ================= MAPPER =================
 

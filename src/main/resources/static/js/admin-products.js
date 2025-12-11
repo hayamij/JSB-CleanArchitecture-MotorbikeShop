@@ -634,6 +634,464 @@ function closeAccessoryModal() {
     currentEditingAccessoryId = null;
 }
 
+// ==================== IMPORT/EXPORT MOTORBIKES ====================
+
+let selectedMotorbikeFile = null;
+
+function showImportMotorbikeModal() {
+    document.getElementById('importMotorbikeModal').classList.add('show');
+    resetMotorbikeImportModal();
+}
+
+function closeImportMotorbikeModal() {
+    document.getElementById('importMotorbikeModal').classList.remove('show');
+    resetMotorbikeImportModal();
+}
+
+function resetMotorbikeImportModal() {
+    selectedMotorbikeFile = null;
+    document.getElementById('excelFileInputMotorbike').value = '';
+    document.getElementById('fileInfoMotorbike').classList.add('hidden');
+    document.getElementById('importProgressMotorbike').classList.add('hidden');
+    document.getElementById('importResultsMotorbike').classList.add('hidden');
+    document.getElementById('uploadAreaMotorbike').classList.remove('hidden');
+    document.getElementById('btnImportMotorbike').disabled = true;
+}
+
+function downloadMotorbikeTemplate() {
+    const templateData = [
+        ['Tên SP', 'Mô tả', 'Giá', 'Hình ảnh', 'Tồn kho', 'Hãng', 'Dòng', 'Màu', 'Năm SX', 'Dung tích'],
+        ['Honda Wave Alpha 110', 'Xe số tiết kiệm nhiên liệu', '20000000', 'https://example.com/wave.jpg', '50', 'Honda', 'Wave Alpha', 'Đỏ', '2024', '110'],
+        ['Yamaha Exciter 155', 'Xe côn tay thể thao', '47000000', 'https://example.com/exciter.jpg', '30', 'Yamaha', 'Exciter', 'Xanh', '2024', '155']
+    ];
+    
+    let csv = templateData.map(row => row.join('\t')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'motorbike-import-template.csv';
+    link.click();
+    
+    showAlert('Đã tải template! Lưu ý: Mở bằng Excel và lưu dạng .xlsx', 'success');
+}
+
+function handleMotorbikeFileDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById('uploadAreaMotorbike').classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        processMotorbikeFile(files[0]);
+    }
+}
+
+function handleMotorbikeFileSelect(e) {
+    const files = e.target.files;
+    if (files.length > 0) {
+        processMotorbikeFile(files[0]);
+    }
+}
+
+function processMotorbikeFile(file) {
+    const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                        'application/vnd.ms-excel',
+                        'text/csv'];
+    const validExtensions = ['.xlsx', '.xls', '.csv'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    
+    if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+        showAlert('Chỉ chấp nhận file Excel (.xlsx, .xls) hoặc CSV!', 'error');
+        return;
+    }
+    
+    if (file.size > 10 * 1024 * 1024) {
+        showAlert('File quá lớn! Tối đa 10MB', 'error');
+        return;
+    }
+    
+    selectedMotorbikeFile = file;
+    
+    document.getElementById('fileNameMotorbike').textContent = file.name;
+    document.getElementById('fileSizeMotorbike').textContent = formatFileSize(file.size);
+    document.getElementById('fileInfoMotorbike').classList.remove('hidden');
+    document.getElementById('uploadAreaMotorbike').classList.add('hidden');
+    document.getElementById('btnImportMotorbike').disabled = false;
+}
+
+function clearMotorbikeFileSelection() {
+    selectedMotorbikeFile = null;
+    document.getElementById('excelFileInputMotorbike').value = '';
+    document.getElementById('fileInfoMotorbike').classList.add('hidden');
+    document.getElementById('uploadAreaMotorbike').classList.remove('hidden');
+    document.getElementById('btnImportMotorbike').disabled = true;
+}
+
+async function submitMotorbikeImport() {
+    if (!selectedMotorbikeFile) {
+        showAlert('Vui lòng chọn file Excel!', 'error');
+        return;
+    }
+    
+    document.getElementById('importProgressMotorbike').classList.remove('hidden');
+    document.getElementById('importResultsMotorbike').classList.add('hidden');
+    document.getElementById('btnImportMotorbike').disabled = true;
+    
+    const formData = new FormData();
+    formData.append('file', selectedMotorbikeFile);
+    
+    try {
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += 10;
+            if (progress <= 90) {
+                document.getElementById('progressFillMotorbike').style.width = progress + '%';
+                document.getElementById('progressTextMotorbike').textContent = `Đang xử lý... ${progress}%`;
+            }
+        }, 200);
+        
+        const response = await fetch(`${API_BASE_URL}/motorbikes/import`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        clearInterval(progressInterval);
+        document.getElementById('progressFillMotorbike').style.width = '100%';
+        document.getElementById('progressTextMotorbike').textContent = 'Hoàn thành!';
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            setTimeout(() => {
+                document.getElementById('importProgressMotorbike').classList.add('hidden');
+                displayMotorbikeImportResults(data);
+            }, 500);
+        } else {
+            showAlert(data.errorMessage || 'Import thất bại!', 'error');
+            document.getElementById('importProgressMotorbike').classList.add('hidden');
+            document.getElementById('btnImportMotorbike').disabled = false;
+        }
+        
+    } catch (error) {
+        console.error('Error importing:', error);
+        showAlert('Lỗi kết nối server!', 'error');
+        document.getElementById('importProgressMotorbike').classList.add('hidden');
+        document.getElementById('btnImportMotorbike').disabled = false;
+    }
+}
+
+function displayMotorbikeImportResults(data) {
+    document.getElementById('importResultsMotorbike').classList.remove('hidden');
+    
+    document.getElementById('totalRecordsMotorbike').textContent = data.totalRecords || 0;
+    document.getElementById('successCountMotorbike').textContent = data.successCount || 0;
+    document.getElementById('failureCountMotorbike').textContent = data.failureCount || 0;
+    
+    if (data.errors && data.errors.length > 0) {
+        document.getElementById('errorListContainerMotorbike').classList.remove('hidden');
+        const errorList = document.getElementById('errorListMotorbike');
+        errorList.innerHTML = data.errors.map((error, index) => `
+            <div style="padding: 8px; border-bottom: 1px solid #fca5a5; font-size: 13px;">
+                <strong>Dòng ${error.row || (index + 2)}:</strong> ${error.message || error}
+            </div>
+        `).join('');
+    } else {
+        document.getElementById('errorListContainerMotorbike').classList.add('hidden');
+    }
+    
+    if (data.successCount > 0) {
+        showAlert(`Import thành công ${data.successCount}/${data.totalRecords} xe máy!`, 'success');
+        setTimeout(() => {
+            loadAllMotorbikes();
+        }, 1500);
+    }
+}
+
+async function exportMotorbikes() {
+    try {
+        showAlert('Đang export dữ liệu...', 'info');
+        
+        const keyword = document.getElementById('searchMotorbikeName')?.value || '';
+        const brand = document.getElementById('filterMotorbikeBrand')?.value || '';
+        
+        const params = new URLSearchParams();
+        if (keyword) params.append('keyword', keyword);
+        if (brand) params.append('brand', brand);
+        
+        const url = `${API_BASE_URL}/motorbikes/export?${params.toString()}`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.errorMessage || 'Export failed');
+        }
+        
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'motorbikes_export.xlsx';
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            }
+        }
+        
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        document.body.removeChild(a);
+        
+        showAlert('Export thành công!', 'success');
+        
+    } catch (error) {
+        console.error('Export error:', error);
+        showAlert('Lỗi khi export: ' + error.message, 'error');
+    }
+}
+
+// ==================== IMPORT/EXPORT ACCESSORIES ====================
+
+let selectedAccessoryFile = null;
+
+function showImportAccessoryModal() {
+    document.getElementById('importAccessoryModal').classList.add('show');
+    resetAccessoryImportModal();
+}
+
+function closeImportAccessoryModal() {
+    document.getElementById('importAccessoryModal').classList.remove('show');
+    resetAccessoryImportModal();
+}
+
+function resetAccessoryImportModal() {
+    selectedAccessoryFile = null;
+    document.getElementById('excelFileInputAccessory').value = '';
+    document.getElementById('fileInfoAccessory').classList.add('hidden');
+    document.getElementById('importProgressAccessory').classList.add('hidden');
+    document.getElementById('importResultsAccessory').classList.add('hidden');
+    document.getElementById('uploadAreaAccessory').classList.remove('hidden');
+    document.getElementById('btnImportAccessory').disabled = true;
+}
+
+function downloadAccessoryTemplate() {
+    const templateData = [
+        ['Tên SP', 'Mô tả', 'Giá', 'Hình ảnh', 'Tồn kho', 'Loại', 'Thương hiệu', 'Chất liệu'],
+        ['Mũ bảo hiểm Fullface', 'Mũ bảo hiểm cao cấp', '1500000', 'https://example.com/helmet.jpg', '100', 'Mũ bảo hiểm', 'Royal', 'Nhựa ABS'],
+        ['Găng tay da', 'Găng tay da thật', '300000', 'https://example.com/glove.jpg', '50', 'Găng tay', 'RS Taichi', 'Da thật']
+    ];
+    
+    let csv = templateData.map(row => row.join('\t')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'accessory-import-template.csv';
+    link.click();
+    
+    showAlert('Đã tải template! Lưu ý: Mở bằng Excel và lưu dạng .xlsx', 'success');
+}
+
+function handleAccessoryFileDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById('uploadAreaAccessory').classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        processAccessoryFile(files[0]);
+    }
+}
+
+function handleAccessoryFileSelect(e) {
+    const files = e.target.files;
+    if (files.length > 0) {
+        processAccessoryFile(files[0]);
+    }
+}
+
+function processAccessoryFile(file) {
+    const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                        'application/vnd.ms-excel',
+                        'text/csv'];
+    const validExtensions = ['.xlsx', '.xls', '.csv'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    
+    if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+        showAlert('Chỉ chấp nhận file Excel (.xlsx, .xls) hoặc CSV!', 'error');
+        return;
+    }
+    
+    if (file.size > 10 * 1024 * 1024) {
+        showAlert('File quá lớn! Tối đa 10MB', 'error');
+        return;
+    }
+    
+    selectedAccessoryFile = file;
+    
+    document.getElementById('fileNameAccessory').textContent = file.name;
+    document.getElementById('fileSizeAccessory').textContent = formatFileSize(file.size);
+    document.getElementById('fileInfoAccessory').classList.remove('hidden');
+    document.getElementById('uploadAreaAccessory').classList.add('hidden');
+    document.getElementById('btnImportAccessory').disabled = false;
+}
+
+function clearAccessoryFileSelection() {
+    selectedAccessoryFile = null;
+    document.getElementById('excelFileInputAccessory').value = '';
+    document.getElementById('fileInfoAccessory').classList.add('hidden');
+    document.getElementById('uploadAreaAccessory').classList.remove('hidden');
+    document.getElementById('btnImportAccessory').disabled = true;
+}
+
+async function submitAccessoryImport() {
+    if (!selectedAccessoryFile) {
+        showAlert('Vui lòng chọn file Excel!', 'error');
+        return;
+    }
+    
+    document.getElementById('importProgressAccessory').classList.remove('hidden');
+    document.getElementById('importResultsAccessory').classList.add('hidden');
+    document.getElementById('btnImportAccessory').disabled = true;
+    
+    const formData = new FormData();
+    formData.append('file', selectedAccessoryFile);
+    
+    try {
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += 10;
+            if (progress <= 90) {
+                document.getElementById('progressFillAccessory').style.width = progress + '%';
+                document.getElementById('progressTextAccessory').textContent = `Đang xử lý... ${progress}%`;
+            }
+        }, 200);
+        
+        const response = await fetch(`${API_BASE_URL}/accessories/import`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        clearInterval(progressInterval);
+        document.getElementById('progressFillAccessory').style.width = '100%';
+        document.getElementById('progressTextAccessory').textContent = 'Hoàn thành!';
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            setTimeout(() => {
+                document.getElementById('importProgressAccessory').classList.add('hidden');
+                displayAccessoryImportResults(data);
+            }, 500);
+        } else {
+            showAlert(data.errorMessage || 'Import thất bại!', 'error');
+            document.getElementById('importProgressAccessory').classList.add('hidden');
+            document.getElementById('btnImportAccessory').disabled = false;
+        }
+        
+    } catch (error) {
+        console.error('Error importing:', error);
+        showAlert('Lỗi kết nối server!', 'error');
+        document.getElementById('importProgressAccessory').classList.add('hidden');
+        document.getElementById('btnImportAccessory').disabled = false;
+    }
+}
+
+function displayAccessoryImportResults(data) {
+    document.getElementById('importResultsAccessory').classList.remove('hidden');
+    
+    document.getElementById('totalRecordsAccessory').textContent = data.totalRecords || 0;
+    document.getElementById('successCountAccessory').textContent = data.successCount || 0;
+    document.getElementById('failureCountAccessory').textContent = data.failureCount || 0;
+    
+    if (data.errors && data.errors.length > 0) {
+        document.getElementById('errorListContainerAccessory').classList.remove('hidden');
+        const errorList = document.getElementById('errorListAccessory');
+        errorList.innerHTML = data.errors.map((error, index) => `
+            <div style="padding: 8px; border-bottom: 1px solid #fca5a5; font-size: 13px;">
+                <strong>Dòng ${error.row || (index + 2)}:</strong> ${error.message || error}
+            </div>
+        `).join('');
+    } else {
+        document.getElementById('errorListContainerAccessory').classList.add('hidden');
+    }
+    
+    if (data.successCount > 0) {
+        showAlert(`Import thành công ${data.successCount}/${data.totalRecords} phụ kiện!`, 'success');
+        setTimeout(() => {
+            loadAllAccessories();
+        }, 1500);
+    }
+}
+
+async function exportAccessories() {
+    try {
+        showAlert('Đang export dữ liệu...', 'info');
+        
+        const keyword = document.getElementById('searchAccessoryName')?.value || '';
+        const type = document.getElementById('filterAccessoryType')?.value || '';
+        
+        const params = new URLSearchParams();
+        if (keyword) params.append('keyword', keyword);
+        if (type) params.append('type', type);
+        
+        const url = `${API_BASE_URL}/accessories/export?${params.toString()}`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.errorMessage || 'Export failed');
+        }
+        
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'accessories_export.xlsx';
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            }
+        }
+        
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        document.body.removeChild(a);
+        
+        showAlert('Export thành công!', 'success');
+        
+    } catch (error) {
+        console.error('Export error:', error);
+        showAlert('Lỗi khi export: ' + error.message, 'error');
+    }
+}
+
+// ==================== UTILITIES ====================
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('drag-over');
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     if (checkAdminAuth()) {

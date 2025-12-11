@@ -7,44 +7,8 @@
     <link rel="stylesheet" href="css/common.css?v=3">
     <link rel="stylesheet" href="css/admin.css?v=3">
 </head>
-<body>
-    <!-- Admin Sidebar -->
-    <aside class="admin-sidebar">
-        <div class="sidebar-header">
-            <h2>ADMIN PANEL</h2>
-            <p class="admin-name" id="sidebarAdminName">Admin</p>
-        </div>
-        
-        <nav class="sidebar-nav">
-            <a href="admin.html" class="nav-item">
-                <span class="nav-icon">📊</span>
-                <span class="nav-text">Dashboard</span>
-            </a>
-            <a href="admin-users.html" class="nav-item">
-                <span class="nav-icon">👥</span>
-                <span class="nav-text">Quản lý Users</span>
-            </a>
-            <a href="admin-products.html" class="nav-item active">
-                <span class="nav-icon">🏍️</span>
-                <span class="nav-text">Quản lý Sản phẩm</span>
-            </a>
-            <a href="admin-orders.html" class="nav-item">
-                <span class="nav-icon">📦</span>
-                <span class="nav-text">Quản lý Đơn hàng</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <a href="home.html" class="nav-item">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-text">Trang chủ</span>
-            </a>
-            <button class="nav-item btn-logout-sidebar" onclick="logout()">
-                <span class="nav-icon">🚪</span>
-                <span class="nav-text">Đăng xuất</span>
-            </button>
-        </div>
-    </aside>
+<body data-page="products">
+    <!-- Admin Sidebar will be loaded by admin-sidebar.js -->
 
     <!-- Main Content Area -->
     <div class="admin-main">
@@ -65,6 +29,8 @@
             <!-- Motorbikes Tab -->
             <div id="motorbikesTab" class="tab-content active">
                 <div class="section-actions">
+                    <button class="btn-add" onclick="exportMotorbikes()" style="background: #f59e0b;">📄 Export Excel</button>
+                    <button class="btn-add" onclick="showImportMotorbikeModal()" style="background: #10b981;">📊 Import Excel</button>
                     <button class="btn-add" onclick="showAddMotorbikeModal()">+ THÊM XE MÁY</button>
                 </div>
 
@@ -143,6 +109,8 @@
             <!-- Accessories Tab -->
             <div id="accessoriesTab" class="tab-content">
                 <div class="section-actions">
+                    <button class="btn-add" onclick="exportAccessories()" style="background: #f59e0b;">📄 Export Excel</button>
+                    <button class="btn-add" onclick="showImportAccessoryModal()" style="background: #10b981;">📊 Import Excel</button>
                     <button class="btn-add" onclick="showAddAccessoryModal()">+ THÊM PHỤ KIỆN</button>
                 </div>
 
@@ -350,6 +318,173 @@
         </div>
     </div>
 
+    <!-- Import Motorbike Modal -->
+    <div id="importMotorbikeModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Import Xe máy từ Excel</h2>
+            </div>
+            <div class="modal-body">
+                <!-- Template Download -->
+                <div style="background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; color: #0369a1;">📄 Tải Template Excel</h3>
+                    <p style="margin: 0 0 12px 0; color: #075985; font-size: 14px;">Tải file mẫu để biết định dạng đúng. File Excel cần 10 cột theo thứ tự:</p>
+                    <p style="margin: 0 0 12px 0; color: #0c4a6e; font-size: 13px; font-weight: 600;">
+                        Tên SP | Mô tả | Giá | Hình ảnh | Tồn kho | Hãng | Dòng | Màu | Năm SX | Dung tích
+                    </p>
+                    <button class="btn-add" onclick="downloadMotorbikeTemplate()" style="background: #0ea5e9;">⬇️ Tải Template Excel</button>
+                </div>
+
+                <!-- File Upload Area -->
+                <div id="uploadAreaMotorbike" class="upload-area" 
+                     ondrop="handleMotorbikeFileDrop(event)" 
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Kéo thả file Excel/CSV vào đây hoặc</p>
+                    <input type="file" id="excelFileInputMotorbike" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleMotorbikeFileSelect(event)">
+                    <button class="btn-add" onclick="document.getElementById('excelFileInputMotorbike').click()">Chọn file</button>
+                    <p class="upload-hint">Hỗ trợ: .xlsx, .xls, .csv (tối đa 10MB)</p>
+                </div>
+
+                <!-- Selected File Info -->
+                <div id="fileInfoMotorbike" class="file-info hidden">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px;">📊</span>
+                        <div style="flex: 1;">
+                            <p style="margin: 0; font-weight: 600;" id="fileNameMotorbike"></p>
+                            <p style="margin: 0; font-size: 14px; color: #666;" id="fileSizeMotorbike"></p>
+                        </div>
+                        <button class="btn-action btn-delete" onclick="clearMotorbikeFileSelection()">✕</button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="importProgressMotorbike" class="import-progress hidden">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFillMotorbike"></div>
+                    </div>
+                    <p id="progressTextMotorbike" style="text-align: center; margin-top: 8px; color: #666;">Đang xử lý...</p>
+                </div>
+
+                <!-- Import Results -->
+                <div id="importResultsMotorbike" class="import-results hidden">
+                    <h3 style="margin: 0 0 16px 0; color: #059669;">✅ Kết quả Import</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                        <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #0369a1;" id="totalRecordsMotorbike">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #075985;">Tổng số</p>
+                        </div>
+                        <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #059669;" id="successCountMotorbike">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #047857;">Thành công</p>
+                        </div>
+                        <div style="background: #fef2f2; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #dc2626;" id="failureCountMotorbike">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #991b1b;">Thất bại</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Error List -->
+                    <div id="errorListContainerMotorbike" class="hidden">
+                        <h4 style="margin: 0 0 8px 0; color: #dc2626;">❌ Lỗi chi tiết:</h4>
+                        <div id="errorListMotorbike" style="max-height: 200px; overflow-y: auto; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px;">
+                            <!-- Errors will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeImportMotorbikeModal()">Đóng</button>
+                <button class="btn-submit" id="btnImportMotorbike" onclick="submitMotorbikeImport()" disabled>📤 Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Accessory Modal -->
+    <div id="importAccessoryModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Import Phụ kiện từ Excel</h2>
+            </div>
+            <div class="modal-body">
+                <!-- Template Download -->
+                <div style="background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; color: #0369a1;">📄 Tải Template Excel</h3>
+                    <p style="margin: 0 0 12px 0; color: #075985; font-size: 14px;">Tải file mẫu để biết định dạng đúng. File Excel cần 8 cột theo thứ tự:</p>
+                    <p style="margin: 0 0 12px 0; color: #0c4a6e; font-size: 13px; font-weight: 600;">
+                        Tên SP | Mô tả | Giá | Hình ảnh | Tồn kho | Loại | Thương hiệu | Chất liệu
+                    </p>
+                    <button class="btn-add" onclick="downloadAccessoryTemplate()" style="background: #0ea5e9;">⬇️ Tải Template Excel</button>
+                </div>
+
+                <!-- File Upload Area -->
+                <div id="uploadAreaAccessory" class="upload-area" 
+                     ondrop="handleAccessoryFileDrop(event)" 
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Kéo thả file Excel/CSV vào đây hoặc</p>
+                    <input type="file" id="excelFileInputAccessory" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleAccessoryFileSelect(event)">
+                    <button class="btn-add" onclick="document.getElementById('excelFileInputAccessory').click()">Chọn file</button>
+                    <p class="upload-hint">Hỗ trợ: .xlsx, .xls, .csv (tối đa 10MB)</p>
+                </div>
+
+                <!-- Selected File Info -->
+                <div id="fileInfoAccessory" class="file-info hidden">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px;">📊</span>
+                        <div style="flex: 1;">
+                            <p style="margin: 0; font-weight: 600;" id="fileNameAccessory"></p>
+                            <p style="margin: 0; font-size: 14px; color: #666;" id="fileSizeAccessory"></p>
+                        </div>
+                        <button class="btn-action btn-delete" onclick="clearAccessoryFileSelection()">✕</button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="importProgressAccessory" class="import-progress hidden">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFillAccessory"></div>
+                    </div>
+                    <p id="progressTextAccessory" style="text-align: center; margin-top: 8px; color: #666;">Đang xử lý...</p>
+                </div>
+
+                <!-- Import Results -->
+                <div id="importResultsAccessory" class="import-results hidden">
+                    <h3 style="margin: 0 0 16px 0; color: #059669;">✅ Kết quả Import</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                        <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #0369a1;" id="totalRecordsAccessory">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #075985;">Tổng số</p>
+                        </div>
+                        <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #059669;" id="successCountAccessory">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #047857;">Thành công</p>
+                        </div>
+                        <div style="background: #fef2f2; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #dc2626;" id="failureCountAccessory">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #991b1b;">Thất bại</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Error List -->
+                    <div id="errorListContainerAccessory" class="hidden">
+                        <h4 style="margin: 0 0 8px 0; color: #dc2626;">❌ Lỗi chi tiết:</h4>
+                        <div id="errorListAccessory" style="max-height: 200px; overflow-y: auto; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px;">
+                            <!-- Errors will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeImportAccessoryModal()">Đóng</button>
+                <button class="btn-submit" id="btnImportAccessory" onclick="submitAccessoryImport()" disabled>📤 Import</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-sidebar.js?v=1"></script>
     <script src="js/common.js?v=3"></script>
     <script src="js/admin-products.js?v=3"></script>
 </body>

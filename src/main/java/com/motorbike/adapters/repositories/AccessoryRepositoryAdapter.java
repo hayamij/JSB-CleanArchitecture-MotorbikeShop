@@ -90,6 +90,19 @@ public class AccessoryRepositoryAdapter implements AccessoryRepository {
                 .collect(Collectors.toList());
     }
     
+    @Override
+    public List<PhuKienXeMay> saveAll(List<PhuKienXeMay> phuKienList) {
+        List<PhuKienXeMayJpaEntity> jpaEntities = phuKienList.stream()
+                .map(this::toJpaEntity)
+                .collect(Collectors.toList());
+        
+        List<PhuKienXeMayJpaEntity> savedEntities = jpaRepository.saveAll(jpaEntities);
+        
+        return savedEntities.stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+    
     private PhuKienXeMay toDomain(PhuKienXeMayJpaEntity jpaEntity) {
         return new PhuKienXeMay(
                 jpaEntity.getMaSanPham(),
