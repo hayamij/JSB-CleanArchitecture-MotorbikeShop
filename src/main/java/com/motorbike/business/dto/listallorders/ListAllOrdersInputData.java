@@ -15,6 +15,10 @@ public class ListAllOrdersInputData {
         return new ListAllOrdersInputData(true);
     }
 
+    public static ListAllOrdersInputData forNonAdmin() {
+        return new ListAllOrdersInputData(false);
+    }
+
     public boolean isAdmin() {
         return admin;
     }

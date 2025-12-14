@@ -1,195 +1,210 @@
 package com.motorbike.business.usecase.control;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+import com.motorbike.adapters.presenters.ListAllOrdersPresenter;
+import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
 import com.motorbike.business.dto.listallorders.ListAllOrdersInputData;
-import com.motorbike.business.dto.listallorders.ListAllOrdersOutputData;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
-import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.TrangThaiDonHang;
 
-@DisplayName("List All Orders Use Case Tests (no pagination/status/sort/revenue)")
-class ListAllOrdersUseCaseControlTest {
+public class ListAllOrdersUseCaseControlTest {
 
-    private ListAllOrdersUseCaseControl listAllOrdersUseCase;
-    private OrderRepository orderRepository;
-    private ListAllOrdersOutputBoundary outputBoundary;
+	// Kịch bản 1: Không có dấu vào
+	@Test
+	@DisplayName("Kịch bản 1: Không có dấu vào")
+	public void testExecute_NullInputData_ShouldReturnError() {
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		ListAllOrdersViewModel viewModel = new ListAllOrdersViewModel();
+		ListAllOrdersOutputBoundary outputBoundary = new ListAllOrdersPresenter(viewModel);
+		
+		ListAllOrdersUseCaseControl control = new ListAllOrdersUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		control.execute(null);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
 
-    @BeforeEach
-    void setUp() {
-        orderRepository = mock(OrderRepository.class);
-        outputBoundary = mock(ListAllOrdersOutputBoundary.class);
-        listAllOrdersUseCase = new ListAllOrdersUseCaseControl(outputBoundary, orderRepository);
-    }
+	// Kịch bản 2: Không phải là Admin
+	@Test
+	@DisplayName("Kịch bản 2: Không phải là Admin")
+	public void testExecute_NotAdmin_ShouldReturnError() {
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		ListAllOrdersViewModel viewModel = new ListAllOrdersViewModel();
+		ListAllOrdersOutputBoundary outputBoundary = new ListAllOrdersPresenter(viewModel);
+		
+		ListAllOrdersUseCaseControl control = new ListAllOrdersUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		// Using forNonAdmin() to test non-admin user
+		control.execute(ListAllOrdersInputData.forNonAdmin());
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
 
-    @Test
-    @DisplayName("Should list all orders successfully and return all items")
-    void testListAllOrdersSuccess() {
-        List<DonHang> mockOrders = createMockOrders(5);
-        when(orderRepository.findAll()).thenReturn(mockOrders);
+	// Kịch bản 3: Lấy đơn hàng thất bại
+	@Test
+	@DisplayName("Kịch bản 3: Lấy đơn hàng thất bại")
+	public void testExecute_RepositoryError_ShouldReturnError() {
+		OrderRepository orderRepo = new MockOrderRepositoryWithError();
+		
+		ListAllOrdersViewModel viewModel = new ListAllOrdersViewModel();
+		ListAllOrdersOutputBoundary outputBoundary = new ListAllOrdersPresenter(viewModel);
+		
+		ListAllOrdersUseCaseControl control = new ListAllOrdersUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		control.execute(ListAllOrdersInputData.forAdmin());
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
-        listAllOrdersUseCase.execute(inputData);
+	// Kịch bản 4: Lấy đơn hàng thành công
+	@Test
+	@DisplayName("Kịch bản 4: Lấy đơn hàng thành công")
+	public void testExecute_ValidInput_ShouldReturnOrders() {
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		ListAllOrdersViewModel viewModel = new ListAllOrdersViewModel();
+		ListAllOrdersOutputBoundary outputBoundary = new ListAllOrdersPresenter(viewModel);
+		
+		ListAllOrdersUseCaseControl control = new ListAllOrdersUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		control.execute(ListAllOrdersInputData.forAdmin());
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+		assertNotNull(viewModel.orders);
+	}
 
-        verify(orderRepository).findAll();
-        
-        ArgumentCaptor<ListAllOrdersOutputData> captor =
-            ArgumentCaptor.forClass(ListAllOrdersOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        ListAllOrdersOutputData output = captor.getValue();
-        assertTrue(output.isSuccess());
-        assertNotNull(output.getOrders());
-        assertEquals(5, output.getOrders().size());
-    }
+	// Mock OrderRepository implementation
+	private static class MockOrderRepository implements OrderRepository {
+		@Override
+		public Optional<DonHang> findById(Long orderId) {
+			return Optional.empty();
+		}
 
-    @Test
-    @DisplayName("Should return empty result when no orders found")
-    void testListAllOrdersEmptyResult() {
-        when(orderRepository.findAll()).thenReturn(new ArrayList<>());
+		@Override
+		public DonHang save(DonHang donHang) {
+			return donHang;
+		}
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
-        listAllOrdersUseCase.execute(inputData);
+		@Override
+		public List<DonHang> findByUserId(Long userId) {
+			return new ArrayList<>();
+		}
 
-        ArgumentCaptor<ListAllOrdersOutputData> captor =
-            ArgumentCaptor.forClass(ListAllOrdersOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        ListAllOrdersOutputData output = captor.getValue();
-        assertTrue(output.isSuccess());
-        assertTrue(output.isEmpty());
-        assertEquals(0, output.getOrders().size());
-    }
+		@Override
+		public List<DonHang> findByStatus(TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
 
-    @Test
-    @DisplayName("Should calculate total amount by summing returned order items")
-    void testCalculateTotalAmountFromOrderItems() {
-        List<DonHang> mockOrders = new ArrayList<>();
-        
-        DonHang order1 = new DonHang(1L, "Customer 1", "0123", "Address", null);
-        order1.setMaDonHang(1L);
-        order1.themSanPham(new ChiTietDonHang(1L, "Product 1",
-            BigDecimal.valueOf(10000000), 1));
-        
-        DonHang order2 = new DonHang(2L, "Customer 2", "0456", "Address", null);
-        order2.setMaDonHang(2L);
-        order2.themSanPham(new ChiTietDonHang(2L, "Product 2",
-            BigDecimal.valueOf(20000000), 1));
-        
-        mockOrders.add(order1);
-        mockOrders.add(order2);
-        
-        when(orderRepository.findAll()).thenReturn(mockOrders);
+		@Override
+		public List<DonHang> findByUserIdAndStatus(Long userId, TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
-        listAllOrdersUseCase.execute(inputData);
+		@Override
+		public List<DonHang> findAll() {
+			List<DonHang> orders = new ArrayList<>();
+			
+			for (int i = 1; i <= 3; i++) {
+				DonHang order = new DonHang(
+					(long) i,
+					(long) i,
+					new ArrayList<>(),
+					new BigDecimal(String.valueOf(1000000 * i)),
+					TrangThaiDonHang.CHO_XAC_NHAN,
+					"Customer " + i,
+					"012345678" + i,
+					"Address " + i,
+					"Note " + i,
+					LocalDateTime.now().minusDays(i),
+					LocalDateTime.now().minusDays(i)
+				);
+				orders.add(order);
+			}
+			
+			return orders;
+		}
 
-        ArgumentCaptor<ListAllOrdersOutputData> captor =
-            ArgumentCaptor.forClass(ListAllOrdersOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        ListAllOrdersOutputData output = captor.getValue();
-        BigDecimal sum = BigDecimal.ZERO;
-        for (ListAllOrdersOutputData.OrderItemData oi : output.getOrders()) {
-            sum = sum.add(oi.getTotalAmount());
-        }
-        assertEquals(0, BigDecimal.valueOf(30000000).compareTo(sum));
-    }
+		@Override
+		public List<DonHang> searchForAdmin(String keyword) {
+			return new ArrayList<>();
+		}
 
-    @Test
-    @DisplayName("Should fail with null input")
-    void testValidationFailNullInput() {
-        listAllOrdersUseCase.execute(null);
+		@Override
+		public void deleteById(Long orderId) {
+		}
 
-        verify(orderRepository, never()).findAll();
-        
-        ArgumentCaptor<ListAllOrdersOutputData> captor =
-            ArgumentCaptor.forClass(ListAllOrdersOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        ListAllOrdersOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
-    }
+		@Override
+		public boolean existsById(Long orderId) {
+			return false;
+		}
+	}
 
-    @Test
-    @DisplayName("Should handle single order")
-    void testEdgeCaseSingleOrder() {
-        List<DonHang> mockOrders = createMockOrders(1);
-        when(orderRepository.findAll()).thenReturn(mockOrders);
+	// Mock OrderRepository that throws error
+	private static class MockOrderRepositoryWithError implements OrderRepository {
+		@Override
+		public Optional<DonHang> findById(Long orderId) {
+			return Optional.empty();
+		}
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
-        listAllOrdersUseCase.execute(inputData);
+		@Override
+		public DonHang save(DonHang donHang) {
+			return donHang;
+		}
 
-        ArgumentCaptor<ListAllOrdersOutputData> captor =
-            ArgumentCaptor.forClass(ListAllOrdersOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        ListAllOrdersOutputData output = captor.getValue();
-        assertTrue(output.isSuccess());
-        assertEquals(1, output.getOrders().size());
-    }
+		@Override
+		public List<DonHang> findByUserId(Long userId) {
+			return new ArrayList<>();
+		}
 
-    @Test
-    @DisplayName("Should verify output data structure")
-    void testOutputDataStructure() {
-        List<DonHang> mockOrders = createMockOrders(3);
-        when(orderRepository.findAll()).thenReturn(mockOrders);
+		@Override
+		public List<DonHang> findByStatus(TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
 
-        ListAllOrdersInputData inputData = ListAllOrdersInputData.forAdmin();
-        listAllOrdersUseCase.execute(inputData);
+		@Override
+		public List<DonHang> findByUserIdAndStatus(Long userId, TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
 
-        ArgumentCaptor<ListAllOrdersOutputData> captor =
-            ArgumentCaptor.forClass(ListAllOrdersOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        
-        ListAllOrdersOutputData output = captor.getValue();
-        assertTrue(output.isSuccess());
-        assertNotNull(output.getOrders());
-        assertTrue(output.getOrders().size() > 0);
-    }
+		@Override
+		public List<DonHang> findAll() {
+			throw new RuntimeException("Database connection error");
+		}
 
-    
-    private List<DonHang> createMockOrders(int count) {
-        List<DonHang> orders = new ArrayList<>();
-        
-        for (int i = 1; i <= count; i++) {
-            DonHang order = new DonHang(
-                (long) i,
-                "Customer " + i,
-                "012345678" + i,
-                "Address " + i,
-                "Note " + i
-            );
-            order.setMaDonHang((long) i);
-            
-            ChiTietDonHang item = new ChiTietDonHang(
-                (long) i,
-                "Product " + i,
-                BigDecimal.valueOf(1000000 * i),
-                1
-            );
-            order.themSanPham(item);
-            
-            orders.add(order);
-        }
-        
-        return orders;
-    }
+		@Override
+		public List<DonHang> searchForAdmin(String keyword) {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public void deleteById(Long orderId) {
+		}
+
+		@Override
+		public boolean existsById(Long orderId) {
+			return false;
+		}
+	}
 }

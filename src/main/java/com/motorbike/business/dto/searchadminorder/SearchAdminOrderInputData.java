@@ -14,6 +14,10 @@ public class SearchAdminOrderInputData {
         return new SearchAdminOrderInputData(searchQuery, true);
     }
 
+    public static SearchAdminOrderInputData forNonAdmin(String searchQuery) {
+        return new SearchAdminOrderInputData(searchQuery, false);
+    }
+
     public String getSearchQuery() {
         return searchQuery;
     }

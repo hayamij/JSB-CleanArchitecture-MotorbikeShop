@@ -1,16 +1,15 @@
 package com.motorbike.business.usecase.control;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.motorbike.business.dto.listallorders.ListAllOrdersInputData;
 import com.motorbike.business.dto.listallorders.ListAllOrdersOutputData;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.exceptions.ValidationException;
-
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ListAllOrdersUseCaseControl {
     
@@ -50,10 +49,6 @@ public class ListAllOrdersUseCaseControl {
                 List<DonHang> sortedOrders = allOrders.stream()
                         .sorted(Comparator.comparing(DonHang::getNgayDat).reversed())
                         .collect(Collectors.toList());
-
-                BigDecimal totalRevenue = sortedOrders.stream()
-                        .map(DonHang::getTongTien)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 List<ListAllOrdersOutputData.OrderItemData> orderItems = sortedOrders.stream()
                         .map(donHang -> new ListAllOrdersOutputData.OrderItemData(
