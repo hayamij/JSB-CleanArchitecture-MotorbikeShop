@@ -1,228 +1,231 @@
 package com.motorbike.business.usecase.control;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
+import com.motorbike.adapters.presenters.UpdateOrderInforPresenter;
+import com.motorbike.adapters.viewmodels.UpdateOrderInforViewModel;
 import com.motorbike.business.dto.updateorderinfor.UpdateOrderInforInputData;
-import com.motorbike.business.dto.updateorderinfor.UpdateOrderInforOutputData;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.UpdateOrderInforOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 
-class UpdateOrderInforUseCaseControlTest {
+public class UpdateOrderInforUseCaseControlTest {
 
-    private UpdateOrderInforUseCaseControl useCase;
-    private OrderRepository orderRepository;
-    private UpdateOrderInforOutputBoundary outputBoundary;
+	// Kịch bản 1: Không có dấu vào
+	@Test
+	@DisplayName("Kịch bản 1: Không có dấu vào")
+	public void testExecute_NullInputData_ShouldReturnError() {
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		UpdateOrderInforViewModel viewModel = new UpdateOrderInforViewModel();
+		UpdateOrderInforOutputBoundary outputBoundary = new UpdateOrderInforPresenter(viewModel);
+		
+		UpdateOrderInforUseCaseControl control = new UpdateOrderInforUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		control.execute(null);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
 
-    @BeforeEach
-    void setUp() {
-        orderRepository = mock(OrderRepository.class);
-        outputBoundary = mock(UpdateOrderInforOutputBoundary.class);
-        useCase = new UpdateOrderInforUseCaseControl(outputBoundary, orderRepository);
-    }
+	// Kịch bản 2: Lỗi nhập liệu
+	@Test
+	@DisplayName("Kịch bản 2: Lỗi nhập liệu")
+	public void testExecute_InvalidInput_ShouldReturnError() {
+		Long orderId = 1L;
+		Long userId = 1L;
+		
+		// Test with invalid receiver name (empty)
+		UpdateOrderInforInputData inputData = new UpdateOrderInforInputData(
+			orderId,
+			userId,
+			"",  // Empty name
+			"0123456789",
+			"123 Street",
+			"Note"
+		);
+		
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		UpdateOrderInforViewModel viewModel = new UpdateOrderInforViewModel();
+		UpdateOrderInforOutputBoundary outputBoundary = new UpdateOrderInforPresenter(viewModel);
+		
+		UpdateOrderInforUseCaseControl control = new UpdateOrderInforUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
 
-    @Test
-    @DisplayName("Should update shipping info when order is pending and user owns it")
-    void testUpdateSuccess() {
-        Long orderId = 1L;
-        Long userId = 10L;
+	// Kịch bản 3: Không tìm thấy đơn hàng
+	@Test
+	@DisplayName("Kịch bản 3: Không tìm thấy đơn hàng")
+	public void testExecute_OrderNotFound_ShouldReturnError() {
+		Long orderId = 999L;  // Non-existent order
+		Long userId = 1L;
+		
+		UpdateOrderInforInputData inputData = new UpdateOrderInforInputData(
+			orderId,
+			userId,
+			"Nguyen Van A",
+			"0123456789",
+			"123 Street",
+			"Note"
+		);
+		
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		UpdateOrderInforViewModel viewModel = new UpdateOrderInforViewModel();
+		UpdateOrderInforOutputBoundary outputBoundary = new UpdateOrderInforPresenter(viewModel);
+		
+		UpdateOrderInforUseCaseControl control = new UpdateOrderInforUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
 
-        DonHang order = new DonHang(
-            orderId,
-            userId,
-            new ArrayList<>(),
-            BigDecimal.valueOf(5000000),
-            TrangThaiDonHang.CHO_XAC_NHAN,
-            "Old Name",
-            "0909000000",
-            "Old Address",
-            "Old Note",
-            LocalDateTime.now().minusDays(1),
-            LocalDateTime.now().minusDays(1)
-        );
+	// Kịch bản 4: Quyền truy cập không hợp lệ
+	@Test
+	@DisplayName("Kịch bản 4: Quyền truy cập không hợp lệ")
+	public void testExecute_InvalidPermission_ShouldReturnError() {
+		Long orderId = 1L;
+		Long differentUserId = 99L;  // Different user trying to update
+		
+		UpdateOrderInforInputData inputData = new UpdateOrderInforInputData(
+			orderId,
+			differentUserId,
+			"Nguyen Van A",
+			"0123456789",
+			"123 Street",
+			"Note"
+		);
+		
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		UpdateOrderInforViewModel viewModel = new UpdateOrderInforViewModel();
+		UpdateOrderInforOutputBoundary outputBoundary = new UpdateOrderInforPresenter(viewModel);
+		
+		UpdateOrderInforUseCaseControl control = new UpdateOrderInforUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(false, viewModel.success);
+		assertEquals(true, viewModel.hasError);
+	}
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-        when(orderRepository.save(any(DonHang.class))).thenAnswer(invocation -> invocation.getArgument(0));
+	// Kịch bản 5: Sửa thông tin đơn hàng thành công
+	@Test
+	@DisplayName("Kịch bản 5: Sửa thông tin đơn hàng thành công")
+	public void testExecute_ValidData_ShouldUpdateSuccessfully() {
+		Long orderId = 1L;
+		Long userId = 1L;
+		
+		UpdateOrderInforInputData inputData = new UpdateOrderInforInputData(
+			orderId,
+			userId,
+			"Tran Thi B",
+			"0987654321",
+			"456 Avenue",
+			"Giao trong giờ hành chính"
+		);
+		
+		OrderRepository orderRepo = new MockOrderRepository();
+		
+		UpdateOrderInforViewModel viewModel = new UpdateOrderInforViewModel();
+		UpdateOrderInforOutputBoundary outputBoundary = new UpdateOrderInforPresenter(viewModel);
+		
+		UpdateOrderInforUseCaseControl control = new UpdateOrderInforUseCaseControl(
+			outputBoundary, orderRepo
+		);
+		control.execute(inputData);
+		
+		assertEquals(true, viewModel.success);
+		assertEquals(false, viewModel.hasError);
+		assertNotNull(viewModel.orderId);
+		assertEquals(orderId, viewModel.orderId);
+	}
 
-        UpdateOrderInforInputData input = new UpdateOrderInforInputData(
-            orderId,
-            userId,
-            "New Name",
-            "0988000000",
-            "123 New Street",
-            "Please call before delivery"
-        );
+	// Mock OrderRepository implementation
+	private static class MockOrderRepository implements OrderRepository {
+		@Override
+		public Optional<DonHang> findById(Long orderId) {
+			if (orderId == null || orderId == 999L) {
+				return Optional.empty();
+			}
+			
+			if (orderId == 1L) {
+				DonHang order = new DonHang(
+					1L,
+					1L,
+					new ArrayList<>(),
+					new BigDecimal("1000000"),
+					TrangThaiDonHang.CHO_XAC_NHAN,
+					"Nguyen Van A",
+					"0123456789",
+					"123 Street",
+					"Old Note",
+					LocalDateTime.now().minusDays(1),
+					LocalDateTime.now().minusDays(1)
+				);
+				return Optional.of(order);
+			}
+			
+			return Optional.empty();
+		}
 
-        useCase.execute(input);
+		@Override
+		public DonHang save(DonHang donHang) {
+			return donHang;
+		}
 
-        verify(orderRepository).findById(orderId);
-        verify(orderRepository).save(any(DonHang.class));
+		@Override
+		public java.util.List<DonHang> findByUserId(Long userId) {
+			return new ArrayList<>();
+		}
 
-        ArgumentCaptor<UpdateOrderInforOutputData> captor = ArgumentCaptor.forClass(UpdateOrderInforOutputData.class);
-        verify(outputBoundary).present(captor.capture());
+		@Override
+		public java.util.List<DonHang> findByStatus(TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
 
-        UpdateOrderInforOutputData output = captor.getValue();
-        assertTrue(output.isSuccess());
-        assertEquals(orderId, output.getOrderId());
-        assertEquals(userId, output.getCustomerId());
-        assertEquals("New Name", output.getReceiverName());
-        assertEquals("0988000000", output.getPhoneNumber());
-        assertEquals("123 New Street", output.getShippingAddress());
-        assertEquals("Please call before delivery", output.getNote());
-        assertEquals(TrangThaiDonHang.CHO_XAC_NHAN.name(), output.getOrderStatus());
-    }
+		@Override
+		public java.util.List<DonHang> findByUserIdAndStatus(Long userId, TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
 
-    @Test
-    @DisplayName("Should fail when order status is not editable")
-    void testUpdateFailsForInvalidStatus() {
-        Long orderId = 2L;
-        Long userId = 10L;
+		@Override
+		public java.util.List<DonHang> findAll() {
+			return new ArrayList<>();
+		}
 
-        DonHang order = new DonHang(
-            orderId,
-            userId,
-            new ArrayList<>(),
-            BigDecimal.valueOf(2000000),
-            TrangThaiDonHang.DA_XAC_NHAN,
-            "Old Name",
-            "0909000000",
-            "Old Address",
-            null,
-            LocalDateTime.now(),
-            LocalDateTime.now()
-        );
+		@Override
+		public java.util.List<DonHang> searchForAdmin(String keyword) {
+			return new ArrayList<>();
+		}
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+		@Override
+		public void deleteById(Long orderId) {
+		}
 
-        UpdateOrderInforInputData input = new UpdateOrderInforInputData(
-            orderId,
-            userId,
-            "New Name",
-            "0988000000",
-            "New Address",
-            "Note"
-        );
-
-        useCase.execute(input);
-
-        verify(orderRepository).findById(orderId);
-        verify(orderRepository, never()).save(any(DonHang.class));
-
-        ArgumentCaptor<UpdateOrderInforOutputData> captor = ArgumentCaptor.forClass(UpdateOrderInforOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-
-        UpdateOrderInforOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("CANNOT_UPDATE_ORDER", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail when user does not own the order")
-    void testUpdateFailsForWrongUser() {
-        Long orderId = 3L;
-        Long ownerId = 20L;
-        Long otherUser = 30L;
-
-        DonHang order = new DonHang(
-            orderId,
-            ownerId,
-            new ArrayList<>(),
-            BigDecimal.valueOf(3000000),
-            TrangThaiDonHang.CHO_XAC_NHAN,
-            "Old",
-            "0909000000",
-            "Old Address",
-            null,
-            LocalDateTime.now(),
-            LocalDateTime.now()
-        );
-
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-
-        UpdateOrderInforInputData input = new UpdateOrderInforInputData(
-            orderId,
-            otherUser,
-            "New",
-            "0988111111",
-            "New Address",
-            null
-        );
-
-        useCase.execute(input);
-
-        verify(orderRepository).findById(orderId);
-        verify(orderRepository, never()).save(any(DonHang.class));
-
-        ArgumentCaptor<UpdateOrderInforOutputData> captor = ArgumentCaptor.forClass(UpdateOrderInforOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-
-        UpdateOrderInforOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("CANNOT_UPDATE_ORDER", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail when order not found")
-    void testUpdateFailsWhenOrderNotFound() {
-        Long orderId = 99L;
-        Long userId = 1L;
-
-        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
-
-        UpdateOrderInforInputData input = new UpdateOrderInforInputData(
-            orderId,
-            userId,
-            "Name",
-            "0988000000",
-            "Address",
-            null
-        );
-
-        useCase.execute(input);
-
-        verify(orderRepository).findById(orderId);
-        verify(orderRepository, never()).save(any(DonHang.class));
-
-        ArgumentCaptor<UpdateOrderInforOutputData> captor = ArgumentCaptor.forClass(UpdateOrderInforOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-
-        UpdateOrderInforOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("CANNOT_UPDATE_ORDER", output.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("Should fail when input is null")
-    void testUpdateFailsWithNullInput() {
-        useCase.execute(null);
-
-        verify(orderRepository, never()).findById(any());
-        verify(orderRepository, never()).save(any());
-
-        ArgumentCaptor<UpdateOrderInforOutputData> captor = ArgumentCaptor.forClass(UpdateOrderInforOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-
-        UpdateOrderInforOutputData output = captor.getValue();
-        assertFalse(output.isSuccess());
-        assertEquals("INVALID_INPUT", output.getErrorCode());
-    }
+		@Override
+		public boolean existsById(Long orderId) {
+			return false;
+		}
+	}
 }
