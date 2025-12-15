@@ -67,11 +67,10 @@ public class ListMyOrdersUseCaseControlTest {
 	@Test
 	@DisplayName("Kịch bản 3: Lấy đơn hàng thất bại")
 	public void testExecute_RepositoryThrowsException_ShouldReturnError() {
-		Long userId = 1L;
+		Long userId = 999L;  // Special userId that triggers exception in mock
 		ListMyOrdersInputData inputData = ListMyOrdersInputData.forUser(userId);
 		
-		OrderRepository orderRepo = new MockOrderRepository();
-		// Mock repository throws exception
+		OrderRepository orderRepo = new MockOrderRepositoryWithException();
 		
 		ListMyOrdersViewModel viewModel = new ListMyOrdersViewModel();
 		ListMyOrdersOutputBoundary outputBoundary = new ListMyOrdersPresenter(viewModel);
@@ -162,6 +161,53 @@ public class ListMyOrdersUseCaseControlTest {
 			}
 			
 			return orders;
+		}
+
+		@Override
+		public List<DonHang> findByStatus(TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public List<DonHang> findByUserIdAndStatus(Long userId, TrangThaiDonHang trangThai) {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public List<DonHang> findAll() {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public List<DonHang> searchForAdmin(String keyword) {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public void deleteById(Long orderId) {
+		}
+
+		@Override
+		public boolean existsById(Long orderId) {
+			return false;
+		}
+	}
+
+	// Mock OrderRepository that throws exception
+	private static class MockOrderRepositoryWithException implements OrderRepository {
+		@Override
+		public Optional<DonHang> findById(Long orderId) {
+			return Optional.empty();
+		}
+
+		@Override
+		public DonHang save(DonHang donHang) {
+			return donHang;
+		}
+
+		@Override
+		public List<DonHang> findByUserId(Long userId) {
+			throw new RuntimeException("Database connection error");
 		}
 
 		@Override
