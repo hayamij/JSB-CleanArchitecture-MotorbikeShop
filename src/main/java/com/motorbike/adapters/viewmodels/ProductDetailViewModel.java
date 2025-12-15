@@ -1,12 +1,14 @@
 package com.motorbike.adapters.viewmodels;
 
+import java.util.Map;
+
 public class ProductDetailViewModel {
     public String productId;
     public String name;
     public String description;
     public String formattedPrice;
     public String imageUrl;
-    public String specifications;
+    public Map<String, String> specifications;
     public String categoryDisplay;
     public String stockQuantity;
     public String availabilityStatus;

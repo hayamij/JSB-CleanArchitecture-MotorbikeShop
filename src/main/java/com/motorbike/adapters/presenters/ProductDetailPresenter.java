@@ -1,12 +1,13 @@
 package com.motorbike.adapters.presenters;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Locale;
+
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
-
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
     
@@ -35,7 +36,7 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         viewModel.description = outputData.description != null ? outputData.description : "No description available";
         viewModel.formattedPrice = formatPrice(outputData.price);
         viewModel.imageUrl = outputData.imageUrl != null ? outputData.imageUrl : "/images/no-image.jpg";
-        viewModel.specifications = outputData.specifications != null ? outputData.specifications : "{}";
+        viewModel.specifications = outputData.specifications != null ? outputData.specifications : new HashMap<>();
         viewModel.categoryDisplay = formatCategory(outputData.category);
         viewModel.stockQuantity = formatStockQuantity(outputData.stockQuantity);
         

@@ -1,14 +1,17 @@
 package com.motorbike.business.usecase.control;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
-import com.motorbike.domain.exceptions.ValidationException;
 import com.motorbike.domain.exceptions.DomainException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import com.motorbike.domain.exceptions.ValidationException;
 
 public class GetProductDetailUseCaseControl {
     
@@ -47,7 +50,8 @@ public class GetProductDetailUseCaseControl {
         
         if (errorException == null && sanPham != null) {
             try {
-                String chiTiet = sanPham.layThongTinChiTiet();
+                String chiTietString = sanPham.layThongTinChiTiet();
+                Map<String, String> specifications = parseSpecifications(chiTietString);
                 BigDecimal giaGoc = sanPham.getGia();
                 BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
                 double phanTramGiam = giaGoc.subtract(giaSauKhuyenMai)
@@ -60,7 +64,7 @@ public class GetProductDetailUseCaseControl {
                     sanPham.getMaSanPham(),
                     sanPham.getTenSanPham(),
                     sanPham.getMoTa(),
-                    chiTiet,
+                    specifications,
                     giaGoc,
                     giaSauKhuyenMai,
                     phanTramGiam,
@@ -88,5 +92,28 @@ public class GetProductDetailUseCaseControl {
         }
         
         outputBoundary.present(outputData);
+    }
+    
+    private Map<String, String> parseSpecifications(String specString) {
+        Map<String, String> specs = new HashMap<>();
+        if (specString == null || specString.isEmpty()) {
+            return specs;
+        }
+        
+        // Parse the specifications string into key-value pairs
+        String[] lines = specString.split("\n");
+        for (String line : lines) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+            
+            int colonIndex = line.indexOf(":");
+            if (colonIndex > 0) {
+                String key = line.substring(0, colonIndex).trim();
+                String value = line.substring(colonIndex + 1).trim();
+                specs.put(key, value);
+            }
+        }
+        
+        return specs;
     }
 }
