@@ -146,7 +146,7 @@ function displayUsers(users) {
             <td>${user.email || 'N/A'}</td>
             <td>${user.soDienThoai || 'N/A'}</td>
             <td title="${user.diaChi || 'Chưa có'}">${user.diaChi ? (user.diaChi.length > 30 ? user.diaChi.substring(0, 30) + '...' : user.diaChi) : 'N/A'}</td>
-            <td><span class="status-badge ${user.vaiTro === 'ADMIN' ? 'status-confirmed' : 'status-pending'}">${user.vaiTro || 'N/A'}</span></td>
+            <td><span class="status-badge ${user.vaiTro === 'ADMIN' ? 'status-admin' : 'status-customer'}">${user.vaiTro || 'N/A'}</span></td>
             <td>
                 <span class="visibility-badge ${user.hoatDong ? 'visibility-visible' : 'visibility-hidden'}">
                     ${user.hoatDong ? 'HOẠT ĐỘNG' : 'BỊ KHÓA'}

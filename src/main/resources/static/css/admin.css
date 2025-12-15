@@ -442,7 +442,6 @@ body {
 /* Badge Styles */
 .badge {
     padding: 6px 12px;
-    border-radius: 4px;
     font-size: 0.85em;
     font-weight: 600;
     text-transform: uppercase;
@@ -627,19 +626,48 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* Order Status Colors - Vibrant */
 .status-pending {
-    background: var(--color-gray);
-    color: var(--color-white);
+    background: #FFA500;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(255, 165, 0, 0.3);
 }
 
 .status-confirmed {
-    background: var(--color-dark-gray);
-    color: var(--color-white);
+    background: #4169E1;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(65, 105, 225, 0.3);
+}
+
+.status-shipping {
+    background: #9370DB;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(147, 112, 219, 0.3);
+}
+
+.status-delivered {
+    background: #28A745;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
 }
 
 .status-cancelled {
-    background: var(--color-light-gray);
-    color: var(--color-dark-gray);
+    background: #DC3545;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+/* User Role Status Colors */
+.status-admin {
+    background: #343A40;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(52, 58, 64, 0.3);
+}
+
+.status-customer {
+    background: #17A2B8;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
 }
 
 /* Empty State */
@@ -738,13 +766,15 @@ body {
 }
 
 .visibility-visible {
-    background: var(--color-black);
-    color: var(--color-white);
+    background: #28A745;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
 }
 
 .visibility-hidden {
-    background: var(--color-gray);
-    color: var(--color-white);
+    background: #6C757D;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
 }
 
 /* Responsive */
@@ -792,7 +822,6 @@ body {
 /* Import Excel Styles */
 .upload-area {
     border: 3px dashed #cbd5e1;
-    border-radius: 12px;
     padding: 40px;
     text-align: center;
     background: #f8fafc;
@@ -832,7 +861,6 @@ body {
 .file-info {
     background: #f0fdf4;
     border: 2px solid #86efac;
-    border-radius: 8px;
     padding: 16px;
     margin-top: 16px;
 }
@@ -845,7 +873,6 @@ body {
     width: 100%;
     height: 24px;
     background: #e5e7eb;
-    border-radius: 12px;
     overflow: hidden;
 }
 
@@ -860,7 +887,6 @@ body {
     margin-top: 20px;
     padding: 20px;
     background: #f9fafb;
-    border-radius: 8px;
     border: 2px solid #d1d5db;
 }
 

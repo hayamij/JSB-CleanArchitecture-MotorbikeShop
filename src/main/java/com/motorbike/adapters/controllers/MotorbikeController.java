@@ -254,8 +254,15 @@ public class MotorbikeController {
             var result = exportMotorbikesViewModel.exportResult;
             
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + result.getFileName() + "\"");
+            headers.setContentType(MediaType.parseMediaType("text/csv"));
+            headers.setContentDisposition(
+                org.springframework.http.ContentDisposition.attachment()
+                    .filename(result.getFileName())
+                    .build()
+            );
+            headers.setCacheControl("no-cache, no-store, must-revalidate");
+            headers.setPragma("no-cache");
+            headers.setExpires(0);
             
             return ResponseEntity
                     .ok()

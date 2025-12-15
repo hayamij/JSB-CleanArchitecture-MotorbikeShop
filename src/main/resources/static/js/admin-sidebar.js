@@ -10,30 +10,24 @@ function loadAdminSidebar(activePage) {
             
             <nav class="sidebar-nav">
                 <a href="admin.html" class="nav-item ${activePage === 'dashboard' ? 'active' : ''}">
-                    <span class="nav-icon">📊</span>
                     <span class="nav-text">Dashboard</span>
                 </a>
                 <a href="admin-users.html" class="nav-item ${activePage === 'users' ? 'active' : ''}">
-                    <span class="nav-icon">👥</span>
                     <span class="nav-text">Quản lý Users</span>
                 </a>
                 <a href="admin-products.html" class="nav-item ${activePage === 'products' ? 'active' : ''}">
-                    <span class="nav-icon">📦</span>
                     <span class="nav-text">Quản lý Sản phẩm</span>
                 </a>
                 <a href="admin-orders.html" class="nav-item ${activePage === 'orders' ? 'active' : ''}">
-                    <span class="nav-icon">🛒</span>
                     <span class="nav-text">Quản lý Đơn hàng</span>
                 </a>
             </nav>
 
             <div class="sidebar-footer">
                 <a href="home.html" class="nav-item">
-                    <span class="nav-icon">🏠</span>
                     <span class="nav-text">Trang chủ</span>
                 </a>
                 <button class="nav-item btn-logout-sidebar" onclick="logout()">
-                    <span class="nav-icon">🚪</span>
                     <span class="nav-text">Đăng xuất</span>
                 </button>
             </div>

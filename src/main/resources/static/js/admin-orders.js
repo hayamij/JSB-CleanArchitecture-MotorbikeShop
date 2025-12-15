@@ -167,8 +167,8 @@ function getStatusClassFromText(statusText) {
     switch(statusText) {
         case 'Chờ xác nhận': return 'status-pending';
         case 'Đã xác nhận': return 'status-confirmed';
-        case 'Đang giao hàng': return 'status-confirmed';
-        case 'Đã giao hàng': return 'status-confirmed';
+        case 'Đang giao hàng': return 'status-shipping';
+        case 'Đã giao hàng': return 'status-delivered';
         case 'Đã hủy': return 'status-cancelled';
         default: return 'status-pending';
     }

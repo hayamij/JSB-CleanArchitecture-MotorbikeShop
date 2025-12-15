@@ -2,7 +2,7 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.accessory.ExportAccessoriesInputData;
 import com.motorbike.business.dto.accessory.ExportAccessoriesOutputData;
-import com.motorbike.business.ports.exporter.ExcelExporter;
+import com.motorbike.business.ports.exporter.CSVExporter;
 import com.motorbike.business.ports.repository.AccessoryRepository;
 import com.motorbike.business.usecase.input.ExportAccessoriesInputBoundary;
 import com.motorbike.business.usecase.output.ExportAccessoriesOutputBoundary;
@@ -21,16 +21,16 @@ public class ExportAccessoriesUseCaseControl implements ExportAccessoriesInputBo
     
     private final ExportAccessoriesOutputBoundary outputBoundary;
     private final AccessoryRepository accessoryRepository;
-    private final ExcelExporter excelExporter;
+    private final CSVExporter csvExporter;
     
     public ExportAccessoriesUseCaseControl(
             ExportAccessoriesOutputBoundary outputBoundary,
             AccessoryRepository accessoryRepository,
-            ExcelExporter excelExporter
+            CSVExporter csvExporter
     ) {
         this.outputBoundary = outputBoundary;
         this.accessoryRepository = accessoryRepository;
-        this.excelExporter = excelExporter;
+        this.csvExporter = csvExporter;
     }
     
     @Override
@@ -57,8 +57,8 @@ public class ExportAccessoriesUseCaseControl implements ExportAccessoriesInputBo
             // Step 3: Convert entities sang rows
             List<List<String>> rows = convertAccessoriesToRows(accessories);
             
-            // Step 4: Export ra Excel
-            ByteArrayOutputStream outputStream = excelExporter.exportToExcel(headers, rows);
+            // Step 4: Export ra CSV
+            ByteArrayOutputStream outputStream = csvExporter.exportToCSV(headers, rows);
             
             // Step 5: Tạo filename với timestamp
             String fileName = generateFileName();
@@ -120,7 +120,7 @@ public class ExportAccessoriesUseCaseControl implements ExportAccessoriesInputBo
     }
     
     private String generateFileName() {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        return "accessories_export_" + timestamp + ".xlsx";
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        return "accessories-export-" + timestamp + ".csv";
     }
 }
