@@ -1,9 +1,5 @@
 package com.motorbike.infrastructure.config;
 
-import com.motorbike.adapters.presenters.ListMyOrdersPresenter;
-import com.motorbike.adapters.viewmodels.ListMyOrdersViewModel;
-import com.motorbike.business.usecase.control.ListMyOrdersUseCaseControl;
-import com.motorbike.business.usecase.output.ListMyOrdersOutputBoundary;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.annotation.RequestScope;
@@ -16,6 +12,7 @@ import com.motorbike.adapters.presenters.DeleteMotorbikePresenter;
 import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
 import com.motorbike.adapters.presenters.GetAllMotorbikesPresenter;
 import com.motorbike.adapters.presenters.ListAllOrdersPresenter;
+import com.motorbike.adapters.presenters.ListMyOrdersPresenter;
 import com.motorbike.adapters.presenters.LoginPresenter;
 import com.motorbike.adapters.presenters.OrderDetailPresenter;
 import com.motorbike.adapters.presenters.ProductDetailPresenter;
@@ -30,12 +27,16 @@ import com.motorbike.adapters.presenters.ViewCartPresenter;
 import com.motorbike.adapters.repositories.MotorbikeRepositoryAdapter;
 import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
+import com.motorbike.adapters.viewmodels.AddUserViewModel;
 import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
 import com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel;
+import com.motorbike.adapters.viewmodels.DeleteUserViewModel;
 import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.ListAllOrdersViewModel;
+import com.motorbike.adapters.viewmodels.ListMyOrdersViewModel;
+import com.motorbike.adapters.viewmodels.ListUsersViewModel;
 import com.motorbike.adapters.viewmodels.LoginViewModel;
 import com.motorbike.adapters.viewmodels.OrderDetailViewModel;
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
@@ -46,6 +47,7 @@ import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
 import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.UpdateOrderInforViewModel;
+import com.motorbike.adapters.viewmodels.UpdateUserViewModel;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
@@ -54,13 +56,17 @@ import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.control.AddMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.AddToCartUseCaseControl;
+import com.motorbike.business.usecase.control.AddUserUseCaseControl;
 import com.motorbike.business.usecase.control.CancelOrderUseCaseControl;
 import com.motorbike.business.usecase.control.CheckoutUseCaseControl;
 import com.motorbike.business.usecase.control.DeleteMotorbikeUseCaseControl;
+import com.motorbike.business.usecase.control.DeleteUserUseCaseControl;
 import com.motorbike.business.usecase.control.GetAllAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.GetAllMotorbikesUseCaseControl;
 import com.motorbike.business.usecase.control.GetProductDetailUseCaseControl;
 import com.motorbike.business.usecase.control.ListAllOrdersUseCaseControl;
+import com.motorbike.business.usecase.control.ListMyOrdersUseCaseControl;
+import com.motorbike.business.usecase.control.ListUsersUseCaseControl;
 import com.motorbike.business.usecase.control.LoginUseCaseControl;
 import com.motorbike.business.usecase.control.OrderDetailUseCaseControl;
 import com.motorbike.business.usecase.control.RegisterUseCaseControl;
@@ -70,6 +76,7 @@ import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateOrderInforUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateUserUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
 import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
 import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
@@ -86,6 +93,7 @@ import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.GetAllMotorbikesOutputBoundary;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
+import com.motorbike.business.usecase.output.ListMyOrdersOutputBoundary;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
 import com.motorbike.business.usecase.output.OrderDetailOutputBoundary;
 import com.motorbike.business.usecase.output.RegisterOutputBoundary;
@@ -140,6 +148,26 @@ public class UseCaseConfig {
     @RequestScope
     public CheckoutViewModel checkoutViewModel() {
         return new CheckoutViewModel();
+    }
+    // Thêm: danh sách người dùng
+    @Bean
+    public ListUsersUseCaseControl listUsersUseCaseControl(ListUsersViewModel viewModel, UserRepository userRepository) {
+        return new ListUsersUseCaseControl(viewModel, userRepository);
+    }
+    // Thêm: thêm người dùng
+        @Bean
+    public AddUserUseCaseControl addUserUseCaseControl(AddUserViewModel addUserViewModel, UserRepository userRepository, CartRepository cartRepository) {
+        return new AddUserUseCaseControl(addUserViewModel, userRepository, cartRepository);
+    }
+        // Thêm xoá người dùng
+    @Bean
+    public DeleteUserUseCaseControl deleteUserUseCaseControl(DeleteUserViewModel deleteUserViewModel, UserRepository userRepository) {
+        return new DeleteUserUseCaseControl(deleteUserViewModel, userRepository);
+    }
+    //sữa thong tin người dùng
+     @Bean
+    public UpdateUserUseCaseControl updateUserUseCaseControl(UpdateUserViewModel updateUserViewModel, UserRepository userRepository) {
+        return new UpdateUserUseCaseControl(updateUserViewModel, userRepository);
     }
 
     @Bean

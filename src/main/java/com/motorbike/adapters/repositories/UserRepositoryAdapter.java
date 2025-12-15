@@ -1,13 +1,16 @@
 package com.motorbike.adapters.repositories;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.VaiTro;
 import com.motorbike.infrastructure.persistence.jpa.entities.TaiKhoanJpaEntity;
 import com.motorbike.infrastructure.persistence.jpa.repositories.TaiKhoanJpaRepository;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class UserRepositoryAdapter implements UserRepository {
@@ -48,6 +51,19 @@ public class UserRepositoryAdapter implements UserRepository {
             user.setLanDangNhapCuoi(java.time.LocalDateTime.now());
             jpaRepository.save(user);
         });
+    }
+    // Thêm: lấy tất cả người dùng (dùng cho admin)
+     @Override
+    public List<TaiKhoan> findAll() {
+        return jpaRepository.findAll()
+                .stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+    // Thêm: xóa người dùng theo id
+     @Override
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
     }
     
     

@@ -1,0 +1,49 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7fb;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 18px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(20,20,30,0.06);
+}
+
+h1 { margin-top: 0; }
+
+.controls {
+  margin-bottom: 12px;
+}
+
+.message {
+  margin: 8px 0 12px 0;
+  color: #333;
+}
+
+.message.error {
+  color: #b00020;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.users-table th, .users-table td {
+  border: 1px solid #e6e9ef;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.users-table th {
+  background: #f0f4fb;
+  font-weight: 600;
+}

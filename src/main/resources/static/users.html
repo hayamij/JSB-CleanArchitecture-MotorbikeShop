@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Danh sách người dùng</title>
+  <link rel="stylesheet" href="css/admin-users.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Danh sách người dùng</h1>
+
+     <div class="controls">
+      <label for="keyword">Tìm kiếm:</label>
+      <input id="keyword" placeholder="Email, username, role..." style="width: 40%" />
+      <label for="token">Token (nếu có):</label>
+      <input id="token" placeholder="Bearer &lt;token&gt;" style="width: 36%" />
+      <button id="loadBtn">Tìm / Tải</button>
+    </div>
+
+    <hr/>
+
+    <h2>Thêm người dùng</h2>
+    <div id="addMessage" class="message"></div>
+    <form id="addUserForm">
+      <div>
+        <label>Email:</label>
+        <input id="addEmail" type="email" required />
+      </div>
+      <div>
+        <label>Username:</label>
+        <input id="addUsername" required />
+      </div>
+      <div>
+        <label>Password:</label>
+        <input id="addPassword" type="password" required />
+      </div>
+      <div>
+        <label>Phone:</label>
+        <input id="addPhone" />
+      </div>
+      <div>
+        <label>Address:</label>
+        <input id="addAddress" />
+      </div>
+      <div>
+        <label>Role:</label>
+        <select id="addRole">
+          <option value="">(default)</option>
+          <option value="USER">USER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+      </div>
+      
+      <div>
+        <label>Active:</label>
+        <input id="addActive" type="checkbox" checked />
+      </div>
+
+       <div style="margin-top:8px;">
+        <button type="submit">Lưu thay đổi</button>
+        <button type="button" id="cancelEditBtn">Hủy</button>
+      </div>
+    </form>
+
+    <hr/>
+
+    <div id="message" class="message"></div>
+
+    <table id="usersTable" class="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Active</th>
+          <th>Created At</th>
+          <th>Updated At</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script src="js/admin-users.js"></script>
+</body>
+</html>
