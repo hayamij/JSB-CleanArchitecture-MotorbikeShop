@@ -2,7 +2,6 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.ExportMotorbikesInputData;
 import com.motorbike.business.dto.motorbike.ExportMotorbikesOutputData;
-import com.motorbike.business.ports.exporter.CSVExporter;
 import com.motorbike.business.ports.exporter.ExcelExporter;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
 import com.motorbike.business.usecase.input.ExportMotorbikesInputBoundary;
@@ -16,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Use Case Control: Export danh sách xe máy ra file CSV
+ * Use Case Control: Export danh sách xe máy ra file Excel
  * 
  * Business logic:
  * 1. Lấy danh sách xe máy từ repository (có thể filter)
  * 2. Chuyển đổi entities thành rows data
- * 3. Sử dụng CSVExporter để tạo file
- * 4. Trả về file CSV qua Output Boundary
+ * 3. Sử dụng ExcelExporter để tạo file
+ * 4. Trả về file Excel qua Output Boundary
  */
 public class ExportMotorbikesUseCaseControl implements ExportMotorbikesInputBoundary {
     
@@ -142,6 +141,6 @@ public class ExportMotorbikesUseCaseControl implements ExportMotorbikesInputBoun
      */
     private String generateFileName() {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-        return "motorbikes-export-" + timestamp + ".csv";
+        return "motorbikes-export-" + timestamp + ".xlsx";
     }
 }
