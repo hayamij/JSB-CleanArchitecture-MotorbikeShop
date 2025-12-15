@@ -1,5 +1,7 @@
 package com.motorbike.adapters.dto.response;
 
+import java.util.Map;
+
 public class ProductDetailResponse {
     private boolean success;
     private String productId;
@@ -7,7 +9,7 @@ public class ProductDetailResponse {
     private String description;
     private String formattedPrice;
     private String imageUrl;
-    private String specifications;
+    private Map<String, String> specifications;
     private String categoryDisplay;
     private String stockQuantity;
     private String availabilityStatus;
@@ -16,7 +18,7 @@ public class ProductDetailResponse {
 
     public ProductDetailResponse(boolean success, String productId, String name,
                                 String description, String formattedPrice, String imageUrl,
-                                String specifications, String categoryDisplay,
+                                Map<String, String> specifications, String categoryDisplay,
                                 String stockQuantity, String availabilityStatus,
                                 String errorCode, String errorMessage) {
         this.success = success;
@@ -39,7 +41,7 @@ public class ProductDetailResponse {
     public String getDescription() { return description; }
     public String getFormattedPrice() { return formattedPrice; }
     public String getImageUrl() { return imageUrl; }
-    public String getSpecifications() { return specifications; }
+    public Map<String, String> getSpecifications() { return specifications; }
     public String getCategoryDisplay() { return categoryDisplay; }
     public String getStockQuantity() { return stockQuantity; }
     public String getAvailabilityStatus() { return availabilityStatus; }

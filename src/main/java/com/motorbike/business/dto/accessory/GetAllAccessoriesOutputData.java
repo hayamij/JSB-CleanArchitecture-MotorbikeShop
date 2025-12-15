@@ -3,6 +3,8 @@ package com.motorbike.business.dto.accessory;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class GetAllAccessoriesOutputData {
 
     private final boolean success;
@@ -30,15 +32,25 @@ public class GetAllAccessoriesOutputData {
     public List<AccessoryItem> getAccessories() { return accessories; }
 
     public static class AccessoryItem {
+        @JsonProperty("id")
         private final Long id;
+        @JsonProperty("name")
         private final String name;
+        @JsonProperty("description")
         private final String description;
+        @JsonProperty("price")
         private final BigDecimal price;
+        @JsonProperty("stock")
         private final int stock;
+        @JsonProperty("imageUrl")
         private final String imageUrl;
+        @JsonProperty("type")
         private final String type;
+        @JsonProperty("brand")
         private final String brand;
+        @JsonProperty("material")
         private final String material;
+        @JsonProperty("size")
         private final String size;
 
         public AccessoryItem(Long id,
