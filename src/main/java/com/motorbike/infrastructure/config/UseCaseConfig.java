@@ -4,10 +4,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.annotation.RequestScope;
 
+import com.motorbike.adapters.presenters.AddAccessoryPresenter;
 import com.motorbike.adapters.presenters.AddMotorbikePresenter;
 import com.motorbike.adapters.presenters.AddToCartPresenter;
 import com.motorbike.adapters.presenters.CancelOrderPresenter;
 import com.motorbike.adapters.presenters.CheckoutPresenter;
+import com.motorbike.adapters.presenters.DeleteAccessoryPresenter;
 import com.motorbike.adapters.presenters.DeleteMotorbikePresenter;
 import com.motorbike.adapters.presenters.GetAllAccessoriesPresenter;
 import com.motorbike.adapters.presenters.GetAllMotorbikesPresenter;
@@ -20,16 +22,19 @@ import com.motorbike.adapters.presenters.RegisterPresenter;
 import com.motorbike.adapters.presenters.SearchAccessoriesPresenter;
 import com.motorbike.adapters.presenters.SearchAdminOrderPresenter;
 import com.motorbike.adapters.presenters.SearchMotorbikesPresenter;
+import com.motorbike.adapters.presenters.UpdateAccessoryPresenter;
 import com.motorbike.adapters.presenters.UpdateCartQuantityPresenter;
 import com.motorbike.adapters.presenters.UpdateMotorbikePresenter;
 import com.motorbike.adapters.presenters.UpdateOrderInforPresenter;
 import com.motorbike.adapters.presenters.ViewCartPresenter;
 import com.motorbike.adapters.repositories.MotorbikeRepositoryAdapter;
+import com.motorbike.adapters.viewmodels.AddAccessoryViewModel;
 import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.AddToCartViewModel;
 import com.motorbike.adapters.viewmodels.AddUserViewModel;
 import com.motorbike.adapters.viewmodels.CancelOrderViewModel;
 import com.motorbike.adapters.viewmodels.CheckoutViewModel;
+import com.motorbike.adapters.viewmodels.DeleteAccessoryViewModel;
 import com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.DeleteUserViewModel;
 import com.motorbike.adapters.viewmodels.GetAllAccessoriesViewModel;
@@ -44,21 +49,25 @@ import com.motorbike.adapters.viewmodels.RegisterViewModel;
 import com.motorbike.adapters.viewmodels.SearchAccessoriesViewModel;
 import com.motorbike.adapters.viewmodels.SearchAdminOrderViewModel;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
+import com.motorbike.adapters.viewmodels.UpdateAccessoryViewModel;
 import com.motorbike.adapters.viewmodels.UpdateCartQuantityViewModel;
 import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
 import com.motorbike.adapters.viewmodels.UpdateOrderInforViewModel;
 import com.motorbike.adapters.viewmodels.UpdateUserViewModel;
 import com.motorbike.adapters.viewmodels.ViewCartViewModel;
+import com.motorbike.business.ports.repository.AccessoryRepository;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.UserRepository;
+import com.motorbike.business.usecase.control.AddAccessoryUseCaseControl;
 import com.motorbike.business.usecase.control.AddMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.AddToCartUseCaseControl;
 import com.motorbike.business.usecase.control.AddUserUseCaseControl;
 import com.motorbike.business.usecase.control.CancelOrderUseCaseControl;
 import com.motorbike.business.usecase.control.CheckoutUseCaseControl;
+import com.motorbike.business.usecase.control.DeleteAccessoryUseCaseControl;
 import com.motorbike.business.usecase.control.DeleteMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.DeleteUserUseCaseControl;
 import com.motorbike.business.usecase.control.GetAllAccessoriesUseCaseControl;
@@ -73,21 +82,27 @@ import com.motorbike.business.usecase.control.RegisterUseCaseControl;
 import com.motorbike.business.usecase.control.SearchAccessoriesUseCaseControl;
 import com.motorbike.business.usecase.control.SearchAdminOrderUseCaseControl;
 import com.motorbike.business.usecase.control.SearchMotorbikesUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateAccessoryUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateOrderInforUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateUserUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
+import com.motorbike.business.usecase.input.AddAccessoryInputBoundary;
+import com.motorbike.business.usecase.input.DeleteAccessoryInputBoundary;
 import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
 import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
 import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
 import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.UpdateAccessoryInputBoundary;
 import com.motorbike.business.usecase.input.UpdateMotorbikeInputBoundary;
+import com.motorbike.business.usecase.output.AddAccessoryOutputBoundary;
 import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
 import com.motorbike.business.usecase.output.AddToCartOutputBoundary;
 import com.motorbike.business.usecase.output.CancelOrderOutputBoundary;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
+import com.motorbike.business.usecase.output.DeleteAccessoryOutputBoundary;
 import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
 import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.GetAllMotorbikesOutputBoundary;
@@ -100,10 +115,13 @@ import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
 import com.motorbike.business.usecase.output.SearchAdminOrderOutputBoundary;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
+import com.motorbike.business.usecase.output.UpdateAccessoryOutputBoundary;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.business.usecase.output.UpdateOrderInforOutputBoundary;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
+import com.motorbike.infrastructure.persistence.jpa.repositories.PhuKienXeMayJpaRepository;
 import com.motorbike.infrastructure.persistence.jpa.repositories.XeMayJpaRepository;
+import com.motorbike.infrastructure.persistence.repository.AccessoryRepositoryImpl;
 
 @Configuration
 public class UseCaseConfig {
@@ -541,7 +559,57 @@ public class UseCaseConfig {
         return new DeleteMotorbikeUseCaseControl(presenter, motorbikeRepository);
     }
 
+@Bean
+@RequestScope
+public AddAccessoryViewModel addAccessoryViewModel() {
+    return new AddAccessoryViewModel();
+}
 
+@Bean
+public AddAccessoryOutputBoundary addAccessoryPresenter(AddAccessoryViewModel viewModel) {
+    return new AddAccessoryPresenter(viewModel);
+}
 
+@Bean
+public AddAccessoryInputBoundary addAccessoryUseCase(AddAccessoryOutputBoundary presenter, AccessoryRepository repo) {
+    return new AddAccessoryUseCaseControl(presenter, repo);
+}
+
+@Bean
+@RequestScope
+public UpdateAccessoryViewModel updateAccessoryViewModel() {
+    return new UpdateAccessoryViewModel();
+}
+
+@Bean
+public UpdateAccessoryOutputBoundary updateAccessoryPresenter(UpdateAccessoryViewModel viewModel) {
+    return new UpdateAccessoryPresenter(viewModel);
+}
+
+@Bean
+public UpdateAccessoryInputBoundary updateAccessoryUseCase(UpdateAccessoryOutputBoundary presenter, AccessoryRepository repo) {
+    return new UpdateAccessoryUseCaseControl(presenter, repo);
+}
+
+@Bean
+@RequestScope
+public DeleteAccessoryViewModel deleteAccessoryViewModel() {
+    return new DeleteAccessoryViewModel();
+}
+
+@Bean
+public DeleteAccessoryOutputBoundary deleteAccessoryPresenter(DeleteAccessoryViewModel viewModel) {
+    return new DeleteAccessoryPresenter(viewModel);
+}
+
+@Bean
+public DeleteAccessoryInputBoundary deleteAccessoryUseCase(DeleteAccessoryOutputBoundary presenter, AccessoryRepository repo) {
+    return new DeleteAccessoryUseCaseControl(presenter, repo);
+}
+
+@Bean
+public AccessoryRepository accessoryRepository(PhuKienXeMayJpaRepository jpa) {
+    return new AccessoryRepositoryImpl(jpa);
+}
 
 }

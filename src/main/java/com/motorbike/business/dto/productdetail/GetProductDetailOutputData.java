@@ -1,6 +1,7 @@
 package com.motorbike.business.dto.productdetail;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 public class GetProductDetailOutputData {
     public boolean success;
@@ -12,7 +13,7 @@ public class GetProductDetailOutputData {
     public String description;
     public BigDecimal price;
     public String imageUrl;
-    public String specifications;
+    public Map<String, String> specifications;
     public String category;
     public int stockQuantity;
     public boolean available;
@@ -22,7 +23,7 @@ public class GetProductDetailOutputData {
     }
     
     public static GetProductDetailOutputData forSuccess(
-            Long productId, String name, String description, String specifications,
+            Long productId, String name, String description, Map<String, String> specifications,
             BigDecimal originalPrice, BigDecimal discountedPrice, double discountPercent,
             int stockQuantity, boolean available) {
         GetProductDetailOutputData data = new GetProductDetailOutputData();
