@@ -1,8 +1,9 @@
 package com.motorbike.domain.entities;
 
-import com.motorbike.domain.exceptions.*;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
+
+import com.motorbike.domain.exceptions.ValidationException;
 
 public class TaiKhoan {
     private Long maTaiKhoan;
@@ -150,4 +151,13 @@ public class TaiKhoan {
     public void setEmail(String email) {validateEmail(email); this.email = email; this.ngayCapNhat = LocalDateTime.now();}
     public void setSoDienThoai(String soDienThoai) {validateSoDienThoai(soDienThoai); this.soDienThoai = soDienThoai; this.ngayCapNhat = LocalDateTime.now();}
     public void setDiaChi(String diaChi) {this.diaChi = diaChi; this.ngayCapNhat = LocalDateTime.now();}
-}
+    public void setTenDangNhap(String tenDangNhap) {validateTenDangNhap(tenDangNhap); this.tenDangNhap = tenDangNhap; this.ngayCapNhat = LocalDateTime.now();}
+    // thêm đặt vai trò
+    public void setVaiTro(VaiTro vaiTro) {this.vaiTro = vaiTro; this.ngayCapNhat = LocalDateTime.now();}
+    public void setHoatDong(boolean hoatDong) {this.hoatDong = hoatDong; this.ngayCapNhat = LocalDateTime.now();}
+    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {this.ngayCapNhat = ngayCapNhat;}
+    public void setMatKhau(String matKhau) {validateMatKhau(matKhau); this.matKhau = matKhau; this.ngayCapNhat = LocalDateTime.now();}
+}   //sữa thông tin người dùng
+     
+
+
