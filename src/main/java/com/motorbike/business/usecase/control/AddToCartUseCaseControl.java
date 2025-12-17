@@ -58,12 +58,30 @@ public class AddToCartUseCaseControl implements AddToCartInputBoundary {
         }
         
         SanPham sanPham = null;
+        GioHang existingCart = null;
         if (errorException == null) {
             try {
-                // UC-39: Check inventory availability
+                // Get product first to have product name for error messages
+                sanPham = productRepository.findById(inputData.getProductId())
+                    .orElseThrow(() -> DomainException.productNotFound(String.valueOf(inputData.getProductId())));
+                
+                // Check if product already exists in cart
+                existingCart = cartRepository.findByUserId(inputData.getUserId()).orElse(null);
+                int existingQuantity = 0;
+                if (existingCart != null) {
+                    var existingItem = existingCart.getDanhSachSanPham().stream()
+                        .filter(item -> item.getMaSanPham().equals(inputData.getProductId()))
+                        .findFirst();
+                    if (existingItem.isPresent()) {
+                        existingQuantity = existingItem.get().getSoLuong();
+                    }
+                }
+                
+                // UC-39: Check inventory availability (total = existing + new)
+                int totalQuantity = existingQuantity + inputData.getQuantity();
                 CheckInventoryAvailabilityInputData checkInput = new CheckInventoryAvailabilityInputData(
                     inputData.getProductId(),
-                    inputData.getQuantity()
+                    totalQuantity
                 );
                 var inventoryResult = ((CheckInventoryAvailabilityUseCaseControl) checkInventoryUseCase)
                     .checkInventoryInternal(checkInput);
@@ -74,14 +92,10 @@ public class AddToCartUseCaseControl implements AddToCartInputBoundary {
                 
                 if (!inventoryResult.isAvailable()) {
                     throw DomainException.insufficientStock(
-                        inventoryResult.getProductName(), 
+                        sanPham.getTenSanPham(),
                         inventoryResult.getAvailableStock()
                     );
                 }
-                
-                // Get product for creating cart item
-                sanPham = productRepository.findById(inputData.getProductId())
-                    .orElseThrow(() -> DomainException.productNotFound(String.valueOf(inputData.getProductId())));
             } catch (Exception e) {
                 errorException = e;
             }
@@ -89,8 +103,10 @@ public class AddToCartUseCaseControl implements AddToCartInputBoundary {
         
         if (errorException == null && sanPham != null) {
             try {
-                GioHang gioHang = cartRepository.findByUserId(inputData.getUserId())
-                    .orElse(new GioHang(inputData.getUserId()));
+                // Reuse existingCart if already loaded, otherwise create new
+                GioHang gioHang = (existingCart != null) ? existingCart : 
+                    cartRepository.findByUserId(inputData.getUserId())
+                        .orElse(new GioHang(inputData.getUserId()));
                 
                 ChiTietGioHang chiTiet = new ChiTietGioHang(
                     sanPham.getMaSanPham(),

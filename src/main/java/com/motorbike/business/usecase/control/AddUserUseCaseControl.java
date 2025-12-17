@@ -2,8 +2,10 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.user.AddUserInputData;
 import com.motorbike.business.dto.user.AddUserOutputData;
+import com.motorbike.business.dto.user.CheckUserDuplicationInputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.input.AddUserInputBoundary;
+import com.motorbike.business.usecase.input.CheckUserDuplicationInputBoundary;
 import com.motorbike.business.usecase.output.AddUserOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.VaiTro;
@@ -15,11 +17,24 @@ public class AddUserUseCaseControl implements AddUserInputBoundary {
     
     private final AddUserOutputBoundary outputBoundary;
     private final UserRepository userRepository;
+    private final CheckUserDuplicationInputBoundary checkUserDuplicationUseCase;
     
-    public AddUserUseCaseControl(AddUserOutputBoundary outputBoundary,
-                                UserRepository userRepository) {
+    public AddUserUseCaseControl(
+            AddUserOutputBoundary outputBoundary,
+            UserRepository userRepository,
+            CheckUserDuplicationInputBoundary checkUserDuplicationUseCase) {
         this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
+        this.checkUserDuplicationUseCase = checkUserDuplicationUseCase;
+    }
+
+    // Backward compatibility constructor
+    public AddUserUseCaseControl(
+            AddUserOutputBoundary outputBoundary,
+            UserRepository userRepository) {
+        this.outputBoundary = outputBoundary;
+        this.userRepository = userRepository;
+        this.checkUserDuplicationUseCase = new CheckUserDuplicationUseCaseControl(null, userRepository);
     }
     
     @Override
@@ -42,16 +57,34 @@ public class AddUserUseCaseControl implements AddUserInputBoundary {
                 inputData.getSoDienThoai()
             );
             
-            // Check if email already exists
-            if (userRepository.existsByEmail(inputData.getEmail())) {
-                throw DomainException.emailAlreadyExists(inputData.getEmail());
-            }
-            
         } catch (Exception e) {
             errorException = e;
         }
         
-        // Step 2: Create user entity
+        // Step 2: UC-58 Check user duplication
+        if (errorException == null) {
+            try {
+                CheckUserDuplicationInputData checkDupInput = new CheckUserDuplicationInputData(
+                    inputData.getEmail(),
+                    inputData.getTenDangNhap(),
+                    null  // No exclusion for new user
+                );
+                var dupResult = ((CheckUserDuplicationUseCaseControl) checkUserDuplicationUseCase)
+                    .checkInternal(checkDupInput);
+                
+                if (dupResult.isDuplicate()) {
+                    if ("email".equals(dupResult.getDuplicatedField())) {
+                        throw DomainException.emailAlreadyExists(inputData.getEmail());
+                    } else if ("username".equals(dupResult.getDuplicatedField())) {
+                        throw DomainException.usernameAlreadyExists(inputData.getTenDangNhap());
+                    }
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        // Step 3: Create user entity
         if (errorException == null) {
             try {
                 taiKhoan = new TaiKhoan(
@@ -79,7 +112,7 @@ public class AddUserUseCaseControl implements AddUserInputBoundary {
             }
         }
         
-        // Step 3: Save to database
+        // Step 4: Save to database
         if (errorException == null && taiKhoan != null) {
             try {
                 taiKhoan = userRepository.save(taiKhoan);
@@ -98,13 +131,13 @@ public class AddUserUseCaseControl implements AddUserInputBoundary {
             }
         }
         
-        // Step 4: Handle error
+        // Step 5: Handle error
         if (errorException != null) {
             String errorCode = extractErrorCode(errorException);
             outputData = AddUserOutputData.forError(errorCode, errorException.getMessage());
         }
         
-        // Step 5: Present result
+        // Step 6: Present result
         outputBoundary.present(outputData);
     }
     

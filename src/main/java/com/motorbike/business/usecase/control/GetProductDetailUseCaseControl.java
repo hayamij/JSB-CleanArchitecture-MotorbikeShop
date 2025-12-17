@@ -3,12 +3,10 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
 import com.motorbike.business.usecase.input.CalculateProductPriceInputBoundary;
-import com.motorbike.business.usecase.input.FormatProductForDisplayInputBoundary;
 
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.dto.calculateproductprice.CalculateProductPriceInputData;
-import com.motorbike.business.dto.formatproductfordisplay.FormatProductForDisplayInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
@@ -22,17 +20,14 @@ public class GetProductDetailUseCaseControl implements GetProductDetailInputBoun
     private final GetProductDetailOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
     private final CalculateProductPriceInputBoundary calculatePriceUseCase;
-    private final FormatProductForDisplayInputBoundary formatProductUseCase;
     
     public GetProductDetailUseCaseControl(
             GetProductDetailOutputBoundary outputBoundary,
             ProductRepository productRepository,
-            CalculateProductPriceInputBoundary calculatePriceUseCase,
-            FormatProductForDisplayInputBoundary formatProductUseCase) {
+            CalculateProductPriceInputBoundary calculatePriceUseCase) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
         this.calculatePriceUseCase = calculatePriceUseCase;
-        this.formatProductUseCase = formatProductUseCase;
     }
 
     public GetProductDetailUseCaseControl(
@@ -41,7 +36,6 @@ public class GetProductDetailUseCaseControl implements GetProductDetailInputBoun
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
         this.calculatePriceUseCase = null;
-        this.formatProductUseCase = null;
     }
     
     public void execute(GetProductDetailInputData inputData) {

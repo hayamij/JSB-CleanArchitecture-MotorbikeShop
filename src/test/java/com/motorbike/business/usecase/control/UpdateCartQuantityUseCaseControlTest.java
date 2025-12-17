@@ -28,7 +28,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -47,7 +47,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -65,7 +65,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -84,7 +84,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -102,7 +102,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -120,7 +120,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -138,7 +138,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -156,7 +156,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -174,7 +174,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -192,7 +192,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -210,7 +210,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -228,7 +228,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		
@@ -246,7 +246,7 @@ public class UpdateCartQuantityUseCaseControlTest {
 		UpdateCartQuantityOutputBoundary outputBoundary = new UpdateCartQuantityPresenter(viewModel);
 		
 		UpdateCartQuantityUseCaseControl control = new UpdateCartQuantityUseCaseControl(
-			outputBoundary, cartRepo
+			outputBoundary, cartRepo, null, null
 		);
 		control.execute(inputData);
 		

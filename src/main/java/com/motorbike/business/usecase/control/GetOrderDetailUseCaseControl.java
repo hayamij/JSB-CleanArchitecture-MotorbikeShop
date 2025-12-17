@@ -7,10 +7,6 @@ import com.motorbike.business.dto.order.GetOrderDetailOutputData.OrderItemInfo;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.input.GetOrderDetailInputBoundary;
 import com.motorbike.business.usecase.output.GetOrderDetailOutputBoundary;
-import com.motorbike.business.dto.order.CalculateOrderTotalsInputData;
-import com.motorbike.business.dto.order.FormatOrderForDisplayInputData;
-import com.motorbike.business.usecase.input.CalculateOrderTotalsInputBoundary;
-import com.motorbike.business.usecase.input.FormatOrderForDisplayInputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.exceptions.ValidationException;
@@ -24,20 +20,6 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
 
     private final GetOrderDetailOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;
-    private final CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase;
-    private final FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase;
-
-    public GetOrderDetailUseCaseControl(
-            GetOrderDetailOutputBoundary outputBoundary,
-            OrderRepository orderRepository,
-            CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase,
-            FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase
-    ) {
-        this.outputBoundary = outputBoundary;
-        this.orderRepository = orderRepository;
-        this.calculateOrderTotalsUseCase = calculateOrderTotalsUseCase;
-        this.formatOrderForDisplayUseCase = formatOrderForDisplayUseCase;
-    }
 
     public GetOrderDetailUseCaseControl(
             GetOrderDetailOutputBoundary outputBoundary,
@@ -45,8 +27,6 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
     ) {
         this.outputBoundary = outputBoundary;
         this.orderRepository = orderRepository;
-        this.calculateOrderTotalsUseCase = null;
-        this.formatOrderForDisplayUseCase = null;
     }
 
     @Override
@@ -74,30 +54,13 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
                 
                 DonHang order = orderOpt.get();
                 
-                // UC-49: Calculate order totals
+                // Calculate order totals - use order.getTongTien()
                 BigDecimal totalAmount = order.getTongTien();
-                if (calculateOrderTotalsUseCase != null) {
-                    CalculateOrderTotalsInputData totalsInput = new CalculateOrderTotalsInputData(
-                        order.getDanhSachSanPham()
-                    );
-                    var totalsResult = ((CalculateOrderTotalsUseCaseControl) calculateOrderTotalsUseCase)
-                        .calculateInternal(totalsInput);
-                    totalAmount = totalsResult.getTotalAmount();
-                }
                 
-                // UC-50: Format order for display (fallback to simple format if null)
+                // Format order for display - simple format
                 String formattedStatus = order.getTrangThai().name();
                 String formattedDate = order.getNgayDatHang() != null ? order.getNgayDatHang().toString() : "";
                 String formattedPayment = order.getPhuongThucThanhToan() != null ? order.getPhuongThucThanhToan().getMoTa() : "";
-                
-                if (formatOrderForDisplayUseCase != null) {
-                    FormatOrderForDisplayInputData formatInput = new FormatOrderForDisplayInputData(order);
-                    var formatResult = ((FormatOrderForDisplayUseCaseControl) formatOrderForDisplayUseCase)
-                        .formatInternal(formatInput);
-                    formattedStatus = formatResult.getStatusText();
-                    formattedDate = formatResult.getFormattedDate();
-                    formattedPayment = formatResult.getPaymentMethodText();
-                }
                 
                 // Map order items
                 List<OrderItemInfo> items = order.getDanhSachSanPham().stream()

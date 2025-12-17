@@ -3,9 +3,11 @@ package com.motorbike.business.usecase.control;
 import com.motorbike.business.dto.accessory.UpdateAccessoryInputData;
 import com.motorbike.business.dto.accessory.UpdateAccessoryOutputData;
 import com.motorbike.business.dto.validateproductdata.ValidateProductDataInputData;
+import com.motorbike.business.dto.checkproductduplication.CheckProductDuplicationInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.UpdateAccessoryInputBoundary;
 import com.motorbike.business.usecase.input.ValidateProductDataInputBoundary;
+import com.motorbike.business.usecase.input.CheckProductDuplicationInputBoundary;
 import com.motorbike.business.usecase.output.UpdateAccessoryOutputBoundary;
 import com.motorbike.domain.entities.PhuKienXeMay;
 import com.motorbike.domain.entities.SanPham;
@@ -16,15 +18,18 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
     private final UpdateAccessoryOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
     private final ValidateProductDataInputBoundary validateProductDataUseCase;
+    private final CheckProductDuplicationInputBoundary checkDuplicationUseCase;
 
     public UpdateAccessoryUseCaseControl(
             UpdateAccessoryOutputBoundary outputBoundary,
             ProductRepository productRepository,
-            ValidateProductDataInputBoundary validateProductDataUseCase
+            ValidateProductDataInputBoundary validateProductDataUseCase,
+            CheckProductDuplicationInputBoundary checkDuplicationUseCase
     ) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
         this.validateProductDataUseCase = validateProductDataUseCase;
+        this.checkDuplicationUseCase = checkDuplicationUseCase;
     }
 
     // Constructor with 2 parameters (for backward compatibility)
@@ -35,6 +40,7 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
         this.validateProductDataUseCase = new ValidateProductDataUseCaseControl(null);
+        this.checkDuplicationUseCase = new CheckProductDuplicationUseCaseControl(null, productRepository);
     }
 
     @Override
@@ -84,7 +90,7 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
             }
         }
 
-        // Step 3: Check if accessory exists and update
+        // Step 3: Check if accessory exists
         if (errorException == null) {
             try {
                 SanPham sanPham = productRepository.findById(inputData.getMaSanPham())
@@ -95,7 +101,38 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
                 }
                 
                 phuKien = (PhuKienXeMay) sanPham;
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        // Step 3.5: UC-52 - Check duplication ONLY if product name is changing
+        if (errorException == null && phuKien != null) {
+            try {
+                String nameToCheck = (inputData.getTenSanPham() != null && !phuKien.getTenSanPham().equals(inputData.getTenSanPham())) 
+                    ? inputData.getTenSanPham() : null;
+                
+                if (nameToCheck != null) {
+                    CheckProductDuplicationInputData checkDupInput = new CheckProductDuplicationInputData(
+                        nameToCheck,
+                        null, // productCode - not used for accessories
+                        inputData.getMaSanPham() // Exclude current product from duplication check
+                    );
+                    var dupResult = ((CheckProductDuplicationUseCaseControl) checkDuplicationUseCase)
+                        .checkInternal(checkDupInput);
+                    
+                    if (dupResult.isDuplicate()) {
+                        throw DomainException.productAlreadyExists(inputData.getTenSanPham());
+                    }
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
 
+        // Step 4: Update accessory entity
+        if (errorException == null && phuKien != null) {
+            try {
                 // Cập nhật thông tin
                 phuKien.setTenSanPham(inputData.getTenSanPham());
                 phuKien.setMoTa(inputData.getMoTa());

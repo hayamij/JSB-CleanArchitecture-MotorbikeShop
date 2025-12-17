@@ -8,9 +8,11 @@ import com.motorbike.business.usecase.output.RegisterOutputBoundary;
 import com.motorbike.business.dto.user.ValidateUserRegistrationInputData;
 import com.motorbike.business.dto.user.CheckUserDuplicationInputData;
 import com.motorbike.business.dto.user.HashPasswordInputData;
+import com.motorbike.business.dto.cart.CreateUserCartInputData;
 import com.motorbike.business.usecase.input.ValidateUserRegistrationInputBoundary;
 import com.motorbike.business.usecase.input.CheckUserDuplicationInputBoundary;
 import com.motorbike.business.usecase.input.HashPasswordInputBoundary;
+import com.motorbike.business.usecase.input.CreateUserCartInputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.exceptions.DomainException;
@@ -26,6 +28,7 @@ public class RegisterUseCaseControl implements RegisterInputBoundary {
     private final ValidateUserRegistrationInputBoundary validateUserRegistrationUseCase;
     private final CheckUserDuplicationInputBoundary checkUserDuplicationUseCase;
     private final HashPasswordInputBoundary hashPasswordUseCase;
+    private final CreateUserCartInputBoundary createUserCartUseCase;
     
     public RegisterUseCaseControl(
             RegisterOutputBoundary outputBoundary,
@@ -33,13 +36,15 @@ public class RegisterUseCaseControl implements RegisterInputBoundary {
             CartRepository cartRepository,
             ValidateUserRegistrationInputBoundary validateUserRegistrationUseCase,
             CheckUserDuplicationInputBoundary checkUserDuplicationUseCase,
-            HashPasswordInputBoundary hashPasswordUseCase) {
+            HashPasswordInputBoundary hashPasswordUseCase,
+            CreateUserCartInputBoundary createUserCartUseCase) {
         this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.validateUserRegistrationUseCase = validateUserRegistrationUseCase;
         this.checkUserDuplicationUseCase = checkUserDuplicationUseCase;
         this.hashPasswordUseCase = hashPasswordUseCase;
+        this.createUserCartUseCase = createUserCartUseCase;
     }
 
     // Constructor with parameter order: outputBoundary first (for backward compatibility)
@@ -53,6 +58,7 @@ public class RegisterUseCaseControl implements RegisterInputBoundary {
         this.validateUserRegistrationUseCase = new ValidateUserRegistrationUseCaseControl(null);
         this.checkUserDuplicationUseCase = new CheckUserDuplicationUseCaseControl(null, userRepository);
         this.hashPasswordUseCase = new HashPasswordUseCaseControl(null);
+        this.createUserCartUseCase = new CreateUserCartUseCaseControl(null, cartRepository);
     }
     
     public void execute(RegisterInputData inputData) {
@@ -138,8 +144,12 @@ public class RegisterUseCaseControl implements RegisterInputBoundary {
                 
                 TaiKhoan savedTaiKhoan = userRepository.save(taiKhoan);
                 
-                GioHang gioHang = new GioHang(savedTaiKhoan.getMaTaiKhoan());
-                cartRepository.save(gioHang);
+                // UC-71 Create user cart
+                CreateUserCartInputData createCartInput = new CreateUserCartInputData(savedTaiKhoan.getMaTaiKhoan());
+                var createCartResult = ((CreateUserCartUseCaseControl) createUserCartUseCase).createInternal(createCartInput);
+                if (!createCartResult.isSuccess()) {
+                    throw new SystemException(createCartResult.getErrorMessage(), createCartResult.getErrorCode());
+                }
                 
                 outputData = RegisterOutputData.forSuccess(
                     savedTaiKhoan.getMaTaiKhoan(),

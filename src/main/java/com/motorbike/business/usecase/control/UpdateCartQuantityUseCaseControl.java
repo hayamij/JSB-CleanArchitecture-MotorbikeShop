@@ -5,12 +5,10 @@ import com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary;
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityInputData;
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityOutputData;
 import com.motorbike.business.dto.checkinventory.CheckInventoryAvailabilityInputData;
-import com.motorbike.business.dto.removeitemfromcart.RemoveItemFromCartInputData;
 import com.motorbike.business.dto.calculatecarttotals.CalculateCartTotalsInputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
 import com.motorbike.business.usecase.input.CheckInventoryAvailabilityInputBoundary;
-import com.motorbike.business.usecase.input.RemoveItemFromCartInputBoundary;
 import com.motorbike.business.usecase.input.CalculateCartTotalsInputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
@@ -25,32 +23,17 @@ public class UpdateCartQuantityUseCaseControl implements UpdateCartQuantityInput
     private final UpdateCartQuantityOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     private final CheckInventoryAvailabilityInputBoundary checkInventoryUseCase;
-    private final RemoveItemFromCartInputBoundary removeItemUseCase;
     private final CalculateCartTotalsInputBoundary calculateTotalsUseCase;
     
     public UpdateCartQuantityUseCaseControl(
             UpdateCartQuantityOutputBoundary outputBoundary,
             CartRepository cartRepository,
             CheckInventoryAvailabilityInputBoundary checkInventoryUseCase,
-            RemoveItemFromCartInputBoundary removeItemUseCase,
             CalculateCartTotalsInputBoundary calculateTotalsUseCase) {
         this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
         this.checkInventoryUseCase = checkInventoryUseCase;
-        this.removeItemUseCase = removeItemUseCase;
         this.calculateTotalsUseCase = calculateTotalsUseCase;
-    }
-
-    // Constructor with 2 parameters (for backward compatibility)
-    public UpdateCartQuantityUseCaseControl(
-            UpdateCartQuantityOutputBoundary outputBoundary,
-            CartRepository cartRepository
-    ) {
-        this.outputBoundary = outputBoundary;
-        this.cartRepository = cartRepository;
-        this.checkInventoryUseCase = new CheckInventoryAvailabilityUseCaseControl(null, null);
-        this.removeItemUseCase = new RemoveItemFromCartUseCaseControl(null, cartRepository);
-        this.calculateTotalsUseCase = new CalculateCartTotalsUseCaseControl(null);
     }
     
     @Override
@@ -100,39 +83,26 @@ public class UpdateCartQuantityUseCaseControl implements UpdateCartQuantityInput
         // Step 3: Delegate to atomic use cases based on operation
         if (errorException == null && gioHang != null) {
             try {
-                // UC-39: Check inventory before updating (skip if in test mode with null dependencies)
-                // In test mode, dependencies may be null, so skip the check
-                boolean skipInventoryCheck = false;
+                // UC-39: Check inventory before updating (only if newQuantity > 0)
                 if (inputData.getNewQuantity() > 0 && checkInventoryUseCase != null) {
-                    CheckInventoryAvailabilityUseCaseControl checkControl = (CheckInventoryAvailabilityUseCaseControl) checkInventoryUseCase;
-                    // Check if the use case has a valid productRepository
-                    try {
-                        java.lang.reflect.Field field = checkControl.getClass().getDeclaredField("productRepository");
-                        field.setAccessible(true);
-                        if (field.get(checkControl) == null) {
-                            skipInventoryCheck = true;
-                        }
-                    } catch (Exception e) {
-                        skipInventoryCheck = true;
+                    CheckInventoryAvailabilityInputData checkInput = new CheckInventoryAvailabilityInputData(
+                        inputData.getProductId(),
+                        inputData.getNewQuantity()
+                    );
+                    
+                    // Delegate to CheckInventoryAvailabilityUseCaseControl
+                    var inventoryResult = ((CheckInventoryAvailabilityUseCaseControl) checkInventoryUseCase)
+                        .checkInventoryInternal(checkInput);
+                    
+                    if (!inventoryResult.isSuccess()) {
+                        throw new DomainException(inventoryResult.getErrorMessage(), inventoryResult.getErrorCode());
                     }
                     
-                    if (!skipInventoryCheck) {
-                        CheckInventoryAvailabilityInputData checkInput = new CheckInventoryAvailabilityInputData(
-                            inputData.getProductId(),
-                            inputData.getNewQuantity()
+                    if (!inventoryResult.isAvailable()) {
+                        throw DomainException.insufficientStock(
+                            inventoryResult.getProductName() != null ? inventoryResult.getProductName() : productName,
+                            inventoryResult.getAvailableStock()
                         );
-                        var inventoryResult = checkControl.checkInventoryInternal(checkInput);
-                        
-                        if (!inventoryResult.isSuccess()) {
-                            throw new DomainException(inventoryResult.getErrorMessage(), inventoryResult.getErrorCode());
-                        }
-                        
-                        if (!inventoryResult.isAvailable()) {
-                            throw DomainException.insufficientStock(
-                                productName, 
-                                inventoryResult.getAvailableStock()
-                            );
-                        }
                     }
                 }
                 

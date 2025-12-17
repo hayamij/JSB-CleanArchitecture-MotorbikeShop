@@ -2,11 +2,14 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.GetAllMotorbikesOutputData;
 import com.motorbike.business.dto.motorbike.GetAllMotorbikesOutputData.MotorbikeItem;
+import com.motorbike.business.dto.motorbike.FormatMotorbikesForDisplayInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.FormatMotorbikesForDisplayInputBoundary;
 import com.motorbike.business.usecase.output.GetAllMotorbikesOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.XeMay;
+import com.motorbike.domain.exceptions.SystemException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,13 +18,26 @@ public class GetAllMotorbikesUseCaseControl implements GetAllMotorbikesInputBoun
 
     private final GetAllMotorbikesOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final FormatMotorbikesForDisplayInputBoundary formatMotorbikesUseCase;
 
+    public GetAllMotorbikesUseCaseControl(
+            GetAllMotorbikesOutputBoundary outputBoundary,
+            ProductRepository productRepository,
+            FormatMotorbikesForDisplayInputBoundary formatMotorbikesUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.formatMotorbikesUseCase = formatMotorbikesUseCase;
+    }
+
+    // Backward compatibility constructor
     public GetAllMotorbikesUseCaseControl(
             GetAllMotorbikesOutputBoundary outputBoundary,
             ProductRepository productRepository
     ) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.formatMotorbikesUseCase = new FormatMotorbikesForDisplayUseCaseControl(null);
     }
 
     @Override
@@ -30,29 +46,24 @@ public class GetAllMotorbikesUseCaseControl implements GetAllMotorbikesInputBoun
         Exception errorException = null;
 
         try {
+            // Step 1: Get all products from repository
             List<SanPham> allProducts = productRepository.findAll();
 
-            List<MotorbikeItem> motorbikes = allProducts.stream()
+            // Step 2: Filter to get only motorbikes
+            List<XeMay> motorbikes = allProducts.stream()
                     .filter(p -> p instanceof XeMay)
-                    .map(p -> {
-                        XeMay x = (XeMay) p;
-                        return new MotorbikeItem(
-                                x.getMaSanPham(),
-                                x.getTenSanPham(),
-                                x.getMoTa(),
-                                x.getGia(),
-                                x.getSoLuongTonKho(),
-                                x.getHinhAnh(),
-                                x.getHangXe(),
-                                x.getDongXe(),
-                                x.getMauSac(),
-                                x.getNamSanXuat(),
-                                x.getDungTich()
-                        );
-                    })
+                    .map(p -> (XeMay) p)
                     .collect(Collectors.toList());
 
-            outputData = new GetAllMotorbikesOutputData(motorbikes);
+            // Step 3: UC-74 Format motorbikes for display
+            FormatMotorbikesForDisplayInputData formatInput = new FormatMotorbikesForDisplayInputData(motorbikes);
+            var formatResult = ((FormatMotorbikesForDisplayUseCaseControl) formatMotorbikesUseCase).formatInternal(formatInput);
+            
+            if (!formatResult.isSuccess()) {
+                throw new SystemException(formatResult.getErrorMessage(), formatResult.getErrorCode());
+            }
+
+            outputData = new GetAllMotorbikesOutputData(formatResult.getMotorbikeItems());
         } catch (Exception e) {
             errorException = e;
         }

@@ -3,52 +3,42 @@ package com.motorbike.business.usecase.control;
 import com.motorbike.business.dto.user.SearchUsersInputData;
 import com.motorbike.business.dto.user.SearchUsersOutputData;
 import com.motorbike.business.dto.user.SearchUsersOutputData.UserItem;
+import com.motorbike.business.dto.user.ApplyUserFiltersInputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.input.SearchUsersInputBoundary;
+import com.motorbike.business.usecase.input.ApplyUserFiltersInputBoundary;
 import com.motorbike.business.usecase.output.SearchUsersOutputBoundary;
-import com.motorbike.business.dto.buildsearchcriteria.BuildSearchCriteriaInputData;
-import com.motorbike.business.dto.applysearchfilters.ApplySearchFiltersInputData;
-import com.motorbike.business.dto.sortsearchresults.SortSearchResultsInputData;
-import com.motorbike.business.usecase.input.BuildSearchCriteriaInputBoundary;
-import com.motorbike.business.usecase.input.ApplySearchFiltersInputBoundary;
-import com.motorbike.business.usecase.input.SortSearchResultsInputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
+import com.motorbike.domain.exceptions.SystemException;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class SearchUsersUseCaseControl implements SearchUsersInputBoundary {
 
     private final SearchUsersOutputBoundary outputBoundary;
     private final UserRepository userRepository;
-    private final BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase;
-    private final ApplySearchFiltersInputBoundary applySearchFiltersUseCase;
-    private final SortSearchResultsInputBoundary sortSearchResultsUseCase;
+    private final ApplyUserFiltersInputBoundary applyUserFiltersUseCase;
 
     public SearchUsersUseCaseControl(
             SearchUsersOutputBoundary outputBoundary,
             UserRepository userRepository,
-            BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase,
-            ApplySearchFiltersInputBoundary applySearchFiltersUseCase,
-            SortSearchResultsInputBoundary sortSearchResultsUseCase
+            ApplyUserFiltersInputBoundary applyUserFiltersUseCase
     ) {
         this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
-        this.buildSearchCriteriaUseCase = buildSearchCriteriaUseCase;
-        this.applySearchFiltersUseCase = applySearchFiltersUseCase;
-        this.sortSearchResultsUseCase = sortSearchResultsUseCase;
+        this.applyUserFiltersUseCase = applyUserFiltersUseCase;
     }
 
-    // Constructor with 2 parameters (for backward compatibility)
+    // Backward compatibility constructor
     public SearchUsersUseCaseControl(
             SearchUsersOutputBoundary outputBoundary,
             UserRepository userRepository
     ) {
         this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
-        this.buildSearchCriteriaUseCase = new BuildSearchCriteriaUseCaseControl(null);
-        this.applySearchFiltersUseCase = new ApplySearchFiltersUseCaseControl(null);
-        this.sortSearchResultsUseCase = new SortSearchResultsUseCaseControl(null);
+        this.applyUserFiltersUseCase = new ApplyUserFiltersUseCaseControl(null);
     }
 
     @Override
@@ -57,15 +47,20 @@ public class SearchUsersUseCaseControl implements SearchUsersInputBoundary {
         Exception errorException = null;
 
         try {
+            // Step 1: Get all users from repository
             List<TaiKhoan> all = userRepository.findAll();
 
-            List<UserItem> filtered = all.stream()
-                    .filter(u -> input.keyword == null || 
-                            u.getEmail().toLowerCase().contains(input.keyword.toLowerCase()) ||
-                            u.getTenDangNhap().toLowerCase().contains(input.keyword.toLowerCase()) ||
-                            (u.getSoDienThoai() != null && u.getSoDienThoai().contains(input.keyword)))
-                    .filter(u -> input.vaiTro == null || u.getVaiTro() == input.vaiTro)
-                    .filter(u -> input.hoatDong == null || u.isHoatDong() == input.hoatDong)
+            // Step 2: UC-73 Apply filters
+            ApplyUserFiltersInputData filterInput = new ApplyUserFiltersInputData(
+                all, input.keyword, input.vaiTro, input.hoatDong
+            );
+            var filterResult = ((ApplyUserFiltersUseCaseControl) applyUserFiltersUseCase).filterInternal(filterInput);
+            if (!filterResult.isSuccess()) {
+                throw new SystemException(filterResult.getErrorMessage(), filterResult.getErrorCode());
+            }
+
+            // Step 3: Map to UserItem DTOs
+            List<UserItem> userItems = filterResult.getFilteredUsers().stream()
                     .map(u -> new UserItem(
                             u.getMaTaiKhoan(),
                             u.getHoTen(),
@@ -81,7 +76,7 @@ public class SearchUsersUseCaseControl implements SearchUsersInputBoundary {
                     ))
                     .collect(Collectors.toList());
 
-            outputData = new SearchUsersOutputData(filtered);
+            outputData = new SearchUsersOutputData(userItems);
         } catch (Exception e) {
             errorException = e;
         }

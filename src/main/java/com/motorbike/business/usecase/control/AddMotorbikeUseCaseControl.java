@@ -2,8 +2,10 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.AddMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.AddMotorbikeOutputData;
+import com.motorbike.business.dto.motorbike.ValidateMotorbikeFieldsInputData;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
 import com.motorbike.business.usecase.input.AddMotorbikeInputBoundary;
+import com.motorbike.business.usecase.input.ValidateMotorbikeFieldsInputBoundary;
 import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
 import com.motorbike.domain.entities.SanPham;
@@ -15,11 +17,24 @@ public class AddMotorbikeUseCaseControl implements AddMotorbikeInputBoundary {
     
     private final AddMotorbikeOutputBoundary outputBoundary;
     private final MotorbikeRepository motorbikeRepository;
+    private final ValidateMotorbikeFieldsInputBoundary validateMotorbikeFieldsUseCase;
     
-    public AddMotorbikeUseCaseControl(AddMotorbikeOutputBoundary outputBoundary,
-                                     MotorbikeRepository motorbikeRepository) {
+    public AddMotorbikeUseCaseControl(
+            AddMotorbikeOutputBoundary outputBoundary,
+            MotorbikeRepository motorbikeRepository,
+            ValidateMotorbikeFieldsInputBoundary validateMotorbikeFieldsUseCase) {
         this.outputBoundary = outputBoundary;
         this.motorbikeRepository = motorbikeRepository;
+        this.validateMotorbikeFieldsUseCase = validateMotorbikeFieldsUseCase;
+    }
+
+    // Backward compatibility constructor
+    public AddMotorbikeUseCaseControl(
+            AddMotorbikeOutputBoundary outputBoundary,
+            MotorbikeRepository motorbikeRepository) {
+        this.outputBoundary = outputBoundary;
+        this.motorbikeRepository = motorbikeRepository;
+        this.validateMotorbikeFieldsUseCase = new ValidateMotorbikeFieldsUseCaseControl(null);
     }
     
     @Override
@@ -38,7 +53,27 @@ public class AddMotorbikeUseCaseControl implements AddMotorbikeInputBoundary {
             SanPham.validateGia(inputData.getGia());
             SanPham.validateSoLuongTonKho(inputData.getSoLuongTonKho());
             
-            validateMotorbikeFields(inputData);
+            // UC-75 Validate motorbike-specific fields
+            ValidateMotorbikeFieldsInputData validateFieldsInput = new ValidateMotorbikeFieldsInputData(
+                inputData.getHangXe(),
+                inputData.getDongXe(),
+                inputData.getMauSac(),
+                inputData.getNamSanXuat(),
+                inputData.getDungTich()
+            );
+            var validateFieldsResult = ((ValidateMotorbikeFieldsUseCaseControl) validateMotorbikeFieldsUseCase)
+                .validateInternal(validateFieldsInput);
+            
+            if (!validateFieldsResult.isSuccess()) {
+                throw new SystemException(validateFieldsResult.getErrorMessage(), validateFieldsResult.getErrorCode());
+            }
+            
+            if (!validateFieldsResult.isValid()) {
+                throw new ValidationException(
+                    String.join("; ", validateFieldsResult.getErrors()),
+                    "INVALID_MOTORBIKE_FIELDS"
+                );
+            }
             
         } catch (Exception e) {
             errorException = e;
@@ -93,24 +128,6 @@ public class AddMotorbikeUseCaseControl implements AddMotorbikeInputBoundary {
         
         // Step 5: Present result
         outputBoundary.present(outputData);
-    }
-    
-    private void validateMotorbikeFields(AddMotorbikeInputData inputData) {
-        if (inputData.getHangXe() == null || inputData.getHangXe().trim().isEmpty()) {
-            throw ValidationException.fieldRequired("Hãng xe");
-        }
-        if (inputData.getDongXe() == null || inputData.getDongXe().trim().isEmpty()) {
-            throw ValidationException.fieldRequired("Dòng xe");
-        }
-        if (inputData.getMauSac() == null || inputData.getMauSac().trim().isEmpty()) {
-            throw ValidationException.fieldRequired("Màu sắc");
-        }
-        if (inputData.getNamSanXuat() < 2000 || inputData.getNamSanXuat() > 2100) {
-            throw ValidationException.invalidYear();
-        }
-        if (inputData.getDungTich() <= 0) {
-            throw ValidationException.invalidEngineCapacity();
-        }
     }
     
     private String extractErrorCode(Exception exception) {

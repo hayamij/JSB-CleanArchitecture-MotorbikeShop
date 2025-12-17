@@ -6,12 +6,6 @@ import com.motorbike.business.dto.order.SearchOrdersOutputData.OrderItem;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.output.SearchOrdersOutputBoundary;
-import com.motorbike.business.dto.buildsearchcriteria.BuildSearchCriteriaInputData;
-import com.motorbike.business.dto.applysearchfilters.ApplySearchFiltersInputData;
-import com.motorbike.business.dto.sortsearchresults.SortSearchResultsInputData;
-import com.motorbike.business.usecase.input.BuildSearchCriteriaInputBoundary;
-import com.motorbike.business.usecase.input.ApplySearchFiltersInputBoundary;
-import com.motorbike.business.usecase.input.SortSearchResultsInputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.TaiKhoan;
 
@@ -23,27 +17,7 @@ public class SearchOrdersUseCaseControl {
     private final SearchOrdersOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
-    private final BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase;
-    private final ApplySearchFiltersInputBoundary applySearchFiltersUseCase;
-    private final SortSearchResultsInputBoundary sortSearchResultsUseCase;
 
-    public SearchOrdersUseCaseControl(
-            SearchOrdersOutputBoundary outputBoundary,
-            OrderRepository orderRepository,
-            UserRepository userRepository,
-            BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase,
-            ApplySearchFiltersInputBoundary applySearchFiltersUseCase,
-            SortSearchResultsInputBoundary sortSearchResultsUseCase
-    ) {
-        this.outputBoundary = outputBoundary;
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
-        this.buildSearchCriteriaUseCase = buildSearchCriteriaUseCase;
-        this.applySearchFiltersUseCase = applySearchFiltersUseCase;
-        this.sortSearchResultsUseCase = sortSearchResultsUseCase;
-    }
-
-    // Constructor with 3 parameters (for backward compatibility)
     public SearchOrdersUseCaseControl(
             SearchOrdersOutputBoundary outputBoundary,
             OrderRepository orderRepository,
@@ -52,9 +26,6 @@ public class SearchOrdersUseCaseControl {
         this.outputBoundary = outputBoundary;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
-        this.buildSearchCriteriaUseCase = new BuildSearchCriteriaUseCaseControl(null);
-        this.applySearchFiltersUseCase = new ApplySearchFiltersUseCaseControl(null);
-        this.sortSearchResultsUseCase = new SortSearchResultsUseCaseControl(null);
     }
 
     public void execute(SearchOrdersInputData inputData) {
