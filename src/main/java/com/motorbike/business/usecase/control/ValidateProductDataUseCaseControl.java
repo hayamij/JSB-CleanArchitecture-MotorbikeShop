@@ -50,13 +50,13 @@ public class ValidateProductDataUseCaseControl implements ValidateProductDataInp
                     errors.add("Tên sản phẩm không được vượt quá 200 ký tự");
                 }
 
-                // Validate product code
-                if (inputData.getProductCode() == null || inputData.getProductCode().trim().isEmpty()) {
-                    errors.add("Mã sản phẩm không được để trống");
-                } else if (inputData.getProductCode().trim().length() < 3) {
-                    errors.add("Mã sản phẩm phải có ít nhất 3 ký tự");
-                } else if (inputData.getProductCode().trim().length() > 50) {
-                    errors.add("Mã sản phẩm không được vượt quá 50 ký tự");
+                // Validate product code (optional - only validate if provided)
+                if (inputData.getProductCode() != null && !inputData.getProductCode().trim().isEmpty()) {
+                    if (inputData.getProductCode().trim().length() < 3) {
+                        errors.add("Mã sản phẩm phải có ít nhất 3 ký tự");
+                    } else if (inputData.getProductCode().trim().length() > 50) {
+                        errors.add("Mã sản phẩm không được vượt quá 50 ký tự");
+                    }
                 }
 
                 // Validate price

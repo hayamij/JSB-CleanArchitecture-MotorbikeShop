@@ -83,7 +83,7 @@ public class ApplySearchFiltersUseCaseControlTest {
         List<SanPham> allProducts = Arrays.asList(product1, product2);
 
         Map<String, Object> filters = new HashMap<>();
-        filters.put("category", "Xe");
+        filters.put("category", "XeMay");
 
         ApplySearchFiltersInputData inputData = new ApplySearchFiltersInputData(allProducts, filters);
 

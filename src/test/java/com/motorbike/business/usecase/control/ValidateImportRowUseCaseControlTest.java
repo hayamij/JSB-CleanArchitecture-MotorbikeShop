@@ -16,9 +16,9 @@ public class ValidateImportRowUseCaseControlTest {
         // Given
         Map<String, Object> rowData = new HashMap<>();
         rowData.put("Mã SP", "XE001");
-        rowData.put("Tên SP", "Yamaha Exciter");
+        rowData.put("Tên sản phẩm", "Yamaha Exciter"); // Correct field name for generic validation
         rowData.put("Mô tả", "Xe thể thao");
-        rowData.put("Giá", 45000000.0);
+        rowData.put("Giá bán", 45000000.0); // Correct field name for generic validation
         rowData.put("Số lượng", 10);
 
         ValidateImportRowInputData inputData = new ValidateImportRowInputData(rowData, 1);

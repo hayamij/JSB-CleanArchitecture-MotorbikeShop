@@ -71,12 +71,13 @@ public class RegisterUseCaseControl implements RegisterInputBoundary {
         // Step 2: UC-57 - Validate user registration data
         if (errorException == null) {
             try {
+                // Using Vietnamese DTO: hoTen, email, tenDangNhap, matKhau, soDienThoai
                 ValidateUserRegistrationInputData validateInput = new ValidateUserRegistrationInputData(
-                    inputData.getName(),
-                    inputData.getEmail(),
-                    inputData.getUsername(),
-                    inputData.getPassword(),
-                    inputData.getPhoneNumber()
+                    inputData.getName(),        // hoTen (fullName)
+                    inputData.getEmail(),       // email
+                    inputData.getUsername(),    // tenDangNhap (username)
+                    inputData.getPassword(),    // matKhau (password)
+                    inputData.getPhoneNumber()  // soDienThoai (phoneNumber)
                 );
                 var validateResult = ((ValidateUserRegistrationUseCaseControl) validateUserRegistrationUseCase)
                     .validateInternal(validateInput);

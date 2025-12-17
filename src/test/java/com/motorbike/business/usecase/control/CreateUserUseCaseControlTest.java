@@ -37,6 +37,11 @@ public class CreateUserUseCaseControlTest {
 		CreateUserUseCaseControl control = new CreateUserUseCaseControl(outputBoundary, userRepo);
 		control.execute(inputData);
 		
+		// Debug: Print error if failed
+		if (!viewModel.success) {
+			System.out.println("ERROR: " + viewModel.errorCode + " - " + viewModel.errorMessage);
+		}
+		
 		assertTrue(viewModel.success);
 		assertFalse(viewModel.hasError);
 		assertNotNull(viewModel.maTaiKhoan);

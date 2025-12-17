@@ -380,6 +380,11 @@ public class RegisterUseCaseControlTest {
 		
 	@Override
 	public Optional<TaiKhoan> findByEmail(String email) {
+		if ("existing@test.com".equals(email)) {
+			TaiKhoan existingUser = new TaiKhoan("Existing User", email, "existing_user", "password", "0900000000", "Address");
+			existingUser.setMaTaiKhoan(999L);
+			return Optional.of(existingUser);
+		}
 		return Optional.empty();
 	}
 	

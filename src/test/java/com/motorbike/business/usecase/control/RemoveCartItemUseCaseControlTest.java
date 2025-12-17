@@ -23,7 +23,7 @@ public class RemoveCartItemUseCaseControlTest {
         Long productId = 100L;
 
         GioHang cart = new GioHang(1L, userId, 0);
-        cart.themSanPham(new ChiTietGioHang(cart.getMaGioHang(), productId, 2));
+        cart.themSanPham(new ChiTietGioHang(productId, "Test Product", BigDecimal.valueOf(500000), 2));
 
         CartRepository cartRepo = new MockCartRepository(cart, true);
         RemoveCartItemUseCaseControl useCase = new RemoveCartItemUseCaseControl(null, cartRepo);

@@ -39,7 +39,8 @@ public class UpdateProductStockUseCaseControl implements UpdateProductStockInput
         
         try {
             Long productId = inputData.getProductId();
-            int stockChange = inputData.getQuantityChange();
+            int quantity = inputData.getQuantityChange();
+            String operation = inputData.getOperation();
             
             Optional<SanPham> productOpt = productRepository.findById(productId);
             if (productOpt.isEmpty()) {
@@ -48,10 +49,10 @@ public class UpdateProductStockUseCaseControl implements UpdateProductStockInput
             
             SanPham product = productOpt.get();
             
-            if (stockChange > 0) {
-                product.tangTonKho(stockChange);
-            } else if (stockChange < 0) {
-                product.giamTonKho(Math.abs(stockChange));
+            if ("INCREASE".equals(operation)) {
+                product.tangTonKho(quantity);
+            } else if ("DECREASE".equals(operation)) {
+                product.giamTonKho(quantity);
             }
             
             productRepository.save(product);

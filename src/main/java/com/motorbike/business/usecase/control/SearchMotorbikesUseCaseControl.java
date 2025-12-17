@@ -101,10 +101,15 @@ public class SearchMotorbikesUseCaseControl implements SearchMotorbikesInputBoun
 
             // Step 5: UC-70 - Sort results (if sortBy specified)
             if (input.sortBy != null && !input.sortBy.isEmpty()) {
+                SortSearchResultsInputData.SortDirection direction = 
+                    (input.sortDirection != null && "DESC".equalsIgnoreCase(input.sortDirection)) 
+                    ? SortSearchResultsInputData.SortDirection.DESC 
+                    : SortSearchResultsInputData.SortDirection.ASC;
+                
                 SortSearchResultsInputData sortInput = new SortSearchResultsInputData(
                     (List) mapped,
                     input.sortBy,
-                    input.sortDirection != null ? input.sortDirection : "ASC"
+                    direction
                 );
                 var sortResult = ((SortSearchResultsUseCaseControl) sortSearchResultsUseCase)
                     .sortInternal(sortInput);

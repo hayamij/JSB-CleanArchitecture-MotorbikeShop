@@ -44,7 +44,7 @@ public class CalculateCartTotalsUseCaseControlTest {
         assertEquals(2, outputData.getTotalItems());
         assertEquals(5, outputData.getTotalQuantity());
         // tamTinh = product1.giaBan * 2 + product2.giaBan * 3 = 90000000 + 1500000 = 91500000
-        assertEquals(new BigDecimal("91500000"), outputData.getTotalAmount());
+        assertEquals(0, new BigDecimal("91500000").compareTo(outputData.getTotalAmount()));
     }
 
     @Test

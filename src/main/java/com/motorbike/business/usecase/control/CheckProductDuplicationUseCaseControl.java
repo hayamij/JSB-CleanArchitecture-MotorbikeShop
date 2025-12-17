@@ -47,9 +47,7 @@ public class CheckProductDuplicationUseCaseControl implements CheckProductDuplic
             if (inputData.getProductName() == null || inputData.getProductName().trim().isEmpty()) {
                 throw ValidationException.invalidInput("Product name is required");
             }
-            if (inputData.getProductCode() == null || inputData.getProductCode().trim().isEmpty()) {
-                throw ValidationException.invalidInput("Product code is required");
-            }
+            // productCode is optional - only validate if provided
         } catch (Exception e) {
             errorException = e;
         }
@@ -58,8 +56,25 @@ public class CheckProductDuplicationUseCaseControl implements CheckProductDuplic
         if (errorException == null) {
             try {
                 String productName = inputData.getProductName().trim();
-                String productCode = inputData.getProductCode().trim();
+                String productCode = inputData.getProductCode() != null ? inputData.getProductCode().trim() : null;
                 Long excludeId = inputData.getExcludeProductId();
+
+                // Check product code duplication first (more specific identifier)
+                if (productCode != null && !productCode.isEmpty()) {
+                    Optional<SanPham> existingByCode = productRepository.findByMaSanPham(productCode);
+                    if (existingByCode.isPresent()) {
+                        SanPham existing = existingByCode.get();
+                        // If excludeId is provided, ignore if it's the same product
+                        if (excludeId == null || !existing.getMaSanPham().equals(excludeId)) {
+                            outputData = new CheckProductDuplicationOutputData(
+                                    true,
+                                    "code",
+                                    existing.getMaSanPham()
+                            );
+                            return outputData;
+                        }
+                    }
+                }
 
                 // Check product name duplication
                 Optional<SanPham> existingByName = productRepository.findByTenSanPham(productName);
@@ -70,21 +85,6 @@ public class CheckProductDuplicationUseCaseControl implements CheckProductDuplic
                         outputData = new CheckProductDuplicationOutputData(
                                 true,
                                 "name",
-                                existing.getMaSanPham()
-                        );
-                        return outputData;
-                    }
-                }
-
-                // Check product code duplication
-                Optional<SanPham> existingByCode = productRepository.findByMaSanPham(productCode);
-                if (existingByCode.isPresent()) {
-                    SanPham existing = existingByCode.get();
-                    // If excludeId is provided, ignore if it's the same product
-                    if (excludeId == null || !existing.getMaSanPham().equals(excludeId)) {
-                        outputData = new CheckProductDuplicationOutputData(
-                                true,
-                                "code",
                                 existing.getMaSanPham()
                         );
                         return outputData;

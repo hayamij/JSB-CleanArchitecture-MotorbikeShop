@@ -27,10 +27,10 @@ public class CalculateProductPriceUseCaseControlTest {
 
         // Then
         assertTrue(outputData.isSuccess());
-        assertEquals(new BigDecimal("45000000.0"), outputData.getBasePrice());
+        assertEquals(0, new BigDecimal("45000000.0").compareTo(outputData.getBasePrice()));
         assertEquals(10, outputData.getDiscountPercent());
-        assertEquals(new BigDecimal("4500000.00"), outputData.getDiscountAmount());
-        assertEquals(new BigDecimal("40500000.00"), outputData.getFinalPrice());
+        assertEquals(0, new BigDecimal("4500000.00").compareTo(outputData.getDiscountAmount()));
+        assertEquals(0, new BigDecimal("40500000.00").compareTo(outputData.getFinalPrice()));
     }
 
     @Test
@@ -46,10 +46,10 @@ public class CalculateProductPriceUseCaseControlTest {
 
         // Then
         assertTrue(outputData.isSuccess());
-        assertEquals(new BigDecimal("45000000.0"), outputData.getBasePrice());
+        assertEquals(0, new BigDecimal("45000000.0").compareTo(outputData.getBasePrice()));
         assertEquals(0, outputData.getDiscountPercent());
-        assertEquals(new BigDecimal("0.00"), outputData.getDiscountAmount());
-        assertEquals(new BigDecimal("45000000.00"), outputData.getFinalPrice());
+        assertEquals(0, new BigDecimal("0.00").compareTo(outputData.getDiscountAmount()));
+        assertEquals(0, new BigDecimal("45000000.00").compareTo(outputData.getFinalPrice()));
     }
 
     @Test

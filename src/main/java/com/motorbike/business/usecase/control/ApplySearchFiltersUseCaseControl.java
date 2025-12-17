@@ -93,10 +93,23 @@ public class ApplySearchFiltersUseCaseControl implements ApplySearchFiltersInput
     private List<SanPham> filterProducts(List<SanPham> products, Map<String, Object> filters) {
         return products.stream()
                 .filter(product -> {
+                    // Filter by keyword
+                    if (filters.containsKey("keyword")) {
+                        String keyword = (String) filters.get("keyword");
+                        if (keyword != null && !keyword.isEmpty()) {
+                            String lowerKeyword = keyword.toLowerCase();
+                            boolean matchesKeyword = product.getTenSanPham().toLowerCase().contains(lowerKeyword) ||
+                                    (product.getMoTa() != null && product.getMoTa().toLowerCase().contains(lowerKeyword));
+                            if (!matchesKeyword) {
+                                return false;
+                            }
+                        }
+                    }
+                    
                     // Filter by category
                     if (filters.containsKey("category") || filters.containsKey("loaiSanPham")) {
                         String category = (String) filters.getOrDefault("category", filters.get("loaiSanPham"));
-                        if (category != null && !product.getLoaiSanPham().toLowerCase().contains(category.toLowerCase())) {
+                        if (category != null && !product.getLoaiSanPham().equalsIgnoreCase(category)) {
                             return false;
                         }
                     }

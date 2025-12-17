@@ -12,7 +12,7 @@ public class ValidateProductDataUseCaseControlTest {
     void shouldValidateProductSuccessfully() {
         // Given
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
-            "XE001", "Yamaha Exciter", "Xe thể thao", 45000000.0, 10
+            "Yamaha Exciter", "XE001", 45000000.0, 10, "xe_may"
         );
         ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
@@ -26,25 +26,26 @@ public class ValidateProductDataUseCaseControlTest {
 
     @Test
     void shouldFailWhenProductCodeIsEmpty() {
-        // Given
+        // Given - productCode is now optional, empty string is valid
+        // Test validates that when product code is empty, validation still passes if other fields are valid
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
-            "", "Yamaha Exciter", "Xe thể thao", 45000000.0, 10
+            "Yamaha Exciter", "", 45000000.0, 10, "xe_may"
         );
         ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
         // When
         ValidateProductDataOutputData outputData = useCase.validateInternal(inputData);
 
-        // Then
-        assertFalse(outputData.isValid());
-        assertFalse(outputData.getErrors().isEmpty());
+        // Then - should be valid since productCode is optional
+        assertTrue(outputData.isValid());
+        assertTrue(outputData.getErrors().isEmpty());
     }
 
     @Test
     void shouldFailWhenProductNameIsEmpty() {
         // Given
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
-            "XE001", "", "Xe thể thao", 45000000.0, 10
+            "", "XE001", 45000000.0, 10, "xe_may"
         );
         ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
@@ -60,7 +61,7 @@ public class ValidateProductDataUseCaseControlTest {
     void shouldFailWhenPriceIsNegative() {
         // Given
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
-            "XE001", "Yamaha Exciter", "Xe thể thao", -1000.0, 10
+            "Yamaha Exciter", "XE001", -1000.0, 10, "xe_may"
         );
         ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
@@ -76,7 +77,7 @@ public class ValidateProductDataUseCaseControlTest {
     void shouldFailWhenStockIsNegative() {
         // Given
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
-            "XE001", "Yamaha Exciter", "Xe thể thao", 45000000.0, -5
+            "Yamaha Exciter", "XE001", 45000000.0, -5, "xe_may"
         );
         ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 

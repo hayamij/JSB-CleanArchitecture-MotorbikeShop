@@ -384,6 +384,7 @@ public class CheckoutUseCaseControlTest {
 			}
 			
 			GioHang cart = new GioHang(userId);
+			cart.setMaGioHang(userId); // Set cart ID for testing
 			
 			if (userId == 999L) {
 				return Optional.of(cart);
@@ -408,7 +409,8 @@ public class CheckoutUseCaseControlTest {
 		
 		@Override
 		public Optional<GioHang> findById(Long id) {
-			return Optional.empty();
+			// For testing, treat cart ID same as user ID
+			return findByUserId(id);
 		}
 		
 		@Override

@@ -74,22 +74,35 @@ public class GetProductDetailUseCaseControl implements GetProductDetailInputBoun
                 Integer discountPercent = sanPham.getPhanTramGiamGia() != null ? sanPham.getPhanTramGiamGia().intValue() : 0;
                 
                 // UC-53: Calculate product price
-                CalculateProductPriceInputData priceInput = new CalculateProductPriceInputData(
-                    giaGoc,
-                    discountPercent
-                );
-                var priceResult = ((CalculateProductPriceUseCaseControl) calculatePriceUseCase)
-                    .calculateInternal(priceInput);
+                BigDecimal giaSauKhuyenMai = giaGoc;
+                double phanTramGiam = 0.0;
                 
-                if (!priceResult.isSuccess()) {
-                    throw new DomainException(priceResult.getErrorMessage(), priceResult.getErrorCode());
+                if (calculatePriceUseCase != null) {
+                    CalculateProductPriceInputData priceInput = new CalculateProductPriceInputData(
+                        giaGoc,
+                        discountPercent
+                    );
+                    var priceResult = ((CalculateProductPriceUseCaseControl) calculatePriceUseCase)
+                        .calculateInternal(priceInput);
+                    
+                    if (!priceResult.isSuccess()) {
+                        throw new DomainException(priceResult.getErrorMessage(), priceResult.getErrorCode());
+                    }
+                    
+                    giaSauKhuyenMai = priceResult.getFinalPrice();
+                    phanTramGiam = priceResult.getDiscountAmount()
+                        .divide(giaGoc, 4, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100))
+                        .doubleValue();
+                } else {
+                    // Fallback: calculate manually if use case not provided
+                    if (discountPercent > 0) {
+                        BigDecimal discount = giaGoc.multiply(BigDecimal.valueOf(discountPercent))
+                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                        giaSauKhuyenMai = giaGoc.subtract(discount);
+                        phanTramGiam = discountPercent.doubleValue();
+                    }
                 }
-                
-                BigDecimal giaSauKhuyenMai = priceResult.getFinalPrice();
-                double phanTramGiam = priceResult.getDiscountAmount()
-                    .divide(giaGoc, 4, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100))
-                    .doubleValue();
                 
                 boolean conHang = sanPham.getSoLuongTonKho() > 0;
                 

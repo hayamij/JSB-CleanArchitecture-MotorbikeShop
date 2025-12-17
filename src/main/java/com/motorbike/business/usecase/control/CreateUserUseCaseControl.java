@@ -54,12 +54,14 @@ public class CreateUserUseCaseControl implements AddUserInputBoundary {
             throw ValidationException.invalidInput();
         }
         // Convert AddUserInputData to CreateUserInputData
+        // Constructor: hoTen, email, tenDangNhap, matKhau, soDienThoai, diaChi, VaiTro
         CreateUserInputData createInput = new CreateUserInputData(
+            inputData.getHoTen(),
+            inputData.getEmail(),
             inputData.getUsername(),
             inputData.getPassword(),
-            inputData.getEmail(),
-            inputData.getHoTen(),
             inputData.getSoDienThoai(),
+            inputData.getDiaChi(),
             inputData.getVaiTro()
         );
         executeInternal(createInput);
@@ -81,12 +83,13 @@ public class CreateUserUseCaseControl implements AddUserInputBoundary {
         // Step 2: UC-57 - Validate user registration data
         if (errorException == null) {
             try {
+                // ValidateUserRegistrationInputData constructor: (email, username, password, phoneNumber, fullName)
                 ValidateUserRegistrationInputData validateInput = new ValidateUserRegistrationInputData(
-                    inputData.getHoTen(),
                     inputData.getEmail(),
                     inputData.getTenDangNhap(),
                     inputData.getMatKhau(),
-                    inputData.getSoDienThoai()
+                    inputData.getSoDienThoai(),
+                    inputData.getHoTen()
                 );
                 var validateResult = ((ValidateUserRegistrationUseCaseControl) validateUserRegistrationUseCase)
                     .validateInternal(validateInput);

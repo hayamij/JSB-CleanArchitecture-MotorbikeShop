@@ -15,6 +15,7 @@ import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.exceptions.ValidationException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,16 +75,29 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
                 DonHang order = orderOpt.get();
                 
                 // UC-49: Calculate order totals
-                CalculateOrderTotalsInputData totalsInput = new CalculateOrderTotalsInputData(
-                    order.getDanhSachSanPham()
-                );
-                var totalsResult = ((CalculateOrderTotalsUseCaseControl) calculateOrderTotalsUseCase)
-                    .calculateInternal(totalsInput);
+                BigDecimal totalAmount = order.getTongTien();
+                if (calculateOrderTotalsUseCase != null) {
+                    CalculateOrderTotalsInputData totalsInput = new CalculateOrderTotalsInputData(
+                        order.getDanhSachSanPham()
+                    );
+                    var totalsResult = ((CalculateOrderTotalsUseCaseControl) calculateOrderTotalsUseCase)
+                        .calculateInternal(totalsInput);
+                    totalAmount = totalsResult.getTotalAmount();
+                }
                 
-                // UC-50: Format order for display
-                FormatOrderForDisplayInputData formatInput = new FormatOrderForDisplayInputData(order);
-                var formatResult = ((FormatOrderForDisplayUseCaseControl) formatOrderForDisplayUseCase)
-                    .formatInternal(formatInput);
+                // UC-50: Format order for display (fallback to simple format if null)
+                String formattedStatus = order.getTrangThai().name();
+                String formattedDate = order.getNgayDatHang() != null ? order.getNgayDatHang().toString() : "";
+                String formattedPayment = order.getPhuongThucThanhToan() != null ? order.getPhuongThucThanhToan().getMoTa() : "";
+                
+                if (formatOrderForDisplayUseCase != null) {
+                    FormatOrderForDisplayInputData formatInput = new FormatOrderForDisplayInputData(order);
+                    var formatResult = ((FormatOrderForDisplayUseCaseControl) formatOrderForDisplayUseCase)
+                        .formatInternal(formatInput);
+                    formattedStatus = formatResult.getStatusText();
+                    formattedDate = formatResult.getFormattedDate();
+                    formattedPayment = formatResult.getPaymentMethodText();
+                }
                 
                 // Map order items
                 List<OrderItemInfo> items = order.getDanhSachSanPham().stream()
@@ -103,12 +117,12 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
                         order.getTenNguoiNhan(),
                         order.getSoDienThoai(),
                         order.getDiaChiGiaoHang(),
-                        formatResult.getFormattedStatus(),
+                        formattedStatus,
                         order.getTrangThai().name(),
-                        totalsResult.getTotalAmount(),
-                        formatResult.getFormattedOrderDate(),
+                        totalAmount,
+                        formattedDate,
                         order.getGhiChu(),
-                        formatResult.getFormattedPaymentMethod(),
+                        formattedPayment,
                         items
                 );
                 

@@ -16,7 +16,8 @@ public class ValidateExcelFileOutputData {
         this.isValid = isValid;
         this.errors = errors != null ? new ArrayList<>(errors) : new ArrayList<>();
         this.errorCode = null;
-        this.errorMessage = null;
+        // Set errorMessage from errors list if not valid
+        this.errorMessage = (errors != null && !errors.isEmpty()) ? String.join("; ", errors) : null;
     }
 
     // Error constructor

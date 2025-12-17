@@ -51,8 +51,8 @@ public class ValidateOrderCancellationUseCaseControl implements ValidateOrderCan
                         reason = "Đơn hàng đang chờ xác nhận, có thể hủy";
                         break;
                     case DA_XAC_NHAN:
-                        canCancel = true;
-                        reason = "Đơn hàng đã xác nhận nhưng chưa giao, có thể hủy";
+                        canCancel = false;
+                        reason = "Đơn hàng đã được xác nhận, không thể hủy";
                         break;
                     case DANG_GIAO:
                         canCancel = false;

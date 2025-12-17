@@ -62,7 +62,7 @@ public class ValidateOrderCancellationUseCaseControlTest {
 
     @Test
     void shouldAllowCancellationForConfirmedOrder() {
-        // Given - Order with DA_XAC_NHAN status can still be cancelled
+        // Given - Order with DA_XAC_NHAN status cannot be cancelled (already confirmed)
         Long orderId = 1L;
         TrangThaiDonHang status = TrangThaiDonHang.DA_XAC_NHAN;
         
@@ -73,7 +73,7 @@ public class ValidateOrderCancellationUseCaseControlTest {
         ValidateOrderCancellationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        assertTrue(outputData.canCancel());
+        assertFalse(outputData.canCancel());
         assertNotNull(outputData.getReason());
     }
 }

@@ -12,7 +12,7 @@ public class ValidateUserRegistrationUseCaseControlTest {
     void shouldValidateUserSuccessfully() {
         // Given
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
-            "john_doe", "john@example.com", "SecurePass123", "0123456789", "123 Main St"
+            "john@example.com", "john_doe", "SecurePass123", "0123456789", "John Doe"
         );
         ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
@@ -28,7 +28,7 @@ public class ValidateUserRegistrationUseCaseControlTest {
     void shouldFailWhenUsernameIsEmpty() {
         // Given
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
-            "", "john@example.com", "SecurePass123", "0123456789", "123 Main St"
+            "john@example.com", "", "SecurePass123", "0123456789", "John Doe"
         );
         ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
@@ -44,7 +44,7 @@ public class ValidateUserRegistrationUseCaseControlTest {
     void shouldFailWhenEmailIsInvalid() {
         // Given
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
-            "john_doe", "invalid-email", "SecurePass123", "0123456789", "123 Main St"
+            "invalid-email", "john_doe", "SecurePass123", "0123456789", "John Doe"
         );
         ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
@@ -60,7 +60,7 @@ public class ValidateUserRegistrationUseCaseControlTest {
     void shouldFailWhenPasswordIsTooShort() {
         // Given
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
-            "john_doe", "john@example.com", "123", "0123456789", "123 Main St"
+            "john@example.com", "john_doe", "123", "0123456789", "John Doe"
         );
         ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
@@ -76,7 +76,7 @@ public class ValidateUserRegistrationUseCaseControlTest {
     void shouldFailWhenPhoneIsInvalid() {
         // Given
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
-            "john_doe", "john@example.com", "SecurePass123", "12345", "123 Main St"
+            "john@example.com", "john_doe", "SecurePass123", "12345", "John Doe"
         );
         ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 

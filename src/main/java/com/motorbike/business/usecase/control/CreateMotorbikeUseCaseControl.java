@@ -75,9 +75,20 @@ public class CreateMotorbikeUseCaseControl implements AddMotorbikeInputBoundary 
             errorException = e;
         }
         
-        // Step 2: UC-51 - Validate product data
+        // Step 2: UC-51 - Validate product data with specific error codes
         if (errorException == null) {
             try {
+                // Check for specific validation errors first to provide detailed error codes
+                if (inputData.getTenSanPham() == null || inputData.getTenSanPham().trim().isEmpty()) {
+                    throw ValidationException.emptyProductName();
+                }
+                if (inputData.getGia() == null || inputData.getGia().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                    throw ValidationException.invalidPrice();
+                }
+                if (inputData.getSoLuongTonKho() < 0) {
+                    throw ValidationException.invalidStock();
+                }
+                
                 ValidateProductDataInputData validateInput = new ValidateProductDataInputData(
                     inputData.getTenSanPham(),
                     null, // productCode - not used for motorbike creation
@@ -112,7 +123,7 @@ public class CreateMotorbikeUseCaseControl implements AddMotorbikeInputBoundary 
                     null  // excludeProductId - not applicable for creation
                 );
                 var duplicationResult = ((CheckProductDuplicationUseCaseControl) checkDuplicationUseCase)
-                    .checkInternal(checkInput);
+                    .checkDuplicationInternal(checkInput);
                 
                 if (!duplicationResult.isSuccess()) {
                     throw new DomainException(duplicationResult.getErrorMessage(), duplicationResult.getErrorCode());

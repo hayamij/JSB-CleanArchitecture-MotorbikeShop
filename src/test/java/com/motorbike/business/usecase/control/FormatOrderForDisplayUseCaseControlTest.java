@@ -18,13 +18,14 @@ public class FormatOrderForDisplayUseCaseControlTest {
     void shouldFormatOrderSuccessfully() {
         // Given
         DonHang order = new DonHang(
-            1L,
+            1L, // maTaiKhoan
             "Nguyễn Văn A",
             "0912345678",
             "123 Test Street",
             "Test Note",
             PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP
         );
+        order.setMaDonHang(1L); // Set orderId separately
 
         FormatOrderForDisplayInputData inputData = new FormatOrderForDisplayInputData(order);
         FormatOrderForDisplayUseCaseControl useCase = new FormatOrderForDisplayUseCaseControl(null);

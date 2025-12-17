@@ -62,6 +62,14 @@ public class DeleteAccessoryUseCaseControlTest {
 	private static class MockProductRepository implements ProductRepository {
 		@Override
 		public Optional<SanPham> findById(Long id) {
+			if (id == 1L) {
+				// Return a test accessory product
+				return Optional.of(new PhuKienXeMay(
+					1L, "Test Accessory", "Test Description",
+					java.math.BigDecimal.valueOf(100000), "test.jpg", 10, true,
+					null, null, "Test Type", "Test Brand", "Test Material", "Test Size"
+				));
+			}
 			return Optional.empty();
 		}
 

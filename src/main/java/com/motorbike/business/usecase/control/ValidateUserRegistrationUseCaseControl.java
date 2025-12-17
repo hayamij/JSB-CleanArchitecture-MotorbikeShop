@@ -32,10 +32,14 @@ public class ValidateUserRegistrationUseCaseControl implements ValidateUserRegis
     
     // Overload to accept DTO from user package
     public ValidateUserRegistrationOutputData validateInternal(com.motorbike.business.dto.user.ValidateUserRegistrationInputData inputData) {
-        // Convert to the expected DTO type
+        // Convert Vietnamese DTO to English DTO
+        // English DTO expects: email, username, password, phoneNumber, fullName
         ValidateUserRegistrationInputData convertedInput = new ValidateUserRegistrationInputData(
-            inputData.getTenDangNhap(), inputData.getEmail(), inputData.getMatKhau(), 
-            inputData.getHoTen(), inputData.getSoDienThoai()
+            inputData.getEmail(),          // email
+            inputData.getTenDangNhap(),    // username
+            inputData.getMatKhau(),        // password
+            inputData.getSoDienThoai(),    // phoneNumber
+            inputData.getHoTen()           // fullName
         );
         return validateInternal(convertedInput);
     }

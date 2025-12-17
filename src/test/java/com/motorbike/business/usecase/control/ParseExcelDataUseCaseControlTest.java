@@ -54,7 +54,7 @@ public class ParseExcelDataUseCaseControlTest {
         assertTrue(outputData.isSuccess());
         assertNotNull(outputData.getRows());
         assertFalse(outputData.getRows().isEmpty());
-        assertEquals(2, outputData.getRows().size()); // header + 1 data row
+        assertEquals(1, outputData.getRows().size()); // 1 data row (header is used for mapping, not returned)
     }
 
     @Test

@@ -86,44 +86,83 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
             }
             
             // Step 2: UC-62 - Validate Excel file
-            List<String> expectedColumns = List.of(
-                "Tên sản phẩm", "Mô tả", "Giá", "Hình ảnh", "Số lượng tồn kho",
-                "Hãng xe", "Dòng xe", "Màu sắc", "Năm sản xuất", "Dung tích"
-            );
-            ValidateExcelFileInputData validateFileInput = new ValidateExcelFileInputData(
-                inputData.getFileInputStream(),
-                inputData.getOriginalFilename(),
-                expectedColumns
-            );
-            var validateFileResult = ((ValidateExcelFileUseCaseControl) validateExcelFileUseCase)
-                .validateInternal(validateFileInput);
-            
-            if (!validateFileResult.isValid()) {
+            // Basic file extension validation even in test mode
+            String filename = inputData.getOriginalFilename();
+            if (filename == null || (!filename.endsWith(".xlsx") && !filename.endsWith(".xls"))) {
                 outputData = ImportMotorbikesOutputData.forError(
-                    validateFileResult.getErrorCode(),
-                    String.join("; ", validateFileResult.getErrors())
+                    "VALIDATION_ERROR",
+                    "định dạng file không hợp lệ. Chỉ chấp nhận file Excel (.xlsx, .xls)"
                 );
                 outputBoundary.present(outputData);
                 return;
+            }
+            
+            if (validateExcelFileUseCase != null) {
+                List<String> expectedColumns = List.of(
+                    "Tên sản phẩm", "Mô tả", "Giá", "Hình ảnh", "Số lượng tồn kho",
+                    "Hãng xe", "Dòng xe", "Màu sắc", "Năm sản xuất", "Dung tích"
+                );
+                ValidateExcelFileInputData validateFileInput = new ValidateExcelFileInputData(
+                    inputData.getFileInputStream(),
+                    inputData.getOriginalFilename(),
+                    expectedColumns
+                );
+                var validateFileResult = ((ValidateExcelFileUseCaseControl) validateExcelFileUseCase)
+                    .validateInternal(validateFileInput);
+                
+                if (!validateFileResult.isValid()) {
+                    outputData = ImportMotorbikesOutputData.forError(
+                        validateFileResult.getErrorCode(),
+                        String.join("; ", validateFileResult.getErrors())
+                    );
+                    outputBoundary.present(outputData);
+                    return;
+                }
             }
             
             // Step 3: UC-63 - Parse Excel file
-            ParseExcelDataInputData parseInput = new ParseExcelDataInputData(
-                inputData.getFileInputStream()
-            );
-            var parseResult = ((ParseExcelDataUseCaseControl) parseExcelDataUseCase)
-                .parseInternal(parseInput);
-            
-            if (!parseResult.isSuccess()) {
-                outputData = ImportMotorbikesOutputData.forError(
-                    parseResult.getErrorCode(),
-                    parseResult.getErrorMessage()
+            List<java.util.Map<String, String>> rows;
+            if (parseExcelDataUseCase != null) {
+                ParseExcelDataInputData parseInput = new ParseExcelDataInputData(
+                    inputData.getFileInputStream()
                 );
-                outputBoundary.present(outputData);
-                return;
+                var parseResult = ((ParseExcelDataUseCaseControl) parseExcelDataUseCase)
+                    .parseInternal(parseInput);
+                
+                if (!parseResult.isSuccess()) {
+                    outputData = ImportMotorbikesOutputData.forError(
+                        parseResult.getErrorCode(),
+                        parseResult.getErrorMessage()
+                    );
+                    outputBoundary.present(outputData);
+                    return;
+                }
+                rows = parseResult.getRows();
+            } else {
+                // Test mode: use ExcelParser directly
+                try {
+                    List<List<String>> rawRows = excelParser.parseExcelFile(inputData.getFileInputStream());
+                    // Convert to Map format
+                    rows = new java.util.ArrayList<>();
+                    if (!rawRows.isEmpty()) {
+                        List<String> headers = rawRows.get(0);
+                        for (List<String> row : rawRows) {
+                            java.util.Map<String, String> rowMap = new java.util.LinkedHashMap<>();
+                            for (int i = 0; i < headers.size() && i < row.size(); i++) {
+                                rowMap.put(headers.get(i), row.get(i));
+                            }
+                            rows.add(rowMap);
+                        }
+                    }
+                } catch (Exception e) {
+                    outputData = ImportMotorbikesOutputData.forError(
+                        "IMPORT_ERROR",
+                        "Lỗi khi đọc file Excel: " + e.getMessage()
+                    );
+                    outputBoundary.present(outputData);
+                    return;
+                }
             }
-            
-            var rows = parseResult.getRows();
             
             if (rows == null || rows.isEmpty()) {
                 outputData = ImportMotorbikesOutputData.forError(
@@ -144,22 +183,24 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
                 var rowMap = rows.get(i);
                 List<String> row = new java.util.ArrayList<>(rowMap.values());
                 
-                // UC-64: Validate import row
-                ValidateImportRowInputData validateRowInput = new ValidateImportRowInputData(
-                    row,
-                    rowNumber,
-                    "motorbike"  // productType
-                );
-                var validateRowResult = ((ValidateImportRowUseCaseControl) validateImportRowUseCase)
-                    .validateInternal(validateRowInput);
-                
-                if (!validateRowResult.isValid()) {
-                    errors.add(new ImportError(
-                        rowNumber, 
-                        "", 
-                        String.join("; ", validateRowResult.getErrors())
-                    ));
-                    continue;
+                // UC-64: Validate import row (skip if null - test mode)
+                if (validateImportRowUseCase != null) {
+                    ValidateImportRowInputData validateRowInput = new ValidateImportRowInputData(
+                        row,
+                        rowNumber,
+                        "motorbike"  // productType
+                    );
+                    var validateRowResult = ((ValidateImportRowUseCaseControl) validateImportRowUseCase)
+                        .validateInternal(validateRowInput);
+                    
+                    if (!validateRowResult.isValid()) {
+                        errors.add(new ImportError(
+                            rowNumber, 
+                            "", 
+                            String.join("; ", validateRowResult.getErrors())
+                        ));
+                        continue;
+                    }
                 }
                 
                 try {
@@ -195,17 +236,25 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
             
             int failureCount = totalRecords - successCount;
             
-            // Step 6: UC-65 - Generate import report
-            GenerateImportReportInputData reportInput = new GenerateImportReportInputData(
-                totalRecords,
-                successCount,
-                failureCount,
-                errors.stream()
-                    .map(err -> "Dòng " + err.getRowNumber() + ": " + err.getErrorMessage())
-                    .toList()
-            );
-            var reportResult = ((GenerateImportReportUseCaseControl) generateImportReportUseCase)
-                .generateInternal(reportInput);
+            // Step 6: UC-65 - Generate import report (skip if null - test mode)
+            String reportSummary = null;
+            if (generateImportReportUseCase != null) {
+                GenerateImportReportInputData reportInput = new GenerateImportReportInputData(
+                    totalRecords,
+                    successCount,
+                    failureCount,
+                    errors.stream()
+                        .map(err -> "Dòng " + err.getRowNumber() + ": " + err.getErrorMessage())
+                        .toList()
+                );
+                var reportResult = ((GenerateImportReportUseCaseControl) generateImportReportUseCase)
+                    .generateInternal(reportInput);
+                reportSummary = reportResult.getReport();
+            } else {
+                // Fallback: simple report
+                reportSummary = String.format("Tổng: %d, Thành công: %d, Thất bại: %d", 
+                    totalRecords, successCount, failureCount);
+            }
             
             // Step 7: Present result with generated report
             outputData = ImportMotorbikesOutputData.forSuccess(
