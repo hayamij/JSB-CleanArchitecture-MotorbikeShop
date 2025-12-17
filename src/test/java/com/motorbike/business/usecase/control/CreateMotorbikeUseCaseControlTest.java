@@ -14,6 +14,7 @@ import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.CreateMotorbikeOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.domain.exceptions.ValidationException;
 
 public class CreateMotorbikeUseCaseControlTest {
 
@@ -52,11 +53,8 @@ public class CreateMotorbikeUseCaseControlTest {
 		CreateMotorbikeOutputBoundary outputBoundary = new CreateMotorbikePresenter(viewModel);
 		
 		CreateMotorbikeUseCaseControl control = new CreateMotorbikeUseCaseControl(outputBoundary, productRepo);
-		control.execute(null);
 		
-		assertFalse(viewModel.success);
-		assertTrue(viewModel.hasError);
-		assertEquals("INVALID_INPUT", viewModel.errorCode);
+		assertThrows(ValidationException.class, () -> control.execute(null));
 	}
 
 	@Test

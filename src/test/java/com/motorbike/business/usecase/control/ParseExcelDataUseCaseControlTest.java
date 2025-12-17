@@ -2,35 +2,17 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.parseexceldata.ParseExcelDataInputData;
 import com.motorbike.business.dto.parseexceldata.ParseExcelDataOutputData;
-import com.motorbike.business.usecase.output.ParseExcelDataOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ParseExcelDataUseCaseControlTest {
-
-    @Mock
-    private ParseExcelDataOutputBoundary outputBoundary;
-
-    private ParseExcelDataUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ParseExcelDataUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldParseExcelDataSuccessfully() throws Exception {
@@ -63,11 +45,30 @@ public class ParseExcelDataUseCaseControlTest {
         );
 
         ParseExcelDataInputData inputData = new ParseExcelDataInputData(file);
+        ParseExcelDataUseCaseControl useCase = new ParseExcelDataUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ParseExcelDataOutputData outputData = useCase.parseInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ParseExcelDataOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotNull(outputData.getRows());
+        assertFalse(outputData.getRows().isEmpty());
+        assertEquals(2, outputData.getRows().size()); // header + 1 data row
+    }
+
+    @Test
+    void shouldHandleNullFile() {
+        // Given
+        MultipartFile nullFile = null;
+        ParseExcelDataInputData inputData = new ParseExcelDataInputData(nullFile);
+        ParseExcelDataUseCaseControl useCase = new ParseExcelDataUseCaseControl(null);
+
+        // When
+        ParseExcelDataOutputData outputData = useCase.parseInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isSuccess());
+        assertNotNull(outputData.getErrorCode());
     }
 }

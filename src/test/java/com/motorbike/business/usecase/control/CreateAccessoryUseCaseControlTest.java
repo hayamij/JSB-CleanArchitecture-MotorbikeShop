@@ -14,6 +14,7 @@ import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.CreateAccessoryOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.domain.exceptions.ValidationException;
 
 public class CreateAccessoryUseCaseControlTest {
 
@@ -50,10 +51,8 @@ public class CreateAccessoryUseCaseControlTest {
 		CreateAccessoryOutputBoundary outputBoundary = new CreateAccessoryPresenter(viewModel);
 		
 		CreateAccessoryUseCaseControl control = new CreateAccessoryUseCaseControl(outputBoundary, productRepo);
-		control.execute(null);
 		
-		assertFalse(viewModel.success);
-		assertTrue(viewModel.hasError);
+		assertThrows(ValidationException.class, () -> control.execute(null));
 	}
 
 	@Test

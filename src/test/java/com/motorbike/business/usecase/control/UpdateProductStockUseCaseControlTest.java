@@ -2,60 +2,108 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.updateproductstock.UpdateProductStockInputData;
 import com.motorbike.business.dto.updateproductstock.UpdateProductStockOutputData;
-import com.motorbike.business.usecase.output.UpdateProductStockOutputBoundary;
-import com.motorbike.domain.entities.GioHang;
+import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.domain.entities.SanPham;
-import com.motorbike.business.ports.SanPhamRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.motorbike.domain.entities.XeMay;
+import com.motorbike.domain.entities.PhuKienXeMay;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class UpdateProductStockUseCaseControlTest {
 
-    @Mock
-    private SanPhamRepository sanPhamRepository;
-
-    @Mock
-    private UpdateProductStockOutputBoundary outputBoundary;
-
-    private UpdateProductStockUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new UpdateProductStockUseCaseControl(sanPhamRepository, outputBoundary);
+    // UpdateProductStock use case expects productId, quantityChange, and operation
+    
+    static class MockProductRepository implements ProductRepository {
+        private SanPham product;
+        
+        public void setProduct(SanPham product) {
+            this.product = product;
+        }
+        
+        @Override
+        public Optional<SanPham> findById(Long id) {
+            return product != null && product.getMaSP().equals(id) ? Optional.of(product) : Optional.empty();
+        }
+        
+        @Override
+        public SanPham save(SanPham sanPham) {
+            this.product = sanPham;
+            return sanPham;
+        }
+        
+        @Override
+        public java.util.List<SanPham> findAll() { return null; }
+        
+        @Override
+        public void deleteById(Long id) {}
+        
+        @Override
+        public boolean existsById(Long id) { return product != null; }
+        
+        @Override
+        public Optional<SanPham> findByTenSanPham(String tenSanPham) { return Optional.empty(); }
+        
+        @Override
+        public Optional<SanPham> findByMaSanPham(String maSanPham) { return Optional.empty(); }
+        
+        @Override
+        public java.util.List<PhuKienXeMay> findAllAccessories() { return new java.util.ArrayList<>(); }
+        
+        @Override
+        public java.util.List<PhuKienXeMay> searchAccessories(String keyword) { return new java.util.ArrayList<>(); }
+        
+        @Override
+        public java.util.List<XeMay> findAllMotorbikes() { return new java.util.ArrayList<>(); }
+        
+        @Override
+        public java.util.List<XeMay> searchMotorbikes(String keyword) { return new java.util.ArrayList<>(); }
     }
 
     @Test
-    void shouldUpdateStockSuccessfully() {
-        // Given
-        SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 10, true, false);
-        product.setMaSP(1L);
+    void shouldIncreaseStockSuccessfully() {
+        // Given - Increase stock by 5
+        Long productId = 1L;
+        XeMay product = new XeMay(productId, "Yamaha Exciter", "Xe thể thao",
+            BigDecimal.valueOf(45000000), "exciter.jpg", 10, true, null, null,
+            "Yamaha", "Exciter", "Đỏ", 2024, 155);
 
-        GioHang item = new GioHang(1L, 1L, 5);
-        item.setSanPham(product);
-
-        List<GioHang> cartItems = Arrays.asList(item);
-
-        when(sanPhamRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(sanPhamRepository.save(any(SanPham.class))).thenReturn(product);
-
-        UpdateProductStockInputData inputData = new UpdateProductStockInputData(cartItems);
+        MockProductRepository productRepo = new MockProductRepository();
+        productRepo.setProduct(product);
+        UpdateProductStockUseCaseControl useCase = new UpdateProductStockUseCaseControl(null, productRepo);
+        UpdateProductStockInputData inputData = new UpdateProductStockInputData(productId, 5, "INCREASE");
 
         // When
-        useCase.execute(inputData);
+        UpdateProductStockOutputData outputData = useCase.updateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(UpdateProductStockOutputData.class));
-        verify(sanPhamRepository, times(1)).save(any(SanPham.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals("Product stock updated successfully", outputData.getMessage());
+        assertEquals(15, outputData.getNewStock()); // 10 + 5
+    }
+
+    @Test
+    void shouldDecreaseStockSuccessfully() {
+        // Given - Decrease stock by 3
+        Long productId = 1L;
+        XeMay product = new XeMay(productId, "Yamaha Exciter", "Xe thể thao",
+            BigDecimal.valueOf(45000000), "exciter.jpg", 20, true, null, null,
+            "Yamaha", "Exciter", "Đỏ", 2024, 155);
+
+        MockProductRepository productRepo = new MockProductRepository();
+        productRepo.setProduct(product);
+        UpdateProductStockUseCaseControl useCase = new UpdateProductStockUseCaseControl(null, productRepo);
+        UpdateProductStockInputData inputData = new UpdateProductStockInputData(productId, 3, "DECREASE");
+
+        // When
+        UpdateProductStockOutputData outputData = useCase.updateInternal(inputData);
+
+        // Then
+        assertTrue(outputData.isSuccess());
+        assertEquals("Product stock updated successfully", outputData.getMessage());
+        assertEquals(17, outputData.getNewStock()); // 20 - 3
     }
 }

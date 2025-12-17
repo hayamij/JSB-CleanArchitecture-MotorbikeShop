@@ -2,72 +2,78 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.validateordercancellation.ValidateOrderCancellationInputData;
 import com.motorbike.business.dto.validateordercancellation.ValidateOrderCancellationOutputData;
-import com.motorbike.business.usecase.output.ValidateOrderCancellationOutputBoundary;
-import com.motorbike.domain.entities.DonHang;
-import org.junit.jupiter.api.BeforeEach;
+import com.motorbike.domain.entities.TrangThaiDonHang;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ValidateOrderCancellationUseCaseControlTest {
-
-    @Mock
-    private ValidateOrderCancellationOutputBoundary outputBoundary;
-
-    private ValidateOrderCancellationUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ValidateOrderCancellationUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldAllowCancellationForPendingOrder() {
-        // Given
-        DonHang order = new DonHang(1L, 90000000.0, "PENDING");
-        order.setMaDH(1L);
-
-        ValidateOrderCancellationInputData inputData = new ValidateOrderCancellationInputData(order);
+        // Given - Order with CHO_XAC_NHAN status
+        Long orderId = 1L;
+        TrangThaiDonHang status = TrangThaiDonHang.CHO_XAC_NHAN;
+        
+        ValidateOrderCancellationInputData inputData = new ValidateOrderCancellationInputData(orderId, status);
+        ValidateOrderCancellationUseCaseControl useCase = new ValidateOrderCancellationUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateOrderCancellationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateOrderCancellationOutputData.class));
+        assertTrue(outputData.canCancel());
+        assertNotNull(outputData.getReason());
     }
 
     @Test
-    void shouldDenyCancellationForShippedOrder() {
-        // Given
-        DonHang order = new DonHang(1L, 90000000.0, "SHIPPED");
-        order.setMaDH(1L);
-
-        ValidateOrderCancellationInputData inputData = new ValidateOrderCancellationInputData(order);
+    void shouldDenyCancellationForShippingOrder() {
+        // Given - Order with DANG_GIAO status
+        Long orderId = 1L;
+        TrangThaiDonHang status = TrangThaiDonHang.DANG_GIAO;
+        
+        ValidateOrderCancellationInputData inputData = new ValidateOrderCancellationInputData(orderId, status);
+        ValidateOrderCancellationUseCaseControl useCase = new ValidateOrderCancellationUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateOrderCancellationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateOrderCancellationOutputData.class));
+        assertFalse(outputData.canCancel());
+        assertNotNull(outputData.getReason());
     }
 
     @Test
     void shouldDenyCancellationForDeliveredOrder() {
-        // Given
-        DonHang order = new DonHang(1L, 90000000.0, "DELIVERED");
-        order.setMaDH(1L);
-
-        ValidateOrderCancellationInputData inputData = new ValidateOrderCancellationInputData(order);
+        // Given - Order with DA_GIAO status
+        Long orderId = 1L;
+        TrangThaiDonHang status = TrangThaiDonHang.DA_GIAO;
+        
+        ValidateOrderCancellationInputData inputData = new ValidateOrderCancellationInputData(orderId, status);
+        ValidateOrderCancellationUseCaseControl useCase = new ValidateOrderCancellationUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateOrderCancellationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateOrderCancellationOutputData.class));
+        assertFalse(outputData.canCancel());
+        assertNotNull(outputData.getReason());
+    }
+
+    @Test
+    void shouldAllowCancellationForConfirmedOrder() {
+        // Given - Order with DA_XAC_NHAN status can still be cancelled
+        Long orderId = 1L;
+        TrangThaiDonHang status = TrangThaiDonHang.DA_XAC_NHAN;
+        
+        ValidateOrderCancellationInputData inputData = new ValidateOrderCancellationInputData(orderId, status);
+        ValidateOrderCancellationUseCaseControl useCase = new ValidateOrderCancellationUseCaseControl(null);
+
+        // When
+        ValidateOrderCancellationOutputData outputData = useCase.validateInternal(inputData);
+
+        // Then
+        assertTrue(outputData.canCancel());
+        assertNotNull(outputData.getReason());
     }
 }

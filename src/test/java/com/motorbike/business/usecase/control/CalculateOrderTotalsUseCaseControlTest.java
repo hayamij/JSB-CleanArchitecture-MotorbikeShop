@@ -2,33 +2,20 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.calculateordertotals.CalculateOrderTotalsInputData;
 import com.motorbike.business.dto.calculateordertotals.CalculateOrderTotalsOutputData;
-import com.motorbike.business.usecase.output.CalculateOrderTotalsOutputBoundary;
 import com.motorbike.domain.entities.ChiTietDonHang;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 public class CalculateOrderTotalsUseCaseControlTest {
 
-    @Mock
-    private CalculateOrderTotalsOutputBoundary outputBoundary;
-
-    private CalculateOrderTotalsUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new CalculateOrderTotalsUseCaseControl(outputBoundary);
-    }
+    private CalculateOrderTotalsUseCaseControl useCase = new CalculateOrderTotalsUseCaseControl(null);
 
     @Test
     void shouldCalculateTotalsSuccessfully() {
@@ -40,10 +27,14 @@ public class CalculateOrderTotalsUseCaseControlTest {
         CalculateOrderTotalsInputData inputData = new CalculateOrderTotalsInputData(orderDetails);
 
         // When
-        useCase.execute(inputData);
+        CalculateOrderTotalsOutputData outputData = useCase.calculateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CalculateOrderTotalsOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(2, outputData.getTotalItems());
+        assertEquals(5, outputData.getTotalQuantity());
+        // thanhTien = detail1.donGia * 2 + detail2.donGia * 3 = 90000000 + 1500000 = 91500000
+        assertEquals(new BigDecimal("91500000"), outputData.getTotalAmount());
     }
 
     @Test
@@ -53,9 +44,12 @@ public class CalculateOrderTotalsUseCaseControlTest {
         CalculateOrderTotalsInputData inputData = new CalculateOrderTotalsInputData(orderDetails);
 
         // When
-        useCase.execute(inputData);
+        CalculateOrderTotalsOutputData outputData = useCase.calculateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CalculateOrderTotalsOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(0, outputData.getTotalItems());
+        assertEquals(0, outputData.getTotalQuantity());
+        assertEquals(BigDecimal.ZERO, outputData.getTotalAmount());
     }
 }

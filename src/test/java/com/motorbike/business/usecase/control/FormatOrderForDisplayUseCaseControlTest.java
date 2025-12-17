@@ -2,51 +2,80 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.formatorderfordisplay.FormatOrderForDisplayInputData;
 import com.motorbike.business.dto.formatorderfordisplay.FormatOrderForDisplayOutputData;
-import com.motorbike.business.usecase.output.FormatOrderForDisplayOutputBoundary;
 import com.motorbike.domain.entities.DonHang;
-import com.motorbike.domain.entities.ChiTietDonHang;
-import org.junit.jupiter.api.BeforeEach;
+import com.motorbike.domain.entities.TrangThaiDonHang;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class FormatOrderForDisplayUseCaseControlTest {
-
-    @Mock
-    private FormatOrderForDisplayOutputBoundary outputBoundary;
-
-    private FormatOrderForDisplayUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new FormatOrderForDisplayUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldFormatOrderSuccessfully() {
         // Given
-        DonHang order = new DonHang(1L, 90000000.0, "PENDING");
-        order.setMaDH(1L);
+        DonHang order = new DonHang(
+            1L,
+            "Nguyễn Văn A",
+            "0912345678",
+            "123 Test Street",
+            "Test Note",
+            PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP
+        );
 
-        ChiTietDonHang detail1 = new ChiTietDonHang(1L, 1L, 2, 45000000.0);
-        ChiTietDonHang detail2 = new ChiTietDonHang(1L, 2L, 3, 500000.0);
-
-        List<ChiTietDonHang> orderDetails = Arrays.asList(detail1, detail2);
-
-        FormatOrderForDisplayInputData inputData = new FormatOrderForDisplayInputData(order, orderDetails);
+        FormatOrderForDisplayInputData inputData = new FormatOrderForDisplayInputData(order);
+        FormatOrderForDisplayUseCaseControl useCase = new FormatOrderForDisplayUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        FormatOrderForDisplayOutputData outputData = useCase.formatInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(FormatOrderForDisplayOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotNull(outputData.getStatusText());
+        assertNotNull(outputData.getFormattedAmount());
+        assertNotNull(outputData.getStatusColor());
+        assertEquals(1L, outputData.getOrderId());
+    }
+
+    @Test
+    void shouldFormatOrderWithDifferentStatus() {
+        // Given
+        DonHang order = new DonHang(
+            1L,
+            "Trần Thị B",
+            "0987654321",
+            "456 Test Street",
+            "Test Note",
+            PhuongThucThanhToan.CHUYEN_KHOAN
+        );
+        order.setMaDonHang(2L);
+
+        FormatOrderForDisplayInputData inputData = new FormatOrderForDisplayInputData(order);
+        FormatOrderForDisplayUseCaseControl useCase = new FormatOrderForDisplayUseCaseControl(null);
+
+        // When
+        FormatOrderForDisplayOutputData outputData = useCase.formatInternal(inputData);
+
+        // Then
+        assertTrue(outputData.isSuccess());
+        assertEquals(2L, outputData.getOrderId());
+        assertNotNull(outputData.getPaymentMethodText());
+    }
+
+    @Test
+    void shouldHandleNullOrderInput() {
+        // Given
+        FormatOrderForDisplayInputData inputData = new FormatOrderForDisplayInputData(null);
+        FormatOrderForDisplayUseCaseControl useCase = new FormatOrderForDisplayUseCaseControl(null);
+
+        // When
+        FormatOrderForDisplayOutputData outputData = useCase.formatInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isSuccess());
+        assertNotNull(outputData.getErrorCode());
     }
 }

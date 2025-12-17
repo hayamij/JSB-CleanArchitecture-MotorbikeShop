@@ -2,70 +2,61 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.checkuserduplication.CheckUserDuplicationInputData;
 import com.motorbike.business.dto.checkuserduplication.CheckUserDuplicationOutputData;
-import com.motorbike.business.usecase.output.CheckUserDuplicationOutputBoundary;
+import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.domain.entities.TaiKhoan;
-import com.motorbike.business.ports.TaiKhoanRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.motorbike.domain.entities.VaiTro;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 public class CheckUserDuplicationUseCaseControlTest {
-
-    @Mock
-    private TaiKhoanRepository taiKhoanRepository;
-
-    @Mock
-    private CheckUserDuplicationOutputBoundary outputBoundary;
-
-    private CheckUserDuplicationUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new CheckUserDuplicationUseCaseControl(taiKhoanRepository, outputBoundary);
-    }
 
     @Test
     void shouldDetectDuplicateUsername() {
         // Given
         String username = "john_doe";
-        TaiKhoan existingUser = new TaiKhoan(username, "password", "john@example.com", "0123456789", "123 Main St");
+        String email = "john@example.com";
+        TaiKhoan existingUser = new TaiKhoan("John Doe", email, username, "password", "0912345678", "123 Street");
+        existingUser.setMaTaiKhoan(1L);
 
-        when(taiKhoanRepository.findByTenDangNhap(username)).thenReturn(Optional.of(existingUser));
+        UserRepository userRepo = new MockUserRepository(existingUser);
+        CheckUserDuplicationUseCaseControl useCase = new CheckUserDuplicationUseCaseControl(null, userRepo);
 
-        CheckUserDuplicationInputData inputData = new CheckUserDuplicationInputData(username, "new@example.com", null);
+        CheckUserDuplicationInputData inputData = new CheckUserDuplicationInputData("new@example.com", username, null);
 
         // When
-        useCase.execute(inputData);
+        CheckUserDuplicationOutputData outputData = useCase.checkDuplicationInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CheckUserDuplicationOutputData.class));
-        verify(taiKhoanRepository).findByTenDangNhap(username);
+        assertTrue(outputData.isSuccess());
+        assertTrue(outputData.isDuplicate());
+        assertEquals("username", outputData.getDuplicatedField());
+        assertEquals(1L, outputData.getExistingUserId());
     }
 
     @Test
     void shouldDetectDuplicateEmail() {
         // Given
         String email = "john@example.com";
-        TaiKhoan existingUser = new TaiKhoan("other_user", "password", email, "0123456789", "123 Main St");
+        TaiKhoan existingUser = new TaiKhoan("Other User", email, "other_user", "password", "0912345678", "456 Street");
+        existingUser.setMaTaiKhoan(2L);
 
-        when(taiKhoanRepository.findByTenDangNhap("new_user")).thenReturn(Optional.empty());
-        when(taiKhoanRepository.findByEmail(email)).thenReturn(Optional.of(existingUser));
+        UserRepository userRepo = new MockUserRepository(existingUser);
+        CheckUserDuplicationUseCaseControl useCase = new CheckUserDuplicationUseCaseControl(null, userRepo);
 
-        CheckUserDuplicationInputData inputData = new CheckUserDuplicationInputData("new_user", email, null);
+        CheckUserDuplicationInputData inputData = new CheckUserDuplicationInputData(email, "new_user", null);
 
         // When
-        useCase.execute(inputData);
+        CheckUserDuplicationOutputData outputData = useCase.checkDuplicationInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CheckUserDuplicationOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertTrue(outputData.isDuplicate());
+        assertEquals("email", outputData.getDuplicatedField());
     }
 
     @Test
@@ -74,16 +65,17 @@ public class CheckUserDuplicationUseCaseControlTest {
         String username = "new_user";
         String email = "new@example.com";
 
-        when(taiKhoanRepository.findByTenDangNhap(username)).thenReturn(Optional.empty());
-        when(taiKhoanRepository.findByEmail(email)).thenReturn(Optional.empty());
+        UserRepository userRepo = new MockUserRepository(null);
+        CheckUserDuplicationUseCaseControl useCase = new CheckUserDuplicationUseCaseControl(null, userRepo);
 
-        CheckUserDuplicationInputData inputData = new CheckUserDuplicationInputData(username, email, null);
+        CheckUserDuplicationInputData inputData = new CheckUserDuplicationInputData(email, username, null);
 
         // When
-        useCase.execute(inputData);
+        CheckUserDuplicationOutputData outputData = useCase.checkDuplicationInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CheckUserDuplicationOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertFalse(outputData.isDuplicate());
     }
 
     @Test
@@ -91,17 +83,99 @@ public class CheckUserDuplicationUseCaseControlTest {
         // Given
         Long userId = 1L;
         String email = "john@example.com";
-        TaiKhoan existingUser = new TaiKhoan("john_doe", "password", email, "0123456789", "123 Main St");
-        existingUser.setMaTK(userId);
+        TaiKhoan existingUser = new TaiKhoan("John Doe", email, "john_doe", "password", "0912345678", "789 Street");
+        existingUser.setMaTaiKhoan(userId);
 
-        when(taiKhoanRepository.findByEmail(email)).thenReturn(Optional.of(existingUser));
+        UserRepository userRepo = new MockUserRepository(existingUser);
+        CheckUserDuplicationUseCaseControl useCase = new CheckUserDuplicationUseCaseControl(null, userRepo);
 
-        CheckUserDuplicationInputData inputData = new CheckUserDuplicationInputData("john_doe", email, userId);
+        CheckUserDuplicationInputData inputData = new CheckUserDuplicationInputData(email, "john_doe", userId);
 
         // When
-        useCase.execute(inputData);
+        CheckUserDuplicationOutputData outputData = useCase.checkDuplicationInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CheckUserDuplicationOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertFalse(outputData.isDuplicate());
+    }
+
+    private static class MockUserRepository implements UserRepository {
+        private final TaiKhoan user;
+
+        public MockUserRepository(TaiKhoan user) {
+            this.user = user;
+        }
+
+        @Override
+        public Optional<TaiKhoan> findById(Long id) {
+            if (user != null && user.getMaTaiKhoan().equals(id)) {
+                return Optional.of(user);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public TaiKhoan save(TaiKhoan taiKhoan) {
+            return taiKhoan;
+        }
+
+        @Override
+        public Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+            if (user != null && user.getTenDangNhap().equals(tenDangNhap)) {
+                return Optional.of(user);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<TaiKhoan> findByEmail(String email) {
+            if (user != null && user.getEmail().equals(email)) {
+                return Optional.of(user);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public boolean existsByTenDangNhap(String tenDangNhap) {
+            return false;
+        }
+
+        @Override
+        public boolean existsByEmail(String email) {
+            return false;
+        }
+        
+        @Override
+        public boolean existsByUsername(String username) {
+            return false;
+        }
+        
+        @Override
+        public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+            return Optional.empty();
+        }
+
+        @Override
+        public java.util.List<TaiKhoan> findAll() {
+            return new java.util.ArrayList<>();
+        }
+
+        @Override
+        public void deleteById(Long id) {
+        }
+        
+        @Override
+        public java.util.List<TaiKhoan> searchUsers(String keyword) {
+            return new java.util.ArrayList<>();
+        }
+        
+        @Override
+        public boolean existsById(Long id) {
+            return user != null && user.getMaTaiKhoan().equals(id);
+        }
+        
+        @Override
+        public void updateLastLogin(Long userId) {
+        }
     }
 }

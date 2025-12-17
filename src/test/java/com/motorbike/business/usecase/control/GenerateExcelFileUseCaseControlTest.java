@@ -2,38 +2,21 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.generateexcelfile.GenerateExcelFileInputData;
 import com.motorbike.business.dto.generateexcelfile.GenerateExcelFileOutputData;
-import com.motorbike.business.usecase.output.GenerateExcelFileOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class GenerateExcelFileUseCaseControlTest {
-
-    @Mock
-    private GenerateExcelFileOutputBoundary outputBoundary;
-
-    private GenerateExcelFileUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new GenerateExcelFileUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldGenerateExcelFileSuccessfully() {
         // Given
-        
         Map<String, Object> row1 = new HashMap<>();
         row1.put("Mã SP", "XE001");
         row1.put("Tên SP", "Yamaha Exciter");
@@ -50,26 +33,48 @@ public class GenerateExcelFileUseCaseControlTest {
         List<String> headers = Arrays.asList("Mã SP", "Tên SP", "Giá", "Số lượng");
 
         GenerateExcelFileInputData inputData = new GenerateExcelFileInputData(data, headers);
+        GenerateExcelFileUseCaseControl useCase = new GenerateExcelFileUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        GenerateExcelFileOutputData outputData = useCase.generateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(GenerateExcelFileOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotNull(outputData.getFileBytes());
+        assertTrue(outputData.getFileBytes().length > 0);
+        assertEquals(2, outputData.getRowCount());
+        assertNotNull(outputData.getFileName());
     }
 
     @Test
     void shouldGenerateExcelFileWithEmptyData() {
         // Given
-        List<Map<String, Object>> data = Arrays.asList();
+        List<Map<String, Object>> data = Collections.emptyList();
         List<String> headers = Arrays.asList("Mã SP", "Tên SP", "Giá");
 
         GenerateExcelFileInputData inputData = new GenerateExcelFileInputData(data, headers);
+        GenerateExcelFileUseCaseControl useCase = new GenerateExcelFileUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        GenerateExcelFileOutputData outputData = useCase.generateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(GenerateExcelFileOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotNull(outputData.getFileBytes());
+        assertEquals(0, outputData.getRowCount());
+    }
+
+    @Test
+    void shouldHandleNullData() {
+        // Given
+        GenerateExcelFileInputData inputData = new GenerateExcelFileInputData(null, Arrays.asList("Header"));
+        GenerateExcelFileUseCaseControl useCase = new GenerateExcelFileUseCaseControl(null);
+
+        // When
+        GenerateExcelFileOutputData outputData = useCase.generateInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isSuccess());
+        assertNotNull(outputData.getErrorCode());
     }
 }

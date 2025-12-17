@@ -2,83 +2,128 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.validateorder.ValidateOrderInputData;
 import com.motorbike.business.dto.validateorder.ValidateOrderOutputData;
-import com.motorbike.business.usecase.output.ValidateOrderOutputBoundary;
-import com.motorbike.domain.entities.GioHang;
-import com.motorbike.domain.entities.SanPham;
-import org.junit.jupiter.api.BeforeEach;
+import com.motorbike.business.ports.repository.OrderRepository;
+import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.ChiTietDonHang;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ValidateOrderUseCaseControlTest {
 
-    @Mock
-    private ValidateOrderOutputBoundary outputBoundary;
-
-    private ValidateOrderUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ValidateOrderUseCaseControl(outputBoundary);
+    // ValidateOrder use case expects orderId and checks if order exists in DB with items
+    
+    static class MockOrderRepository implements OrderRepository {
+        private DonHang order;
+        
+        public void setOrder(DonHang order) {
+            this.order = order;
+        }
+        
+        @Override
+        public Optional<DonHang> findById(Long id) {
+            return order != null && order.getMaDonHang().equals(id) ? Optional.of(order) : Optional.empty();
+        }
+        
+        @Override
+        public DonHang save(DonHang donHang) { return donHang; }
+        
+        @Override
+        public java.util.List<DonHang> findAll() { return null; }
+        
+        @Override
+        public java.util.List<DonHang> findByUserId(Long userId) { return null; }
+        
+        @Override
+        public void deleteById(Long id) {}
+        
+        @Override
+        public java.util.List<com.motorbike.domain.entities.ProductSalesStats> getTopSellingProducts(int limit) { return null; }
+        
+        @Override
+        public boolean existsById(Long id) { return false; }
+        
+        @Override
+        public java.util.List<DonHang> findByStatus(com.motorbike.domain.entities.TrangThaiDonHang trangThai) { return null; }
+        
+        @Override
+        public java.util.List<DonHang> findByUserIdAndStatus(Long userId, com.motorbike.domain.entities.TrangThaiDonHang trangThai) { return null; }
+        
+        @Override
+        public java.util.List<DonHang> searchOrders(String keyword) { return null; }
     }
 
     @Test
     void shouldValidateOrderSuccessfully() {
-        // Given
-        SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 10, true, false);
-        product.setMaSP(1L);
-
-        GioHang item = new GioHang(1L, 1L, 5);
-        item.setSanPham(product);
-
-        List<GioHang> cartItems = Arrays.asList(item);
-        ValidateOrderInputData inputData = new ValidateOrderInputData(cartItems);
+        // Given - Order exists with items
+        Long orderId = 1L;
+        DonHang order = new DonHang(orderId, 100000.0, "Customer Name");
+        order.themSanPham(new ChiTietDonHang(1L, "Product", BigDecimal.valueOf(100000), 1));
+        
+        MockOrderRepository orderRepo = new MockOrderRepository();
+        orderRepo.setOrder(order);
+        ValidateOrderUseCaseControl useCase = new ValidateOrderUseCaseControl(null, orderRepo);
+        ValidateOrderInputData inputData = new ValidateOrderInputData(orderId);
 
         // When
-        useCase.execute(inputData);
+        ValidateOrderOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateOrderOutputData.class));
+        assertTrue(outputData.isValid());
+        assertEquals("Order is valid", outputData.getMessage());
+        assertEquals(orderId, outputData.getOrderId());
     }
 
     @Test
-    void shouldFailWhenCartIsEmpty() {
-        // Given
-        List<GioHang> cartItems = Collections.emptyList();
-        ValidateOrderInputData inputData = new ValidateOrderInputData(cartItems);
+    void shouldFailWhenOrderNotFound() {
+        // Given - Order doesn't exist
+        Long orderId = 999L;
+        MockOrderRepository orderRepo = new MockOrderRepository();
+        ValidateOrderUseCaseControl useCase = new ValidateOrderUseCaseControl(null, orderRepo);
+        ValidateOrderInputData inputData = new ValidateOrderInputData(orderId);
 
         // When
-        useCase.execute(inputData);
+        ValidateOrderOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateOrderOutputData.class));
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getMessage());
     }
 
     @Test
-    void shouldFailWhenInsufficientStock() {
-        // Given
-        SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 2, true, false);
-        product.setMaSP(1L);
-
-        GioHang item = new GioHang(1L, 1L, 10); // More than available
-        item.setSanPham(product);
-
-        List<GioHang> cartItems = Arrays.asList(item);
-        ValidateOrderInputData inputData = new ValidateOrderInputData(cartItems);
+    void shouldFailWhenOrderHasNoItems() {
+        // Given - Order exists but has no items
+        Long orderId = 1L;
+        DonHang order = new DonHang(orderId, 0.0, "Customer Name");
+        // No items added
+        
+        MockOrderRepository orderRepo = new MockOrderRepository();
+        orderRepo.setOrder(order);
+        ValidateOrderUseCaseControl useCase = new ValidateOrderUseCaseControl(null, orderRepo);
+        ValidateOrderInputData inputData = new ValidateOrderInputData(orderId);
 
         // When
-        useCase.execute(inputData);
+        ValidateOrderOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateOrderOutputData.class));
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getMessage());
+    }
+    
+    @Test
+    void shouldFailWhenInputIsNull() {
+        // Given - Null input
+        MockOrderRepository orderRepo = new MockOrderRepository();
+        ValidateOrderUseCaseControl useCase = new ValidateOrderUseCaseControl(null, orderRepo);
+
+        // When
+        ValidateOrderOutputData outputData = useCase.validateInternal(null);
+
+        // Then
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getMessage());
     }
 }

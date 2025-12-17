@@ -2,31 +2,14 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.validateimportrow.ValidateImportRowInputData;
 import com.motorbike.business.dto.validateimportrow.ValidateImportRowOutputData;
-import com.motorbike.business.usecase.output.ValidateImportRowOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ValidateImportRowUseCaseControlTest {
-
-    @Mock
-    private ValidateImportRowOutputBoundary outputBoundary;
-
-    private ValidateImportRowUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ValidateImportRowUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldValidateRowSuccessfully() {
@@ -39,12 +22,14 @@ public class ValidateImportRowUseCaseControlTest {
         rowData.put("Số lượng", 10);
 
         ValidateImportRowInputData inputData = new ValidateImportRowInputData(rowData, 1);
+        ValidateImportRowUseCaseControl useCase = new ValidateImportRowUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateImportRowOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateImportRowOutputData.class));
+        assertTrue(outputData.isValid());
+        assertTrue(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -55,12 +40,14 @@ public class ValidateImportRowUseCaseControlTest {
         // Missing other required fields
 
         ValidateImportRowInputData inputData = new ValidateImportRowInputData(rowData, 1);
+        ValidateImportRowUseCaseControl useCase = new ValidateImportRowUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateImportRowOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateImportRowOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -74,11 +61,13 @@ public class ValidateImportRowUseCaseControlTest {
         rowData.put("Số lượng", 10);
 
         ValidateImportRowInputData inputData = new ValidateImportRowInputData(rowData, 1);
+        ValidateImportRowUseCaseControl useCase = new ValidateImportRowUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateImportRowOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateImportRowOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 }

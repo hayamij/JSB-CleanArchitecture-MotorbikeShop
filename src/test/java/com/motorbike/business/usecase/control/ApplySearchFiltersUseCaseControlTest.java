@@ -2,34 +2,22 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.applysearchfilters.ApplySearchFiltersInputData;
 import com.motorbike.business.dto.applysearchfilters.ApplySearchFiltersOutputData;
-import com.motorbike.business.usecase.output.ApplySearchFiltersOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@ExtendWith(MockitoExtension.class)
 public class ApplySearchFiltersUseCaseControlTest {
 
-    @Mock
-    private ApplySearchFiltersOutputBoundary outputBoundary;
-
-    private ApplySearchFiltersUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ApplySearchFiltersUseCaseControl(outputBoundary);
-    }
+    private ApplySearchFiltersUseCaseControl useCase = new ApplySearchFiltersUseCaseControl(null);
 
     @Test
     void shouldApplyFiltersSuccessfully() {
@@ -48,10 +36,13 @@ public class ApplySearchFiltersUseCaseControlTest {
         ApplySearchFiltersInputData inputData = new ApplySearchFiltersInputData(allProducts, filters);
 
         // When
-        useCase.execute(inputData);
+        ApplySearchFiltersOutputData outputData = useCase.applyInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ApplySearchFiltersOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(2, outputData.getOriginalCount());
+        assertNotEquals(null, outputData.getFilteredResults());
+        assertEquals(1, outputData.getFilteredCount());
     }
 
     @Test
@@ -72,10 +63,12 @@ public class ApplySearchFiltersUseCaseControlTest {
         ApplySearchFiltersInputData inputData = new ApplySearchFiltersInputData(allProducts, filters);
 
         // When
-        useCase.execute(inputData);
+        ApplySearchFiltersOutputData outputData = useCase.applyInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ApplySearchFiltersOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(2, outputData.getOriginalCount());
+        assertEquals(1, outputData.getFilteredCount());
     }
 
     @Test
@@ -95,10 +88,12 @@ public class ApplySearchFiltersUseCaseControlTest {
         ApplySearchFiltersInputData inputData = new ApplySearchFiltersInputData(allProducts, filters);
 
         // When
-        useCase.execute(inputData);
+        ApplySearchFiltersOutputData outputData = useCase.applyInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ApplySearchFiltersOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(2, outputData.getOriginalCount());
+        assertEquals(1, outputData.getFilteredCount());
     }
 
     @Test
@@ -113,9 +108,11 @@ public class ApplySearchFiltersUseCaseControlTest {
         ApplySearchFiltersInputData inputData = new ApplySearchFiltersInputData(allProducts, filters);
 
         // When
-        useCase.execute(inputData);
+        ApplySearchFiltersOutputData outputData = useCase.applyInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ApplySearchFiltersOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(1, outputData.getOriginalCount());
+        assertEquals(1, outputData.getFilteredCount());
     }
 }

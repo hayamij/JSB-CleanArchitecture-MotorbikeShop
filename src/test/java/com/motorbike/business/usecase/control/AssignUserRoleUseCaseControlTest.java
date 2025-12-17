@@ -2,62 +2,124 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.assignuserrole.AssignUserRoleInputData;
 import com.motorbike.business.dto.assignuserrole.AssignUserRoleOutputData;
-import com.motorbike.business.usecase.output.AssignUserRoleOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
+import com.motorbike.business.ports.repository.TaiKhoanRepository;
+import com.motorbike.domain.entities.TaiKhoan;
+import com.motorbike.domain.entities.VaiTro;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import java.util.Optional;
 
-@ExtendWith(MockitoExtension.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class AssignUserRoleUseCaseControlTest {
 
-    @Mock
-    private AssignUserRoleOutputBoundary outputBoundary;
+    @Test
+    void shouldAssignAdminRoleSuccessfully() {
+        // Given
+        TaiKhoan user = new TaiKhoan("Test User", "test@example.com", "testuser", "Test@123", "0912345678", "123 Street");
+        user.setMaTaiKhoan(1L);
 
-    private AssignUserRoleUseCaseControl useCase;
+        TaiKhoanRepository taiKhoanRepo = new MockTaiKhoanRepository(user);
+        AssignUserRoleUseCaseControl useCase = new AssignUserRoleUseCaseControl(null, taiKhoanRepo);
 
-    @BeforeEach
-    void setUp() {
-        useCase = new AssignUserRoleUseCaseControl(outputBoundary);
+        AssignUserRoleInputData inputData = new AssignUserRoleInputData(1L, "ADMIN");
+
+        // When
+        AssignUserRoleOutputData outputData = useCase.assignInternal(inputData);
+
+        // Then
+        assertTrue(outputData.isSuccess());
     }
 
     @Test
-    void shouldAssignCustomerRoleByDefault() {
+    void shouldAssignCustomerRoleSuccessfully() {
         // Given
-        AssignUserRoleInputData inputData = new AssignUserRoleInputData(null);
+        TaiKhoan user = new TaiKhoan("Test User", "test@example.com", "testuser", "Test@123", "0912345678", "123 Street");
+        user.setMaTaiKhoan(1L);
+        user.setVaiTro(VaiTro.ADMIN);
+
+        TaiKhoanRepository taiKhoanRepo = new MockTaiKhoanRepository(user);
+        AssignUserRoleUseCaseControl useCase = new AssignUserRoleUseCaseControl(null, taiKhoanRepo);
+
+        AssignUserRoleInputData inputData = new AssignUserRoleInputData(1L, "CUSTOMER");
 
         // When
-        useCase.execute(inputData);
+        AssignUserRoleOutputData outputData = useCase.assignInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(AssignUserRoleOutputData.class));
+        assertTrue(outputData.isSuccess());
     }
 
     @Test
-    void shouldAssignAdminRole() {
+    void shouldFailWhenUserNotFound() {
         // Given
-        AssignUserRoleInputData inputData = new AssignUserRoleInputData("ADMIN");
+        TaiKhoanRepository taiKhoanRepo = new MockTaiKhoanRepository(null);
+        AssignUserRoleUseCaseControl useCase = new AssignUserRoleUseCaseControl(null, taiKhoanRepo);
+
+        AssignUserRoleInputData inputData = new AssignUserRoleInputData(999L, "ADMIN");
 
         // When
-        useCase.execute(inputData);
+        AssignUserRoleOutputData outputData = useCase.assignInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(AssignUserRoleOutputData.class));
+        assertFalse(outputData.isSuccess());
     }
 
-    @Test
-    void shouldAssignCustomerRole() {
-        // Given
-        AssignUserRoleInputData inputData = new AssignUserRoleInputData("CUSTOMER");
+    private static class MockTaiKhoanRepository implements TaiKhoanRepository {
+        private TaiKhoan user;
 
-        // When
-        useCase.execute(inputData);
+        public MockTaiKhoanRepository(TaiKhoan user) {
+            this.user = user;
+        }
 
-        // Then
-        verify(outputBoundary).present(any(AssignUserRoleOutputData.class));
+        @Override
+        public Optional<TaiKhoan> findById(Long id) {
+            if (user != null && user.getMaTaiKhoan().equals(id)) {
+                return Optional.of(user);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public TaiKhoan save(TaiKhoan taiKhoan) {
+            this.user = taiKhoan;
+            return taiKhoan;
+        }
+
+        @Override
+        public Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<TaiKhoan> findByEmail(String email) {
+            return Optional.empty();
+        }
+
+        @Override
+        public boolean existsByTenDangNhap(String tenDangNhap) {
+            return false;
+        }
+
+        @Override
+        public boolean existsByEmail(String email) {
+            return false;
+        }
+
+        @Override
+        public java.util.List<TaiKhoan> findAll() {
+            return new java.util.ArrayList<>();
+        }
+
+        @Override
+        public void deleteById(Long id) {
+        }
+        
+        @Override
+        public boolean existsById(Long id) {
+            return user != null && user.getMaTaiKhoan().equals(id);
+        }
     }
 }

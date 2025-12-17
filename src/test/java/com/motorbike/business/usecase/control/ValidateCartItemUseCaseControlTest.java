@@ -2,125 +2,86 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.validatecartitem.ValidateCartItemInputData;
 import com.motorbike.business.dto.validatecartitem.ValidateCartItemOutputData;
-import com.motorbike.business.usecase.output.ValidateCartItemOutputBoundary;
-import com.motorbike.domain.entities.SanPham;
-import com.motorbike.business.ports.SanPhamRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
 public class ValidateCartItemUseCaseControlTest {
 
-    @Mock
-    private SanPhamRepository sanPhamRepository;
-
-    @Mock
-    private ValidateCartItemOutputBoundary outputBoundary;
-
-    private ValidateCartItemUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ValidateCartItemUseCaseControl(sanPhamRepository, outputBoundary);
-    }
+    // ValidateCartItem use case ONLY validates input data (productId, quantity)
+    // It does NOT access repository or check product stock/visibility
 
     @Test
     void shouldValidateCartItemSuccessfully() {
-        // Given
+        // Given - Valid product ID and quantity
         Long productId = 1L;
         int quantity = 5;
-        SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe thể thao", 45000000.0, 10, true, false);
-        product.setMaSP(productId);
-
-        when(sanPhamRepository.findById(productId)).thenReturn(Optional.of(product));
-
+        ValidateCartItemUseCaseControl useCase = new ValidateCartItemUseCaseControl(null, null);
         ValidateCartItemInputData inputData = new ValidateCartItemInputData(productId, quantity);
 
         // When
-        useCase.execute(inputData);
+        ValidateCartItemOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateCartItemOutputData.class));
-        verify(sanPhamRepository).findById(productId);
+        assertTrue(outputData.isValid());
+        assertEquals("Cart item is valid", outputData.getMessage());
+        assertEquals(productId, outputData.getProductId());
     }
 
     @Test
-    void shouldFailWhenProductNotFound() {
-        // Given
-        Long productId = 999L;
-        int quantity = 5;
-
-        when(sanPhamRepository.findById(productId)).thenReturn(Optional.empty());
-
-        ValidateCartItemInputData inputData = new ValidateCartItemInputData(productId, quantity);
+    void shouldFailWhenProductIdIsNull() {
+        // Given - Null product ID
+        ValidateCartItemUseCaseControl useCase = new ValidateCartItemUseCaseControl(null, null);
+        ValidateCartItemInputData inputData = new ValidateCartItemInputData(null, 5);
 
         // When
-        useCase.execute(inputData);
+        ValidateCartItemOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateCartItemOutputData.class));
-        verify(sanPhamRepository).findById(productId);
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getMessage());
     }
 
     @Test
-    void shouldFailWhenInsufficientStock() {
-        // Given
+    void shouldFailWhenQuantityIsZero() {
+        // Given - Quantity is zero
         Long productId = 1L;
-        int quantity = 100; // More than available
-        SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe thể thao", 45000000.0, 10, true, false);
-        product.setMaSP(productId);
-
-        when(sanPhamRepository.findById(productId)).thenReturn(Optional.of(product));
-
-        ValidateCartItemInputData inputData = new ValidateCartItemInputData(productId, quantity);
+        ValidateCartItemUseCaseControl useCase = new ValidateCartItemUseCaseControl(null, null);
+        ValidateCartItemInputData inputData = new ValidateCartItemInputData(productId, 0);
 
         // When
-        useCase.execute(inputData);
+        ValidateCartItemOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateCartItemOutputData.class));
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getMessage());
     }
 
     @Test
-    void shouldFailWhenProductNotVisible() {
-        // Given
+    void shouldFailWhenQuantityIsNegative() {
+        // Given - Negative quantity
         Long productId = 1L;
-        int quantity = 5;
-        SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe thể thao", 45000000.0, 10, false, false);
-        product.setMaSP(productId);
-
-        when(sanPhamRepository.findById(productId)).thenReturn(Optional.of(product));
-
-        ValidateCartItemInputData inputData = new ValidateCartItemInputData(productId, quantity);
+        ValidateCartItemUseCaseControl useCase = new ValidateCartItemUseCaseControl(null, null);
+        ValidateCartItemInputData inputData = new ValidateCartItemInputData(productId, -5);
 
         // When
-        useCase.execute(inputData);
+        ValidateCartItemOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateCartItemOutputData.class));
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getMessage());
     }
 
     @Test
-    void shouldFailWhenQuantityIsZeroOrNegative() {
-        // Given
-        Long productId = 1L;
-        int quantity = 0;
-
-        ValidateCartItemInputData inputData = new ValidateCartItemInputData(productId, quantity);
+    void shouldFailWhenInputIsNull() {
+        // Given - Null input data
+        ValidateCartItemUseCaseControl useCase = new ValidateCartItemUseCaseControl(null, null);
 
         // When
-        useCase.execute(inputData);
+        ValidateCartItemOutputData outputData = useCase.validateInternal(null);
 
         // Then
-        verify(outputBoundary).present(any(ValidateCartItemOutputData.class));
-        verifyNoInteractions(sanPhamRepository);
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getMessage());
     }
 }

@@ -2,29 +2,17 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.checkproductavailability.CheckProductAvailabilityInputData;
 import com.motorbike.business.dto.checkproductavailability.CheckProductAvailabilityOutputData;
-import com.motorbike.business.usecase.output.CheckProductAvailabilityOutputBoundary;
+import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.domain.entities.SanPham;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import java.util.Optional;
 
-@ExtendWith(MockitoExtension.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class CheckProductAvailabilityUseCaseControlTest {
-
-    @Mock
-    private CheckProductAvailabilityOutputBoundary outputBoundary;
-
-    private CheckProductAvailabilityUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new CheckProductAvailabilityUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldConfirmProductIsAvailable() {
@@ -32,13 +20,18 @@ public class CheckProductAvailabilityUseCaseControlTest {
         SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 10, true, false);
         product.setMaSP(1L);
 
-        CheckProductAvailabilityInputData inputData = new CheckProductAvailabilityInputData(product);
+        ProductRepository productRepo = new MockProductRepository(product);
+        CheckProductAvailabilityUseCaseControl useCase = new CheckProductAvailabilityUseCaseControl(null, productRepo);
+
+        CheckProductAvailabilityInputData inputData = new CheckProductAvailabilityInputData(1L, 5);
 
         // When
-        useCase.execute(inputData);
+        CheckProductAvailabilityOutputData outputData = useCase.checkInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CheckProductAvailabilityOutputData.class));
+        assertTrue(outputData.isAvailable());
+        assertEquals(1L, outputData.getProductId());
+        assertEquals(10, outputData.getAvailableQuantity());
     }
 
     @Test
@@ -47,12 +40,96 @@ public class CheckProductAvailabilityUseCaseControlTest {
         SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 0, false, false);
         product.setMaSP(1L);
 
-        CheckProductAvailabilityInputData inputData = new CheckProductAvailabilityInputData(product);
+        ProductRepository productRepo = new MockProductRepository(product);
+        CheckProductAvailabilityUseCaseControl useCase = new CheckProductAvailabilityUseCaseControl(null, productRepo);
+
+        CheckProductAvailabilityInputData inputData = new CheckProductAvailabilityInputData(1L, 5);
 
         // When
-        useCase.execute(inputData);
+        CheckProductAvailabilityOutputData outputData = useCase.checkInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CheckProductAvailabilityOutputData.class));
+        assertFalse(outputData.isAvailable());
+        assertEquals(1L, outputData.getProductId());
+    }
+
+    @Test
+    void shouldFailWhenProductNotFound() {
+        // Given
+        ProductRepository productRepo = new MockProductRepository(null);
+        CheckProductAvailabilityUseCaseControl useCase = new CheckProductAvailabilityUseCaseControl(null, productRepo);
+
+        CheckProductAvailabilityInputData inputData = new CheckProductAvailabilityInputData(999L, 5);
+
+        // When
+        CheckProductAvailabilityOutputData outputData = useCase.checkInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isAvailable());
+    }
+
+    private static class MockProductRepository implements ProductRepository {
+        private final SanPham product;
+
+        public MockProductRepository(SanPham product) {
+            this.product = product;
+        }
+
+        @Override
+        public Optional<SanPham> findById(Long id) {
+            if (product != null && product.getMaSanPham().equals(id)) {
+                return Optional.of(product);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public SanPham save(SanPham product) {
+            return product;
+        }
+
+        @Override
+        public boolean existsById(Long productId) {
+            return false;
+        }
+
+        @Override
+        public java.util.List<SanPham> findAll() {
+            return new java.util.ArrayList<>();
+        }
+
+        @Override
+        public void deleteById(Long productId) {
+        }
+
+        @Override
+        public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> findAllAccessories() {
+            return new java.util.ArrayList<>();
+        }
+
+        @Override
+        public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
+            return new java.util.ArrayList<>();
+        }
+
+        @Override
+        public java.util.List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+            return new java.util.ArrayList<>();
+        }
+
+        @Override
+        public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+            return new java.util.ArrayList<>();
+        }
+
+        @Override
+        public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<SanPham> findByMaSanPham(String maSanPham) {
+            return Optional.empty();
+        }
     }
 }

@@ -2,28 +2,18 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.buildsearchcriteria.BuildSearchCriteriaInputData;
 import com.motorbike.business.dto.buildsearchcriteria.BuildSearchCriteriaOutputData;
-import com.motorbike.business.usecase.output.BuildSearchCriteriaOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import java.util.HashMap;
+import java.util.Map;
 
-@ExtendWith(MockitoExtension.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class BuildSearchCriteriaUseCaseControlTest {
 
-    @Mock
-    private BuildSearchCriteriaOutputBoundary outputBoundary;
-
-    private BuildSearchCriteriaUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new BuildSearchCriteriaUseCaseControl(outputBoundary);
-    }
+    private BuildSearchCriteriaUseCaseControl useCase = new BuildSearchCriteriaUseCaseControl(null);
 
     @Test
     void shouldBuildCriteriaWithKeywordOnly() {
@@ -33,65 +23,87 @@ public class BuildSearchCriteriaUseCaseControlTest {
         );
 
         // When
-        useCase.execute(inputData);
+        BuildSearchCriteriaOutputData outputData = useCase.buildInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(BuildSearchCriteriaOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotEquals(null, outputData.getCriteria());
+        assertTrue(outputData.getCriteria().containsKey("keyword"));
+        assertEquals("yamaha", outputData.getCriteria().get("keyword"));
     }
 
     @Test
     void shouldBuildCriteriaWithPriceRange() {
         // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("minPrice", 1000000.0);
+        filters.put("maxPrice", 5000000.0);
+
         BuildSearchCriteriaInputData inputData = new BuildSearchCriteriaInputData(
-            null, 1000000.0, 5000000.0, null
+            null, filters, null
         );
 
         // When
-        useCase.execute(inputData);
+        BuildSearchCriteriaOutputData outputData = useCase.buildInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(BuildSearchCriteriaOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotEquals(null, outputData.getCriteria());
+        assertTrue(outputData.getCriteria().containsKey("minPrice"));
+        assertTrue(outputData.getCriteria().containsKey("maxPrice"));
     }
 
     @Test
     void shouldBuildCriteriaWithCategory() {
         // Given
         BuildSearchCriteriaInputData inputData = new BuildSearchCriteriaInputData(
-            null, null, null, "Xe máy"
+            null, null, "motorbike"
         );
 
         // When
-        useCase.execute(inputData);
+        BuildSearchCriteriaOutputData outputData = useCase.buildInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(BuildSearchCriteriaOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotEquals(null, outputData.getCriteria());
+        assertEquals("motorbike", outputData.getSearchType());
     }
 
     @Test
     void shouldBuildCriteriaWithAllParameters() {
         // Given
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("minPrice", 10000000.0);
+        filters.put("maxPrice", 50000000.0);
+
         BuildSearchCriteriaInputData inputData = new BuildSearchCriteriaInputData(
-            "Yamaha", 10000000.0, 50000000.0, "Xe máy"
+            "Yamaha", filters, "motorbike"
         );
 
         // When
-        useCase.execute(inputData);
+        BuildSearchCriteriaOutputData outputData = useCase.buildInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(BuildSearchCriteriaOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotEquals(null, outputData.getCriteria());
+        assertTrue(outputData.getCriteria().containsKey("keyword"));
+        assertTrue(outputData.getCriteria().containsKey("minPrice"));
+        assertTrue(outputData.getCriteria().containsKey("maxPrice"));
+        assertEquals("motorbike", outputData.getSearchType());
     }
 
     @Test
     void shouldHandleEmptyCriteria() {
         // Given
         BuildSearchCriteriaInputData inputData = new BuildSearchCriteriaInputData(
-            null, null, null, null
+            null, null, null
         );
 
         // When
-        useCase.execute(inputData);
+        BuildSearchCriteriaOutputData outputData = useCase.buildInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(BuildSearchCriteriaOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotEquals(null, outputData.getCriteria());
     }
 }

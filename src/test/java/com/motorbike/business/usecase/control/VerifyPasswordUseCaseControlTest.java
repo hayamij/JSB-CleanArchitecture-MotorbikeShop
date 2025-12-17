@@ -2,59 +2,82 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.verifypassword.VerifyPasswordInputData;
 import com.motorbike.business.dto.verifypassword.VerifyPasswordOutputData;
-import com.motorbike.business.usecase.output.VerifyPasswordOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.util.Base64;
 
-@ExtendWith(MockitoExtension.class)
+import static org.junit.jupiter.api.Assertions.*;
+
 public class VerifyPasswordUseCaseControlTest {
 
-    @Mock
-    private VerifyPasswordOutputBoundary outputBoundary;
-
-    private VerifyPasswordUseCaseControl useCase;
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new VerifyPasswordUseCaseControl(outputBoundary);
-        passwordEncoder = new BCryptPasswordEncoder();
+    // VerifyPassword use case uses SHA-256 with salt (not BCrypt)
+    
+    private String hashPasswordWithSalt(String password) throws Exception {
+        // Generate salt
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        
+        // Hash password with salt
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(salt);
+        byte[] hashedPassword = md.digest(password.getBytes(StandardCharsets.UTF_8));
+        
+        // Combine salt + hash and encode
+        byte[] combined = new byte[salt.length + hashedPassword.length];
+        System.arraycopy(salt, 0, combined, 0, salt.length);
+        System.arraycopy(hashedPassword, 0, combined, salt.length, hashedPassword.length);
+        
+        return Base64.getEncoder().encodeToString(combined);
     }
 
     @Test
-    void shouldVerifyCorrectPassword() {
-        // Given
+    void shouldVerifyCorrectPassword() throws Exception {
+        // Given - Hash password using SHA-256 with salt
         String plainPassword = "SecurePass123";
-        String hashedPassword = passwordEncoder.encode(plainPassword);
+        String hashedPassword = hashPasswordWithSalt(plainPassword);
 
         VerifyPasswordInputData inputData = new VerifyPasswordInputData(plainPassword, hashedPassword);
+        VerifyPasswordUseCaseControl useCase = new VerifyPasswordUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        VerifyPasswordOutputData outputData = useCase.verifyInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(VerifyPasswordOutputData.class));
+        assertTrue(outputData.isValid());
     }
 
     @Test
-    void shouldRejectIncorrectPassword() {
-        // Given
+    void shouldRejectIncorrectPassword() throws Exception {
+        // Given - Hash different password
         String plainPassword = "WrongPassword";
-        String hashedPassword = passwordEncoder.encode("SecurePass123");
+        String hashedPassword = hashPasswordWithSalt("SecurePass123");
 
         VerifyPasswordInputData inputData = new VerifyPasswordInputData(plainPassword, hashedPassword);
+        VerifyPasswordUseCaseControl useCase = new VerifyPasswordUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        VerifyPasswordOutputData outputData = useCase.verifyInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(VerifyPasswordOutputData.class));
+        assertFalse(outputData.isValid());
+    }
+    
+    @Test
+    void shouldFailWhenPasswordIsNull() {
+        // Given - Null plain password
+        String hashedPassword = "someHash";
+        
+        VerifyPasswordInputData inputData = new VerifyPasswordInputData(null, hashedPassword);
+        VerifyPasswordUseCaseControl useCase = new VerifyPasswordUseCaseControl(null);
+
+        // When
+        VerifyPasswordOutputData outputData = useCase.verifyInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isValid());
     }
 }

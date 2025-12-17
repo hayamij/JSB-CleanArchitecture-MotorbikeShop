@@ -2,35 +2,21 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.calculatecarttotals.CalculateCartTotalsInputData;
 import com.motorbike.business.dto.calculatecarttotals.CalculateCartTotalsOutputData;
-import com.motorbike.business.usecase.output.CalculateCartTotalsOutputBoundary;
 import com.motorbike.domain.entities.ChiTietGioHang;
-import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 public class CalculateCartTotalsUseCaseControlTest {
 
-    @Mock
-    private CalculateCartTotalsOutputBoundary outputBoundary;
-
-    private CalculateCartTotalsUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new CalculateCartTotalsUseCaseControl(outputBoundary);
-    }
+    private CalculateCartTotalsUseCaseControl useCase = new CalculateCartTotalsUseCaseControl(null);
 
     @Test
     void shouldCalculateTotalsSuccessfully() {
@@ -51,10 +37,14 @@ public class CalculateCartTotalsUseCaseControlTest {
         CalculateCartTotalsInputData inputData = new CalculateCartTotalsInputData(cartItems);
 
         // When
-        useCase.execute(inputData);
+        CalculateCartTotalsOutputData outputData = useCase.calculateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CalculateCartTotalsOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(2, outputData.getTotalItems());
+        assertEquals(5, outputData.getTotalQuantity());
+        // tamTinh = product1.giaBan * 2 + product2.giaBan * 3 = 90000000 + 1500000 = 91500000
+        assertEquals(new BigDecimal("91500000"), outputData.getTotalAmount());
     }
 
     @Test
@@ -64,9 +54,12 @@ public class CalculateCartTotalsUseCaseControlTest {
         CalculateCartTotalsInputData inputData = new CalculateCartTotalsInputData(cartItems);
 
         // When
-        useCase.execute(inputData);
+        CalculateCartTotalsOutputData outputData = useCase.calculateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(CalculateCartTotalsOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(0, outputData.getTotalItems());
+        assertEquals(0, outputData.getTotalQuantity());
+        assertEquals(BigDecimal.ZERO, outputData.getTotalAmount());
     }
 }

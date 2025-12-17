@@ -2,32 +2,20 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.formatdataforexport.FormatDataForExportInputData;
 import com.motorbike.business.dto.formatdataforexport.FormatDataForExportOutputData;
-import com.motorbike.business.usecase.output.FormatDataForExportOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 public class FormatDataForExportUseCaseControlTest {
 
-    @Mock
-    private FormatDataForExportOutputBoundary outputBoundary;
-
-    private FormatDataForExportUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new FormatDataForExportUseCaseControl(outputBoundary);
-    }
+    private FormatDataForExportUseCaseControl useCase = new FormatDataForExportUseCaseControl(null);
 
     @Test
     void shouldFormatDataSuccessfully() {
@@ -39,25 +27,46 @@ public class FormatDataForExportUseCaseControlTest {
         product2.setMaSP(2L);
 
         List<SanPham> products = Arrays.asList(product1, product2);
-        FormatDataForExportInputData inputData = new FormatDataForExportInputData(products);
+        FormatDataForExportInputData inputData = new FormatDataForExportInputData(products, null);
 
         // When
-        useCase.execute(inputData);
+        FormatDataForExportOutputData outputData = useCase.formatInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(FormatDataForExportOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotEquals(null, outputData.getFormattedData());
+        assertNotEquals(null, outputData.getHeaders());
+        assertEquals(2, outputData.getRowCount());
     }
 
     @Test
     void shouldHandleEmptyList() {
         // Given
-        List<SanPham> products = Arrays.asList();
-        FormatDataForExportInputData inputData = new FormatDataForExportInputData(products);
+        List<SanPham> products = Collections.emptyList();
+        FormatDataForExportInputData inputData = new FormatDataForExportInputData(products, null);
 
         // When
-        useCase.execute(inputData);
+        FormatDataForExportOutputData outputData = useCase.formatInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(FormatDataForExportOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(0, outputData.getRowCount());
+    }
+
+    @Test
+    void shouldFormatMotorbikeData() {
+        // Given
+        SanPham product = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 10, true, false);
+        product.setMaSP(1L);
+
+        List<SanPham> products = Arrays.asList(product);
+        FormatDataForExportInputData inputData = new FormatDataForExportInputData(products, "motorbike");
+
+        // When
+        FormatDataForExportOutputData outputData = useCase.formatInternal(inputData);
+
+        // Then
+        assertTrue(outputData.isSuccess());
+        assertEquals(1, outputData.getRowCount());
     }
 }

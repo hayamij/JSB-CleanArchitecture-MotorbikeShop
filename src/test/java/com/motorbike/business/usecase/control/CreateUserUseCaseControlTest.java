@@ -14,6 +14,7 @@ import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.output.CreateUserOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.VaiTro;
+import com.motorbike.domain.exceptions.ValidationException;
 
 public class CreateUserUseCaseControlTest {
 
@@ -71,10 +72,8 @@ public class CreateUserUseCaseControlTest {
 		CreateUserOutputBoundary outputBoundary = new CreateUserPresenter(viewModel);
 		
 		CreateUserUseCaseControl control = new CreateUserUseCaseControl(outputBoundary, userRepo);
-		control.execute(null);
 		
-		assertFalse(viewModel.success);
-		assertTrue(viewModel.hasError);
+		assertThrows(ValidationException.class, () -> control.execute(null));
 	}
 
 	private static class MockUserRepository implements UserRepository {

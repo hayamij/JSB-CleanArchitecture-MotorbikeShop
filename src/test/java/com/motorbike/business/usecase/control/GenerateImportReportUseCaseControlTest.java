@@ -2,31 +2,15 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData;
 import com.motorbike.business.dto.generateimportreport.GenerateImportReportOutputData;
-import com.motorbike.business.usecase.output.GenerateImportReportOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class GenerateImportReportUseCaseControlTest {
-
-    @Mock
-    private GenerateImportReportOutputBoundary outputBoundary;
-
-    private GenerateImportReportUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new GenerateImportReportUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldGenerateReportSuccessfully() {
@@ -38,12 +22,17 @@ public class GenerateImportReportUseCaseControlTest {
         GenerateImportReportInputData inputData = GenerateImportReportInputData.fromMessages(
             totalRows, successCount, errors
         );
+        GenerateImportReportUseCaseControl useCase = new GenerateImportReportUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        GenerateImportReportOutputData outputData = useCase.generateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(GenerateImportReportOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(12, outputData.getTotalRows());
+        assertEquals(10, outputData.getSuccessCount());
+        assertEquals(2, outputData.getFailureCount());
+        assertNotNull(outputData.getReport());
     }
 
     @Test
@@ -51,16 +40,42 @@ public class GenerateImportReportUseCaseControlTest {
         // Given
         int totalRows = 10;
         int successCount = 10;
-        List<String> errors = Arrays.asList();
+        List<String> errors = Collections.emptyList();
 
         GenerateImportReportInputData inputData = GenerateImportReportInputData.fromMessages(
             totalRows, successCount, errors
         );
+        GenerateImportReportUseCaseControl useCase = new GenerateImportReportUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        GenerateImportReportOutputData outputData = useCase.generateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(GenerateImportReportOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(10, outputData.getTotalRows());
+        assertEquals(10, outputData.getSuccessCount());
+        assertEquals(0, outputData.getFailureCount());
+        assertNotNull(outputData.getReport());
+    }
+
+    @Test
+    void shouldCalculateSuccessRate() {
+        // Given
+        int totalRows = 20;
+        int successCount = 15;
+        List<String> errors = Arrays.asList("Error 1", "Error 2", "Error 3", "Error 4", "Error 5");
+
+        GenerateImportReportInputData inputData = GenerateImportReportInputData.fromMessages(
+            totalRows, successCount, errors
+        );
+        GenerateImportReportUseCaseControl useCase = new GenerateImportReportUseCaseControl(null);
+
+        // When
+        GenerateImportReportOutputData outputData = useCase.generateInternal(inputData);
+
+        // Then
+        assertTrue(outputData.isSuccess());
+        assertEquals(5, outputData.getFailureCount());
+        assertNotNull(outputData.getReport());
     }
 }

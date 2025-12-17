@@ -2,46 +2,99 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.clearcart.ClearCartInputData;
 import com.motorbike.business.dto.clearcart.ClearCartOutputData;
-import com.motorbike.business.usecase.output.ClearCartOutputBoundary;
-import com.motorbike.business.ports.GioHangRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.motorbike.business.ports.repository.CartRepository;
+import com.motorbike.domain.entities.GioHang;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import java.util.Optional;
 
-@ExtendWith(MockitoExtension.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ClearCartUseCaseControlTest {
-
-    @Mock
-    private GioHangRepository gioHangRepository;
-
-    @Mock
-    private ClearCartOutputBoundary outputBoundary;
-
-    private ClearCartUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ClearCartUseCaseControl(gioHangRepository, outputBoundary);
-    }
 
     @Test
     void shouldClearCartSuccessfully() {
         // Given
-        Long userId = 1L;
-        doNothing().when(gioHangRepository).deleteAllByUserId(userId);
+        Long cartId = 1L;
+        GioHang cart = new GioHang(100L);
+        cart.setMaGioHang(cartId);
 
-        ClearCartInputData inputData = new ClearCartInputData(userId);
+        CartRepository cartRepo = new MockCartRepository(cart);
+        ClearCartUseCaseControl useCase = new ClearCartUseCaseControl(null, cartRepo);
+
+        ClearCartInputData inputData = new ClearCartInputData(cartId);
 
         // When
-        useCase.execute(inputData);
+        ClearCartOutputData outputData = useCase.clearInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ClearCartOutputData.class));
-        verify(gioHangRepository).deleteAllByUserId(userId);
+        assertTrue(outputData.isSuccess());
+        assertEquals(cartId, outputData.getCartId());
+    }
+
+    @Test
+    void shouldFailWhenCartNotFound() {
+        // Given
+        CartRepository cartRepo = new MockCartRepository(null);
+        ClearCartUseCaseControl useCase = new ClearCartUseCaseControl(null, cartRepo);
+
+        ClearCartInputData inputData = new ClearCartInputData(999L);
+
+        // When
+        ClearCartOutputData outputData = useCase.clearInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isSuccess());
+    }
+
+    private static class MockCartRepository implements CartRepository {
+        private GioHang cart;
+
+        public MockCartRepository(GioHang cart) {
+            this.cart = cart;
+        }
+
+        @Override
+        public Optional<GioHang> findByUserId(Long userId) {
+            return Optional.empty();
+        }
+
+        @Override
+        public GioHang save(GioHang gioHang) {
+            this.cart = gioHang;
+            return gioHang;
+        }
+
+        @Override
+        public Optional<GioHang> findById(Long id) {
+            if (cart != null && cart.getMaGioHang().equals(id)) {
+                return Optional.of(cart);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public void delete(Long cartId) {
+        }
+
+        @Override
+        public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
+            return 0;
+        }
+
+        @Override
+        public void deleteAllByUserId(Long userId) {
+        }
+
+        @Override
+        public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+            return Optional.empty();
+        }
+
+        @Override
+        public void deleteById(Long cartId) {
+        }
     }
 }

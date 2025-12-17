@@ -2,30 +2,13 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.validateexcelfile.ValidateExcelFileInputData;
 import com.motorbike.business.dto.validateexcelfile.ValidateExcelFileOutputData;
-import com.motorbike.business.usecase.output.ValidateExcelFileOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ValidateExcelFileUseCaseControlTest {
-
-    @Mock
-    private ValidateExcelFileOutputBoundary outputBoundary;
-
-    private ValidateExcelFileUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ValidateExcelFileUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldValidateExcelFileSuccessfully() {
@@ -37,12 +20,14 @@ public class ValidateExcelFileUseCaseControlTest {
         );
 
         ValidateExcelFileInputData inputData = new ValidateExcelFileInputData(file);
+        ValidateExcelFileUseCaseControl useCase = new ValidateExcelFileUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateExcelFileOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateExcelFileOutputData.class));
+        assertTrue(outputData.isValid());
+        assertNull(outputData.getErrorMessage());
     }
 
     @Test
@@ -55,12 +40,14 @@ public class ValidateExcelFileUseCaseControlTest {
         );
 
         ValidateExcelFileInputData inputData = new ValidateExcelFileInputData(file);
+        ValidateExcelFileUseCaseControl useCase = new ValidateExcelFileUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateExcelFileOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateExcelFileOutputData.class));
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getErrorMessage());
     }
 
     @Test
@@ -73,11 +60,27 @@ public class ValidateExcelFileUseCaseControlTest {
         );
 
         ValidateExcelFileInputData inputData = new ValidateExcelFileInputData(file);
+        ValidateExcelFileUseCaseControl useCase = new ValidateExcelFileUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateExcelFileOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateExcelFileOutputData.class));
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getErrorMessage());
+    }
+
+    @Test
+    void shouldHandleNullFile() {
+        // Given
+        ValidateExcelFileInputData inputData = new ValidateExcelFileInputData(null);
+        ValidateExcelFileUseCaseControl useCase = new ValidateExcelFileUseCaseControl(null);
+
+        // When
+        ValidateExcelFileOutputData outputData = useCase.validateInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isValid());
+        assertNotNull(outputData.getErrorMessage());
     }
 }

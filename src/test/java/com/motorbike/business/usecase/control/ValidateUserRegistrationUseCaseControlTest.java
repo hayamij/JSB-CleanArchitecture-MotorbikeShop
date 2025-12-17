@@ -2,28 +2,11 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.validateuserregistration.ValidateUserRegistrationInputData;
 import com.motorbike.business.dto.validateuserregistration.ValidateUserRegistrationOutputData;
-import com.motorbike.business.usecase.output.ValidateUserRegistrationOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ValidateUserRegistrationUseCaseControlTest {
-
-    @Mock
-    private ValidateUserRegistrationOutputBoundary outputBoundary;
-
-    private ValidateUserRegistrationUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ValidateUserRegistrationUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldValidateUserSuccessfully() {
@@ -31,12 +14,14 @@ public class ValidateUserRegistrationUseCaseControlTest {
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
             "john_doe", "john@example.com", "SecurePass123", "0123456789", "123 Main St"
         );
+        ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateUserRegistrationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateUserRegistrationOutputData.class));
+        assertTrue(outputData.isValid());
+        assertTrue(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -45,12 +30,14 @@ public class ValidateUserRegistrationUseCaseControlTest {
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
             "", "john@example.com", "SecurePass123", "0123456789", "123 Main St"
         );
+        ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateUserRegistrationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateUserRegistrationOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -59,12 +46,14 @@ public class ValidateUserRegistrationUseCaseControlTest {
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
             "john_doe", "invalid-email", "SecurePass123", "0123456789", "123 Main St"
         );
+        ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateUserRegistrationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateUserRegistrationOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -73,12 +62,14 @@ public class ValidateUserRegistrationUseCaseControlTest {
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
             "john_doe", "john@example.com", "123", "0123456789", "123 Main St"
         );
+        ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateUserRegistrationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateUserRegistrationOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -87,11 +78,13 @@ public class ValidateUserRegistrationUseCaseControlTest {
         ValidateUserRegistrationInputData inputData = new ValidateUserRegistrationInputData(
             "john_doe", "john@example.com", "SecurePass123", "12345", "123 Main St"
         );
+        ValidateUserRegistrationUseCaseControl useCase = new ValidateUserRegistrationUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateUserRegistrationOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateUserRegistrationOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 }

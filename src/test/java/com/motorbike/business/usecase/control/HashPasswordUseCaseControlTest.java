@@ -2,40 +2,27 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.hashpassword.HashPasswordInputData;
 import com.motorbike.business.dto.hashpassword.HashPasswordOutputData;
-import com.motorbike.business.usecase.output.HashPasswordOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class HashPasswordUseCaseControlTest {
-
-    @Mock
-    private HashPasswordOutputBoundary outputBoundary;
-
-    private HashPasswordUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new HashPasswordUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldHashPasswordSuccessfully() {
         // Given
         String plainPassword = "SecurePass123";
         HashPasswordInputData inputData = new HashPasswordInputData(plainPassword);
+        HashPasswordUseCaseControl useCase = new HashPasswordUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        HashPasswordOutputData outputData = useCase.hashInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(HashPasswordOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertNotNull(outputData.getHashedPassword());
+        assertFalse(outputData.getHashedPassword().isEmpty());
+        assertTrue(outputData.getHashedPassword().length() > 20); // Hashed passwords are longer
     }
 
     @Test
@@ -43,12 +30,46 @@ public class HashPasswordUseCaseControlTest {
         // Given
         String plainPassword = "SecurePass123";
         HashPasswordInputData inputData = new HashPasswordInputData(plainPassword);
+        HashPasswordUseCaseControl useCase = new HashPasswordUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
-        useCase.execute(inputData);
+        HashPasswordOutputData outputData1 = useCase.hashInternal(inputData);
+        HashPasswordOutputData outputData2 = useCase.hashInternal(inputData);
 
         // Then
-        verify(outputBoundary, times(2)).present(any(HashPasswordOutputData.class));
+        assertTrue(outputData1.isSuccess());
+        assertTrue(outputData2.isSuccess());
+        assertNotNull(outputData1.getHashedPassword());
+        assertNotNull(outputData2.getHashedPassword());
+        // Due to salt, hashes should be different
+        assertNotEquals(outputData1.getHashedPassword(), outputData2.getHashedPassword());
+    }
+
+    @Test
+    void shouldHandleNullPassword() {
+        // Given
+        HashPasswordInputData inputData = new HashPasswordInputData(null);
+        HashPasswordUseCaseControl useCase = new HashPasswordUseCaseControl(null);
+
+        // When
+        HashPasswordOutputData outputData = useCase.hashInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isSuccess());
+        assertNotNull(outputData.getErrorCode());
+    }
+
+    @Test
+    void shouldHandleEmptyPassword() {
+        // Given
+        HashPasswordInputData inputData = new HashPasswordInputData("");
+        HashPasswordUseCaseControl useCase = new HashPasswordUseCaseControl(null);
+
+        // When
+        HashPasswordOutputData outputData = useCase.hashInternal(inputData);
+
+        // Then
+        assertFalse(outputData.isSuccess());
+        assertNotNull(outputData.getErrorCode());
     }
 }

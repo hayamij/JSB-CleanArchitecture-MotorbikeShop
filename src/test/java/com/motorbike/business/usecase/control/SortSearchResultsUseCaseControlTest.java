@@ -3,110 +3,122 @@ package com.motorbike.business.usecase.control;
 import com.motorbike.business.dto.sortsearchresults.SortSearchResultsInputData;
 import com.motorbike.business.dto.sortsearchresults.SortSearchResultsInputData.SortDirection;
 import com.motorbike.business.dto.sortsearchresults.SortSearchResultsOutputData;
-import com.motorbike.business.usecase.output.SortSearchResultsOutputBoundary;
-import com.motorbike.domain.entities.SanPham;
-import org.junit.jupiter.api.BeforeEach;
+import com.motorbike.domain.entities.XeMay;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class SortSearchResultsUseCaseControlTest {
-
-    @Mock
-    private SortSearchResultsOutputBoundary outputBoundary;
-
-    private SortSearchResultsUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new SortSearchResultsUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldSortByPriceAscending() {
         // Given
-        SanPham product1 = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 10, true, false);
-        product1.setMaSP(1L);
+        XeMay product1 = new XeMay(1L, "Yamaha Exciter", "Xe thể thao",
+            BigDecimal.valueOf(45000000), "exciter.jpg", 10, true, null, null,
+            "Yamaha", "Exciter", "Đỏ", 2024, 155);
 
-        SanPham product2 = SanPham.createForTest("PT001", "Mũ bảo hiểm", "Phụ tùng", 500000.0, 20, true, true);
-        product2.setMaSP(2L);
+        XeMay product2 = new XeMay(2L, "Honda Wave", "Xe số",
+            BigDecimal.valueOf(30000000), "wave.jpg", 15, true, null, null,
+            "Honda", "Wave", "Xanh", 2024, 110);
 
-        SanPham product3 = SanPham.createForTest("XE002", "Honda Wave", "Xe", 30000000.0, 15, true, false);
-        product3.setMaSP(3L);
+        XeMay product3 = new XeMay(3L, "Honda Vision", "Xe tay ga",
+            BigDecimal.valueOf(35000000), "vision.jpg", 8, true, null, null,
+            "Honda", "Vision", "Trắng", 2024, 125);
 
-        List<SanPham> products = Arrays.asList(product1, product2, product3);
+        List<XeMay> products = Arrays.asList(product1, product2, product3);
 
         SortSearchResultsInputData inputData = new SortSearchResultsInputData(products, "price", SortDirection.ASC);
+        SortSearchResultsUseCaseControl useCase = new SortSearchResultsUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        SortSearchResultsOutputData outputData = useCase.sortInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(SortSearchResultsOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(3, outputData.getSortedResults().size());
+        assertEquals("price", outputData.getSortBy());
+        assertEquals("ASC", outputData.getDirection());
+        // Verify sorted order: Wave (30M) < Vision (35M) < Exciter (45M)
+        XeMay first = (XeMay) outputData.getSortedResults().get(0);
+        assertEquals("Honda Wave", first.getTenSanPham());
     }
 
     @Test
     void shouldSortByPriceDescending() {
         // Given
-        SanPham product1 = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 10, true, false);
-        product1.setMaSP(1L);
+        XeMay product1 = new XeMay(1L, "Yamaha Exciter", "Xe thể thao",
+            BigDecimal.valueOf(45000000), "exciter.jpg", 10, true, null, null,
+            "Yamaha", "Exciter", "Đỏ", 2024, 155);
 
-        SanPham product2 = SanPham.createForTest("PT001", "Mũ bảo hiểm", "Phụ tùng", 500000.0, 20, true, true);
-        product2.setMaSP(2L);
+        XeMay product2 = new XeMay(2L, "Honda Wave", "Xe số",
+            BigDecimal.valueOf(30000000), "wave.jpg", 15, true, null, null,
+            "Honda", "Wave", "Xanh", 2024, 110);
 
-        List<SanPham> products = Arrays.asList(product1, product2);
+        List<XeMay> products = Arrays.asList(product1, product2);
 
         SortSearchResultsInputData inputData = new SortSearchResultsInputData(products, "price", SortDirection.DESC);
+        SortSearchResultsUseCaseControl useCase = new SortSearchResultsUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        SortSearchResultsOutputData outputData = useCase.sortInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(SortSearchResultsOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(2, outputData.getSortedResults().size());
+        assertEquals("DESC", outputData.getDirection());
+        // Verify sorted order: Exciter (45M) > Wave (30M)
+        XeMay first = (XeMay) outputData.getSortedResults().get(0);
+        assertEquals("Yamaha Exciter", first.getTenSanPham());
     }
 
     @Test
     void shouldSortByNameAscending() {
         // Given
-        SanPham product1 = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 10, true, false);
-        product1.setMaSP(1L);
+        XeMay product1 = new XeMay(1L, "Yamaha Exciter", "Xe thể thao",
+            BigDecimal.valueOf(45000000), "exciter.jpg", 10, true, null, null,
+            "Yamaha", "Exciter", "Đỏ", 2024, 155);
 
-        SanPham product2 = SanPham.createForTest("XE002", "Honda Wave", "Xe", 30000000.0, 15, true, false);
-        product2.setMaSP(2L);
+        XeMay product2 = new XeMay(2L, "Honda Wave", "Xe số",
+            BigDecimal.valueOf(30000000), "wave.jpg", 15, true, null, null,
+            "Honda", "Wave", "Xanh", 2024, 110);
 
-        List<SanPham> products = Arrays.asList(product1, product2);
+        List<XeMay> products = Arrays.asList(product1, product2);
 
         SortSearchResultsInputData inputData = new SortSearchResultsInputData(products, "name", SortDirection.ASC);
+        SortSearchResultsUseCaseControl useCase = new SortSearchResultsUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        SortSearchResultsOutputData outputData = useCase.sortInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(SortSearchResultsOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(2, outputData.getSortedResults().size());
+        // Verify alphabetical order: Honda < Yamaha
+        XeMay first = (XeMay) outputData.getSortedResults().get(0);
+        assertEquals("Honda Wave", first.getTenSanPham());
     }
 
     @Test
-    void shouldHandleDefaultSort() {
+    void shouldHandleNullSortBy() {
         // Given
-        SanPham product1 = SanPham.createForTest("XE001", "Yamaha Exciter", "Xe", 45000000.0, 10, true, false);
-        product1.setMaSP(1L);
+        XeMay product1 = new XeMay(1L, "Yamaha Exciter", "Xe thể thao",
+            BigDecimal.valueOf(45000000), "exciter.jpg", 10, true, null, null,
+            "Yamaha", "Exciter", "Đỏ", 2024, 155);
 
-        List<SanPham> products = Arrays.asList(product1);
+        List<XeMay> products = Arrays.asList(product1);
 
-        SortSearchResultsInputData inputData = new SortSearchResultsInputData(products, null, (SortDirection) null);
+        SortSearchResultsInputData inputData = new SortSearchResultsInputData(products, null, SortDirection.ASC);
+        SortSearchResultsUseCaseControl useCase = new SortSearchResultsUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        SortSearchResultsOutputData outputData = useCase.sortInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(SortSearchResultsOutputData.class));
+        assertTrue(outputData.isSuccess());
+        assertEquals(1, outputData.getSortedResults().size());
     }
 }

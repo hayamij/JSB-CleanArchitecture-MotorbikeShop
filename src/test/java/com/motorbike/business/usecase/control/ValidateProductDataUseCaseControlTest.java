@@ -2,28 +2,11 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.validateproductdata.ValidateProductDataInputData;
 import com.motorbike.business.dto.validateproductdata.ValidateProductDataOutputData;
-import com.motorbike.business.usecase.output.ValidateProductDataOutputBoundary;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ValidateProductDataUseCaseControlTest {
-
-    @Mock
-    private ValidateProductDataOutputBoundary outputBoundary;
-
-    private ValidateProductDataUseCaseControl useCase;
-
-    @BeforeEach
-    void setUp() {
-        useCase = new ValidateProductDataUseCaseControl(outputBoundary);
-    }
 
     @Test
     void shouldValidateProductSuccessfully() {
@@ -31,12 +14,14 @@ public class ValidateProductDataUseCaseControlTest {
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
             "XE001", "Yamaha Exciter", "Xe thể thao", 45000000.0, 10
         );
+        ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateProductDataOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateProductDataOutputData.class));
+        assertTrue(outputData.isValid());
+        assertTrue(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -45,12 +30,14 @@ public class ValidateProductDataUseCaseControlTest {
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
             "", "Yamaha Exciter", "Xe thể thao", 45000000.0, 10
         );
+        ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateProductDataOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateProductDataOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -59,12 +46,14 @@ public class ValidateProductDataUseCaseControlTest {
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
             "XE001", "", "Xe thể thao", 45000000.0, 10
         );
+        ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateProductDataOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateProductDataOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -73,12 +62,14 @@ public class ValidateProductDataUseCaseControlTest {
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
             "XE001", "Yamaha Exciter", "Xe thể thao", -1000.0, 10
         );
+        ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateProductDataOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateProductDataOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 
     @Test
@@ -87,11 +78,13 @@ public class ValidateProductDataUseCaseControlTest {
         ValidateProductDataInputData inputData = new ValidateProductDataInputData(
             "XE001", "Yamaha Exciter", "Xe thể thao", 45000000.0, -5
         );
+        ValidateProductDataUseCaseControl useCase = new ValidateProductDataUseCaseControl(null);
 
         // When
-        useCase.execute(inputData);
+        ValidateProductDataOutputData outputData = useCase.validateInternal(inputData);
 
         // Then
-        verify(outputBoundary).present(any(ValidateProductDataOutputData.class));
+        assertFalse(outputData.isValid());
+        assertFalse(outputData.getErrors().isEmpty());
     }
 }
