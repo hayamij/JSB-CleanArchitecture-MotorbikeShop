@@ -2,10 +2,15 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.listallorders.ListAllOrdersInputData;
 import com.motorbike.business.dto.listallorders.ListAllOrdersOutputData;
+import com.motorbike.business.dto.sortorders.SortOrdersByDateInputData;
+import com.motorbike.business.dto.formatordersforlist.FormatOrdersForListInputData;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
+import com.motorbike.business.usecase.input.SortOrdersByDateInputBoundary;
+import com.motorbike.business.usecase.input.FormatOrdersForListInputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.domain.exceptions.SystemException;
 import com.motorbike.business.usecase.input.ListAllOrdersInputBoundary;
 
 import java.math.BigDecimal;
@@ -17,12 +22,28 @@ public class ListAllOrdersUseCaseControl implements ListAllOrdersInputBoundary {
     
     private final ListAllOrdersOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;
+    private final SortOrdersByDateInputBoundary sortOrdersUseCase;
+    private final FormatOrdersForListInputBoundary formatOrdersUseCase;
 
+    public ListAllOrdersUseCaseControl(
+            ListAllOrdersOutputBoundary outputBoundary,
+            OrderRepository orderRepository,
+            SortOrdersByDateInputBoundary sortOrdersUseCase,
+            FormatOrdersForListInputBoundary formatOrdersUseCase) {
+        this.outputBoundary = outputBoundary;
+        this.orderRepository = orderRepository;
+        this.sortOrdersUseCase = sortOrdersUseCase;
+        this.formatOrdersUseCase = formatOrdersUseCase;
+    }
+
+    // Backward compatibility constructor
     public ListAllOrdersUseCaseControl(
             ListAllOrdersOutputBoundary outputBoundary,
             OrderRepository orderRepository) {
         this.outputBoundary = outputBoundary;
         this.orderRepository = orderRepository;
+        this.sortOrdersUseCase = new SortOrdersByDateUseCaseControl(null);
+        this.formatOrdersUseCase = new FormatOrdersForListUseCaseControl(null);
     }
 
     public void execute(ListAllOrdersInputData inputData) {
@@ -40,6 +61,7 @@ public class ListAllOrdersUseCaseControl implements ListAllOrdersInputBoundary {
         List<DonHang> allOrders = null;
         if (errorException == null) {
             try {
+                // Step 1: Get all orders from repository
                 allOrders = orderRepository.findAll();
             } catch (Exception e) {
                 errorException = e;
@@ -48,30 +70,37 @@ public class ListAllOrdersUseCaseControl implements ListAllOrdersInputBoundary {
 
         if (errorException == null && allOrders != null) {
             try {
-                List<DonHang> sortedOrders = allOrders.stream()
-                        .sorted(Comparator.comparing(DonHang::getNgayDat).reversed())
-                        .collect(Collectors.toList());
-
-                BigDecimal totalRevenue = sortedOrders.stream()
-                        .map(DonHang::getTongTien)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                List<ListAllOrdersOutputData.OrderItemData> orderItems = sortedOrders.stream()
-                        .map(donHang -> new ListAllOrdersOutputData.OrderItemData(
-                                donHang.getMaDonHang(),
-                                donHang.getMaTaiKhoan(),
-                                donHang.getTenNguoiNhan(),
-                                donHang.getSoDienThoai(),
-                                donHang.getDiaChiGiaoHang(),
-                                donHang.getTrangThai().name(),
-                                donHang.getTongTien(),
-                                donHang.getDanhSachSanPham().size(),
-                                donHang.getDanhSachSanPham().stream()
-                                        .mapToInt(item -> item.getSoLuong())
-                                        .sum(),
-                                donHang.getNgayDat(),
-                                donHang.getGhiChu(),
-                                donHang.getPhuongThucThanhToan().name()
+                // Step 2: UC-79 Sort orders by date (newest first)
+                SortOrdersByDateInputData sortInput = new SortOrdersByDateInputData(allOrders, true);
+                var sortResult = ((SortOrdersByDateUseCaseControl) sortOrdersUseCase).sortInternal(sortInput);
+                
+                if (!sortResult.isSuccess()) {
+                    throw new SystemException(sortResult.getErrorMessage(), sortResult.getErrorCode());
+                }
+                
+                // Step 3: UC-81 Format orders for list display
+                FormatOrdersForListInputData formatInput = new FormatOrdersForListInputData(sortResult.getSortedOrders());
+                var formatResult = ((FormatOrdersForListUseCaseControl) formatOrdersUseCase).formatInternal(formatInput);
+                
+                if (!formatResult.isSuccess()) {
+                    throw new SystemException(formatResult.getErrorMessage(), formatResult.getErrorCode());
+                }
+                
+                // Convert FormatOrdersForListOutputData.OrderListItem to ListAllOrdersOutputData.OrderItemData
+                List<ListAllOrdersOutputData.OrderItemData> orderItems = formatResult.getOrderItems().stream()
+                        .map(item -> new ListAllOrdersOutputData.OrderItemData(
+                                item.getOrderId(),
+                                Long.parseLong(item.getUserId()),
+                                item.getReceiverName(),
+                                item.getPhoneNumber(),
+                                item.getShippingAddress(),
+                                item.getStatus(),
+                                item.getTotalAmount(),
+                                item.getProductCount(),
+                                item.getTotalQuantity(),
+                                item.getOrderDate(),
+                                item.getNote(),
+                                item.getPaymentMethod()
                         ))
                         .collect(Collectors.toList());
 

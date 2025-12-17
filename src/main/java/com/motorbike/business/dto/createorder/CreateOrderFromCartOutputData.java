@@ -4,6 +4,7 @@ import com.motorbike.domain.entities.DonHang;
 import java.math.BigDecimal;
 
 public class CreateOrderFromCartOutputData {
+    private final DonHang donHang;
     private final Long orderId;
     private final Long userId;
     private final BigDecimal totalAmount;
@@ -15,6 +16,7 @@ public class CreateOrderFromCartOutputData {
     
     // Success constructor
     public CreateOrderFromCartOutputData(DonHang order) {
+        this.donHang = order;
         this.orderId = order.getMaDonHang();
         this.userId = order.getMaTaiKhoan();
         this.totalAmount = order.getTongTien();
@@ -27,6 +29,7 @@ public class CreateOrderFromCartOutputData {
     
     // Error constructor
     private CreateOrderFromCartOutputData(String errorCode, String errorMessage) {
+        this.donHang = null;
         this.orderId = null;
         this.userId = null;
         this.totalAmount = null;
@@ -43,6 +46,10 @@ public class CreateOrderFromCartOutputData {
     
     public boolean isSuccess() {
         return success;
+    }
+    
+    public DonHang getDonHang() {
+        return donHang;
     }
     
     public Long getOrderId() {

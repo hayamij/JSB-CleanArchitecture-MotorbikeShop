@@ -9,6 +9,7 @@ import com.motorbike.business.dto.validatecart.ValidateCartBeforeCheckoutInputDa
 import com.motorbike.business.dto.clearcart.ClearCartInputData;
 import com.motorbike.business.dto.createorder.CreateOrderFromCartInputData;
 import com.motorbike.business.dto.reducestock.ReduceProductStockInputData;
+import com.motorbike.business.dto.formatorderitems.FormatOrderItemsForCheckoutInputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
@@ -16,12 +17,14 @@ import com.motorbike.business.usecase.input.ValidateCartBeforeCheckoutInputBound
 import com.motorbike.business.usecase.input.ClearCartInputBoundary;
 import com.motorbike.business.usecase.input.CreateOrderFromCartInputBoundary;
 import com.motorbike.business.usecase.input.ReduceProductStockInputBoundary;
+import com.motorbike.business.usecase.input.FormatOrderItemsForCheckoutInputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.exceptions.ValidationException;
 import com.motorbike.domain.exceptions.DomainException;
+import com.motorbike.domain.exceptions.SystemException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,7 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
     private final CreateOrderFromCartInputBoundary createOrderUseCase;
     private final ReduceProductStockInputBoundary reduceStockUseCase;
     private final ClearCartInputBoundary clearCartUseCase;
+    private final FormatOrderItemsForCheckoutInputBoundary formatOrderItemsUseCase;
     
     public CheckoutUseCaseControl(
             CheckoutOutputBoundary outputBoundary,
@@ -42,7 +46,8 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
             ValidateCartBeforeCheckoutInputBoundary validateCartUseCase,
             CreateOrderFromCartInputBoundary createOrderUseCase,
             ReduceProductStockInputBoundary reduceStockUseCase,
-            ClearCartInputBoundary clearCartUseCase) {
+            ClearCartInputBoundary clearCartUseCase,
+            FormatOrderItemsForCheckoutInputBoundary formatOrderItemsUseCase) {
         this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
         this.orderRepository = orderRepository;
@@ -50,6 +55,7 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
         this.createOrderUseCase = createOrderUseCase;
         this.reduceStockUseCase = reduceStockUseCase;
         this.clearCartUseCase = clearCartUseCase;
+        this.formatOrderItemsUseCase = formatOrderItemsUseCase;
     }
     
     // Constructor for tests with 4 params (outputBoundary, cartRepo, productRepo, orderRepo)
@@ -65,6 +71,7 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
         this.createOrderUseCase = new CreateOrderFromCartUseCaseControl(null, orderRepository, cartRepository);
         this.reduceStockUseCase = new ReduceProductStockUseCaseControl(null, productRepository);
         this.clearCartUseCase = new ClearCartUseCaseControl(null, cartRepository);
+        this.formatOrderItemsUseCase = new FormatOrderItemsForCheckoutUseCaseControl(null);
     }
     
     public void execute(CheckoutInputData inputData) {
@@ -142,15 +149,8 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
                     throw new DomainException(createOrderResult.getErrorMessage(), createOrderResult.getErrorCode());
                 }
                 
-                // Get the created order domain object
-                DonHang donHang = DonHang.fromGioHang(
-                    gioHang,
-                    inputData.getReceiverName(),
-                    inputData.getPhoneNumber(),
-                    inputData.getShippingAddress(),
-                    inputData.getNote(),
-                    phuongThucThanhToan
-                );
+                // Get the created order from UC-44
+                DonHang donHang = createOrderResult.getDonHang();
                 
                 // Save order to get ID
                 DonHang savedOrder = orderRepository.save(donHang);
@@ -173,14 +173,25 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
                 ClearCartInputData clearInput = new ClearCartInputData(gioHang.getMaGioHang());
                 ((ClearCartUseCaseControl) clearCartUseCase).clearInternal(clearInput);
                 
-                List<CheckoutOutputData.OrderItemData> orderItems = savedOrder.getDanhSachSanPham()
-                    .stream()
+                // UC-82: Format order items for checkout response
+                FormatOrderItemsForCheckoutInputData formatInput = new FormatOrderItemsForCheckoutInputData(
+                    savedOrder.getDanhSachSanPham()
+                );
+                var formatResult = ((FormatOrderItemsForCheckoutUseCaseControl) formatOrderItemsUseCase)
+                    .formatInternal(formatInput);
+                
+                if (!formatResult.isSuccess()) {
+                    throw new SystemException(formatResult.getErrorMessage(), formatResult.getErrorCode());
+                }
+                
+                // Convert to CheckoutOutputData.OrderItemData
+                List<CheckoutOutputData.OrderItemData> orderItems = formatResult.getFormattedItems().stream()
                     .map(item -> new CheckoutOutputData.OrderItemData(
-                        item.getMaSanPham(),
-                        item.getTenSanPham(),
-                        item.getGiaBan(),
-                        item.getSoLuong(),
-                        item.getThanhTien()
+                        Long.parseLong(item.getProductId()),
+                        item.getProductName(),
+                        item.getPrice(),
+                        item.getQuantity(),
+                        item.getSubtotal()
                     ))
                     .collect(Collectors.toList());
                 

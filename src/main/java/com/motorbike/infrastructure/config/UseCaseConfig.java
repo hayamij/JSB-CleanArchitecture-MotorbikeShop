@@ -128,7 +128,9 @@ import com.motorbike.business.usecase.control.UpdateCartItemQuantityUseCaseContr
 import com.motorbike.business.usecase.control.CalculateCartTotalsUseCaseControl;
 import com.motorbike.business.usecase.control.RemoveCartItemUseCaseControl;
 import com.motorbike.business.usecase.control.ValidateOrderUseCaseControl;
+import com.motorbike.business.usecase.control.ValidateCartBeforeCheckoutUseCaseControl;
 import com.motorbike.business.usecase.control.CreateOrderFromCartUseCaseControl;
+import com.motorbike.business.usecase.control.ReduceProductStockUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateProductStockUseCaseControl;
 import com.motorbike.business.usecase.control.ClearCartUseCaseControl;
 import com.motorbike.business.usecase.control.ValidateOrderCancellationUseCaseControl;
@@ -152,6 +154,12 @@ import com.motorbike.business.usecase.control.ApplyUserFiltersUseCaseControl;
 import com.motorbike.business.usecase.control.FormatMotorbikesForDisplayUseCaseControl;
 import com.motorbike.business.usecase.control.ValidateMotorbikeFieldsUseCaseControl;
 import com.motorbike.business.usecase.control.FormatAccessoriesForDisplayUseCaseControl;
+import com.motorbike.business.usecase.control.FormatProductsForDisplayUseCaseControl;
+import com.motorbike.business.usecase.control.FormatCartItemsForDisplayUseCaseControl;
+import com.motorbike.business.usecase.control.SortOrdersByDateUseCaseControl;
+import com.motorbike.business.usecase.control.CalculateOrderStatisticsUseCaseControl;
+import com.motorbike.business.usecase.control.FormatOrdersForListUseCaseControl;
+import com.motorbike.business.usecase.control.FormatOrderItemsForCheckoutUseCaseControl;
 import com.motorbike.business.usecase.control.ValidateExcelFileUseCaseControl;
 import com.motorbike.business.usecase.control.ParseExcelDataUseCaseControl;
 import com.motorbike.business.usecase.control.ValidateImportRowUseCaseControl;
@@ -213,6 +221,16 @@ import com.motorbike.business.usecase.input.ApplyUserFiltersInputBoundary;
 import com.motorbike.business.usecase.input.FormatMotorbikesForDisplayInputBoundary;
 import com.motorbike.business.usecase.input.ValidateMotorbikeFieldsInputBoundary;
 import com.motorbike.business.usecase.input.FormatAccessoriesForDisplayInputBoundary;
+import com.motorbike.business.usecase.input.FormatProductsForDisplayInputBoundary;
+import com.motorbike.business.usecase.input.FormatCartItemsForDisplayInputBoundary;
+import com.motorbike.business.usecase.input.SortOrdersByDateInputBoundary;
+import com.motorbike.business.usecase.input.CalculateOrderStatisticsInputBoundary;
+import com.motorbike.business.usecase.input.FormatOrdersForListInputBoundary;
+import com.motorbike.business.usecase.input.FormatOrderItemsForCheckoutInputBoundary;
+import com.motorbike.business.usecase.input.ValidateCartBeforeCheckoutInputBoundary;
+import com.motorbike.business.usecase.input.CreateOrderFromCartInputBoundary;
+import com.motorbike.business.usecase.input.ReduceProductStockInputBoundary;
+import com.motorbike.business.usecase.input.ClearCartInputBoundary;
 import com.motorbike.business.usecase.input.ValidateExcelFileInputBoundary;
 import com.motorbike.business.usecase.input.ParseExcelDataInputBoundary;
 import com.motorbike.business.usecase.input.ValidateImportRowInputBoundary;
@@ -266,6 +284,12 @@ import com.motorbike.business.usecase.output.ApplyUserFiltersOutputBoundary;
 import com.motorbike.business.usecase.output.FormatMotorbikesForDisplayOutputBoundary;
 import com.motorbike.business.usecase.output.ValidateMotorbikeFieldsOutputBoundary;
 import com.motorbike.business.usecase.output.FormatAccessoriesForDisplayOutputBoundary;
+import com.motorbike.business.usecase.output.FormatProductsForDisplayOutputBoundary;
+import com.motorbike.business.usecase.output.FormatCartItemsForDisplayOutputBoundary;
+import com.motorbike.business.usecase.output.SortOrdersByDateOutputBoundary;
+import com.motorbike.business.usecase.output.CalculateOrderStatisticsOutputBoundary;
+import com.motorbike.business.usecase.output.FormatOrdersForListOutputBoundary;
+import com.motorbike.business.usecase.output.FormatOrderItemsForCheckoutOutputBoundary;
 import com.motorbike.infrastructure.persistence.jpa.repositories.XeMayJpaRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -387,8 +411,9 @@ public class UseCaseConfig {
             ViewCartOutputBoundary viewCartPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository,
-            CalculateCartTotalsInputBoundary calculateCartTotalsUseCase) {
-        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository, calculateCartTotalsUseCase);
+            CalculateCartTotalsInputBoundary calculateCartTotalsUseCase,
+            FormatCartItemsForDisplayInputBoundary formatCartItemsUseCase) {
+        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository, calculateCartTotalsUseCase, formatCartItemsUseCase);
     }
     
     @Bean
@@ -432,8 +457,22 @@ public class UseCaseConfig {
             CheckoutOutputBoundary checkoutPresenter,
             CartRepository cartRepository,
             ProductRepository productRepository,
-            OrderRepository orderRepository) {
-        return new CheckoutUseCaseControl(checkoutPresenter, cartRepository, productRepository, orderRepository);
+            OrderRepository orderRepository,
+            ValidateCartBeforeCheckoutInputBoundary validateCartUseCase,
+            CreateOrderFromCartInputBoundary createOrderUseCase,
+            ReduceProductStockInputBoundary reduceStockUseCase,
+            ClearCartInputBoundary clearCartUseCase,
+            FormatOrderItemsForCheckoutInputBoundary formatOrderItemsUseCase) {
+        return new CheckoutUseCaseControl(
+            checkoutPresenter, 
+            cartRepository, 
+            orderRepository,
+            validateCartUseCase,
+            createOrderUseCase,
+            reduceStockUseCase,
+            clearCartUseCase,
+            formatOrderItemsUseCase
+        );
     }
     
     
@@ -451,8 +490,10 @@ public class UseCaseConfig {
     @Bean
     public ListAllOrdersInputBoundary listAllOrdersUseCase(
             ListAllOrdersOutputBoundary listAllOrdersPresenter,
-            OrderRepository orderRepository) {
-        return new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository);
+            OrderRepository orderRepository,
+            SortOrdersByDateInputBoundary sortOrdersUseCase,
+            FormatOrdersForListInputBoundary formatOrdersUseCase) {
+        return new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository, sortOrdersUseCase, formatOrdersUseCase);
     }
 
     @Bean
@@ -1084,9 +1125,10 @@ public CreateUserOutputBoundary createUserPresenter(
     @Bean
     public GetAllProductsInputBoundary getAllProductsUseCase(
             GetAllProductsOutputBoundary presenter,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            FormatProductsForDisplayInputBoundary formatProductsUseCase
     ) {
-        return new GetAllProductsUseCaseControl(presenter, productRepository);
+        return new GetAllProductsUseCaseControl(presenter, productRepository, formatProductsUseCase);
     }
 
     @Bean
@@ -1221,6 +1263,13 @@ public CreateUserOutputBoundary createUserPresenter(
     }
     
     @Bean
+    public ValidateCartBeforeCheckoutInputBoundary validateCartBeforeCheckoutUseCase(
+            CartRepository cartRepository,
+            ProductRepository productRepository) {
+        return new ValidateCartBeforeCheckoutUseCaseControl(data -> {}, cartRepository, productRepository);
+    }
+    
+    @Bean
     public CreateOrderFromCartInputBoundary createOrderFromCartUseCase(
             OrderRepository orderRepository,
             CartRepository cartRepository) {
@@ -1228,8 +1277,8 @@ public CreateUserOutputBoundary createUserPresenter(
     }
     
     @Bean
-    public UpdateProductStockInputBoundary updateProductStockUseCase(ProductRepository productRepository) {
-        return new UpdateProductStockUseCaseControl(data -> {}, productRepository);
+    public ReduceProductStockInputBoundary reduceProductStockUseCase(ProductRepository productRepository) {
+        return new ReduceProductStockUseCaseControl(data -> {}, productRepository);
     }
     
     @Bean
@@ -1345,6 +1394,42 @@ public CreateUserOutputBoundary createUserPresenter(
     @Bean
     public FormatAccessoriesForDisplayInputBoundary formatAccessoriesForDisplayUseCase() {
         return new FormatAccessoriesForDisplayUseCaseControl((FormatAccessoriesForDisplayOutputBoundary) data -> {});
+    }
+    
+    // ===== PRODUCT MANAGEMENT SECONDARY USECASES (UC-77) =====
+    
+    @Bean
+    public FormatProductsForDisplayInputBoundary formatProductsForDisplayUseCase() {
+        return new FormatProductsForDisplayUseCaseControl((FormatProductsForDisplayOutputBoundary) data -> {});
+    }
+    
+    // ===== CART MANAGEMENT SECONDARY USECASES (UC-78) =====
+    
+    @Bean
+    public FormatCartItemsForDisplayInputBoundary formatCartItemsForDisplayUseCase(ProductRepository productRepository) {
+        return new FormatCartItemsForDisplayUseCaseControl((FormatCartItemsForDisplayOutputBoundary) data -> {}, productRepository);
+    }
+    
+    // ===== ORDER MANAGEMENT SECONDARY USECASES (UC-79, UC-80, UC-81) =====
+    
+    @Bean
+    public SortOrdersByDateInputBoundary sortOrdersByDateUseCase() {
+        return new SortOrdersByDateUseCaseControl((SortOrdersByDateOutputBoundary) data -> {});
+    }
+    
+    @Bean
+    public CalculateOrderStatisticsInputBoundary calculateOrderStatisticsUseCase() {
+        return new CalculateOrderStatisticsUseCaseControl((CalculateOrderStatisticsOutputBoundary) data -> {});
+    }
+    
+    @Bean
+    public FormatOrdersForListInputBoundary formatOrdersForListUseCase() {
+        return new FormatOrdersForListUseCaseControl((FormatOrdersForListOutputBoundary) data -> {});
+    }
+    
+    @Bean
+    public FormatOrderItemsForCheckoutInputBoundary formatOrderItemsForCheckoutUseCase() {
+        return new FormatOrderItemsForCheckoutUseCaseControl((FormatOrderItemsForCheckoutOutputBoundary) data -> {});
     }
     
     // ===== IMPORT/EXPORT GROUP (UC-62 TO UC-67) =====
