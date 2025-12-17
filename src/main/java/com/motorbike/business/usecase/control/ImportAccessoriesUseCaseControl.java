@@ -7,6 +7,14 @@ import com.motorbike.business.ports.parser.ExcelParser;
 import com.motorbike.business.ports.repository.AccessoryRepository;
 import com.motorbike.business.usecase.input.ImportAccessoriesInputBoundary;
 import com.motorbike.business.usecase.output.ImportAccessoriesOutputBoundary;
+import com.motorbike.business.dto.validateexcelfile.ValidateExcelFileInputData;
+import com.motorbike.business.dto.parseexceldata.ParseExcelDataInputData;
+import com.motorbike.business.dto.validateimportrow.ValidateImportRowInputData;
+import com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData;
+import com.motorbike.business.usecase.input.ValidateExcelFileInputBoundary;
+import com.motorbike.business.usecase.input.ParseExcelDataInputBoundary;
+import com.motorbike.business.usecase.input.ValidateImportRowInputBoundary;
+import com.motorbike.business.usecase.input.GenerateImportReportInputBoundary;
 import com.motorbike.domain.entities.PhuKienXeMay;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.exceptions.ValidationException;
@@ -30,15 +38,60 @@ public class ImportAccessoriesUseCaseControl implements ImportAccessoriesInputBo
     private final ImportAccessoriesOutputBoundary outputBoundary;
     private final AccessoryRepository accessoryRepository;
     private final ExcelParser excelParser;
+    private final ValidateExcelFileInputBoundary validateExcelFileUseCase;
+    private final ParseExcelDataInputBoundary parseExcelDataUseCase;
+    private final ValidateImportRowInputBoundary validateImportRowUseCase;
+    private final GenerateImportReportInputBoundary generateImportReportUseCase;
     
     public ImportAccessoriesUseCaseControl(
             ImportAccessoriesOutputBoundary outputBoundary,
             AccessoryRepository accessoryRepository,
-            ExcelParser excelParser
+            ExcelParser excelParser,
+            ValidateExcelFileInputBoundary validateExcelFileUseCase,
+            ParseExcelDataInputBoundary parseExcelDataUseCase,
+            ValidateImportRowInputBoundary validateImportRowUseCase,
+            GenerateImportReportInputBoundary generateImportReportUseCase
     ) {
         this.outputBoundary = outputBoundary;
         this.accessoryRepository = accessoryRepository;
         this.excelParser = excelParser;
+        this.validateExcelFileUseCase = validateExcelFileUseCase;
+        this.parseExcelDataUseCase = parseExcelDataUseCase;
+        this.validateImportRowUseCase = validateImportRowUseCase;
+        this.generateImportReportUseCase = generateImportReportUseCase;
+    }
+
+    public ImportAccessoriesUseCaseControl(
+            ImportAccessoriesOutputBoundary outputBoundary,
+            AccessoryRepository accessoryRepository,
+            ValidateExcelFileInputBoundary validateExcelFileUseCase,
+            ParseExcelDataInputBoundary parseExcelDataUseCase,
+            ValidateImportRowInputBoundary validateImportRowUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.accessoryRepository = accessoryRepository;
+        this.excelParser = null;
+        this.validateExcelFileUseCase = validateExcelFileUseCase;
+        this.parseExcelDataUseCase = parseExcelDataUseCase;
+        this.validateImportRowUseCase = validateImportRowUseCase;
+        this.generateImportReportUseCase = null;
+    }
+
+    // Constructor with 5 parameters (for backward compatibility)
+    public ImportAccessoriesUseCaseControl(
+            ValidateExcelFileInputBoundary validateExcelFileUseCase,
+            ParseExcelDataInputBoundary parseExcelDataUseCase,
+            ValidateImportRowInputBoundary validateImportRowUseCase,
+            GenerateImportReportInputBoundary generateImportReportUseCase,
+            ImportAccessoriesOutputBoundary outputBoundary
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.accessoryRepository = null;
+        this.excelParser = null;
+        this.validateExcelFileUseCase = validateExcelFileUseCase;
+        this.parseExcelDataUseCase = parseExcelDataUseCase;
+        this.validateImportRowUseCase = validateImportRowUseCase;
+        this.generateImportReportUseCase = generateImportReportUseCase;
     }
     
     @Override
@@ -46,15 +99,50 @@ public class ImportAccessoriesUseCaseControl implements ImportAccessoriesInputBo
         ImportAccessoriesOutputData outputData;
         
         try {
-            // Step 1: Validate input
+            // Step 1: Basic validation
             if (inputData == null || inputData.getFileInputStream() == null) {
                 throw ValidationException.invalidInput();
             }
             
-            validateFileExtension(inputData.getOriginalFilename());
+            // Step 2: UC-62 - Validate Excel file
+            List<String> expectedColumns = List.of(
+                "Tên sản phẩm", "Mô tả", "Giá", "Hình ảnh", "Số lượng tồn kho",
+                "Loại phụ kiện", "Thương hiệu", "Chất liệu"
+            );
+            ValidateExcelFileInputData validateFileInput = new ValidateExcelFileInputData(
+                inputData.getFileInputStream(),
+                inputData.getOriginalFilename(),
+                expectedColumns
+            );
+            var validateFileResult = ((ValidateExcelFileUseCaseControl) validateExcelFileUseCase)
+                .validateInternal(validateFileInput);
             
-            // Step 2: Parse Excel file
-            List<List<String>> rows = excelParser.parseExcelFile(inputData.getFileInputStream());
+            if (!validateFileResult.isValid()) {
+                outputData = ImportAccessoriesOutputData.forError(
+                    validateFileResult.getErrorCode(),
+                    String.join("; ", validateFileResult.getErrors())
+                );
+                outputBoundary.present(outputData);
+                return;
+            }
+            
+            // Step 3: UC-63 - Parse Excel file
+            ParseExcelDataInputData parseInput = new ParseExcelDataInputData(
+                inputData.getFileInputStream()
+            );
+            var parseResult = ((ParseExcelDataUseCaseControl) parseExcelDataUseCase)
+                .parseInternal(parseInput);
+            
+            if (!parseResult.isSuccess()) {
+                outputData = ImportAccessoriesOutputData.forError(
+                    parseResult.getErrorCode(),
+                    parseResult.getErrorMessage()
+                );
+                outputBoundary.present(outputData);
+                return;
+            }
+            
+            var rows = parseResult.getRows();
             
             if (rows == null || rows.isEmpty()) {
                 outputData = ImportAccessoriesOutputData.forError(
@@ -72,7 +160,8 @@ public class ImportAccessoriesUseCaseControl implements ImportAccessoriesInputBo
             
             for (int i = 1; i < rows.size(); i++) {
                 int rowNumber = i + 1; // Excel row number (1-based, accounting for header)
-                List<String> row = rows.get(i);
+                var rowMap = rows.get(i);
+                List<String> row = new java.util.ArrayList<>(rowMap.values());
                 
                 try {
                     PhuKienXeMay phuKien = parseRowToAccessory(row, rowNumber);

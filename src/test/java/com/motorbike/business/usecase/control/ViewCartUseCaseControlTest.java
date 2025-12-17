@@ -308,6 +308,16 @@ public class ViewCartUseCaseControlTest {
 		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
 			return Collections.emptyList();
 		}
+		
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
 	}
 	
 	private static class MockCartRepository implements CartRepository {
@@ -365,6 +375,19 @@ public class ViewCartUseCaseControlTest {
 		@Override
 		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
 			return 0;
+		}
+
+		@Override
+		public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+			return Optional.empty();
+		}
+
+		@Override
+		public void deleteAllByUserId(Long userId) {
+		}
+
+		@Override
+		public void deleteById(Long cartId) {
 		}
 	}
 }

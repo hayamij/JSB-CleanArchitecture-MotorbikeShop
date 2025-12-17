@@ -142,6 +142,11 @@ public class UpdateUserUseCaseControlTest {
 		@Override
 		public java.util.List<TaiKhoan> searchUsers(String keyword) {
 			return new java.util.ArrayList<>();
-		}
+	}
+	
+	@Override
+	public Optional<com.motorbike.domain.entities.TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+		return Optional.empty();
+	}
 	}
 }

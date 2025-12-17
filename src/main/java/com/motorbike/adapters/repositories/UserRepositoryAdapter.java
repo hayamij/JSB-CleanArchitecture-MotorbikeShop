@@ -25,6 +25,12 @@ public class UserRepositoryAdapter implements UserRepository {
     }
     
     @Override
+    public Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+        return jpaRepository.findByTenDangNhap(tenDangNhap)
+                .map(this::toDomain);
+    }
+    
+    @Override
     public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
         // Try to find by username first
         Optional<TaiKhoanJpaEntity> result = jpaRepository.findByTenDangNhap(username);

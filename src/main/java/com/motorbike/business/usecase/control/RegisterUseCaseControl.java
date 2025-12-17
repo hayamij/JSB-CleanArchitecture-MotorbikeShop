@@ -5,6 +5,12 @@ import com.motorbike.business.dto.register.RegisterOutputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.RegisterOutputBoundary;
+import com.motorbike.business.dto.user.ValidateUserRegistrationInputData;
+import com.motorbike.business.dto.user.CheckUserDuplicationInputData;
+import com.motorbike.business.dto.user.HashPasswordInputData;
+import com.motorbike.business.usecase.input.ValidateUserRegistrationInputBoundary;
+import com.motorbike.business.usecase.input.CheckUserDuplicationInputBoundary;
+import com.motorbike.business.usecase.input.HashPasswordInputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.exceptions.DomainException;
@@ -17,7 +23,26 @@ public class RegisterUseCaseControl implements RegisterInputBoundary {
     private final RegisterOutputBoundary outputBoundary;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
+    private final ValidateUserRegistrationInputBoundary validateUserRegistrationUseCase;
+    private final CheckUserDuplicationInputBoundary checkUserDuplicationUseCase;
+    private final HashPasswordInputBoundary hashPasswordUseCase;
     
+    public RegisterUseCaseControl(
+            RegisterOutputBoundary outputBoundary,
+            UserRepository userRepository,
+            CartRepository cartRepository,
+            ValidateUserRegistrationInputBoundary validateUserRegistrationUseCase,
+            CheckUserDuplicationInputBoundary checkUserDuplicationUseCase,
+            HashPasswordInputBoundary hashPasswordUseCase) {
+        this.outputBoundary = outputBoundary;
+        this.userRepository = userRepository;
+        this.cartRepository = cartRepository;
+        this.validateUserRegistrationUseCase = validateUserRegistrationUseCase;
+        this.checkUserDuplicationUseCase = checkUserDuplicationUseCase;
+        this.hashPasswordUseCase = hashPasswordUseCase;
+    }
+
+    // Constructor with parameter order: outputBoundary first (for backward compatibility)
     public RegisterUseCaseControl(
             RegisterOutputBoundary outputBoundary,
             UserRepository userRepository,
@@ -25,47 +50,87 @@ public class RegisterUseCaseControl implements RegisterInputBoundary {
         this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
+        this.validateUserRegistrationUseCase = new ValidateUserRegistrationUseCaseControl(null);
+        this.checkUserDuplicationUseCase = new CheckUserDuplicationUseCaseControl(null, userRepository);
+        this.hashPasswordUseCase = new HashPasswordUseCaseControl(null);
     }
     
     public void execute(RegisterInputData inputData) {
         RegisterOutputData outputData = null;
         Exception errorException = null;
         
+        // Step 1: Basic validation
         try {
             if (inputData == null) {
                 throw ValidationException.invalidInput();
             }
-            TaiKhoan.checkInputForRegister(
-                inputData.getName(),
-                inputData.getEmail(),
-                inputData.getUsername(),
-                inputData.getPassword(),
-                inputData.getPhoneNumber()
-            );
         } catch (Exception e) {
             errorException = e;
         }
         
+        // Step 2: UC-57 - Validate user registration data
         if (errorException == null) {
             try {
-                if (userRepository.existsByEmail(inputData.getEmail())) {
-                    throw DomainException.emailAlreadyExists(inputData.getEmail());
-                }
-                if (userRepository.existsByUsername(inputData.getUsername())) {
-                    throw DomainException.usernameAlreadyExists(inputData.getUsername());
+                ValidateUserRegistrationInputData validateInput = new ValidateUserRegistrationInputData(
+                    inputData.getName(),
+                    inputData.getEmail(),
+                    inputData.getUsername(),
+                    inputData.getPassword(),
+                    inputData.getPhoneNumber()
+                );
+                var validateResult = ((ValidateUserRegistrationUseCaseControl) validateUserRegistrationUseCase)
+                    .validateInternal(validateInput);
+                
+                if (!validateResult.isValid()) {
+                    throw new ValidationException(
+                        String.join("; ", validateResult.getErrors()),
+                        "VALIDATION_ERROR"
+                    );
                 }
             } catch (Exception e) {
                 errorException = e;
             }
         }
         
+        // Step 3: UC-58 - Check user duplication
         if (errorException == null) {
             try {
+                CheckUserDuplicationInputData checkDupInput = new CheckUserDuplicationInputData(
+                    inputData.getEmail(),
+                    inputData.getUsername(),
+                    null  // excludeUserId - not applicable for registration
+                );
+                var dupResult = ((CheckUserDuplicationUseCaseControl) checkUserDuplicationUseCase)
+                    .checkInternal(checkDupInput);
+                
+                if (dupResult.isDuplicate()) {
+                    if ("email".equals(dupResult.getDuplicatedField())) {
+                        throw DomainException.emailAlreadyExists(inputData.getEmail());
+                    } else if ("username".equals(dupResult.getDuplicatedField())) {
+                        throw DomainException.usernameAlreadyExists(inputData.getUsername());
+                    }
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        // Step 4: UC-59 - Hash password and create user
+        if (errorException == null) {
+            try {
+                HashPasswordInputData hashInput = new HashPasswordInputData(inputData.getPassword());
+                var hashResult = ((HashPasswordUseCaseControl) hashPasswordUseCase)
+                    .hashInternal(hashInput);
+                
+                if (!hashResult.isSuccess()) {
+                    throw new SystemException(hashResult.getErrorMessage(), hashResult.getErrorCode());
+                }
+                
                 TaiKhoan taiKhoan = new TaiKhoan(
                     inputData.getName(),
                     inputData.getEmail(),
                     inputData.getUsername(),
-                    inputData.getPassword(),
+                    hashResult.getHashedPassword(),  // Use hashed password
                     inputData.getPhoneNumber(),
                     inputData.getAddress()
                 );
@@ -89,6 +154,7 @@ public class RegisterUseCaseControl implements RegisterInputBoundary {
             }
         }
         
+        // Step 5: Handle error
         if (errorException != null) {
             String errorCode = "SYSTEM_ERROR";
             String message = errorException.getMessage();

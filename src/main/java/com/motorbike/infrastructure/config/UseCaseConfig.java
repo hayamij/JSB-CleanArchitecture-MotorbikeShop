@@ -120,6 +120,38 @@ import com.motorbike.business.usecase.control.UpdateMotorbikeUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateOrderUseCaseControl;
 import com.motorbike.business.usecase.control.UpdateUserUseCaseControl;
 import com.motorbike.business.usecase.control.ViewCartUseCaseControl;
+import com.motorbike.business.usecase.control.ValidateCartItemUseCaseControl;
+import com.motorbike.business.usecase.control.FindCartItemUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateCartItemQuantityUseCaseControl;
+import com.motorbike.business.usecase.control.CalculateCartTotalsUseCaseControl;
+import com.motorbike.business.usecase.control.RemoveCartItemUseCaseControl;
+import com.motorbike.business.usecase.control.ValidateOrderUseCaseControl;
+import com.motorbike.business.usecase.control.CreateOrderFromCartUseCaseControl;
+import com.motorbike.business.usecase.control.UpdateProductStockUseCaseControl;
+import com.motorbike.business.usecase.control.ClearCartUseCaseControl;
+import com.motorbike.business.usecase.control.ValidateOrderCancellationUseCaseControl;
+import com.motorbike.business.usecase.control.CalculateOrderTotalsUseCaseControl;
+import com.motorbike.business.usecase.control.FormatOrderForDisplayUseCaseControl;
+import com.motorbike.business.usecase.control.ValidateProductDataUseCaseControl;
+import com.motorbike.business.usecase.control.CheckProductDuplicationUseCaseControl;
+import com.motorbike.business.usecase.control.CalculateProductPriceUseCaseControl;
+import com.motorbike.business.usecase.control.FormatProductForDisplayUseCaseControl;
+import com.motorbike.business.usecase.control.CheckProductAvailabilityUseCaseControl;
+import com.motorbike.business.usecase.control.ArchiveProductUseCaseControl;
+import com.motorbike.business.usecase.control.ValidateUserRegistrationUseCaseControl;
+import com.motorbike.business.usecase.control.CheckUserDuplicationUseCaseControl;
+import com.motorbike.business.usecase.control.HashPasswordUseCaseControl;
+import com.motorbike.business.usecase.control.VerifyPasswordUseCaseControl;
+import com.motorbike.business.usecase.control.AssignUserRoleUseCaseControl;
+import com.motorbike.business.usecase.control.ValidateExcelFileUseCaseControl;
+import com.motorbike.business.usecase.control.ParseExcelDataUseCaseControl;
+import com.motorbike.business.usecase.control.ValidateImportRowUseCaseControl;
+import com.motorbike.business.usecase.control.GenerateImportReportUseCaseControl;
+import com.motorbike.business.usecase.control.GenerateExcelFileUseCaseControl;
+import com.motorbike.business.usecase.control.FormatDataForExportUseCaseControl;
+import com.motorbike.business.usecase.control.BuildSearchCriteriaUseCaseControl;
+import com.motorbike.business.usecase.control.ApplySearchFiltersUseCaseControl;
+import com.motorbike.business.usecase.control.SortSearchResultsUseCaseControl;
 import com.motorbike.business.usecase.input.AddToCartInputBoundary;
 import com.motorbike.business.usecase.input.CancelOrderInputBoundary;
 import com.motorbike.business.usecase.input.CheckoutInputBoundary;
@@ -142,6 +174,38 @@ import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.ToggleProductVisibilityInputBoundary;
 import com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary;
 import com.motorbike.business.usecase.input.ViewCartInputBoundary;
+import com.motorbike.business.usecase.input.ValidateCartItemInputBoundary;
+import com.motorbike.business.usecase.input.FindCartItemInputBoundary;
+import com.motorbike.business.usecase.input.UpdateCartItemQuantityInputBoundary;
+import com.motorbike.business.usecase.input.CalculateCartTotalsInputBoundary;
+import com.motorbike.business.usecase.input.RemoveCartItemInputBoundary;
+import com.motorbike.business.usecase.input.ValidateOrderInputBoundary;
+import com.motorbike.business.usecase.input.CreateOrderFromCartInputBoundary;
+import com.motorbike.business.usecase.input.UpdateProductStockInputBoundary;
+import com.motorbike.business.usecase.input.ClearCartInputBoundary;
+import com.motorbike.business.usecase.input.ValidateOrderCancellationInputBoundary;
+import com.motorbike.business.usecase.input.CalculateOrderTotalsInputBoundary;
+import com.motorbike.business.usecase.input.FormatOrderForDisplayInputBoundary;
+import com.motorbike.business.usecase.input.ValidateProductDataInputBoundary;
+import com.motorbike.business.usecase.input.CheckProductDuplicationInputBoundary;
+import com.motorbike.business.usecase.input.CalculateProductPriceInputBoundary;
+import com.motorbike.business.usecase.input.FormatProductForDisplayInputBoundary;
+import com.motorbike.business.usecase.input.CheckProductAvailabilityInputBoundary;
+import com.motorbike.business.usecase.input.ArchiveProductInputBoundary;
+import com.motorbike.business.usecase.input.ValidateUserRegistrationInputBoundary;
+import com.motorbike.business.usecase.input.CheckUserDuplicationInputBoundary;
+import com.motorbike.business.usecase.input.HashPasswordInputBoundary;
+import com.motorbike.business.usecase.input.VerifyPasswordInputBoundary;
+import com.motorbike.business.usecase.input.AssignUserRoleInputBoundary;
+import com.motorbike.business.usecase.input.ValidateExcelFileInputBoundary;
+import com.motorbike.business.usecase.input.ParseExcelDataInputBoundary;
+import com.motorbike.business.usecase.input.ValidateImportRowInputBoundary;
+import com.motorbike.business.usecase.input.GenerateImportReportInputBoundary;
+import com.motorbike.business.usecase.input.GenerateExcelFileInputBoundary;
+import com.motorbike.business.usecase.input.FormatDataForExportInputBoundary;
+import com.motorbike.business.usecase.input.BuildSearchCriteriaInputBoundary;
+import com.motorbike.business.usecase.input.ApplySearchFiltersInputBoundary;
+import com.motorbike.business.usecase.input.SortSearchResultsInputBoundary;
 import com.motorbike.business.usecase.output.AddAccessoryOutputBoundary;
 import com.motorbike.business.usecase.output.AddMotorbikeOutputBoundary;
 import com.motorbike.business.usecase.output.AddUserOutputBoundary;
@@ -233,8 +297,9 @@ public class UseCaseConfig {
     public LoginInputBoundary loginUseCase(
             LoginOutputBoundary loginPresenter,
             UserRepository userRepository,
-            CartRepository cartRepository) {
-        return new LoginUseCaseControl(loginPresenter, userRepository, cartRepository);
+            CartRepository cartRepository,
+            VerifyPasswordInputBoundary verifyPasswordUseCase) {
+        return new LoginUseCaseControl(loginPresenter, userRepository, cartRepository, verifyPasswordUseCase);
     }
     
     @Bean
@@ -246,8 +311,11 @@ public class UseCaseConfig {
     public RegisterInputBoundary registerUseCase(
             RegisterOutputBoundary registerPresenter,
             UserRepository userRepository,
-            CartRepository cartRepository) {
-        return new RegisterUseCaseControl(registerPresenter, userRepository, cartRepository);
+            CartRepository cartRepository,
+            ValidateUserRegistrationInputBoundary validateUserRegistrationUseCase,
+            CheckUserDuplicationInputBoundary checkUserDuplicationUseCase,
+            HashPasswordInputBoundary hashPasswordUseCase) {
+        return new RegisterUseCaseControl(registerPresenter, userRepository, cartRepository, validateUserRegistrationUseCase, checkUserDuplicationUseCase, hashPasswordUseCase);
     }
     
     @Bean
@@ -258,8 +326,10 @@ public class UseCaseConfig {
     @Bean
     public GetProductDetailInputBoundary getProductDetailUseCase(
             GetProductDetailOutputBoundary productDetailPresenter,
-            ProductRepository productRepository) {
-        return new GetProductDetailUseCaseControl(productDetailPresenter, productRepository);
+            ProductRepository productRepository,
+            CalculateProductPriceInputBoundary calculatePriceUseCase,
+            FormatProductForDisplayInputBoundary formatProductUseCase) {
+        return new GetProductDetailUseCaseControl(productDetailPresenter, productRepository, calculatePriceUseCase, formatProductUseCase);
     }
     
     @Bean
@@ -284,8 +354,9 @@ public class UseCaseConfig {
     public ViewCartInputBoundary viewCartUseCase(
             ViewCartOutputBoundary viewCartPresenter,
             CartRepository cartRepository,
-            ProductRepository productRepository) {
-        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository);
+            ProductRepository productRepository,
+            CalculateCartTotalsInputBoundary calculateCartTotalsUseCase) {
+        return new ViewCartUseCaseControl(viewCartPresenter, cartRepository, productRepository, calculateCartTotalsUseCase);
     }
     
     @Bean
@@ -329,8 +400,10 @@ public class UseCaseConfig {
     @Bean
     public ListAllOrdersInputBoundary listAllOrdersUseCase(
             ListAllOrdersOutputBoundary listAllOrdersPresenter,
-            OrderRepository orderRepository) {
-        return new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository);
+            OrderRepository orderRepository,
+            CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase,
+            FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase) {
+        return new ListAllOrdersUseCaseControl(listAllOrdersPresenter, orderRepository, calculateOrderTotalsUseCase, formatOrderForDisplayUseCase);
     }
 
     @Bean
@@ -400,9 +473,12 @@ public class UseCaseConfig {
     @Bean
     public SearchMotorbikesInputBoundary searchMotorbikesUseCase(
             SearchMotorbikesOutputBoundary outputBoundary,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase,
+            ApplySearchFiltersInputBoundary applySearchFiltersUseCase,
+            SortSearchResultsInputBoundary sortSearchResultsUseCase
     ) {
-        return new SearchMotorbikesUseCaseControl(outputBoundary, productRepository);
+        return new SearchMotorbikesUseCaseControl(outputBoundary, productRepository, buildSearchCriteriaUseCase, applySearchFiltersUseCase, sortSearchResultsUseCase);
     }
 
     @Bean
@@ -460,9 +536,13 @@ public class UseCaseConfig {
     public ImportMotorbikesUseCaseControl importMotorbikesUseCase(
             ImportMotorbikesOutputBoundary presenter,
             MotorbikeRepository motorbikeRepository,
-            ExcelParser excelParser
+            ExcelParser excelParser,
+            ValidateExcelFileInputBoundary validateExcelFileUseCase,
+            ParseExcelDataInputBoundary parseExcelDataUseCase,
+            ValidateImportRowInputBoundary validateImportRowUseCase,
+            GenerateImportReportInputBoundary generateImportReportUseCase
     ) {
-        return new ImportMotorbikesUseCaseControl(presenter, motorbikeRepository, excelParser);
+        return new ImportMotorbikesUseCaseControl(presenter, motorbikeRepository, excelParser, validateExcelFileUseCase, parseExcelDataUseCase, validateImportRowUseCase, generateImportReportUseCase);
     }
 
     @Bean
@@ -493,9 +573,13 @@ public class UseCaseConfig {
     public ImportAccessoriesUseCaseControl importAccessoriesUseCase(
             ImportAccessoriesOutputBoundary presenter,
             AccessoryRepository accessoryRepository,
-            ExcelParser excelParser
+            ExcelParser excelParser,
+            ValidateExcelFileInputBoundary validateExcelFileUseCase,
+            ParseExcelDataInputBoundary parseExcelDataUseCase,
+            ValidateImportRowInputBoundary validateImportRowUseCase,
+            GenerateImportReportInputBoundary generateImportReportUseCase
     ) {
-        return new ImportAccessoriesUseCaseControl(presenter, accessoryRepository, excelParser);
+        return new ImportAccessoriesUseCaseControl(presenter, accessoryRepository, excelParser, validateExcelFileUseCase, parseExcelDataUseCase, validateImportRowUseCase, generateImportReportUseCase);
     }
 
     @Bean
@@ -525,9 +609,11 @@ public class UseCaseConfig {
     public ExportMotorbikesUseCaseControl exportMotorbikesUseCase(
             ExportMotorbikesOutputBoundary presenter,
             MotorbikeRepository motorbikeRepository,
-            ExcelExporter excelExporter
+            ExcelExporter excelExporter,
+            FormatDataForExportInputBoundary formatDataForExportUseCase,
+            GenerateExcelFileInputBoundary generateExcelFileUseCase
     ) {
-        return new ExportMotorbikesUseCaseControl(presenter, motorbikeRepository, excelExporter);
+        return new ExportMotorbikesUseCaseControl(presenter, motorbikeRepository, excelExporter, formatDataForExportUseCase, generateExcelFileUseCase);
     }
 
     @Bean
@@ -557,9 +643,11 @@ public class UseCaseConfig {
     public ExportAccessoriesUseCaseControl exportAccessoriesUseCase(
             ExportAccessoriesOutputBoundary presenter,
             AccessoryRepository accessoryRepository,
-            ExcelExporter excelExporter
+            ExcelExporter excelExporter,
+            FormatDataForExportInputBoundary formatDataForExportUseCase,
+            GenerateExcelFileInputBoundary generateExcelFileUseCase
     ) {
-        return new ExportAccessoriesUseCaseControl(presenter, accessoryRepository, excelExporter);
+        return new ExportAccessoriesUseCaseControl(presenter, accessoryRepository, excelExporter, formatDataForExportUseCase, generateExcelFileUseCase);
     }
 
     @Bean
@@ -607,9 +695,12 @@ public class UseCaseConfig {
     @Bean
     public SearchAccessoriesInputBoundary searchAccessoriesUseCase(
             SearchAccessoriesOutputBoundary outputBoundary,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase,
+            ApplySearchFiltersInputBoundary applySearchFiltersUseCase,
+            SortSearchResultsInputBoundary sortSearchResultsUseCase
     ) {
-        return new SearchAccessoriesUseCaseControl(outputBoundary, productRepository);
+        return new SearchAccessoriesUseCaseControl(outputBoundary, productRepository, buildSearchCriteriaUseCase, applySearchFiltersUseCase, sortSearchResultsUseCase);
     }
 
     @Bean
@@ -657,9 +748,12 @@ public class UseCaseConfig {
     @Bean
     public SearchUsersUseCaseControl searchUsersUseCase(
             SearchUsersOutputBoundary presenter,
-            UserRepository userRepository
+            UserRepository userRepository,
+            BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase,
+            ApplySearchFiltersInputBoundary applySearchFiltersUseCase,
+            SortSearchResultsInputBoundary sortSearchResultsUseCase
     ) {
-        return new SearchUsersUseCaseControl(presenter, userRepository);
+        return new SearchUsersUseCaseControl(presenter, userRepository, buildSearchCriteriaUseCase, applySearchFiltersUseCase, sortSearchResultsUseCase);
     }
 
     @Bean
@@ -720,9 +814,12 @@ public AddUserOutputBoundary addUserOutputBoundary(
 @Bean
 public CreateUserUseCaseControl createUserUseCaseControl(
         CreateUserOutputBoundary presenter,
-        UserRepository userRepository
+        UserRepository userRepository,
+        ValidateUserRegistrationInputBoundary validateUserRegistrationUseCase,
+        CheckUserDuplicationInputBoundary checkUserDuplicationUseCase,
+        HashPasswordInputBoundary hashPasswordUseCase
 ) {
-    return new CreateUserUseCaseControl(presenter, userRepository);
+    return new CreateUserUseCaseControl(presenter, userRepository, validateUserRegistrationUseCase, checkUserDuplicationUseCase, hashPasswordUseCase);
 }
 
 @Bean
@@ -739,9 +836,10 @@ public CreateUserOutputBoundary createUserPresenter(
     @Bean
     public UpdateUserUseCaseControl updateUserUseCase(
             UpdateUserOutputBoundary presenter,
-            UserRepository userRepository
+            UserRepository userRepository,
+            CheckUserDuplicationInputBoundary checkUserDuplicationUseCase
     ) {
-        return new UpdateUserUseCaseControl(presenter, userRepository);
+        return new UpdateUserUseCaseControl(presenter, userRepository, checkUserDuplicationUseCase);
     }
 
     @Bean
@@ -762,9 +860,10 @@ public CreateUserOutputBoundary createUserPresenter(
     @Bean
     public DeleteMotorbikeUseCaseControl deleteMotorbikeUseCase(
             DeleteMotorbikeOutputBoundary presenter,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            ArchiveProductInputBoundary archiveProductUseCase
     ) {
-        return new DeleteMotorbikeUseCaseControl(presenter, productRepository);
+        return new DeleteMotorbikeUseCaseControl(presenter, productRepository, archiveProductUseCase);
     }
 
     @Bean
@@ -783,9 +882,10 @@ public CreateUserOutputBoundary createUserPresenter(
     @Bean
     public UpdateMotorbikeUseCaseControl updateMotorbikeUseCase(
             UpdateMotorbikeOutputBoundary presenter,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            ValidateProductDataInputBoundary validateProductDataUseCase
     ) {
-        return new UpdateMotorbikeUseCaseControl(presenter, productRepository);
+        return new UpdateMotorbikeUseCaseControl(presenter, productRepository, validateProductDataUseCase);
     }
 
     @Bean
@@ -848,9 +948,10 @@ public CreateUserOutputBoundary createUserPresenter(
     @Bean
     public UpdateAccessoryUseCaseControl updateAccessoryUseCase(
             UpdateAccessoryOutputBoundary presenter,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            ValidateProductDataInputBoundary validateProductDataUseCase
     ) {
-        return new UpdateAccessoryUseCaseControl(presenter, productRepository);
+        return new UpdateAccessoryUseCaseControl(presenter, productRepository, validateProductDataUseCase);
     }
 
     @Bean
@@ -869,9 +970,10 @@ public CreateUserOutputBoundary createUserPresenter(
     @Bean
     public DeleteAccessoryUseCaseControl deleteAccessoryUseCase(
             DeleteAccessoryOutputBoundary presenter,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            ArchiveProductInputBoundary archiveProductUseCase
     ) {
-        return new DeleteAccessoryUseCaseControl(presenter, productRepository);
+        return new DeleteAccessoryUseCaseControl(presenter, productRepository, archiveProductUseCase);
     }
 
     @Bean
@@ -893,9 +995,12 @@ public CreateUserOutputBoundary createUserPresenter(
     public SearchOrdersUseCaseControl searchOrdersUseCase(
             SearchOrdersOutputBoundary presenter,
             OrderRepository orderRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase,
+            ApplySearchFiltersInputBoundary applySearchFiltersUseCase,
+            SortSearchResultsInputBoundary sortSearchResultsUseCase
     ) {
-        return new SearchOrdersUseCaseControl(presenter, orderRepository, userRepository);
+        return new SearchOrdersUseCaseControl(presenter, orderRepository, userRepository, buildSearchCriteriaUseCase, applySearchFiltersUseCase, sortSearchResultsUseCase);
     }
 
     @Bean
@@ -958,9 +1063,11 @@ public CreateUserOutputBoundary createUserPresenter(
     @Bean
     public GetOrderDetailInputBoundary getOrderDetailUseCase(
             GetOrderDetailOutputBoundary presenter,
-            OrderRepository orderRepository
+            OrderRepository orderRepository,
+            CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase,
+            FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase
     ) {
-        return new GetOrderDetailUseCaseControl(presenter, orderRepository);
+        return new GetOrderDetailUseCaseControl(presenter, orderRepository, calculateOrderTotalsUseCase, formatOrderForDisplayUseCase);
     }
 
     @Bean
@@ -1034,6 +1141,182 @@ public CreateUserOutputBoundary createUserPresenter(
             GetTopProductsViewModel viewModel
     ) {
         return new GetTopProductsPresenter(viewModel);
+    }
+
+    // ==================== ATOMIC USE CASES (UC-39 TO UC-70) ====================
+    
+    // ===== CART GROUP (UC-39 TO UC-43) =====
+    
+    @Bean
+    public ValidateCartItemInputBoundary validateCartItemUseCase() {
+        return new ValidateCartItemUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public FindCartItemInputBoundary findCartItemUseCase(CartRepository cartRepository) {
+        return new FindCartItemUseCaseControl(data -> {}, cartRepository);
+    }
+    
+    @Bean
+    public UpdateCartItemQuantityInputBoundary updateCartItemQuantityUseCase(CartRepository cartRepository) {
+        return new UpdateCartItemQuantityUseCaseControl(data -> {}, cartRepository);
+    }
+    
+    @Bean
+    public CalculateCartTotalsInputBoundary calculateCartTotalsUseCase(ProductRepository productRepository) {
+        return new CalculateCartTotalsUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public RemoveCartItemInputBoundary removeCartItemUseCase(CartRepository cartRepository) {
+        return new RemoveCartItemUseCaseControl(data -> {}, cartRepository);
+    }
+    
+    // ===== ORDER GROUP (UC-44 TO UC-50) =====
+    
+    @Bean
+    public ValidateOrderInputBoundary validateOrderUseCase() {
+        return new ValidateOrderUseCaseControl(data -> {}, null);
+    }
+    
+    @Bean
+    public CreateOrderFromCartInputBoundary createOrderFromCartUseCase(
+            OrderRepository orderRepository,
+            CartRepository cartRepository) {
+        return new CreateOrderFromCartUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public UpdateProductStockInputBoundary updateProductStockUseCase(ProductRepository productRepository) {
+        return new UpdateProductStockUseCaseControl(data -> {}, productRepository);
+    }
+    
+    @Bean
+    public ClearCartInputBoundary clearCartUseCase(CartRepository cartRepository) {
+        return new ClearCartUseCaseControl(data -> {}, cartRepository);
+    }
+    
+    @Bean
+    public ValidateOrderCancellationInputBoundary validateOrderCancellationUseCase() {
+        return new ValidateOrderCancellationUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase(ProductRepository productRepository) {
+        return new CalculateOrderTotalsUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase(ProductRepository productRepository) {
+        return new FormatOrderForDisplayUseCaseControl(data -> {});
+    }
+    
+    // ===== PRODUCT GROUP (UC-51 TO UC-56) =====
+    
+    @Bean
+    public ValidateProductDataInputBoundary validateProductDataUseCase() {
+        return new ValidateProductDataUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public CheckProductDuplicationInputBoundary checkProductDuplicationUseCase(ProductRepository productRepository) {
+        return new CheckProductDuplicationUseCaseControl(data -> {}, productRepository);
+    }
+    
+    @Bean
+    public CalculateProductPriceInputBoundary calculateProductPriceUseCase() {
+        return new CalculateProductPriceUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public FormatProductForDisplayInputBoundary formatProductForDisplayUseCase() {
+        return new FormatProductForDisplayUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public CheckProductAvailabilityInputBoundary checkProductAvailabilityUseCase(ProductRepository productRepository) {
+        return new CheckProductAvailabilityUseCaseControl(data -> {}, productRepository);
+    }
+    
+    @Bean
+    public ArchiveProductInputBoundary archiveProductUseCase(ProductRepository productRepository) {
+        return new ArchiveProductUseCaseControl(data -> {}, productRepository);
+    }
+    
+    // ===== USER GROUP (UC-57 TO UC-61) =====
+    
+    @Bean
+    public ValidateUserRegistrationInputBoundary validateUserRegistrationUseCase() {
+        return new ValidateUserRegistrationUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public CheckUserDuplicationInputBoundary checkUserDuplicationUseCase(UserRepository userRepository) {
+        return new CheckUserDuplicationUseCaseControl(data -> {}, userRepository);
+    }
+    
+    @Bean
+    public HashPasswordInputBoundary hashPasswordUseCase() {
+        return new HashPasswordUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public VerifyPasswordInputBoundary verifyPasswordUseCase() {
+        return new VerifyPasswordUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public AssignUserRoleInputBoundary assignUserRoleUseCase() {
+        return new AssignUserRoleUseCaseControl(data -> {}, null);
+    }
+    
+    // ===== IMPORT/EXPORT GROUP (UC-62 TO UC-67) =====
+    
+    @Bean
+    public ValidateExcelFileInputBoundary validateExcelFileUseCase() {
+        return new ValidateExcelFileUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public ParseExcelDataInputBoundary parseExcelDataUseCase() {
+        return new ParseExcelDataUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public ValidateImportRowInputBoundary validateImportRowUseCase() {
+        return new ValidateImportRowUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public GenerateImportReportInputBoundary generateImportReportUseCase() {
+        return new GenerateImportReportUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public GenerateExcelFileInputBoundary generateExcelFileUseCase() {
+        return new GenerateExcelFileUseCaseControl(data -> {});
+    }
+    
+    @Bean
+    public FormatDataForExportInputBoundary formatDataForExportUseCase() {
+        return new FormatDataForExportUseCaseControl(outputData -> {});
+    }
+    
+    // ===== SEARCH GROUP (UC-68 TO UC-70) =====
+    
+    @Bean
+    public BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase() {
+        return new BuildSearchCriteriaUseCaseControl(outputData -> {});
+    }
+    
+    @Bean
+    public ApplySearchFiltersInputBoundary applySearchFiltersUseCase() {
+        return new ApplySearchFiltersUseCaseControl(outputData -> {});
+    }
+    
+    @Bean
+    public SortSearchResultsInputBoundary sortSearchResultsUseCase() {
+        return new SortSearchResultsUseCaseControl(outputData -> {});
     }
 
 }

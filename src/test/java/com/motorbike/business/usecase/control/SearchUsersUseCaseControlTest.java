@@ -140,5 +140,10 @@ public class SearchUsersUseCaseControlTest {
 		public boolean existsById(Long userId) {
 			return false;
 		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+			return Optional.empty();
+		}
 	}
 }

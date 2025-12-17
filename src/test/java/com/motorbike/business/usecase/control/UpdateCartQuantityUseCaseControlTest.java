@@ -298,5 +298,18 @@ public class UpdateCartQuantityUseCaseControlTest {
 		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
 			return 0;
 		}
+
+		@Override
+		public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+			return Optional.empty();
+		}
+
+		@Override
+		public void deleteAllByUserId(Long userId) {
+		}
+
+		@Override
+		public void deleteById(Long cartId) {
+		}
 	}
 }

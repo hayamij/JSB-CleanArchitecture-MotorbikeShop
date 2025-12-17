@@ -2,8 +2,10 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.DeleteMotorbikeOutputData;
+import com.motorbike.business.dto.archiveproduct.ArchiveProductInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
+import com.motorbike.business.usecase.input.ArchiveProductInputBoundary;
 import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
 import com.motorbike.domain.exceptions.DomainException;
@@ -14,11 +16,23 @@ public class DeleteMotorbikeUseCaseControl implements DeleteMotorbikeInputBounda
     
     private final DeleteMotorbikeOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final ArchiveProductInputBoundary archiveProductUseCase;
     
     public DeleteMotorbikeUseCaseControl(DeleteMotorbikeOutputBoundary outputBoundary,
-                                        ProductRepository productRepository) {
+                                        ProductRepository productRepository,
+                                        ArchiveProductInputBoundary archiveProductUseCase) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.archiveProductUseCase = archiveProductUseCase;
+    }
+    
+    // Constructor for tests with 2 params
+    public DeleteMotorbikeUseCaseControl(
+            DeleteMotorbikeOutputBoundary outputBoundary,
+            ProductRepository productRepository) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.archiveProductUseCase = new ArchiveProductUseCaseControl(null, productRepository);
     }
     
     @Override
@@ -50,13 +64,20 @@ public class DeleteMotorbikeUseCaseControl implements DeleteMotorbikeInputBounda
             }
         }
         
-        // Step 3: Delete motorbike
+        // Step 3: UC-56 - Archive motorbike (soft delete)
         if (errorException == null && xeMay != null) {
             try {
                 String tenSanPham = xeMay.getTenSanPham();
                 Long maSanPham = xeMay.getMaSanPham();
                 
-                productRepository.deleteById(maSanPham);
+                // Use UC-56 for soft delete instead of hard delete
+                ArchiveProductInputData archiveInput = new ArchiveProductInputData(maSanPham);
+                var archiveResult = ((ArchiveProductUseCaseControl) archiveProductUseCase)
+                    .archiveInternal(archiveInput);
+                
+                if (!archiveResult.isSuccess()) {
+                    throw new DomainException(archiveResult.getErrorMessage(), archiveResult.getErrorCode());
+                }
                 
                 outputData = DeleteMotorbikeOutputData.forSuccess(maSanPham, tenSanPham);
             } catch (Exception e) {

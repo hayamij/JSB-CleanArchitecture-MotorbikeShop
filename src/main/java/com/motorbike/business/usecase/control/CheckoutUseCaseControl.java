@@ -5,14 +5,20 @@ import com.motorbike.business.usecase.input.CheckoutInputBoundary;
 
 import com.motorbike.business.dto.checkout.CheckoutInputData;
 import com.motorbike.business.dto.checkout.CheckoutOutputData;
+import com.motorbike.business.dto.validatecart.ValidateCartBeforeCheckoutInputData;
+import com.motorbike.business.dto.clearcart.ClearCartInputData;
+import com.motorbike.business.dto.createorder.CreateOrderFromCartInputData;
+import com.motorbike.business.dto.reducestock.ReduceProductStockInputData;
 import com.motorbike.business.ports.repository.CartRepository;
-import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
+import com.motorbike.business.usecase.input.ValidateCartBeforeCheckoutInputBoundary;
+import com.motorbike.business.usecase.input.ClearCartInputBoundary;
+import com.motorbike.business.usecase.input.CreateOrderFromCartInputBoundary;
+import com.motorbike.business.usecase.input.ReduceProductStockInputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.DonHang;
-import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.exceptions.ValidationException;
 import com.motorbike.domain.exceptions.DomainException;
@@ -23,18 +29,42 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
     
     private final CheckoutOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final ValidateCartBeforeCheckoutInputBoundary validateCartUseCase;
+    private final CreateOrderFromCartInputBoundary createOrderUseCase;
+    private final ReduceProductStockInputBoundary reduceStockUseCase;
+    private final ClearCartInputBoundary clearCartUseCase;
     
     public CheckoutUseCaseControl(
             CheckoutOutputBoundary outputBoundary,
             CartRepository cartRepository,
-            ProductRepository productRepository,
+            OrderRepository orderRepository,
+            ValidateCartBeforeCheckoutInputBoundary validateCartUseCase,
+            CreateOrderFromCartInputBoundary createOrderUseCase,
+            ReduceProductStockInputBoundary reduceStockUseCase,
+            ClearCartInputBoundary clearCartUseCase) {
+        this.outputBoundary = outputBoundary;
+        this.cartRepository = cartRepository;
+        this.orderRepository = orderRepository;
+        this.validateCartUseCase = validateCartUseCase;
+        this.createOrderUseCase = createOrderUseCase;
+        this.reduceStockUseCase = reduceStockUseCase;
+        this.clearCartUseCase = clearCartUseCase;
+    }
+    
+    // Constructor for tests with 4 params (outputBoundary, cartRepo, productRepo, orderRepo)
+    public CheckoutUseCaseControl(
+            CheckoutOutputBoundary outputBoundary,
+            CartRepository cartRepository,
+            com.motorbike.business.ports.repository.ProductRepository productRepository,
             OrderRepository orderRepository) {
         this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
-        this.productRepository = productRepository;
         this.orderRepository = orderRepository;
+        this.validateCartUseCase = new ValidateCartBeforeCheckoutUseCaseControl(null, cartRepository, productRepository);
+        this.createOrderUseCase = new CreateOrderFromCartUseCaseControl(null, orderRepository, cartRepository);
+        this.reduceStockUseCase = new ReduceProductStockUseCaseControl(null, productRepository);
+        this.clearCartUseCase = new ClearCartUseCaseControl(null, cartRepository);
     }
     
     public void execute(CheckoutInputData inputData) {
@@ -65,15 +95,20 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
                     throw DomainException.emptyCart();
                 }
                 
-                for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
-                    SanPham sanPham = productRepository.findById(item.getMaSanPham())
-                        .orElseThrow(() -> DomainException.productNotFound(String.valueOf(item.getMaSanPham())));
-                    
-                    if (sanPham.getSoLuongTonKho() < item.getSoLuong()) {
-                        throw DomainException.insufficientStock(
-                            sanPham.getTenSanPham(),
-                            sanPham.getSoLuongTonKho());
-                    }
+                // UC-41: Validate cart before checkout
+                ValidateCartBeforeCheckoutInputData validateInput = new ValidateCartBeforeCheckoutInputData(
+                    gioHang.getMaGioHang()
+                );
+                var validationResult = ((ValidateCartBeforeCheckoutUseCaseControl) validateCartUseCase)
+                    .validateInternal(validateInput);
+                
+                if (!validationResult.isSuccess()) {
+                    throw new DomainException(validationResult.getErrorMessage(), validationResult.getErrorCode());
+                }
+                
+                if (!validationResult.isValid()) {
+                    String errorMsg = "Giỏ hàng không hợp lệ: " + String.join("; ", validationResult.getReasons());
+                    throw new DomainException(errorMsg, "INVALID_CART_STATE");
                 }
             } catch (Exception e) {
                 errorException = e;
@@ -91,6 +126,23 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
                     }
                 }
                 
+                // UC-44: Create order from cart
+                CreateOrderFromCartInputData createOrderInput = new CreateOrderFromCartInputData(
+                    gioHang,
+                    inputData.getReceiverName(),
+                    inputData.getPhoneNumber(),
+                    inputData.getShippingAddress(),
+                    inputData.getNote(),
+                    phuongThucThanhToan
+                );
+                var createOrderResult = ((CreateOrderFromCartUseCaseControl) createOrderUseCase)
+                    .createOrderInternal(createOrderInput);
+                
+                if (!createOrderResult.isSuccess()) {
+                    throw new DomainException(createOrderResult.getErrorMessage(), createOrderResult.getErrorCode());
+                }
+                
+                // Get the created order domain object
                 DonHang donHang = DonHang.fromGioHang(
                     gioHang,
                     inputData.getReceiverName(),
@@ -100,16 +152,26 @@ public class CheckoutUseCaseControl implements CheckoutInputBoundary {
                     phuongThucThanhToan
                 );
                 
-                for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
-                    SanPham sanPham = productRepository.findById(item.getMaSanPham()).get();
-                    sanPham.giamTonKho(item.getSoLuong());
-                    productRepository.save(sanPham);
-                }
-                
+                // Save order to get ID
                 DonHang savedOrder = orderRepository.save(donHang);
                 
-                gioHang.xoaToanBoGioHang();
-                cartRepository.save(gioHang);
+                // UC-45: Reduce product stock for all items
+                for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
+                    ReduceProductStockInputData reduceInput = new ReduceProductStockInputData(
+                        item.getMaSanPham(),
+                        item.getSoLuong()
+                    );
+                    var reduceResult = ((ReduceProductStockUseCaseControl) reduceStockUseCase)
+                        .reduceStockInternal(reduceInput);
+                    
+                    if (!reduceResult.isSuccess()) {
+                        throw new DomainException(reduceResult.getErrorMessage(), reduceResult.getErrorCode());
+                    }
+                }
+                
+                // UC-43: Clear cart after successful order creation
+                ClearCartInputData clearInput = new ClearCartInputData(gioHang.getMaGioHang());
+                ((ClearCartUseCaseControl) clearCartUseCase).clearInternal(clearInput);
                 
                 List<CheckoutOutputData.OrderItemData> orderItems = savedOrder.getDanhSachSanPham()
                     .stream()

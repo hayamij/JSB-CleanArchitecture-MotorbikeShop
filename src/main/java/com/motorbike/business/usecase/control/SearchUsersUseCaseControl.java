@@ -6,6 +6,12 @@ import com.motorbike.business.dto.user.SearchUsersOutputData.UserItem;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.input.SearchUsersInputBoundary;
 import com.motorbike.business.usecase.output.SearchUsersOutputBoundary;
+import com.motorbike.business.dto.buildsearchcriteria.BuildSearchCriteriaInputData;
+import com.motorbike.business.dto.applysearchfilters.ApplySearchFiltersInputData;
+import com.motorbike.business.dto.sortsearchresults.SortSearchResultsInputData;
+import com.motorbike.business.usecase.input.BuildSearchCriteriaInputBoundary;
+import com.motorbike.business.usecase.input.ApplySearchFiltersInputBoundary;
+import com.motorbike.business.usecase.input.SortSearchResultsInputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 
 import java.util.List;
@@ -15,13 +21,34 @@ public class SearchUsersUseCaseControl implements SearchUsersInputBoundary {
 
     private final SearchUsersOutputBoundary outputBoundary;
     private final UserRepository userRepository;
+    private final BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase;
+    private final ApplySearchFiltersInputBoundary applySearchFiltersUseCase;
+    private final SortSearchResultsInputBoundary sortSearchResultsUseCase;
 
+    public SearchUsersUseCaseControl(
+            SearchUsersOutputBoundary outputBoundary,
+            UserRepository userRepository,
+            BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase,
+            ApplySearchFiltersInputBoundary applySearchFiltersUseCase,
+            SortSearchResultsInputBoundary sortSearchResultsUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.userRepository = userRepository;
+        this.buildSearchCriteriaUseCase = buildSearchCriteriaUseCase;
+        this.applySearchFiltersUseCase = applySearchFiltersUseCase;
+        this.sortSearchResultsUseCase = sortSearchResultsUseCase;
+    }
+
+    // Constructor with 2 parameters (for backward compatibility)
     public SearchUsersUseCaseControl(
             SearchUsersOutputBoundary outputBoundary,
             UserRepository userRepository
     ) {
         this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
+        this.buildSearchCriteriaUseCase = new BuildSearchCriteriaUseCaseControl(null);
+        this.applySearchFiltersUseCase = new ApplySearchFiltersUseCaseControl(null);
+        this.sortSearchResultsUseCase = new SortSearchResultsUseCaseControl(null);
     }
 
     @Override

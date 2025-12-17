@@ -2,8 +2,10 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.accessory.UpdateAccessoryInputData;
 import com.motorbike.business.dto.accessory.UpdateAccessoryOutputData;
+import com.motorbike.business.dto.validateproductdata.ValidateProductDataInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.UpdateAccessoryInputBoundary;
+import com.motorbike.business.usecase.input.ValidateProductDataInputBoundary;
 import com.motorbike.business.usecase.output.UpdateAccessoryOutputBoundary;
 import com.motorbike.domain.entities.PhuKienXeMay;
 import com.motorbike.domain.entities.SanPham;
@@ -13,13 +15,26 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
 
     private final UpdateAccessoryOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final ValidateProductDataInputBoundary validateProductDataUseCase;
 
+    public UpdateAccessoryUseCaseControl(
+            UpdateAccessoryOutputBoundary outputBoundary,
+            ProductRepository productRepository,
+            ValidateProductDataInputBoundary validateProductDataUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.validateProductDataUseCase = validateProductDataUseCase;
+    }
+
+    // Constructor with 2 parameters (for backward compatibility)
     public UpdateAccessoryUseCaseControl(
             UpdateAccessoryOutputBoundary outputBoundary,
             ProductRepository productRepository
     ) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.validateProductDataUseCase = new ValidateProductDataUseCaseControl(null);
     }
 
     @Override
@@ -28,6 +43,7 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
         Exception errorException = null;
         PhuKienXeMay phuKien = null;
 
+        // Step 1: Basic validation
         try {
             if (inputData == null) {
                 throw ValidationException.invalidInput();
@@ -36,16 +52,39 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
             if (inputData.getMaSanPham() == null) {
                 throw ValidationException.nullProductId();
             }
-            
-            // Validation
-            SanPham.validateTenSanPham(inputData.getTenSanPham());
-            SanPham.validateGia(inputData.getGia());
-            SanPham.validateSoLuongTonKho(inputData.getSoLuongTonKho());
-            
         } catch (Exception e) {
             errorException = e;
         }
+        
+        // Step 2: UC-51 - Validate product data
+        if (errorException == null) {
+            try {
+                ValidateProductDataInputData validateInput = new ValidateProductDataInputData(
+                    inputData.getTenSanPham(),
+                    null,
+                    inputData.getGia(),
+                    inputData.getSoLuongTonKho(),
+                    "phu_tung"
+                );
+                var validateResult = ((ValidateProductDataUseCaseControl) validateProductDataUseCase)
+                    .validateInternal(validateInput);
+                
+                if (!validateResult.isSuccess()) {
+                    throw new DomainException(validateResult.getErrorMessage(), validateResult.getErrorCode());
+                }
+                
+                if (!validateResult.isValid()) {
+                    throw new ValidationException(
+                        String.join("; ", validateResult.getErrors()),
+                        "INVALID_PRODUCT_DATA"
+                    );
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
 
+        // Step 3: Check if accessory exists and update
         if (errorException == null) {
             try {
                 SanPham sanPham = productRepository.findById(inputData.getMaSanPham())
@@ -85,6 +124,7 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
             }
         }
 
+        // Step 4: Handle error
         if (errorException != null) {
             String errorCode = "SYSTEM_ERROR";
             String message = errorException.getMessage();
@@ -100,6 +140,7 @@ public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBounda
             outputData = UpdateAccessoryOutputData.forError(errorCode, message);
         }
 
+        // Step 5: Present result
         outputBoundary.present(outputData);
     }
 }

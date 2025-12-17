@@ -73,6 +73,25 @@ public class GetOrderDetailOutputData {
             this.paymentMethod = paymentMethod;
             this.items = items;
         }
+        
+        // Constructor with String orderDate (for tests)
+        public OrderDetailInfo(Long orderId, Long customerId, String customerName,
+                              String customerPhone, String shippingAddress, String orderStatus,
+                              String orderStatusCode, BigDecimal totalAmount, String orderDateStr,
+                              String note, String paymentMethod, List<OrderItemInfo> items) {
+            this.orderId = orderId;
+            this.customerId = customerId;
+            this.customerName = customerName;
+            this.customerPhone = customerPhone;
+            this.shippingAddress = shippingAddress;
+            this.orderStatus = orderStatus;
+            this.orderStatusCode = orderStatusCode;
+            this.totalAmount = totalAmount;
+            this.orderDate = LocalDateTime.now(); // Parse orderDateStr if needed
+            this.note = note;
+            this.paymentMethod = paymentMethod;
+            this.items = items;
+        }
 
         // Getters
         public Long getOrderId() { return orderId; }

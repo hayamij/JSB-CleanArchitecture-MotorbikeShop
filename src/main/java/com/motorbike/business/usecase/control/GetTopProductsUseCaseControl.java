@@ -21,6 +21,19 @@ public class GetTopProductsUseCaseControl {
         this.outputBoundary = outputBoundary;
         this.orderRepository = orderRepository;
     }
+
+    public GetTopProductsUseCaseControl(OrderRepository orderRepository,
+                                        GetTopProductsOutputBoundary outputBoundary) {
+        this.outputBoundary = outputBoundary;
+        this.orderRepository = orderRepository;
+    }
+
+    // Constructor with ChiTietDonHangRepository (for backward compatibility)
+    public GetTopProductsUseCaseControl(com.motorbike.business.ports.ChiTietDonHangRepository chiTietDonHangRepository,
+                                        GetTopProductsOutputBoundary outputBoundary) {
+        this.outputBoundary = outputBoundary;
+        this.orderRepository = (OrderRepository) chiTietDonHangRepository;
+    }
     
     public void execute(GetTopProductsInputData inputData) {
         GetTopProductsOutputData outputData = null;

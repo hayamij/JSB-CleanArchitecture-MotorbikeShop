@@ -6,6 +6,10 @@ import com.motorbike.business.ports.exporter.ExcelExporter;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
 import com.motorbike.business.usecase.input.ExportMotorbikesInputBoundary;
 import com.motorbike.business.usecase.output.ExportMotorbikesOutputBoundary;
+import com.motorbike.business.dto.generateexcelfile.GenerateExcelFileInputData;
+import com.motorbike.business.dto.formatdataforexport.FormatDataForExportInputData;
+import com.motorbike.business.usecase.input.GenerateExcelFileInputBoundary;
+import com.motorbike.business.usecase.input.FormatDataForExportInputBoundary;
 import com.motorbike.domain.entities.XeMay;
 
 import java.io.ByteArrayOutputStream;
@@ -28,15 +32,48 @@ public class ExportMotorbikesUseCaseControl implements ExportMotorbikesInputBoun
     private final ExportMotorbikesOutputBoundary outputBoundary;
     private final MotorbikeRepository motorbikeRepository;
     private final ExcelExporter excelExporter;
+    private final FormatDataForExportInputBoundary formatDataForExportUseCase;
+    private final GenerateExcelFileInputBoundary generateExcelFileUseCase;
     
     public ExportMotorbikesUseCaseControl(
             ExportMotorbikesOutputBoundary outputBoundary,
             MotorbikeRepository motorbikeRepository,
-            ExcelExporter excelExporter
+            ExcelExporter excelExporter,
+            FormatDataForExportInputBoundary formatDataForExportUseCase,
+            GenerateExcelFileInputBoundary generateExcelFileUseCase
     ) {
         this.outputBoundary = outputBoundary;
         this.motorbikeRepository = motorbikeRepository;
         this.excelExporter = excelExporter;
+        this.formatDataForExportUseCase = formatDataForExportUseCase;
+        this.generateExcelFileUseCase = generateExcelFileUseCase;
+    }
+
+    public ExportMotorbikesUseCaseControl(
+            ExportMotorbikesOutputBoundary outputBoundary,
+            MotorbikeRepository motorbikeRepository,
+            FormatDataForExportInputBoundary formatDataForExportUseCase,
+            GenerateExcelFileInputBoundary generateExcelFileUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.motorbikeRepository = motorbikeRepository;
+        this.excelExporter = null;
+        this.formatDataForExportUseCase = formatDataForExportUseCase;
+        this.generateExcelFileUseCase = generateExcelFileUseCase;
+    }
+
+    // Constructor with SanPhamRepository and 4 parameters (for backward compatibility)
+    public ExportMotorbikesUseCaseControl(
+            com.motorbike.business.ports.SanPhamRepository sanPhamRepository,
+            GenerateExcelFileInputBoundary generateExcelFileUseCase,
+            FormatDataForExportInputBoundary formatDataForExportUseCase,
+            ExportMotorbikesOutputBoundary outputBoundary
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.motorbikeRepository = (MotorbikeRepository) sanPhamRepository;
+        this.excelExporter = null;
+        this.formatDataForExportUseCase = formatDataForExportUseCase;
+        this.generateExcelFileUseCase = generateExcelFileUseCase;
     }
     
     @Override

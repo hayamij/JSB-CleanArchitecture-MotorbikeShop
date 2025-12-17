@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.motorbike.adapters.presenters.CreateUserPresenter;
 import com.motorbike.adapters.viewmodels.CreateUserViewModel;
-import com.motorbike.business.dto.user.CreateUserInputData;
+import com.motorbike.business.dto.user.AddUserInputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.output.CreateUserOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
@@ -19,7 +19,7 @@ public class CreateUserUseCaseControlTest {
 
 	@Test
 	public void testExecute_ValidUser_Success() {
-		CreateUserInputData inputData = new CreateUserInputData(
+		AddUserInputData inputData = new AddUserInputData(
 			"Nguyễn Văn Test",
 			"newuser@test.com",
 			"newuser",
@@ -43,7 +43,7 @@ public class CreateUserUseCaseControlTest {
 
 	@Test
 	public void testExecute_DuplicateEmail() {
-		CreateUserInputData inputData = new CreateUserInputData(
+		AddUserInputData inputData = new AddUserInputData(
 			"Trần Văn B",
 			"existing@test.com",
 			"user",
@@ -154,6 +154,11 @@ public class CreateUserUseCaseControlTest {
 		@Override
 		public java.util.List<TaiKhoan> searchUsers(String keyword) {
 			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+			return Optional.empty();
 		}
 	}
 }

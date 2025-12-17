@@ -435,9 +435,15 @@ public class RegisterUseCaseControlTest {
 		@Override
 		public java.util.List<TaiKhoan> searchUsers(String keyword) {
 			return new java.util.ArrayList<>();
-		}
 	}
 	
+	@Override
+	public Optional<com.motorbike.domain.entities.TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+		return Optional.empty();
+	}
+	}
+
+
 	private static class MockCartRepository implements CartRepository {
 		@Override
 		public Optional<GioHang> findByUserId(Long userId) {
@@ -464,6 +470,19 @@ public class RegisterUseCaseControlTest {
 		@Override
 		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
 			return 0;
+		}
+
+		@Override
+		public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+			return Optional.empty();
+		}
+
+		@Override
+		public void deleteAllByUserId(Long userId) {
+		}
+
+		@Override
+		public void deleteById(Long cartId) {
 		}
 	}
 }

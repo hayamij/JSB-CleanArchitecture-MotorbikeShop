@@ -115,6 +115,11 @@ public class GetAllUsersUseCaseControlTest {
 		public List<TaiKhoan> searchUsers(String keyword) {
 			return new ArrayList<>();
 		}
+
+		@Override
+		public Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+			return Optional.empty();
+		}
 	}
 
 	private static class MockUserRepositoryEmpty implements UserRepository {
@@ -174,6 +179,11 @@ public class GetAllUsersUseCaseControlTest {
 		@Override
 		public List<TaiKhoan> searchUsers(String keyword) {
 			return new ArrayList<>();
+		}
+
+		@Override
+		public Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+			return Optional.empty();
 		}
 	}
 }

@@ -2,8 +2,10 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
 import com.motorbike.business.dto.motorbike.UpdateMotorbikeOutputData;
+import com.motorbike.business.dto.validateproductdata.ValidateProductDataInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.UpdateMotorbikeInputBoundary;
+import com.motorbike.business.usecase.input.ValidateProductDataInputBoundary;
 import com.motorbike.business.usecase.output.UpdateMotorbikeOutputBoundary;
 import com.motorbike.domain.entities.XeMay;
 import com.motorbike.domain.entities.SanPham;
@@ -15,11 +17,24 @@ public class UpdateMotorbikeUseCaseControl implements UpdateMotorbikeInputBounda
     
     private final UpdateMotorbikeOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final ValidateProductDataInputBoundary validateProductDataUseCase;
     
     public UpdateMotorbikeUseCaseControl(UpdateMotorbikeOutputBoundary outputBoundary,
-                                        ProductRepository productRepository) {
+                                        ProductRepository productRepository,
+                                        ValidateProductDataInputBoundary validateProductDataUseCase) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.validateProductDataUseCase = validateProductDataUseCase;
+    }
+
+    // Constructor with 2 parameters (for backward compatibility)
+    public UpdateMotorbikeUseCaseControl(
+            UpdateMotorbikeOutputBoundary outputBoundary,
+            ProductRepository productRepository
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.validateProductDataUseCase = new ValidateProductDataUseCaseControl(null);
     }
     
     @Override
@@ -28,7 +43,7 @@ public class UpdateMotorbikeUseCaseControl implements UpdateMotorbikeInputBounda
         Exception errorException = null;
         XeMay xeMay = null;
         
-        // Step 1: Validation
+        // Step 1: Basic validation
         try {
             if (inputData == null) {
                 throw ValidationException.invalidInput();
@@ -37,18 +52,39 @@ public class UpdateMotorbikeUseCaseControl implements UpdateMotorbikeInputBounda
             if (inputData.getMaSanPham() == null) {
                 throw ValidationException.invalidProductId();
             }
-            
-            SanPham.validateTenSanPham(inputData.getTenSanPham());
-            SanPham.validateGia(inputData.getGia());
-            SanPham.validateSoLuongTonKho(inputData.getSoLuongTonKho());
-            
-            validateMotorbikeFields(inputData);
-            
         } catch (Exception e) {
             errorException = e;
         }
         
-        // Step 2: Check if motorbike exists
+        // Step 2: UC-51 - Validate product data
+        if (errorException == null) {
+            try {
+                ValidateProductDataInputData validateInput = new ValidateProductDataInputData(
+                    inputData.getTenSanPham(),
+                    null,
+                    inputData.getGia(),
+                    inputData.getSoLuongTonKho(),
+                    "xe_may"
+                );
+                var validateResult = ((ValidateProductDataUseCaseControl) validateProductDataUseCase)
+                    .validateInternal(validateInput);
+                
+                if (!validateResult.isSuccess()) {
+                    throw new DomainException(validateResult.getErrorMessage(), validateResult.getErrorCode());
+                }
+                
+                if (!validateResult.isValid()) {
+                    throw new ValidationException(
+                        String.join("; ", validateResult.getErrors()),
+                        "INVALID_PRODUCT_DATA"
+                    );
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        // Step 3: Check if motorbike exists
         if (errorException == null) {
             try {
                 SanPham sanPham = productRepository.findById(inputData.getMaSanPham())
@@ -64,7 +100,7 @@ public class UpdateMotorbikeUseCaseControl implements UpdateMotorbikeInputBounda
             }
         }
         
-        // Step 3: Update motorbike entity
+        // Step 4: Update motorbike entity
         if (errorException == null && xeMay != null) {
             try {
                 xeMay.setTenSanPham(inputData.getTenSanPham());

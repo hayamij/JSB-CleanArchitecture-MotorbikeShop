@@ -1,5 +1,7 @@
 package com.motorbike.business.dto.user;
 
+import com.motorbike.domain.entities.VaiTro;
+
 public class CreateUserInputData {
     private final String hoTen;
     private final String email;
@@ -18,6 +20,23 @@ public class CreateUserInputData {
         this.soDienThoai = soDienThoai;
         this.diaChi = diaChi;
         this.vaiTro = vaiTro;
+    }
+
+    public CreateUserInputData(String hoTen, String email, String tenDangNhap, String matKhau,
+                              String soDienThoai, String diaChi, VaiTro vaiTro) {
+        this.hoTen = hoTen;
+        this.email = email;
+        this.tenDangNhap = tenDangNhap;
+        this.matKhau = matKhau;
+        this.soDienThoai = soDienThoai;
+        this.diaChi = diaChi;
+        this.vaiTro = vaiTro != null ? vaiTro.name() : null;
+    }
+    
+    // Constructor without diaChi (5 String parameters + VaiTro)
+    public CreateUserInputData(String hoTen, String email, String tenDangNhap, 
+                              String matKhau, String soDienThoai, VaiTro vaiTro) {
+        this(hoTen, email, tenDangNhap, matKhau, soDienThoai, null, vaiTro);
     }
 
     public String getHoTen() {return hoTen;}

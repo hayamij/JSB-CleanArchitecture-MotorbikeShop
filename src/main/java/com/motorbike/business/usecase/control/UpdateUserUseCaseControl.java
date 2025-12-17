@@ -5,6 +5,8 @@ import com.motorbike.business.dto.user.UpdateUserOutputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.input.UpdateUserInputBoundary;
 import com.motorbike.business.usecase.output.UpdateUserOutputBoundary;
+import com.motorbike.business.dto.checkuserduplication.CheckUserDuplicationInputData;
+import com.motorbike.business.usecase.input.CheckUserDuplicationInputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.VaiTro;
 import com.motorbike.domain.exceptions.DomainException;
@@ -15,11 +17,24 @@ public class UpdateUserUseCaseControl implements UpdateUserInputBoundary {
     
     private final UpdateUserOutputBoundary outputBoundary;
     private final UserRepository userRepository;
+    private final CheckUserDuplicationInputBoundary checkUserDuplicationUseCase;
     
     public UpdateUserUseCaseControl(UpdateUserOutputBoundary outputBoundary,
-                                   UserRepository userRepository) {
+                                   UserRepository userRepository,
+                                   CheckUserDuplicationInputBoundary checkUserDuplicationUseCase) {
         this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
+        this.checkUserDuplicationUseCase = checkUserDuplicationUseCase;
+    }
+
+    // Constructor with 2 parameters (for backward compatibility)
+    public UpdateUserUseCaseControl(
+            UpdateUserOutputBoundary outputBoundary,
+            UserRepository userRepository
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.userRepository = userRepository;
+        this.checkUserDuplicationUseCase = new CheckUserDuplicationUseCaseControl(null, userRepository);
     }
     
     @Override
@@ -64,14 +79,35 @@ public class UpdateUserUseCaseControl implements UpdateUserInputBoundary {
             }
         }
         
-        // Step 3: Update user entity
+        // Step 3: UC-58 - Check duplication for changed fields
         if (errorException == null && taiKhoan != null) {
             try {
-                // Check if username is changed and already exists (only if provided)
-                if (inputData.getTenDangNhap() != null && !taiKhoan.getTenDangNhap().equals(inputData.getTenDangNhap())) {
-                    if (userRepository.existsByTenDangNhap(inputData.getTenDangNhap())) {
-                        throw DomainException.usernameAlreadyExists(inputData.getTenDangNhap());
+                // Only check duplication if email or username is being changed
+                String emailToCheck = (inputData.getEmail() != null && !taiKhoan.getEmail().equals(inputData.getEmail())) 
+                    ? inputData.getEmail() : null;
+                String usernameToCheck = (inputData.getTenDangNhap() != null && !taiKhoan.getTenDangNhap().equals(inputData.getTenDangNhap())) 
+                    ? inputData.getTenDangNhap() : null;
+                
+                if (emailToCheck != null || usernameToCheck != null) {
+                    CheckUserDuplicationInputData checkDupInput = new CheckUserDuplicationInputData(
+                        emailToCheck,
+                        usernameToCheck,
+                        inputData.getMaTaiKhoan()  // Exclude current user from duplication check
+                    );
+                    var dupResult = ((CheckUserDuplicationUseCaseControl) checkUserDuplicationUseCase)
+                        .checkInternal(checkDupInput);
+                    
+                    if (dupResult.isDuplicate()) {
+                        if ("email".equals(dupResult.getDuplicatedField())) {
+                            throw DomainException.emailAlreadyExists(inputData.getEmail());
+                        } else if ("username".equals(dupResult.getDuplicatedField())) {
+                            throw DomainException.usernameAlreadyExists(inputData.getTenDangNhap());
+                        }
                     }
+                }
+                
+                // Update username (only if provided and passed duplication check)
+                if (inputData.getTenDangNhap() != null && !taiKhoan.getTenDangNhap().equals(inputData.getTenDangNhap())) {
                     taiKhoan.setTenDangNhap(inputData.getTenDangNhap());
                 }
                 
@@ -80,11 +116,8 @@ public class UpdateUserUseCaseControl implements UpdateUserInputBoundary {
                     taiKhoan.setHoTen(inputData.getHoTen());
                 }
                 
-                // Check if email is changed and already exists (only if provided)
+                // Update email (only if provided and passed duplication check)
                 if (inputData.getEmail() != null && !taiKhoan.getEmail().equals(inputData.getEmail())) {
-                    if (userRepository.existsByEmail(inputData.getEmail())) {
-                        throw DomainException.emailAlreadyExists(inputData.getEmail());
-                    }
                     taiKhoan.setEmail(inputData.getEmail());
                 }
                 

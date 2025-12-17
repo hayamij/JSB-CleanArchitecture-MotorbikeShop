@@ -419,6 +419,19 @@ public class CheckoutUseCaseControlTest {
 		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
 			return 0;
 		}
+		
+		@Override
+		public void deleteAllByUserId(Long userId) {
+		}
+		
+		@Override
+		public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public void deleteById(Long cartId) {
+		}
 	}
 	
 	private static class MockProductRepository implements ProductRepository {
@@ -480,6 +493,16 @@ public class CheckoutUseCaseControlTest {
 		@Override
 		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
 			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
 		}
 	}
 	

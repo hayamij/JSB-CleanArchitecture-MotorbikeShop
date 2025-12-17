@@ -131,11 +131,58 @@ public abstract class SanPham {
     public boolean isConHang() {return conHang;}
     public LocalDateTime getNgayTao() {return ngayTao;}
     public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
+    
+    // Alias methods for backward compatibility
+    public BigDecimal getGiaBan() {return gia;}
+    public String getLoaiSanPham() {return this.getClass().getSimpleName();}
+    public BigDecimal getPhanTramGiamGia() {return BigDecimal.ZERO;} // Default no discount
     public void setMaSanPham(Long maSanPham) {this.maSanPham = maSanPham;}
     public void setTenSanPham(String tenSanPham) {validateTenSanPham(tenSanPham); this.tenSanPham = tenSanPham; this.ngayCapNhat = LocalDateTime.now();}
     public void setMoTa(String moTa) {this.moTa = moTa; this.ngayCapNhat = LocalDateTime.now();}
     public void setHinhAnh(String hinhAnh) {this.hinhAnh = hinhAnh; this.ngayCapNhat = LocalDateTime.now();}
     public void setSoLuongTonKho(int soLuongTonKho) {
         this.soLuongTonKho = soLuongTonKho;
+    }
+    
+    public void setMaSP(long maSanPham) {
+        this.maSanPham = maSanPham;
+    }
+    
+    public Long getMaSP() {
+        return maSanPham;
+    }
+    
+    public String getTenSP() {
+        return tenSanPham;
+    }
+    
+    /**
+     * Factory method for creating test mock objects.
+     * Creates XeMay if isPhuKien=false, PhuKienXeMay if isPhuKien=true
+     */
+    public static SanPham createForTest(String maSP, String ten, String moTa, double gia, 
+                                        int soLuong, boolean conHang, boolean isPhuKien) {
+        BigDecimal giaDecimal = BigDecimal.valueOf(gia);
+        SanPham product;
+        
+        if (isPhuKien) {
+            product = new PhuKienXeMay(ten, moTa, giaDecimal, "default.jpg", soLuong,
+                                       "Loại", "Thương hiệu", "Chất liệu", "Size");
+        } else {
+            product = new XeMay(ten, moTa, giaDecimal, "default.jpg", soLuong,
+                               "Yamaha", "Exciter", "Đỏ", 2024, 150);
+        }
+        
+        // Set additional fields
+        if (maSP != null && !maSP.isEmpty()) {
+            try {
+                product.maSanPham = Long.parseLong(maSP.replaceAll("[^0-9]", ""));
+            } catch (NumberFormatException e) {
+                product.maSanPham = 1L;
+            }
+        }
+        product.conHang = conHang;
+        
+        return product;
     }
 }

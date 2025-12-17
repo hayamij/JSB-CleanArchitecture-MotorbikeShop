@@ -130,4 +130,17 @@ public class DomainException extends RuntimeException {
     public static DomainException userNotFound(Long userId) {
         return new DomainException("Không tìm thấy tài khoản với mã: " + userId, "USER_NOT_FOUND");
     }
+    
+    public static DomainException productAlreadyExists(String productName) {
+        return new DomainException("Sản phẩm đã tồn tại: " + productName, "PRODUCT_EXISTS");
+    }
+    
+    // Overload methods for compatibility
+    public static DomainException userNotFound() {
+        return new DomainException("Không tìm thấy tài khoản", "USER_NOT_FOUND");
+    }
+    
+    public static DomainException notFound(String entity, String id) {
+        return new DomainException(entity + " không tìm thấy: " + id, "NOT_FOUND");
+    }
 }

@@ -4,6 +4,10 @@ import com.motorbike.business.dto.listallorders.ListAllOrdersInputData;
 import com.motorbike.business.dto.listallorders.ListAllOrdersOutputData;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.output.ListAllOrdersOutputBoundary;
+import com.motorbike.business.dto.order.CalculateOrderTotalsInputData;
+import com.motorbike.business.dto.order.FormatOrderForDisplayInputData;
+import com.motorbike.business.usecase.input.CalculateOrderTotalsInputBoundary;
+import com.motorbike.business.usecase.input.FormatOrderForDisplayInputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.exceptions.ValidationException;
 import com.motorbike.business.usecase.input.ListAllOrdersInputBoundary;
@@ -17,12 +21,27 @@ public class ListAllOrdersUseCaseControl implements ListAllOrdersInputBoundary {
     
     private final ListAllOrdersOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;
+    private final CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase;
+    private final FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase;
+
+    public ListAllOrdersUseCaseControl(
+            ListAllOrdersOutputBoundary outputBoundary,
+            OrderRepository orderRepository,
+            CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase,
+            FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase) {
+        this.outputBoundary = outputBoundary;
+        this.orderRepository = orderRepository;
+        this.calculateOrderTotalsUseCase = calculateOrderTotalsUseCase;
+        this.formatOrderForDisplayUseCase = formatOrderForDisplayUseCase;
+    }
 
     public ListAllOrdersUseCaseControl(
             ListAllOrdersOutputBoundary outputBoundary,
             OrderRepository orderRepository) {
         this.outputBoundary = outputBoundary;
         this.orderRepository = orderRepository;
+        this.calculateOrderTotalsUseCase = null;
+        this.formatOrderForDisplayUseCase = null;
     }
 
     public void execute(ListAllOrdersInputData inputData) {

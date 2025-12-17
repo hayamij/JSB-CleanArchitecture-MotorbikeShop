@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.motorbike.adapters.presenters.CreateMotorbikePresenter;
 import com.motorbike.adapters.viewmodels.CreateMotorbikeViewModel;
-import com.motorbike.business.dto.motorbike.CreateMotorbikeInputData;
+import com.motorbike.business.dto.motorbike.AddMotorbikeInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.CreateMotorbikeOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
@@ -19,7 +19,7 @@ public class CreateMotorbikeUseCaseControlTest {
 
 	@Test
 	public void testExecute_ValidMotorbike_Success() {
-		CreateMotorbikeInputData inputData = new CreateMotorbikeInputData(
+		AddMotorbikeInputData inputData = new AddMotorbikeInputData(
 			"Honda Wave Alpha",
 			"Xe số tiết kiệm nhiên liệu",
 			new BigDecimal("30000000"),
@@ -61,7 +61,7 @@ public class CreateMotorbikeUseCaseControlTest {
 
 	@Test
 	public void testExecute_EmptyProductName() {
-		CreateMotorbikeInputData inputData = new CreateMotorbikeInputData(
+		AddMotorbikeInputData inputData = new AddMotorbikeInputData(
 			"",
 			"Mô tả",
 			new BigDecimal("30000000"),
@@ -88,7 +88,7 @@ public class CreateMotorbikeUseCaseControlTest {
 
 	@Test
 	public void testExecute_NegativePrice() {
-		CreateMotorbikeInputData inputData = new CreateMotorbikeInputData(
+		AddMotorbikeInputData inputData = new AddMotorbikeInputData(
 			"Honda Wave",
 			"Mô tả",
 			new BigDecimal("-1000"),
@@ -115,7 +115,7 @@ public class CreateMotorbikeUseCaseControlTest {
 
 	@Test
 	public void testExecute_NegativeStock() {
-		CreateMotorbikeInputData inputData = new CreateMotorbikeInputData(
+		AddMotorbikeInputData inputData = new AddMotorbikeInputData(
 			"Honda Wave",
 			"Mô tả",
 			new BigDecimal("30000000"),
@@ -188,6 +188,16 @@ public class CreateMotorbikeUseCaseControlTest {
 		@Override
 		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
 			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
 		}
 	}
 }

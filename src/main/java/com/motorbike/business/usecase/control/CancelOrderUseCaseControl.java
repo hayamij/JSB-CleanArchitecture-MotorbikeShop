@@ -6,12 +6,16 @@ import java.math.BigDecimal;
 
 import com.motorbike.business.dto.cancelorder.CancelOrderInputData;
 import com.motorbike.business.dto.cancelorder.CancelOrderOutputData;
+import com.motorbike.business.dto.validateordercancellation.ValidateOrderCancellationInputData;
+import com.motorbike.business.dto.restorestock.RestoreProductStockInputData;
+import com.motorbike.business.dto.updateorderstatus.UpdateOrderStatusInputData;
 import com.motorbike.business.ports.repository.OrderRepository;
-import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.CancelOrderOutputBoundary;
+import com.motorbike.business.usecase.input.ValidateOrderCancellationInputBoundary;
+import com.motorbike.business.usecase.input.RestoreProductStockInputBoundary;
+import com.motorbike.business.usecase.input.UpdateOrderStatusInputBoundary;
 import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.entities.DonHang;
-import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 import com.motorbike.domain.exceptions.DomainException;
 import com.motorbike.domain.exceptions.ValidationException;
@@ -20,15 +24,33 @@ public class CancelOrderUseCaseControl implements CancelOrderInputBoundary {
     
     private final CancelOrderOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
+    private final ValidateOrderCancellationInputBoundary validateCancellationUseCase;
+    private final RestoreProductStockInputBoundary restoreStockUseCase;
+    private final UpdateOrderStatusInputBoundary updateStatusUseCase;
     
     public CancelOrderUseCaseControl(
             CancelOrderOutputBoundary outputBoundary,
             OrderRepository orderRepository,
-            ProductRepository productRepository) {
+            ValidateOrderCancellationInputBoundary validateCancellationUseCase,
+            RestoreProductStockInputBoundary restoreStockUseCase,
+            UpdateOrderStatusInputBoundary updateStatusUseCase) {
         this.outputBoundary = outputBoundary;
         this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
+        this.validateCancellationUseCase = validateCancellationUseCase;
+        this.restoreStockUseCase = restoreStockUseCase;
+        this.updateStatusUseCase = updateStatusUseCase;
+    }
+    
+    // Constructor for tests with 3 params (outputBoundary, orderRepo, productRepo)
+    public CancelOrderUseCaseControl(
+            CancelOrderOutputBoundary outputBoundary,
+            OrderRepository orderRepository,
+            com.motorbike.business.ports.repository.ProductRepository productRepository) {
+        this.outputBoundary = outputBoundary;
+        this.orderRepository = orderRepository;
+        this.validateCancellationUseCase = new ValidateOrderCancellationUseCaseControl(null);
+        this.restoreStockUseCase = new RestoreProductStockUseCaseControl(null, productRepository);
+        this.updateStatusUseCase = new UpdateOrderStatusUseCaseControl(null, orderRepository);
     }
     
     @Override
@@ -63,11 +85,20 @@ public class CancelOrderUseCaseControl implements CancelOrderInputBoundary {
                     );
                 }
                 
-                if (donHang.getTrangThai() != TrangThaiDonHang.CHO_XAC_NHAN) {
-                    throw DomainException.cannotCancelOrder(
-                        "Chỉ có thể hủy đơn hàng ở trạng thái 'Chờ xác nhận'. " +
-                        "Trạng thái hiện tại: " + donHang.getTrangThai().getMoTa()
-                    );
+                // UC-47: Validate order cancellation
+                ValidateOrderCancellationInputData validateInput = new ValidateOrderCancellationInputData(
+                    donHang.getMaDonHang(),
+                    donHang.getTrangThai()
+                );
+                var validationResult = ((ValidateOrderCancellationUseCaseControl) validateCancellationUseCase)
+                    .validateInternal(validateInput);
+                
+                if (!validationResult.isSuccess()) {
+                    throw new DomainException(validationResult.getErrorMessage(), validationResult.getErrorCode());
+                }
+                
+                if (!validationResult.canCancel()) {
+                    throw DomainException.cannotCancelOrder(validationResult.getReason());
                 }
             } catch (Exception e) {
                 errorException = e;
@@ -77,20 +108,39 @@ public class CancelOrderUseCaseControl implements CancelOrderInputBoundary {
         if (errorException == null && donHang != null) {
             try {
                 BigDecimal totalRefund = BigDecimal.ZERO;
+                
+                // UC-46: Restore product stock for all items
                 for (ChiTietDonHang chiTiet : donHang.getDanhSachSanPham()) {
-                    SanPham sanPham = productRepository.findById(chiTiet.getMaSanPham())
-                        .orElseThrow(() -> DomainException.productNotFound(
-                            "Sản phẩm không tồn tại: " + chiTiet.getMaSanPham()
-                        ));
+                    RestoreProductStockInputData restoreInput = new RestoreProductStockInputData(
+                        chiTiet.getMaSanPham(),
+                        chiTiet.getSoLuong()
+                    );
+                    var restoreResult = ((RestoreProductStockUseCaseControl) restoreStockUseCase)
+                        .restoreStockInternal(restoreInput);
                     
-                    sanPham.tangTonKho(chiTiet.getSoLuong());
-                    productRepository.save(sanPham);
+                    if (!restoreResult.isSuccess()) {
+                        throw new DomainException(restoreResult.getErrorMessage(), restoreResult.getErrorCode());
+                    }
                     
                     totalRefund = totalRefund.add(chiTiet.getThanhTien());
                 }
                 
-                donHang.huyDonHang();
-                DonHang cancelledOrder = orderRepository.save(donHang);
+                // UC-48: Update order status to cancelled
+                UpdateOrderStatusInputData updateInput = new UpdateOrderStatusInputData(
+                    donHang.getMaDonHang(),
+                    TrangThaiDonHang.DA_HUY
+                );
+                var updateResult = ((UpdateOrderStatusUseCaseControl) updateStatusUseCase)
+                    .updateStatusInternal(updateInput);
+                
+                if (!updateResult.isSuccess()) {
+                    throw new DomainException(updateResult.getErrorMessage(), updateResult.getErrorCode());
+                }
+                
+                // Reload order to get updated status
+                Long orderId = donHang.getMaDonHang();
+                DonHang cancelledOrder = orderRepository.findById(orderId)
+                    .orElseThrow(() -> DomainException.orderNotFound(orderId));
                 
                 outputData = CancelOrderOutputData.forSuccess(
                     cancelledOrder.getMaDonHang(),

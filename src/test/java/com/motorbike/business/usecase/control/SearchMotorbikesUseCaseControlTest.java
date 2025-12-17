@@ -115,5 +115,14 @@ public class SearchMotorbikesUseCaseControlTest {
 		public List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
 			return new ArrayList<>();
 		}
-	}
+
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}	}
 }

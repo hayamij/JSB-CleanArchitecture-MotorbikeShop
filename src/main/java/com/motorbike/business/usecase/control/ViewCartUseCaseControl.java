@@ -7,6 +7,8 @@ import com.motorbike.business.dto.viewcart.ViewCartOutputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
+import com.motorbike.business.dto.calculatecarttotals.CalculateCartTotalsInputData;
+import com.motorbike.business.usecase.input.CalculateCartTotalsInputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.exceptions.DomainException;
@@ -19,14 +21,29 @@ public class ViewCartUseCaseControl implements ViewCartInputBoundary {
     private final ViewCartOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final CalculateCartTotalsInputBoundary calculateCartTotalsUseCase;
     
     public ViewCartUseCaseControl(
             ViewCartOutputBoundary outputBoundary,
             CartRepository cartRepository,
-            ProductRepository productRepository) {
+            ProductRepository productRepository,
+            CalculateCartTotalsInputBoundary calculateCartTotalsUseCase) {
         this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
+        this.calculateCartTotalsUseCase = calculateCartTotalsUseCase;
+    }
+
+    // Constructor with 3 parameters (for backward compatibility)
+    public ViewCartUseCaseControl(
+            ViewCartOutputBoundary outputBoundary,
+            CartRepository cartRepository,
+            ProductRepository productRepository
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
+        this.calculateCartTotalsUseCase = new CalculateCartTotalsUseCaseControl(null);
     }
     
     @Override
@@ -96,10 +113,17 @@ public class ViewCartUseCaseControl implements ViewCartInputBoundary {
                     itemList.add(cartItem);
                 }
                 
+                // UC-42: Calculate cart totals
+                CalculateCartTotalsInputData totalsInput = new CalculateCartTotalsInputData(
+                    gioHang.getDanhSachSanPham()
+                );
+                var totalsResult = ((CalculateCartTotalsUseCaseControl) calculateCartTotalsUseCase)
+                    .calculateInternal(totalsInput);
+                
                 outputData = ViewCartOutputData.forSuccess(
                     gioHang.getMaGioHang(),
                     itemList,
-                    gioHang.getTongTien()
+                    totalsResult.getTotalAmount()
                 );
             } catch (Exception e) {
                 errorException = e;

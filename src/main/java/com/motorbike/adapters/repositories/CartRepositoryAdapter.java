@@ -49,6 +49,20 @@ public class CartRepositoryAdapter implements CartRepository {
     
     @Override
     @Transactional
+    public void deleteById(Long cartId) {
+        jpaRepository.deleteById(cartId);
+    }
+    
+    @Override
+    @Transactional
+    public void deleteAllByUserId(Long userId) {
+        jpaRepository.findByUserIdWithItems(userId).ifPresent(cart -> {
+            jpaRepository.deleteById(cart.getMaGioHang());
+        });
+    }
+    
+    @Override
+    @Transactional
     public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
         Optional<GioHangJpaEntity> guestCartOpt = jpaRepository.findByIdWithItems(guestCartId);
         Optional<GioHangJpaEntity> userCartOpt = jpaRepository.findByIdWithItems(userCartId);
@@ -142,5 +156,13 @@ public class CartRepositoryAdapter implements CartRepository {
         }
         
         return jpa;
+    }
+    
+    @Override
+    public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+        // Find cart by userId and check if it contains the productId
+        return findByUserId(userId)
+                .filter(cart -> cart.getDanhSachSanPham().stream()
+                        .anyMatch(item -> item.getMaSanPham().equals(productId)));
     }
 }

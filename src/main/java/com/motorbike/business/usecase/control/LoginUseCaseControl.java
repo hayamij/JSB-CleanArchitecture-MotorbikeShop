@@ -5,6 +5,8 @@ import com.motorbike.business.dto.login.LoginOutputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.LoginOutputBoundary;
+import com.motorbike.business.dto.user.VerifyPasswordInputData;
+import com.motorbike.business.usecase.input.VerifyPasswordInputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.business.usecase.input.LoginInputBoundary;
@@ -16,7 +18,20 @@ public class LoginUseCaseControl implements LoginInputBoundary{
     private final LoginOutputBoundary outputBoundary;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
+    private final VerifyPasswordInputBoundary verifyPasswordUseCase;
     
+    public LoginUseCaseControl(
+            LoginOutputBoundary outputBoundary,
+            UserRepository userRepository,
+            CartRepository cartRepository,
+            VerifyPasswordInputBoundary verifyPasswordUseCase) {
+        this.outputBoundary = outputBoundary;
+        this.userRepository = userRepository;
+        this.cartRepository = cartRepository;
+        this.verifyPasswordUseCase = verifyPasswordUseCase;
+    }
+
+    // Constructor with parameter order: outputBoundary first (for backward compatibility)
     public LoginUseCaseControl(
             LoginOutputBoundary outputBoundary,
             UserRepository userRepository,
@@ -24,6 +39,7 @@ public class LoginUseCaseControl implements LoginInputBoundary{
         this.outputBoundary = outputBoundary;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
+        this.verifyPasswordUseCase = new VerifyPasswordUseCaseControl(null);
     }
     
     public void execute(LoginInputData inputData) {
@@ -42,11 +58,20 @@ public class LoginUseCaseControl implements LoginInputBoundary{
         }
         
         if (errorException == null) {
+            // Step 2: Find user
             try {
                 taiKhoan = userRepository.findByUsernameOrEmailOrPhone(inputData.getUsername())
                     .orElseThrow(() -> DomainException.userNotFound(inputData.getUsername()));
                 
-                if (!taiKhoan.kiemTraMatKhau(inputData.getPassword())) {
+                // Step 3: UC-60 - Verify password
+                VerifyPasswordInputData verifyInput = new VerifyPasswordInputData(
+                    inputData.getPassword(),
+                    taiKhoan.getMatKhau()  // hashed password from DB
+                );
+                var verifyResult = ((VerifyPasswordUseCaseControl) verifyPasswordUseCase)
+                    .verifyInternal(verifyInput);
+                
+                if (!verifyResult.isValid()) {
                     throw DomainException.wrongPassword();
                 }
                 

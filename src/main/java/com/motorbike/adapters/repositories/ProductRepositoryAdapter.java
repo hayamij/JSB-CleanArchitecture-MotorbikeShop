@@ -28,6 +28,24 @@ public class ProductRepositoryAdapter implements ProductRepository {
     }
     
     @Override
+    public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity.getTenSanPham().equalsIgnoreCase(tenSanPham))
+                .findFirst()
+                .map(this::toDomain);
+    }
+    
+    @Override
+    public Optional<SanPham> findByMaSanPham(String maSanPham) {
+        try {
+            Long id = Long.parseLong(maSanPham);
+            return findById(id);
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+    
+    @Override
     public SanPham save(SanPham sanPham) {
         SanPhamJpaEntity jpaEntity = toJpaEntity(sanPham);
         SanPhamJpaEntity saved = jpaRepository.save(jpaEntity);

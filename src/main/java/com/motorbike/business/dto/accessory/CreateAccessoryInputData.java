@@ -27,6 +27,20 @@ public class CreateAccessoryInputData {
         this.kichThuoc = kichThuoc;
     }
 
+    public CreateAccessoryInputData(String tenSanPham, String moTa, BigDecimal gia,
+                                   String hinhAnh, int soLuongTonKho, String loaiPhuKien,
+                                   String thuongHieu, String chatLieu) {
+        this.tenSanPham = tenSanPham;
+        this.moTa = moTa;
+        this.gia = gia;
+        this.hinhAnh = hinhAnh;
+        this.soLuongTonKho = soLuongTonKho;
+        this.loaiPhuKien = loaiPhuKien;
+        this.thuongHieu = thuongHieu;
+        this.chatLieu = chatLieu;
+        this.kichThuoc = null;
+    }
+
     public String getTenSanPham() {return tenSanPham;}
     public String getMoTa() {return moTa;}
     public BigDecimal getGia() {return gia;}

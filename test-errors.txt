@@ -1,0 +1,639 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< com.motorbike:main >-------------------------
+[INFO] Building main 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ main ---
+[INFO] Deleting D:\VisualStudioCode\CodebaseWinter2025\CUOIKI\JSB-CleanArchitecture-MotorbikeShop\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ main ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 39 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ main ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 572 source files with javac [debug release 17] to target\classes
+[INFO] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java: Some input files use unchecked or unsafe operations.
+[INFO] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java: Recompile with -Xlint:unchecked for details.
+[INFO] Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[98,47] cannot find symbol
+  symbol:   method getMaSP()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[99,42] cannot find symbol
+  symbol:   method getTenSP()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[132,46] cannot find symbol
+  symbol:   method getMaNguoiDung()
+  location: variable user of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[160,43] cannot find symbol
+  symbol:   method getNguoiDung()
+  location: variable order of type com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[163,42] cannot find symbol
+  symbol:   method getNgayDatHang()
+  location: variable order of type com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/UpdateCartItemQuantityUseCaseControl.java:[54,75] incompatible types: java.lang.String cannot be converted to int
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/UpdateCartItemQuantityUseCaseControl.java:[58,86] incompatible types: <nulltype> cannot be converted to int
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[50,70] cannot find symbol
+  symbol:   method getGiaBan()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[54,28] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[54,68] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[55,56] cannot find symbol
+  symbol:   method getGiaBan()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[56,65] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[58,52] cannot find symbol
+  symbol:   method getGiaBan()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[83,28] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[83,68] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[84,50] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[88,71] cannot find symbol
+  symbol:   method getLoaiSanPham()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[371,16] constructor UpdateCartQuantityUseCaseControl in class com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary,com.motorbike.business.ports.repository.CartRepository,com.motorbike.business.usecase.input.CheckInventoryAvailabilityInputBoundary,com.motorbike.business.usecase.input.RemoveItemFromCartInputBoundary,com.motorbike.business.usecase.input.CalculateCartTotalsInputBoundary
+  found:    com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary,com.motorbike.business.ports.repository.CartRepository
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[519,20] cannot find symbol
+  symbol:   class CreateMotorbikeUseCaseControl
+  location: class com.motorbike.infrastructure.config.UseCaseConfig
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[618,98] incompatible types: com.motorbike.business.usecase.input.GenerateExcelFileInputBoundary cannot be converted to com.motorbike.business.usecase.input.FormatDataForExportInputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[652,99] incompatible types: com.motorbike.business.usecase.input.GenerateExcelFileInputBoundary cannot be converted to com.motorbike.business.usecase.input.FormatDataForExportInputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[929,50] incompatible types: com.motorbike.business.usecase.output.AddAccessoryOutputBoundary cannot be converted to com.motorbike.business.usecase.output.CreateAccessoryOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1156,16] no suitable constructor found for ValidateCartItemUseCaseControl(no arguments)
+    constructor com.motorbike.business.usecase.control.ValidateCartItemUseCaseControl.ValidateCartItemUseCaseControl(com.motorbike.business.usecase.output.ValidateCartItemOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.ValidateCartItemUseCaseControl.ValidateCartItemUseCaseControl(com.motorbike.business.ports.SanPhamRepository,com.motorbike.business.usecase.output.ValidateCartItemOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1161,16] no suitable constructor found for FindCartItemUseCaseControl(com.motorbike.business.ports.repository.CartRepository)
+    constructor com.motorbike.business.usecase.control.FindCartItemUseCaseControl.FindCartItemUseCaseControl(com.motorbike.business.usecase.output.FindCartItemOutputBoundary,com.motorbike.business.ports.repository.CartRepository) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.FindCartItemUseCaseControl.FindCartItemUseCaseControl(com.motorbike.business.ports.GioHangRepository,com.motorbike.business.usecase.output.FindCartItemOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1166,16] no suitable constructor found for UpdateCartItemQuantityUseCaseControl(com.motorbike.business.ports.repository.CartRepository)
+    constructor com.motorbike.business.usecase.control.UpdateCartItemQuantityUseCaseControl.UpdateCartItemQuantityUseCaseControl(com.motorbike.business.usecase.output.UpdateCartItemQuantityOutputBoundary,com.motorbike.business.ports.repository.CartRepository) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.UpdateCartItemQuantityUseCaseControl.UpdateCartItemQuantityUseCaseControl(com.motorbike.business.ports.GioHangRepository,com.motorbike.business.usecase.output.UpdateCartItemQuantityOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1171,54] incompatible types: com.motorbike.business.ports.repository.ProductRepository cannot be converted to com.motorbike.business.usecase.output.CalculateCartTotalsOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1176,16] no suitable constructor found for RemoveCartItemUseCaseControl(com.motorbike.business.ports.repository.CartRepository)
+    constructor com.motorbike.business.usecase.control.RemoveCartItemUseCaseControl.RemoveCartItemUseCaseControl(com.motorbike.business.usecase.output.RemoveCartItemOutputBoundary,com.motorbike.business.ports.repository.CartRepository) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.RemoveCartItemUseCaseControl.RemoveCartItemUseCaseControl(com.motorbike.business.ports.GioHangRepository,com.motorbike.business.usecase.output.RemoveCartItemOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1183,16] no suitable constructor found for ValidateOrderUseCaseControl(no arguments)
+    constructor com.motorbike.business.usecase.control.ValidateOrderUseCaseControl.ValidateOrderUseCaseControl(com.motorbike.business.usecase.output.ValidateOrderOutputBoundary,com.motorbike.business.ports.repository.OrderRepository) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.ValidateOrderUseCaseControl.ValidateOrderUseCaseControl(com.motorbike.business.ports.SanPhamRepository,com.motorbike.business.usecase.output.ValidateOrderOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1190,54] incompatible types: com.motorbike.business.ports.repository.OrderRepository cannot be converted to com.motorbike.business.ports.DonHangRepository
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1195,16] no suitable constructor found for UpdateProductStockUseCaseControl(com.motorbike.business.ports.repository.ProductRepository)
+    constructor com.motorbike.business.usecase.control.UpdateProductStockUseCaseControl.UpdateProductStockUseCaseControl(com.motorbike.business.usecase.output.UpdateProductStockOutputBoundary,com.motorbike.business.ports.repository.ProductRepository) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.UpdateProductStockUseCaseControl.UpdateProductStockUseCaseControl(com.motorbike.business.ports.SanPhamRepository,com.motorbike.business.usecase.output.UpdateProductStockOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1200,16] no suitable constructor found for ClearCartUseCaseControl(com.motorbike.business.ports.repository.CartRepository)
+    constructor com.motorbike.business.usecase.control.ClearCartUseCaseControl.ClearCartUseCaseControl(com.motorbike.business.usecase.output.ClearCartOutputBoundary,com.motorbike.business.ports.repository.CartRepository) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.ClearCartUseCaseControl.ClearCartUseCaseControl(com.motorbike.business.ports.GioHangRepository,com.motorbike.business.usecase.output.ClearCartOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1205,16] constructor ValidateOrderCancellationUseCaseControl in class com.motorbike.business.usecase.control.ValidateOrderCancellationUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.ValidateOrderCancellationOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1210,55] incompatible types: com.motorbike.business.ports.repository.ProductRepository cannot be converted to com.motorbike.business.usecase.output.CalculateOrderTotalsOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1215,56] incompatible types: com.motorbike.business.ports.repository.ProductRepository cannot be converted to com.motorbike.business.usecase.output.FormatOrderForDisplayOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1222,16] constructor ValidateProductDataUseCaseControl in class com.motorbike.business.usecase.control.ValidateProductDataUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.ValidateProductDataOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1227,16] constructor CheckProductDuplicationUseCaseControl in class com.motorbike.business.usecase.control.CheckProductDuplicationUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.CheckProductDuplicationOutputBoundary,com.motorbike.business.ports.repository.ProductRepository
+  found:    com.motorbike.business.ports.repository.ProductRepository
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1232,16] constructor CalculateProductPriceUseCaseControl in class com.motorbike.business.usecase.control.CalculateProductPriceUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.CalculateProductPriceOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1237,16] constructor FormatProductForDisplayUseCaseControl in class com.motorbike.business.usecase.control.FormatProductForDisplayUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.FormatProductForDisplayOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1242,59] incompatible types: com.motorbike.business.ports.repository.ProductRepository cannot be converted to com.motorbike.business.usecase.output.CheckProductAvailabilityOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1247,16] constructor ArchiveProductUseCaseControl in class com.motorbike.business.usecase.control.ArchiveProductUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.ArchiveProductOutputBoundary,com.motorbike.business.ports.repository.ProductRepository
+  found:    com.motorbike.business.ports.repository.ProductRepository
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1254,16] constructor ValidateUserRegistrationUseCaseControl in class com.motorbike.business.usecase.control.ValidateUserRegistrationUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.ValidateUserRegistrationOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1259,16] no suitable constructor found for CheckUserDuplicationUseCaseControl(com.motorbike.business.ports.repository.UserRepository)
+    constructor com.motorbike.business.usecase.control.CheckUserDuplicationUseCaseControl.CheckUserDuplicationUseCaseControl(com.motorbike.business.usecase.output.CheckUserDuplicationOutputBoundary,com.motorbike.business.ports.repository.UserRepository) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.CheckUserDuplicationUseCaseControl.CheckUserDuplicationUseCaseControl(com.motorbike.business.ports.TaiKhoanRepository,com.motorbike.business.usecase.output.CheckUserDuplicationOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1264,16] constructor HashPasswordUseCaseControl in class com.motorbike.business.usecase.control.HashPasswordUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.HashPasswordOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1269,16] constructor VerifyPasswordUseCaseControl in class com.motorbike.business.usecase.control.VerifyPasswordUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.VerifyPasswordOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1274,16] no suitable constructor found for AssignUserRoleUseCaseControl(no arguments)
+    constructor com.motorbike.business.usecase.control.AssignUserRoleUseCaseControl.AssignUserRoleUseCaseControl(com.motorbike.business.usecase.output.AssignUserRoleOutputBoundary,com.motorbike.business.ports.repository.TaiKhoanRepository) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.usecase.control.AssignUserRoleUseCaseControl.AssignUserRoleUseCaseControl(com.motorbike.business.usecase.output.AssignUserRoleOutputBoundary) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1281,16] constructor ValidateExcelFileUseCaseControl in class com.motorbike.business.usecase.control.ValidateExcelFileUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.ValidateExcelFileOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1286,16] constructor ParseExcelDataUseCaseControl in class com.motorbike.business.usecase.control.ParseExcelDataUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.ParseExcelDataOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1291,16] constructor ValidateImportRowUseCaseControl in class com.motorbike.business.usecase.control.ValidateImportRowUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.ValidateImportRowOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1296,16] constructor GenerateImportReportUseCaseControl in class com.motorbike.business.usecase.control.GenerateImportReportUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.GenerateImportReportOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1301,16] constructor GenerateExcelFileUseCaseControl in class com.motorbike.business.usecase.control.GenerateExcelFileUseCaseControl cannot be applied to given types;
+  required: com.motorbike.business.usecase.output.GenerateExcelFileOutputBoundary
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[93,60] constructor ValidateExcelFileInputData in class com.motorbike.business.dto.validateexcelfile.ValidateExcelFileInputData cannot be applied to given types;
+  required: org.springframework.web.multipart.MultipartFile,java.util.List<java.lang.String>
+  found:    java.io.InputStream,java.lang.String,java.util.List<java.lang.String>
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[111,50] constructor ParseExcelDataInputData in class com.motorbike.business.dto.parseexceldata.ParseExcelDataInputData cannot be applied to given types;
+  required: org.springframework.web.multipart.MultipartFile,int
+  found:    java.io.InputStream
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[126,58] incompatible types: java.util.List<java.util.Map<java.lang.String,java.lang.String>> cannot be converted to java.util.List<java.util.List<java.lang.String>>
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[148,21] incompatible types: java.util.List<java.lang.String> cannot be converted to java.util.Map<java.lang.String,java.lang.String>
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[198,57] no suitable constructor found for GenerateImportReportInputData(int,int,int,java.util.List<java.lang.String>)
+    constructor com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData.GenerateImportReportInputData(int,int,java.util.List<com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData.RowFailure>) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData.GenerateImportReportInputData(int,java.util.List<com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData.RowFailure>,int) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportAccessoriesUseCaseControl.java:[95,60] constructor ValidateExcelFileInputData in class com.motorbike.business.dto.validateexcelfile.ValidateExcelFileInputData cannot be applied to given types;
+  required: org.springframework.web.multipart.MultipartFile,java.util.List<java.lang.String>
+  found:    java.io.InputStream,java.lang.String,java.util.List<java.lang.String>
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportAccessoriesUseCaseControl.java:[113,50] constructor ParseExcelDataInputData in class com.motorbike.business.dto.parseexceldata.ParseExcelDataInputData cannot be applied to given types;
+  required: org.springframework.web.multipart.MultipartFile,int
+  found:    java.io.InputStream
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportAccessoriesUseCaseControl.java:[128,58] incompatible types: java.util.List<java.util.Map<java.lang.String,java.lang.String>> cannot be converted to java.util.List<java.util.List<java.lang.String>>
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CreateUserUseCaseControl.java:[54,43] no suitable constructor found for CreateUserInputData(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,com.motorbike.domain.entities.VaiTro)
+    constructor com.motorbike.business.dto.user.CreateUserInputData.CreateUserInputData(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor com.motorbike.business.dto.user.CreateUserInputData.CreateUserInputData(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,com.motorbike.domain.entities.VaiTro) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/dto/checkproductavailability/CheckProductAvailabilityInputData.java:[16,51] cannot find symbol
+  symbol:   method getMaSP()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/dto/findcartitem/FindCartItemInputData.java:[13,13] cannot find symbol
+  symbol: variable cartId
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FindCartItemUseCaseControl.java:[42,36] cannot find symbol
+  symbol:   method getCartId()
+  location: variable inputData of type com.motorbike.business.dto.findcartitem.FindCartItemInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FindCartItemUseCaseControl.java:[56,30] constructor FindCartItemOutputData in class com.motorbike.business.dto.findcartitem.FindCartItemOutputData cannot be applied to given types;
+  required: com.motorbike.domain.entities.GioHang,boolean,java.lang.String
+  found:    boolean,<nulltype>,java.lang.String,com.motorbike.domain.entities.ChiTietGioHang
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FindCartItemUseCaseControl.java:[58,30] constructor FindCartItemOutputData in class com.motorbike.business.dto.findcartitem.FindCartItemOutputData cannot be applied to given types;
+  required: com.motorbike.domain.entities.GioHang,boolean,java.lang.String
+  found:    boolean,java.lang.String,<nulltype>,<nulltype>
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FindCartItemUseCaseControl.java:[63,26] constructor FindCartItemOutputData in class com.motorbike.business.dto.findcartitem.FindCartItemOutputData cannot be applied to given types;
+  required: com.motorbike.domain.entities.GioHang,boolean,java.lang.String
+  found:    boolean,java.lang.String,<nulltype>,<nulltype>
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckProductAvailabilityUseCaseControl.java:[40,45] cannot find symbol
+  symbol:   method getRequiredQuantity()
+  location: variable inputData of type com.motorbike.business.dto.checkproductavailability.CheckProductAvailabilityInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckProductAvailabilityUseCaseControl.java:[44,38] no suitable method found for productNotFound(no arguments)
+    method com.motorbike.domain.exceptions.DomainException.productNotFound(java.lang.String) is not applicable
+      (actual and formal argument lists differ in length)
+    method com.motorbike.domain.exceptions.DomainException.productNotFound(java.lang.Long) is not applicable
+      (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckProductAvailabilityUseCaseControl.java:[50,26] constructor CheckProductAvailabilityOutputData in class com.motorbike.business.dto.checkproductavailability.CheckProductAvailabilityOutputData cannot be applied to given types;
+  required: boolean,java.lang.String,java.lang.Long,int
+  found:    boolean,<nulltype>,isAvailabl[...]able",boolean,int
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckProductAvailabilityUseCaseControl.java:[56,26] constructor CheckProductAvailabilityOutputData in class com.motorbike.business.dto.checkproductavailability.CheckProductAvailabilityOutputData cannot be applied to given types;
+  required: boolean,java.lang.String,java.lang.Long,int
+  found:    boolean,java.lang.String,<nulltype>,boolean,int
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[64,85] incompatible types: java.util.Optional<com.motorbike.domain.entities.TaiKhoan> cannot be converted to java.util.Optional<com.motorbike.domain.entities.NguoiDung>
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[68,59] cannot find symbol
+  symbol:   method getMaNguoiDung()
+  location: variable existing of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[72,45] cannot find symbol
+  symbol:   method getMaNguoiDung()
+  location: variable existing of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[81,76] cannot find symbol
+  symbol:   method findByTenDangNhap(java.lang.String)
+  location: variable userRepository of type com.motorbike.business.ports.repository.UserRepository
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[85,59] cannot find symbol
+  symbol:   method getMaNguoiDung()
+  location: variable existing of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[89,45] cannot find symbol
+  symbol:   method getMaNguoiDung()
+  location: variable existing of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[66,56] constructor ApplySearchFiltersInputData in class com.motorbike.business.dto.applysearchfilters.ApplySearchFiltersInputData cannot be applied to given types;
+  required: java.util.List<?>,java.util.Map<java.lang.String,java.lang.Object>
+  found:    java.util.List<com.motorbike.domain.entities.XeMay>,java.util.Map<java.lang.String,java.lang.Object>,java.lang.String
+  reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[92,22] cannot find symbol
+  symbol:   variable sortBy
+  location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[92,47] cannot find symbol
+  symbol:   variable sortBy
+  location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[95,26] cannot find symbol
+  symbol:   variable sortBy
+  location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[96,26] cannot find symbol
+  symbol:   variable sortDirection
+  location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[96,56] cannot find symbol
+  symbol:   variable sortDirection
+  location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/RegisterUseCaseControl.java:[69,39] incompatible types: com.motorbike.business.dto.user.ValidateUserRegistrationInputData cannot be converted to com.motorbike.business.dto.validateuserregistration.ValidateUserRegistrationInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/RegisterUseCaseControl.java:[91,36] incompatible types: com.motorbike.business.dto.user.CheckUserDuplicationInputData cannot be converted to com.motorbike.business.dto.checkuserduplication.CheckUserDuplicationInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/RegisterUseCaseControl.java:[110,35] incompatible types: com.motorbike.business.dto.user.HashPasswordInputData cannot be converted to com.motorbike.business.dto.hashpassword.HashPasswordInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetOrderDetailUseCaseControl.java:[78,45] incompatible types: java.util.List<com.motorbike.domain.entities.ChiTietDonHang> cannot be converted to com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetOrderDetailUseCaseControl.java:[81,40] incompatible types: com.motorbike.business.dto.order.CalculateOrderTotalsInputData cannot be converted to com.motorbike.business.dto.calculateordertotals.CalculateOrderTotalsInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetOrderDetailUseCaseControl.java:[86,37] incompatible types: com.motorbike.business.dto.order.FormatOrderForDisplayInputData cannot be converted to com.motorbike.business.dto.formatorderfordisplay.FormatOrderForDisplayInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetProductDetailUseCaseControl.java:[74,50] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable sanPham of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetProductDetailUseCaseControl.java:[74,89] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable sanPham of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[99,57] cannot find symbol
+  symbol:   method getLoaiSanPham()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[107,36] cannot find symbol
+  symbol:   method getGiaBan()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[113,36] cannot find symbol
+  symbol:   method getGiaBan()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[129,52] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[129,92] cannot find symbol
+  symbol:   method getPhanTramGiamGia()
+  location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[179,35] cannot find symbol
+  symbol:   method getNguoiDung()
+  location: variable order of type com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[54,45] cannot find symbol
+  symbol:   method getNgayDatHang()
+  location: variable order of type com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[95,18] an enum switch case label must be the unqualified name of an enumeration constant
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[96,18] an enum switch case label must be the unqualified name of an enumeration constant
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[106,18] an enum switch case label must be the unqualified name of an enumeration constant
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[107,18] an enum switch case label must be the unqualified name of an enumeration constant
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.468 s
+[INFO] Finished at: 2025-12-17T18:31:06+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project main: Compilation failure: Compilation failure: 
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[98,47] cannot find symbol
+[ERROR]   symbol:   method getMaSP()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[99,42] cannot find symbol
+[ERROR]   symbol:   method getTenSP()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[132,46] cannot find symbol
+[ERROR]   symbol:   method getMaNguoiDung()
+[ERROR]   location: variable user of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[160,43] cannot find symbol
+[ERROR]   symbol:   method getNguoiDung()
+[ERROR]   location: variable order of type com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatDataForExportUseCaseControl.java:[163,42] cannot find symbol
+[ERROR]   symbol:   method getNgayDatHang()
+[ERROR]   location: variable order of type com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/UpdateCartItemQuantityUseCaseControl.java:[54,75] incompatible types: java.lang.String cannot be converted to int
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/UpdateCartItemQuantityUseCaseControl.java:[58,86] incompatible types: <nulltype> cannot be converted to int
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[50,70] cannot find symbol
+[ERROR]   symbol:   method getGiaBan()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[54,28] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[54,68] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[55,56] cannot find symbol
+[ERROR]   symbol:   method getGiaBan()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[56,65] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[58,52] cannot find symbol
+[ERROR]   symbol:   method getGiaBan()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[83,28] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[83,68] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[84,50] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatProductForDisplayUseCaseControl.java:[88,71] cannot find symbol
+[ERROR]   symbol:   method getLoaiSanPham()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[371,16] constructor UpdateCartQuantityUseCaseControl in class com.motorbike.business.usecase.control.UpdateCartQuantityUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary,com.motorbike.business.ports.repository.CartRepository,com.motorbike.business.usecase.input.CheckInventoryAvailabilityInputBoundary,com.motorbike.business.usecase.input.RemoveItemFromCartInputBoundary,com.motorbike.business.usecase.input.CalculateCartTotalsInputBoundary
+[ERROR]   found:    com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary,com.motorbike.business.ports.repository.CartRepository
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[519,20] cannot find symbol
+[ERROR]   symbol:   class CreateMotorbikeUseCaseControl
+[ERROR]   location: class com.motorbike.infrastructure.config.UseCaseConfig
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[618,98] incompatible types: com.motorbike.business.usecase.input.GenerateExcelFileInputBoundary cannot be converted to com.motorbike.business.usecase.input.FormatDataForExportInputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[652,99] incompatible types: com.motorbike.business.usecase.input.GenerateExcelFileInputBoundary cannot be converted to com.motorbike.business.usecase.input.FormatDataForExportInputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[929,50] incompatible types: com.motorbike.business.usecase.output.AddAccessoryOutputBoundary cannot be converted to com.motorbike.business.usecase.output.CreateAccessoryOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1156,16] no suitable constructor found for ValidateCartItemUseCaseControl(no arguments)
+[ERROR]     constructor com.motorbike.business.usecase.control.ValidateCartItemUseCaseControl.ValidateCartItemUseCaseControl(com.motorbike.business.usecase.output.ValidateCartItemOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.ValidateCartItemUseCaseControl.ValidateCartItemUseCaseControl(com.motorbike.business.ports.SanPhamRepository,com.motorbike.business.usecase.output.ValidateCartItemOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1161,16] no suitable constructor found for FindCartItemUseCaseControl(com.motorbike.business.ports.repository.CartRepository)
+[ERROR]     constructor com.motorbike.business.usecase.control.FindCartItemUseCaseControl.FindCartItemUseCaseControl(com.motorbike.business.usecase.output.FindCartItemOutputBoundary,com.motorbike.business.ports.repository.CartRepository) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.FindCartItemUseCaseControl.FindCartItemUseCaseControl(com.motorbike.business.ports.GioHangRepository,com.motorbike.business.usecase.output.FindCartItemOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1166,16] no suitable constructor found for UpdateCartItemQuantityUseCaseControl(com.motorbike.business.ports.repository.CartRepository)
+[ERROR]     constructor com.motorbike.business.usecase.control.UpdateCartItemQuantityUseCaseControl.UpdateCartItemQuantityUseCaseControl(com.motorbike.business.usecase.output.UpdateCartItemQuantityOutputBoundary,com.motorbike.business.ports.repository.CartRepository) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.UpdateCartItemQuantityUseCaseControl.UpdateCartItemQuantityUseCaseControl(com.motorbike.business.ports.GioHangRepository,com.motorbike.business.usecase.output.UpdateCartItemQuantityOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1171,54] incompatible types: com.motorbike.business.ports.repository.ProductRepository cannot be converted to com.motorbike.business.usecase.output.CalculateCartTotalsOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1176,16] no suitable constructor found for RemoveCartItemUseCaseControl(com.motorbike.business.ports.repository.CartRepository)
+[ERROR]     constructor com.motorbike.business.usecase.control.RemoveCartItemUseCaseControl.RemoveCartItemUseCaseControl(com.motorbike.business.usecase.output.RemoveCartItemOutputBoundary,com.motorbike.business.ports.repository.CartRepository) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.RemoveCartItemUseCaseControl.RemoveCartItemUseCaseControl(com.motorbike.business.ports.GioHangRepository,com.motorbike.business.usecase.output.RemoveCartItemOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1183,16] no suitable constructor found for ValidateOrderUseCaseControl(no arguments)
+[ERROR]     constructor com.motorbike.business.usecase.control.ValidateOrderUseCaseControl.ValidateOrderUseCaseControl(com.motorbike.business.usecase.output.ValidateOrderOutputBoundary,com.motorbike.business.ports.repository.OrderRepository) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.ValidateOrderUseCaseControl.ValidateOrderUseCaseControl(com.motorbike.business.ports.SanPhamRepository,com.motorbike.business.usecase.output.ValidateOrderOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1190,54] incompatible types: com.motorbike.business.ports.repository.OrderRepository cannot be converted to com.motorbike.business.ports.DonHangRepository
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1195,16] no suitable constructor found for UpdateProductStockUseCaseControl(com.motorbike.business.ports.repository.ProductRepository)
+[ERROR]     constructor com.motorbike.business.usecase.control.UpdateProductStockUseCaseControl.UpdateProductStockUseCaseControl(com.motorbike.business.usecase.output.UpdateProductStockOutputBoundary,com.motorbike.business.ports.repository.ProductRepository) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.UpdateProductStockUseCaseControl.UpdateProductStockUseCaseControl(com.motorbike.business.ports.SanPhamRepository,com.motorbike.business.usecase.output.UpdateProductStockOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1200,16] no suitable constructor found for ClearCartUseCaseControl(com.motorbike.business.ports.repository.CartRepository)
+[ERROR]     constructor com.motorbike.business.usecase.control.ClearCartUseCaseControl.ClearCartUseCaseControl(com.motorbike.business.usecase.output.ClearCartOutputBoundary,com.motorbike.business.ports.repository.CartRepository) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.ClearCartUseCaseControl.ClearCartUseCaseControl(com.motorbike.business.ports.GioHangRepository,com.motorbike.business.usecase.output.ClearCartOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1205,16] constructor ValidateOrderCancellationUseCaseControl in class com.motorbike.business.usecase.control.ValidateOrderCancellationUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.ValidateOrderCancellationOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1210,55] incompatible types: com.motorbike.business.ports.repository.ProductRepository cannot be converted to com.motorbike.business.usecase.output.CalculateOrderTotalsOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1215,56] incompatible types: com.motorbike.business.ports.repository.ProductRepository cannot be converted to com.motorbike.business.usecase.output.FormatOrderForDisplayOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1222,16] constructor ValidateProductDataUseCaseControl in class com.motorbike.business.usecase.control.ValidateProductDataUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.ValidateProductDataOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1227,16] constructor CheckProductDuplicationUseCaseControl in class com.motorbike.business.usecase.control.CheckProductDuplicationUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.CheckProductDuplicationOutputBoundary,com.motorbike.business.ports.repository.ProductRepository
+[ERROR]   found:    com.motorbike.business.ports.repository.ProductRepository
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1232,16] constructor CalculateProductPriceUseCaseControl in class com.motorbike.business.usecase.control.CalculateProductPriceUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.CalculateProductPriceOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1237,16] constructor FormatProductForDisplayUseCaseControl in class com.motorbike.business.usecase.control.FormatProductForDisplayUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.FormatProductForDisplayOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1242,59] incompatible types: com.motorbike.business.ports.repository.ProductRepository cannot be converted to com.motorbike.business.usecase.output.CheckProductAvailabilityOutputBoundary
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1247,16] constructor ArchiveProductUseCaseControl in class com.motorbike.business.usecase.control.ArchiveProductUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.ArchiveProductOutputBoundary,com.motorbike.business.ports.repository.ProductRepository
+[ERROR]   found:    com.motorbike.business.ports.repository.ProductRepository
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1254,16] constructor ValidateUserRegistrationUseCaseControl in class com.motorbike.business.usecase.control.ValidateUserRegistrationUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.ValidateUserRegistrationOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1259,16] no suitable constructor found for CheckUserDuplicationUseCaseControl(com.motorbike.business.ports.repository.UserRepository)
+[ERROR]     constructor com.motorbike.business.usecase.control.CheckUserDuplicationUseCaseControl.CheckUserDuplicationUseCaseControl(com.motorbike.business.usecase.output.CheckUserDuplicationOutputBoundary,com.motorbike.business.ports.repository.UserRepository) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.CheckUserDuplicationUseCaseControl.CheckUserDuplicationUseCaseControl(com.motorbike.business.ports.TaiKhoanRepository,com.motorbike.business.usecase.output.CheckUserDuplicationOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1264,16] constructor HashPasswordUseCaseControl in class com.motorbike.business.usecase.control.HashPasswordUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.HashPasswordOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1269,16] constructor VerifyPasswordUseCaseControl in class com.motorbike.business.usecase.control.VerifyPasswordUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.VerifyPasswordOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1274,16] no suitable constructor found for AssignUserRoleUseCaseControl(no arguments)
+[ERROR]     constructor com.motorbike.business.usecase.control.AssignUserRoleUseCaseControl.AssignUserRoleUseCaseControl(com.motorbike.business.usecase.output.AssignUserRoleOutputBoundary,com.motorbike.business.ports.repository.TaiKhoanRepository) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.usecase.control.AssignUserRoleUseCaseControl.AssignUserRoleUseCaseControl(com.motorbike.business.usecase.output.AssignUserRoleOutputBoundary) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1281,16] constructor ValidateExcelFileUseCaseControl in class com.motorbike.business.usecase.control.ValidateExcelFileUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.ValidateExcelFileOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1286,16] constructor ParseExcelDataUseCaseControl in class com.motorbike.business.usecase.control.ParseExcelDataUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.ParseExcelDataOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1291,16] constructor ValidateImportRowUseCaseControl in class com.motorbike.business.usecase.control.ValidateImportRowUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.ValidateImportRowOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1296,16] constructor GenerateImportReportUseCaseControl in class com.motorbike.business.usecase.control.GenerateImportReportUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.GenerateImportReportOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/infrastructure/config/UseCaseConfig.java:[1301,16] constructor GenerateExcelFileUseCaseControl in class com.motorbike.business.usecase.control.GenerateExcelFileUseCaseControl cannot be applied to given types;
+[ERROR]   required: com.motorbike.business.usecase.output.GenerateExcelFileOutputBoundary
+[ERROR]   found:    no arguments
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[93,60] constructor ValidateExcelFileInputData in class com.motorbike.business.dto.validateexcelfile.ValidateExcelFileInputData cannot be applied to given types;
+[ERROR]   required: org.springframework.web.multipart.MultipartFile,java.util.List<java.lang.String>
+[ERROR]   found:    java.io.InputStream,java.lang.String,java.util.List<java.lang.String>
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[111,50] constructor ParseExcelDataInputData in class com.motorbike.business.dto.parseexceldata.ParseExcelDataInputData cannot be applied to given types;
+[ERROR]   required: org.springframework.web.multipart.MultipartFile,int
+[ERROR]   found:    java.io.InputStream
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[126,58] incompatible types: java.util.List<java.util.Map<java.lang.String,java.lang.String>> cannot be converted to java.util.List<java.util.List<java.lang.String>>
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[148,21] incompatible types: java.util.List<java.lang.String> cannot be converted to java.util.Map<java.lang.String,java.lang.String>
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportMotorbikesUseCaseControl.java:[198,57] no suitable constructor found for GenerateImportReportInputData(int,int,int,java.util.List<java.lang.String>)
+[ERROR]     constructor com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData.GenerateImportReportInputData(int,int,java.util.List<com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData.RowFailure>) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData.GenerateImportReportInputData(int,java.util.List<com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData.RowFailure>,int) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportAccessoriesUseCaseControl.java:[95,60] constructor ValidateExcelFileInputData in class com.motorbike.business.dto.validateexcelfile.ValidateExcelFileInputData cannot be applied to given types;
+[ERROR]   required: org.springframework.web.multipart.MultipartFile,java.util.List<java.lang.String>
+[ERROR]   found:    java.io.InputStream,java.lang.String,java.util.List<java.lang.String>
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportAccessoriesUseCaseControl.java:[113,50] constructor ParseExcelDataInputData in class com.motorbike.business.dto.parseexceldata.ParseExcelDataInputData cannot be applied to given types;
+[ERROR]   required: org.springframework.web.multipart.MultipartFile,int
+[ERROR]   found:    java.io.InputStream
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ImportAccessoriesUseCaseControl.java:[128,58] incompatible types: java.util.List<java.util.Map<java.lang.String,java.lang.String>> cannot be converted to java.util.List<java.util.List<java.lang.String>>
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CreateUserUseCaseControl.java:[54,43] no suitable constructor found for CreateUserInputData(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,com.motorbike.domain.entities.VaiTro)
+[ERROR]     constructor com.motorbike.business.dto.user.CreateUserInputData.CreateUserInputData(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     constructor com.motorbike.business.dto.user.CreateUserInputData.CreateUserInputData(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,com.motorbike.domain.entities.VaiTro) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/dto/checkproductavailability/CheckProductAvailabilityInputData.java:[16,51] cannot find symbol
+[ERROR]   symbol:   method getMaSP()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/dto/findcartitem/FindCartItemInputData.java:[13,13] cannot find symbol
+[ERROR]   symbol: variable cartId
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FindCartItemUseCaseControl.java:[42,36] cannot find symbol
+[ERROR]   symbol:   method getCartId()
+[ERROR]   location: variable inputData of type com.motorbike.business.dto.findcartitem.FindCartItemInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FindCartItemUseCaseControl.java:[56,30] constructor FindCartItemOutputData in class com.motorbike.business.dto.findcartitem.FindCartItemOutputData cannot be applied to given types;
+[ERROR]   required: com.motorbike.domain.entities.GioHang,boolean,java.lang.String
+[ERROR]   found:    boolean,<nulltype>,java.lang.String,com.motorbike.domain.entities.ChiTietGioHang
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FindCartItemUseCaseControl.java:[58,30] constructor FindCartItemOutputData in class com.motorbike.business.dto.findcartitem.FindCartItemOutputData cannot be applied to given types;
+[ERROR]   required: com.motorbike.domain.entities.GioHang,boolean,java.lang.String
+[ERROR]   found:    boolean,java.lang.String,<nulltype>,<nulltype>
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FindCartItemUseCaseControl.java:[63,26] constructor FindCartItemOutputData in class com.motorbike.business.dto.findcartitem.FindCartItemOutputData cannot be applied to given types;
+[ERROR]   required: com.motorbike.domain.entities.GioHang,boolean,java.lang.String
+[ERROR]   found:    boolean,java.lang.String,<nulltype>,<nulltype>
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckProductAvailabilityUseCaseControl.java:[40,45] cannot find symbol
+[ERROR]   symbol:   method getRequiredQuantity()
+[ERROR]   location: variable inputData of type com.motorbike.business.dto.checkproductavailability.CheckProductAvailabilityInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckProductAvailabilityUseCaseControl.java:[44,38] no suitable method found for productNotFound(no arguments)
+[ERROR]     method com.motorbike.domain.exceptions.DomainException.productNotFound(java.lang.String) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR]     method com.motorbike.domain.exceptions.DomainException.productNotFound(java.lang.Long) is not applicable
+[ERROR]       (actual and formal argument lists differ in length)
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckProductAvailabilityUseCaseControl.java:[50,26] constructor CheckProductAvailabilityOutputData in class com.motorbike.business.dto.checkproductavailability.CheckProductAvailabilityOutputData cannot be applied to given types;
+[ERROR]   required: boolean,java.lang.String,java.lang.Long,int
+[ERROR]   found:    boolean,<nulltype>,isAvailabl[...]able",boolean,int
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckProductAvailabilityUseCaseControl.java:[56,26] constructor CheckProductAvailabilityOutputData in class com.motorbike.business.dto.checkproductavailability.CheckProductAvailabilityOutputData cannot be applied to given types;
+[ERROR]   required: boolean,java.lang.String,java.lang.Long,int
+[ERROR]   found:    boolean,java.lang.String,<nulltype>,boolean,int
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[64,85] incompatible types: java.util.Optional<com.motorbike.domain.entities.TaiKhoan> cannot be converted to java.util.Optional<com.motorbike.domain.entities.NguoiDung>
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[68,59] cannot find symbol
+[ERROR]   symbol:   method getMaNguoiDung()
+[ERROR]   location: variable existing of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[72,45] cannot find symbol
+[ERROR]   symbol:   method getMaNguoiDung()
+[ERROR]   location: variable existing of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[81,76] cannot find symbol
+[ERROR]   symbol:   method findByTenDangNhap(java.lang.String)
+[ERROR]   location: variable userRepository of type com.motorbike.business.ports.repository.UserRepository
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[85,59] cannot find symbol
+[ERROR]   symbol:   method getMaNguoiDung()
+[ERROR]   location: variable existing of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/CheckUserDuplicationUseCaseControl.java:[89,45] cannot find symbol
+[ERROR]   symbol:   method getMaNguoiDung()
+[ERROR]   location: variable existing of type com.motorbike.domain.entities.NguoiDung
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[66,56] constructor ApplySearchFiltersInputData in class com.motorbike.business.dto.applysearchfilters.ApplySearchFiltersInputData cannot be applied to given types;
+[ERROR]   required: java.util.List<?>,java.util.Map<java.lang.String,java.lang.Object>
+[ERROR]   found:    java.util.List<com.motorbike.domain.entities.XeMay>,java.util.Map<java.lang.String,java.lang.Object>,java.lang.String
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[92,22] cannot find symbol
+[ERROR]   symbol:   variable sortBy
+[ERROR]   location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[92,47] cannot find symbol
+[ERROR]   symbol:   variable sortBy
+[ERROR]   location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[95,26] cannot find symbol
+[ERROR]   symbol:   variable sortBy
+[ERROR]   location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[96,26] cannot find symbol
+[ERROR]   symbol:   variable sortDirection
+[ERROR]   location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/SearchMotorbikesUseCaseControl.java:[96,56] cannot find symbol
+[ERROR]   symbol:   variable sortDirection
+[ERROR]   location: variable input of type com.motorbike.business.dto.motorbike.SearchMotorbikesInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/RegisterUseCaseControl.java:[69,39] incompatible types: com.motorbike.business.dto.user.ValidateUserRegistrationInputData cannot be converted to com.motorbike.business.dto.validateuserregistration.ValidateUserRegistrationInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/RegisterUseCaseControl.java:[91,36] incompatible types: com.motorbike.business.dto.user.CheckUserDuplicationInputData cannot be converted to com.motorbike.business.dto.checkuserduplication.CheckUserDuplicationInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/RegisterUseCaseControl.java:[110,35] incompatible types: com.motorbike.business.dto.user.HashPasswordInputData cannot be converted to com.motorbike.business.dto.hashpassword.HashPasswordInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetOrderDetailUseCaseControl.java:[78,45] incompatible types: java.util.List<com.motorbike.domain.entities.ChiTietDonHang> cannot be converted to com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetOrderDetailUseCaseControl.java:[81,40] incompatible types: com.motorbike.business.dto.order.CalculateOrderTotalsInputData cannot be converted to com.motorbike.business.dto.calculateordertotals.CalculateOrderTotalsInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetOrderDetailUseCaseControl.java:[86,37] incompatible types: com.motorbike.business.dto.order.FormatOrderForDisplayInputData cannot be converted to com.motorbike.business.dto.formatorderfordisplay.FormatOrderForDisplayInputData
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetProductDetailUseCaseControl.java:[74,50] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable sanPham of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/GetProductDetailUseCaseControl.java:[74,89] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable sanPham of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[99,57] cannot find symbol
+[ERROR]   symbol:   method getLoaiSanPham()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[107,36] cannot find symbol
+[ERROR]   symbol:   method getGiaBan()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[113,36] cannot find symbol
+[ERROR]   symbol:   method getGiaBan()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[129,52] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[129,92] cannot find symbol
+[ERROR]   symbol:   method getPhanTramGiamGia()
+[ERROR]   location: variable product of type com.motorbike.domain.entities.SanPham
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/ApplySearchFiltersUseCaseControl.java:[179,35] cannot find symbol
+[ERROR]   symbol:   method getNguoiDung()
+[ERROR]   location: variable order of type com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[54,45] cannot find symbol
+[ERROR]   symbol:   method getNgayDatHang()
+[ERROR]   location: variable order of type com.motorbike.domain.entities.DonHang
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[95,18] an enum switch case label must be the unqualified name of an enumeration constant
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[96,18] an enum switch case label must be the unqualified name of an enumeration constant
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[106,18] an enum switch case label must be the unqualified name of an enumeration constant
+[ERROR] /D:/VisualStudioCode/CodebaseWinter2025/CUOIKI/JSB-CleanArchitecture-MotorbikeShop/src/main/java/com/motorbike/business/usecase/control/FormatOrderForDisplayUseCaseControl.java:[107,18] an enum switch case label must be the unqualified name of an enumeration constant
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

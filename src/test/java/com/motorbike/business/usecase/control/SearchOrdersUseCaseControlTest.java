@@ -196,5 +196,10 @@ public class SearchOrdersUseCaseControlTest {
 		public List<com.motorbike.domain.entities.TaiKhoan> searchUsers(String keyword) {
 			return new ArrayList<>();
 		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+			return Optional.empty();
+		}
 	}
 }

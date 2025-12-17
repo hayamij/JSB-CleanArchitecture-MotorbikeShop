@@ -7,6 +7,10 @@ import com.motorbike.business.dto.order.GetOrderDetailOutputData.OrderItemInfo;
 import com.motorbike.business.ports.repository.OrderRepository;
 import com.motorbike.business.usecase.input.GetOrderDetailInputBoundary;
 import com.motorbike.business.usecase.output.GetOrderDetailOutputBoundary;
+import com.motorbike.business.dto.order.CalculateOrderTotalsInputData;
+import com.motorbike.business.dto.order.FormatOrderForDisplayInputData;
+import com.motorbike.business.usecase.input.CalculateOrderTotalsInputBoundary;
+import com.motorbike.business.usecase.input.FormatOrderForDisplayInputBoundary;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.ChiTietDonHang;
 import com.motorbike.domain.exceptions.ValidationException;
@@ -19,6 +23,20 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
 
     private final GetOrderDetailOutputBoundary outputBoundary;
     private final OrderRepository orderRepository;
+    private final CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase;
+    private final FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase;
+
+    public GetOrderDetailUseCaseControl(
+            GetOrderDetailOutputBoundary outputBoundary,
+            OrderRepository orderRepository,
+            CalculateOrderTotalsInputBoundary calculateOrderTotalsUseCase,
+            FormatOrderForDisplayInputBoundary formatOrderForDisplayUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.orderRepository = orderRepository;
+        this.calculateOrderTotalsUseCase = calculateOrderTotalsUseCase;
+        this.formatOrderForDisplayUseCase = formatOrderForDisplayUseCase;
+    }
 
     public GetOrderDetailUseCaseControl(
             GetOrderDetailOutputBoundary outputBoundary,
@@ -26,6 +44,8 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
     ) {
         this.outputBoundary = outputBoundary;
         this.orderRepository = orderRepository;
+        this.calculateOrderTotalsUseCase = null;
+        this.formatOrderForDisplayUseCase = null;
     }
 
     @Override
@@ -53,6 +73,18 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
                 
                 DonHang order = orderOpt.get();
                 
+                // UC-49: Calculate order totals
+                CalculateOrderTotalsInputData totalsInput = new CalculateOrderTotalsInputData(
+                    order.getDanhSachSanPham()
+                );
+                var totalsResult = ((CalculateOrderTotalsUseCaseControl) calculateOrderTotalsUseCase)
+                    .calculateInternal(totalsInput);
+                
+                // UC-50: Format order for display
+                FormatOrderForDisplayInputData formatInput = new FormatOrderForDisplayInputData(order);
+                var formatResult = ((FormatOrderForDisplayUseCaseControl) formatOrderForDisplayUseCase)
+                    .formatInternal(formatInput);
+                
                 // Map order items
                 List<OrderItemInfo> items = order.getDanhSachSanPham().stream()
                         .map(item -> new OrderItemInfo(
@@ -64,19 +96,19 @@ public class GetOrderDetailUseCaseControl implements GetOrderDetailInputBoundary
                         ))
                         .collect(Collectors.toList());
                 
-                // Create OrderDetailInfo
+                // Create OrderDetailInfo with formatted data
                 OrderDetailInfo orderDetail = new OrderDetailInfo(
                         order.getMaDonHang(),
                         order.getMaTaiKhoan(),
                         order.getTenNguoiNhan(),
                         order.getSoDienThoai(),
                         order.getDiaChiGiaoHang(),
-                        order.getTrangThai().getMoTa(),
+                        formatResult.getFormattedStatus(),
                         order.getTrangThai().name(),
-                        order.getTongTien(),
-                        order.getNgayDat(),
+                        totalsResult.getTotalAmount(),
+                        formatResult.getFormattedOrderDate(),
                         order.getGhiChu(),
-                        order.getPhuongThucThanhToan().name(),
+                        formatResult.getFormattedPaymentMethod(),
                         items
                 );
                 

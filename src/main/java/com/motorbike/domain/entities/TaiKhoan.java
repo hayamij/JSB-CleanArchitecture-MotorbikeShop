@@ -58,6 +58,11 @@ public class TaiKhoan {
         this.ngayCapNhat = ngayCapNhat;
         this.lanDangNhapCuoi = lanDangNhapCuoi;
     }
+    
+    // Constructor with 5 parameters (no phone)
+    public TaiKhoan(String hoTen, String email, String tenDangNhap, String matKhau, String diaChi) {
+        this(hoTen, email, tenDangNhap, matKhau, null, diaChi);
+    }
 
     public static void validateHoTen(String hoTen) {
         if (hoTen == null || hoTen.trim().isEmpty()) {
@@ -170,4 +175,7 @@ public class TaiKhoan {
     public void setTenDangNhap(String tenDangNhap) {validateTenDangNhap(tenDangNhap); this.tenDangNhap = tenDangNhap; this.ngayCapNhat = LocalDateTime.now();}
     public void setSoDienThoai(String soDienThoai) {validateSoDienThoai(soDienThoai); this.soDienThoai = soDienThoai; this.ngayCapNhat = LocalDateTime.now();}
     public void setDiaChi(String diaChi) {this.diaChi = diaChi; this.ngayCapNhat = LocalDateTime.now();}
+    public void setVaiTro(VaiTro vaiTro) {this.vaiTro = vaiTro; this.ngayCapNhat = LocalDateTime.now();}
+    public void setMaTK(Long maTaiKhoan) {this.maTaiKhoan = maTaiKhoan;}
+    public Long getMaNguoiDung() {return maTaiKhoan;} // Alias for compatibility
 }

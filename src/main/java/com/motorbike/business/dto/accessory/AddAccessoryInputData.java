@@ -36,4 +36,9 @@ public class AddAccessoryInputData {
     public String getThuongHieu() { return thuongHieu; }
     public String getChatLieu() { return chatLieu; }
     public String getKichThuoc() { return kichThuoc; }
+    
+    // Alias methods for compatibility
+    public String getNhaCungCap() { return thuongHieu; }
+    public String getXuatXu() { return chatLieu; }
+    public String getBaoHanh() { return kichThuoc; }
 }

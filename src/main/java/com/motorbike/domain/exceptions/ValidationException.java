@@ -205,4 +205,16 @@ public class ValidationException extends IllegalArgumentException {
     public static ValidationException invalidEngineCapacity() {
         return new ValidationException("Dung tích động cơ không hợp lệ", "INVALID_ENGINE_CAPACITY");
     }
+    
+    public static ValidationException invalidCartId() {
+        return new ValidationException("Mã giỏ hàng không hợp lệ", "INVALID_CART_ID");
+    }
+    
+    public static ValidationException invalidInput(String message) {
+        return new ValidationException(message, "INVALID_INPUT");
+    }
+    
+    public static ValidationException nullOrderStatus() {
+        return new ValidationException("Trạng thái đơn hàng không được null", "NULL_ORDER_STATUS");
+    }
 }

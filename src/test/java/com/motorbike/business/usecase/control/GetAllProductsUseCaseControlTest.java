@@ -97,6 +97,16 @@ public class GetAllProductsUseCaseControlTest {
 		public List<PhuKienXeMay> searchAccessories(String keyword) {
 			return List.of();
 		}
+
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
 	}
 
 	private static class MockProductRepositoryEmpty implements ProductRepository {
@@ -143,5 +153,14 @@ public class GetAllProductsUseCaseControlTest {
 		public List<PhuKienXeMay> searchAccessories(String keyword) {
 			return List.of();
 		}
-	}
+
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}	}
 }

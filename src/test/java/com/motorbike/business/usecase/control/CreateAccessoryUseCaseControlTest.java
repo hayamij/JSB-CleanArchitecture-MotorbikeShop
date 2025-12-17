@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.motorbike.adapters.presenters.CreateAccessoryPresenter;
 import com.motorbike.adapters.viewmodels.CreateAccessoryViewModel;
-import com.motorbike.business.dto.accessory.CreateAccessoryInputData;
+import com.motorbike.business.dto.accessory.AddAccessoryInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.CreateAccessoryOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
@@ -19,7 +19,7 @@ public class CreateAccessoryUseCaseControlTest {
 
 	@Test
 	public void testExecute_ValidAccessory_Success() {
-		CreateAccessoryInputData inputData = new CreateAccessoryInputData(
+		AddAccessoryInputData inputData = new AddAccessoryInputData(
 			"Mũ bảo hiểm Fullface",
 			"Mũ bảo hiểm cao cấp",
 			new BigDecimal("500000"),
@@ -58,7 +58,7 @@ public class CreateAccessoryUseCaseControlTest {
 
 	@Test
 	public void testExecute_EmptyProductName() {
-		CreateAccessoryInputData inputData = new CreateAccessoryInputData(
+		AddAccessoryInputData inputData = new AddAccessoryInputData(
 			"",
 			"Mô tả",
 			new BigDecimal("500000"),
@@ -129,6 +129,16 @@ public class CreateAccessoryUseCaseControlTest {
 		@Override
 		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
 			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
 		}
 	}
 }

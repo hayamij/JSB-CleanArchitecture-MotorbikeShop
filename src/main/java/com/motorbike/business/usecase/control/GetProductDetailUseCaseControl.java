@@ -2,9 +2,13 @@
 package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
+import com.motorbike.business.usecase.input.CalculateProductPriceInputBoundary;
+import com.motorbike.business.usecase.input.FormatProductForDisplayInputBoundary;
 
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
+import com.motorbike.business.dto.calculateproductprice.CalculateProductPriceInputData;
+import com.motorbike.business.dto.formatproductfordisplay.FormatProductForDisplayInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
@@ -17,12 +21,27 @@ public class GetProductDetailUseCaseControl implements GetProductDetailInputBoun
     
     private final GetProductDetailOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final CalculateProductPriceInputBoundary calculatePriceUseCase;
+    private final FormatProductForDisplayInputBoundary formatProductUseCase;
     
+    public GetProductDetailUseCaseControl(
+            GetProductDetailOutputBoundary outputBoundary,
+            ProductRepository productRepository,
+            CalculateProductPriceInputBoundary calculatePriceUseCase,
+            FormatProductForDisplayInputBoundary formatProductUseCase) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.calculatePriceUseCase = calculatePriceUseCase;
+        this.formatProductUseCase = formatProductUseCase;
+    }
+
     public GetProductDetailUseCaseControl(
             GetProductDetailOutputBoundary outputBoundary,
             ProductRepository productRepository) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.calculatePriceUseCase = null;
+        this.formatProductUseCase = null;
     }
     
     public void execute(GetProductDetailInputData inputData) {
@@ -52,11 +71,26 @@ public class GetProductDetailUseCaseControl implements GetProductDetailInputBoun
             try {
                 String chiTiet = sanPham.layThongTinChiTiet();
                 BigDecimal giaGoc = sanPham.getGia();
-                BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
-                double phanTramGiam = giaGoc.subtract(giaSauKhuyenMai)
+                Integer discountPercent = sanPham.getPhanTramGiamGia() != null ? sanPham.getPhanTramGiamGia().intValue() : 0;
+                
+                // UC-53: Calculate product price
+                CalculateProductPriceInputData priceInput = new CalculateProductPriceInputData(
+                    giaGoc,
+                    discountPercent
+                );
+                var priceResult = ((CalculateProductPriceUseCaseControl) calculatePriceUseCase)
+                    .calculateInternal(priceInput);
+                
+                if (!priceResult.isSuccess()) {
+                    throw new DomainException(priceResult.getErrorMessage(), priceResult.getErrorCode());
+                }
+                
+                BigDecimal giaSauKhuyenMai = priceResult.getFinalPrice();
+                double phanTramGiam = priceResult.getDiscountAmount()
                     .divide(giaGoc, 4, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100))
                     .doubleValue();
+                
                 boolean conHang = sanPham.getSoLuongTonKho() > 0;
                 
                 // Determine category based on instance type

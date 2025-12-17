@@ -5,6 +5,12 @@ import com.motorbike.business.dto.motorbike.SearchMotorbikesOutputData;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesOutputData.MotorbikeItem;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
+import com.motorbike.business.dto.buildsearchcriteria.BuildSearchCriteriaInputData;
+import com.motorbike.business.dto.applysearchfilters.ApplySearchFiltersInputData;
+import com.motorbike.business.dto.sortsearchresults.SortSearchResultsInputData;
+import com.motorbike.business.usecase.input.BuildSearchCriteriaInputBoundary;
+import com.motorbike.business.usecase.input.ApplySearchFiltersInputBoundary;
+import com.motorbike.business.usecase.input.SortSearchResultsInputBoundary;
 import com.motorbike.domain.entities.XeMay;
 import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
 
@@ -15,13 +21,34 @@ public class SearchMotorbikesUseCaseControl implements SearchMotorbikesInputBoun
 
     private final SearchMotorbikesOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase;
+    private final ApplySearchFiltersInputBoundary applySearchFiltersUseCase;
+    private final SortSearchResultsInputBoundary sortSearchResultsUseCase;
 
+    public SearchMotorbikesUseCaseControl(
+            SearchMotorbikesOutputBoundary outputBoundary,
+            ProductRepository productRepository,
+            BuildSearchCriteriaInputBoundary buildSearchCriteriaUseCase,
+            ApplySearchFiltersInputBoundary applySearchFiltersUseCase,
+            SortSearchResultsInputBoundary sortSearchResultsUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.buildSearchCriteriaUseCase = buildSearchCriteriaUseCase;
+        this.applySearchFiltersUseCase = applySearchFiltersUseCase;
+        this.sortSearchResultsUseCase = sortSearchResultsUseCase;
+    }
+
+    // Constructor with 2 parameters (for backward compatibility)
     public SearchMotorbikesUseCaseControl(
             SearchMotorbikesOutputBoundary outputBoundary,
             ProductRepository productRepository
     ) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.buildSearchCriteriaUseCase = new BuildSearchCriteriaUseCaseControl(null);
+        this.applySearchFiltersUseCase = new ApplySearchFiltersUseCaseControl(null);
+        this.sortSearchResultsUseCase = new SortSearchResultsUseCaseControl(null);
     }
 
     @Override
@@ -30,15 +57,33 @@ public class SearchMotorbikesUseCaseControl implements SearchMotorbikesInputBoun
         Exception errorException = null;
 
         try {
+            // Step 1: Get all motorbikes
             List<XeMay> all = productRepository.findAllMotorbikes();
 
-            List<MotorbikeItem> filtered = all.stream()
-                    .filter(x -> input.keyword == null || x.getTenSanPham().toLowerCase().contains(input.keyword.toLowerCase()))
-                    .filter(x -> input.brand == null || x.getHangXe().equalsIgnoreCase(input.brand))
-                    .filter(x -> input.model == null || x.getDongXe().equalsIgnoreCase(input.model))
-                    .filter(x -> input.color == null || x.getMauSac().equalsIgnoreCase(input.color))
-                    .filter(x -> input.minCC == null || x.getDungTich() >= input.minCC)
-                    .filter(x -> input.maxCC == null || x.getDungTich() <= input.maxCC)
+            // Step 2: UC-68 - Build search criteria
+            BuildSearchCriteriaInputData criteriaInput = new BuildSearchCriteriaInputData(
+                input.keyword,
+                java.util.Map.of(
+                    "brand", input.brand != null ? input.brand : "",
+                    "model", input.model != null ? input.model : "",
+                    "color", input.color != null ? input.color : "",
+                    "minCC", input.minCC != null ? input.minCC.toString() : "",
+                    "maxCC", input.maxCC != null ? input.maxCC.toString() : ""
+                )
+            ); 
+            var criteriaResult = ((BuildSearchCriteriaUseCaseControl) buildSearchCriteriaUseCase)
+                .buildInternal(criteriaInput);
+
+            // Step 3: UC-69 - Apply search filters
+            ApplySearchFiltersInputData filtersInput = new ApplySearchFiltersInputData(
+                all,
+                criteriaResult.getCriteria()
+            );
+            var filtersResult = ((ApplySearchFiltersUseCaseControl) applySearchFiltersUseCase)
+                .applyInternal(filtersInput);
+
+            // Step 4: Map to output DTOs
+            List<MotorbikeItem> mapped = ((List<XeMay>) filtersResult.getFilteredResults()).stream()
                     .map(x -> new MotorbikeItem(
                             x.getMaSanPham(),
                             x.getTenSanPham(),
@@ -54,7 +99,19 @@ public class SearchMotorbikesUseCaseControl implements SearchMotorbikesInputBoun
                     ))
                     .collect(Collectors.toList());
 
-            outputData = new SearchMotorbikesOutputData(filtered);
+            // Step 5: UC-70 - Sort results (if sortBy specified)
+            if (input.sortBy != null && !input.sortBy.isEmpty()) {
+                SortSearchResultsInputData sortInput = new SortSearchResultsInputData(
+                    (List) mapped,
+                    input.sortBy,
+                    input.sortDirection != null ? input.sortDirection : "ASC"
+                );
+                var sortResult = ((SortSearchResultsUseCaseControl) sortSearchResultsUseCase)
+                    .sortInternal(sortInput);
+                mapped = (List<MotorbikeItem>) sortResult.getSortedResults();
+            }
+
+            outputData = new SearchMotorbikesOutputData(mapped);
         } catch (Exception e) {
             errorException = e;
         }

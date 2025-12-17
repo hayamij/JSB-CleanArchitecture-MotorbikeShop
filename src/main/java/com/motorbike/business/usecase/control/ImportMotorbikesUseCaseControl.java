@@ -7,6 +7,14 @@ import com.motorbike.business.ports.parser.ExcelParser;
 import com.motorbike.business.ports.repository.MotorbikeRepository;
 import com.motorbike.business.usecase.input.ImportMotorbikesInputBoundary;
 import com.motorbike.business.usecase.output.ImportMotorbikesOutputBoundary;
+import com.motorbike.business.dto.validateexcelfile.ValidateExcelFileInputData;
+import com.motorbike.business.dto.parseexceldata.ParseExcelDataInputData;
+import com.motorbike.business.dto.validateimportrow.ValidateImportRowInputData;
+import com.motorbike.business.dto.generateimportreport.GenerateImportReportInputData;
+import com.motorbike.business.usecase.input.ValidateExcelFileInputBoundary;
+import com.motorbike.business.usecase.input.ParseExcelDataInputBoundary;
+import com.motorbike.business.usecase.input.ValidateImportRowInputBoundary;
+import com.motorbike.business.usecase.input.GenerateImportReportInputBoundary;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.XeMay;
 import com.motorbike.domain.exceptions.ValidationException;
@@ -30,7 +38,29 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
     private final ImportMotorbikesOutputBoundary outputBoundary;
     private final MotorbikeRepository motorbikeRepository;
     private final ExcelParser excelParser;
+    private final ValidateExcelFileInputBoundary validateExcelFileUseCase;
+    private final ParseExcelDataInputBoundary parseExcelDataUseCase;
+    private final ValidateImportRowInputBoundary validateImportRowUseCase;
+    private final GenerateImportReportInputBoundary generateImportReportUseCase;
     
+    public ImportMotorbikesUseCaseControl(
+            ImportMotorbikesOutputBoundary outputBoundary,
+            MotorbikeRepository motorbikeRepository,
+            ExcelParser excelParser,
+            ValidateExcelFileInputBoundary validateExcelFileUseCase,
+            ParseExcelDataInputBoundary parseExcelDataUseCase,
+            ValidateImportRowInputBoundary validateImportRowUseCase,
+            GenerateImportReportInputBoundary generateImportReportUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.motorbikeRepository = motorbikeRepository;
+        this.excelParser = excelParser;
+        this.validateExcelFileUseCase = validateExcelFileUseCase;
+        this.parseExcelDataUseCase = parseExcelDataUseCase;
+        this.validateImportRowUseCase = validateImportRowUseCase;
+        this.generateImportReportUseCase = generateImportReportUseCase;
+    }
+
     public ImportMotorbikesUseCaseControl(
             ImportMotorbikesOutputBoundary outputBoundary,
             MotorbikeRepository motorbikeRepository,
@@ -39,6 +69,10 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
         this.outputBoundary = outputBoundary;
         this.motorbikeRepository = motorbikeRepository;
         this.excelParser = excelParser;
+        this.validateExcelFileUseCase = null;
+        this.parseExcelDataUseCase = null;
+        this.validateImportRowUseCase = null;
+        this.generateImportReportUseCase = null;
     }
     
     @Override
@@ -46,15 +80,50 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
         ImportMotorbikesOutputData outputData;
         
         try {
-            // Step 1: Validate input
+            // Step 1: Basic validation
             if (inputData == null || inputData.getFileInputStream() == null) {
                 throw ValidationException.invalidInput();
             }
             
-            validateFileExtension(inputData.getOriginalFilename());
+            // Step 2: UC-62 - Validate Excel file
+            List<String> expectedColumns = List.of(
+                "Tên sản phẩm", "Mô tả", "Giá", "Hình ảnh", "Số lượng tồn kho",
+                "Hãng xe", "Dòng xe", "Màu sắc", "Năm sản xuất", "Dung tích"
+            );
+            ValidateExcelFileInputData validateFileInput = new ValidateExcelFileInputData(
+                inputData.getFileInputStream(),
+                inputData.getOriginalFilename(),
+                expectedColumns
+            );
+            var validateFileResult = ((ValidateExcelFileUseCaseControl) validateExcelFileUseCase)
+                .validateInternal(validateFileInput);
             
-            // Step 2: Parse Excel file
-            List<List<String>> rows = excelParser.parseExcelFile(inputData.getFileInputStream());
+            if (!validateFileResult.isValid()) {
+                outputData = ImportMotorbikesOutputData.forError(
+                    validateFileResult.getErrorCode(),
+                    String.join("; ", validateFileResult.getErrors())
+                );
+                outputBoundary.present(outputData);
+                return;
+            }
+            
+            // Step 3: UC-63 - Parse Excel file
+            ParseExcelDataInputData parseInput = new ParseExcelDataInputData(
+                inputData.getFileInputStream()
+            );
+            var parseResult = ((ParseExcelDataUseCaseControl) parseExcelDataUseCase)
+                .parseInternal(parseInput);
+            
+            if (!parseResult.isSuccess()) {
+                outputData = ImportMotorbikesOutputData.forError(
+                    parseResult.getErrorCode(),
+                    parseResult.getErrorMessage()
+                );
+                outputBoundary.present(outputData);
+                return;
+            }
+            
+            var rows = parseResult.getRows();
             
             if (rows == null || rows.isEmpty()) {
                 outputData = ImportMotorbikesOutputData.forError(
@@ -65,14 +134,33 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
                 return;
             }
             
-            // Step 3: Process rows (skip header row)
+            // Step 4: UC-64 - Validate and process rows (skip header row)
             List<XeMay> validMotorbikes = new ArrayList<>();
             List<ImportError> errors = new ArrayList<>();
             int totalRecords = rows.size() - 1; // Exclude header
             
             for (int i = 1; i < rows.size(); i++) {
                 int rowNumber = i + 1; // Excel row number (1-based, accounting for header)
-                List<String> row = rows.get(i);
+                var rowMap = rows.get(i);
+                List<String> row = new java.util.ArrayList<>(rowMap.values());
+                
+                // UC-64: Validate import row
+                ValidateImportRowInputData validateRowInput = new ValidateImportRowInputData(
+                    row,
+                    rowNumber,
+                    "motorbike"  // productType
+                );
+                var validateRowResult = ((ValidateImportRowUseCaseControl) validateImportRowUseCase)
+                    .validateInternal(validateRowInput);
+                
+                if (!validateRowResult.isValid()) {
+                    errors.add(new ImportError(
+                        rowNumber, 
+                        "", 
+                        String.join("; ", validateRowResult.getErrors())
+                    ));
+                    continue;
+                }
                 
                 try {
                     XeMay xeMay = parseRowToMotorbike(row, rowNumber);
@@ -82,7 +170,7 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
                 }
             }
             
-            // Step 4: Save valid motorbikes in bulk
+            // Step 5: Save valid motorbikes in bulk
             int successCount = 0;
             if (!validMotorbikes.isEmpty()) {
                 try {
@@ -107,7 +195,19 @@ public class ImportMotorbikesUseCaseControl implements ImportMotorbikesInputBoun
             
             int failureCount = totalRecords - successCount;
             
-            // Step 5: Present result
+            // Step 6: UC-65 - Generate import report
+            GenerateImportReportInputData reportInput = new GenerateImportReportInputData(
+                totalRecords,
+                successCount,
+                failureCount,
+                errors.stream()
+                    .map(err -> "Dòng " + err.getRowNumber() + ": " + err.getErrorMessage())
+                    .toList()
+            );
+            var reportResult = ((GenerateImportReportUseCaseControl) generateImportReportUseCase)
+                .generateInternal(reportInput);
+            
+            // Step 7: Present result with generated report
             outputData = ImportMotorbikesOutputData.forSuccess(
                 totalRecords,
                 successCount,

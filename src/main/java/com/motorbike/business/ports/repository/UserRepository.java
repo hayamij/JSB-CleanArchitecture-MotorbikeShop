@@ -12,6 +12,7 @@ public interface UserRepository {
     
     Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username);
     
+    Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap);
     
     Optional<TaiKhoan> findById(Long id);
     

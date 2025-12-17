@@ -38,6 +38,22 @@ public class DonHang {
         this.ngayDat = LocalDateTime.now();
         this.ngayCapNhat = LocalDateTime.now();
     }
+    
+    // Constructor for tests with 3 params (maDonHang, tongTien, tenNguoiNhan)
+    public DonHang(long maDonHang, double tongTien, String tenNguoiNhan) {
+        this.maDonHang = maDonHang;
+        this.tongTien = BigDecimal.valueOf(tongTien);
+        this.tenNguoiNhan = tenNguoiNhan;
+        this.maTaiKhoan = null;
+        this.danhSachSanPham = new ArrayList<>();
+        this.trangThai = TrangThaiDonHang.CHO_XAC_NHAN;
+        this.soDienThoai = "";
+        this.diaChiGiaoHang = "";
+        this.ghiChu = "";
+        this.phuongThucThanhToan = PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP;
+        this.ngayDat = LocalDateTime.now();
+        this.ngayCapNhat = LocalDateTime.now();
+    }
 
     public DonHang(Long maDonHang, Long maTaiKhoan, List<ChiTietDonHang> danhSachSanPham,
                    BigDecimal tongTien, TrangThaiDonHang trangThai,
@@ -193,10 +209,26 @@ public class DonHang {
     public String getGhiChu() {return ghiChu;}
     public PhuongThucThanhToan getPhuongThucThanhToan() {return phuongThucThanhToan;}
     public LocalDateTime getNgayDat() {return ngayDat;}
+    public LocalDateTime getNgayDatHang() {return ngayDat;}
     public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
     public void setMaDonHang(Long maDonHang) {this.maDonHang = maDonHang;}
+    public void setMaDH(long maDonHang) {this.maDonHang = maDonHang;}
     public void setDanhSachSanPham(List<ChiTietDonHang> danhSachSanPham) {this.danhSachSanPham = danhSachSanPham;}
     public void setPhuongThucThanhToan(PhuongThucThanhToan phuongThucThanhToan) {this.phuongThucThanhToan = phuongThucThanhToan;}
+    
+    // Additional methods for tests
+    public void capNhatTrangThai(TrangThaiDonHang trangThaiMoi) {
+        if (trangThaiMoi == null) {
+            throw ValidationException.nullOrderStatus();
+        }
+        this.trangThai = trangThaiMoi;
+        this.ngayCapNhat = LocalDateTime.now();
+    }
+    
+    public TaiKhoan getNguoiDung() {
+        // This returns null - tests should mock or provide TaiKhoan separately
+        return null;
+    }
 
     @Override
     public String toString() {

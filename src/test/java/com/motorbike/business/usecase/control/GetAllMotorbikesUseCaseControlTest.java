@@ -93,6 +93,16 @@ public class GetAllMotorbikesUseCaseControlTest {
 		public List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
 			return new ArrayList<>();
 		}
+
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
 	}
 
 	private static class MockProductRepositoryEmpty implements ProductRepository {
@@ -139,5 +149,14 @@ public class GetAllMotorbikesUseCaseControlTest {
 		public List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
 			return new ArrayList<>();
 		}
-	}
+
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}	}
 }

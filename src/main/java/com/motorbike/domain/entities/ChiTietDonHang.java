@@ -22,6 +22,16 @@ public class ChiTietDonHang {
         this.soLuong = soLuong;
         this.thanhTien = tinhThanhTien();
     }
+    
+    // Constructor for tests with primitive long and double
+    public ChiTietDonHang(long maSanPham, long maDonHang, int soLuong, double giaBan) {
+        this.maSanPham = maSanPham;
+        this.maDonHang = maDonHang;
+        this.soLuong = soLuong;
+        this.giaBan = BigDecimal.valueOf(giaBan);
+        this.tenSanPham = "";
+        this.thanhTien = this.giaBan.multiply(BigDecimal.valueOf(soLuong));
+    }
 
     public ChiTietDonHang(Long maChiTiet, Long maDonHang, Long maSanPham,
                           String tenSanPham, BigDecimal giaBan,

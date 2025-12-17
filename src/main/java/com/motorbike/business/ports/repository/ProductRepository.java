@@ -11,6 +11,9 @@ public interface ProductRepository {
     
     Optional<SanPham> findById(Long productId);
     
+    Optional<SanPham> findByMaSanPham(String maSanPham);
+    
+    Optional<SanPham> findByTenSanPham(String tenSanPham);
     
     SanPham save(SanPham sanPham);
     

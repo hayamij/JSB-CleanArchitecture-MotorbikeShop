@@ -151,5 +151,15 @@ public class UpdateMotorbikeUseCaseControlTest {
 		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
 			return new java.util.ArrayList<>();
 		}
+		
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
 	}
 }

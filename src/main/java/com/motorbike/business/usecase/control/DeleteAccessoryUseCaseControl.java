@@ -2,8 +2,10 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.accessory.DeleteAccessoryInputData;
 import com.motorbike.business.dto.accessory.DeleteAccessoryOutputData;
+import com.motorbike.business.dto.archiveproduct.ArchiveProductInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.DeleteAccessoryInputBoundary;
+import com.motorbike.business.usecase.input.ArchiveProductInputBoundary;
 import com.motorbike.business.usecase.output.DeleteAccessoryOutputBoundary;
 import com.motorbike.domain.exceptions.*;
 
@@ -11,13 +13,25 @@ public class DeleteAccessoryUseCaseControl implements DeleteAccessoryInputBounda
 
     private final DeleteAccessoryOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final ArchiveProductInputBoundary archiveProductUseCase;
 
     public DeleteAccessoryUseCaseControl(
             DeleteAccessoryOutputBoundary outputBoundary,
-            ProductRepository productRepository
+            ProductRepository productRepository,
+            ArchiveProductInputBoundary archiveProductUseCase
     ) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.archiveProductUseCase = archiveProductUseCase;
+    }
+    
+    // Constructor for tests with 2 params
+    public DeleteAccessoryUseCaseControl(
+            DeleteAccessoryOutputBoundary outputBoundary,
+            ProductRepository productRepository) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.archiveProductUseCase = new ArchiveProductUseCaseControl(null, productRepository);
     }
 
     @Override
@@ -44,7 +58,14 @@ public class DeleteAccessoryUseCaseControl implements DeleteAccessoryInputBounda
                     throw DomainException.productNotFound(inputData.getMaSanPham().toString());
                 }
 
-                productRepository.deleteById(inputData.getMaSanPham());
+                // UC-56: Archive product (soft delete)
+                ArchiveProductInputData archiveInput = new ArchiveProductInputData(inputData.getMaSanPham());
+                var archiveResult = ((ArchiveProductUseCaseControl) archiveProductUseCase)
+                    .archiveInternal(archiveInput);
+                
+                if (!archiveResult.isSuccess()) {
+                    throw new DomainException(archiveResult.getErrorMessage(), archiveResult.getErrorCode());
+                }
 
                 outputData = DeleteAccessoryOutputData.forSuccess(
                         inputData.getMaSanPham(),
