@@ -378,6 +378,11 @@ public class LoginUseCaseControlTest {
 				guestCart.setMaGioHang(999L);
 				return Optional.of(guestCart);
 			}
+			if (id == 1L) {
+				GioHang userCart = new GioHang(1L);
+				userCart.setMaGioHang(1L);
+				return Optional.of(userCart);
+			}
 			return Optional.empty();
 		}
 		
