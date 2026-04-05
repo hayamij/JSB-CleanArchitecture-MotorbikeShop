@@ -20,6 +20,7 @@ import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.XeMay;
+import com.motorbike.domain.entities.PhuKienXeMay;
 
 public class ViewCartUseCaseControlTest {
 
@@ -283,6 +284,40 @@ public class ViewCartUseCaseControlTest {
 		public List<SanPham> findAll() {
 			return Collections.emptyList();
 		}
+		
+		@Override
+		public void deleteById(Long productId) {
+		}
+		
+		@Override
+		public List<PhuKienXeMay> findAllAccessories() {
+			return Collections.emptyList();
+		}
+		
+		@Override
+		public List<PhuKienXeMay> searchAccessories(String keyword) {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+			return Collections.emptyList();
+		}
+		
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
 	}
 	
 	private static class MockCartRepository implements CartRepository {
@@ -340,6 +375,19 @@ public class ViewCartUseCaseControlTest {
 		@Override
 		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
 			return 0;
+		}
+
+		@Override
+		public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+			return Optional.empty();
+		}
+
+		@Override
+		public void deleteAllByUserId(Long userId) {
+		}
+
+		@Override
+		public void deleteById(Long cartId) {
 		}
 	}
 }

@@ -3,11 +3,15 @@ package com.motorbike.business.usecase.control;
 import com.motorbike.business.dto.accessory.SearchAccessoriesInputData;
 import com.motorbike.business.dto.accessory.SearchAccessoriesOutputData;
 import com.motorbike.business.dto.accessory.SearchAccessoriesOutputData.AccessoryItem;
+import com.motorbike.business.dto.accessory.FormatAccessoriesForDisplayInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.SearchAccessoriesInputBoundary;
+import com.motorbike.business.usecase.input.FormatAccessoriesForDisplayInputBoundary;
 import com.motorbike.business.usecase.output.SearchAccessoriesOutputBoundary;
+
 import com.motorbike.domain.entities.PhuKienXeMay;
 import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.exceptions.SystemException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,13 +20,26 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
 
     private final SearchAccessoriesOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final FormatAccessoriesForDisplayInputBoundary formatAccessoriesUseCase;
 
+    public SearchAccessoriesUseCaseControl(
+            SearchAccessoriesOutputBoundary outputBoundary,
+            ProductRepository productRepository,
+            FormatAccessoriesForDisplayInputBoundary formatAccessoriesUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.formatAccessoriesUseCase = formatAccessoriesUseCase;
+    }
+
+    // Backward compatibility constructor
     public SearchAccessoriesUseCaseControl(
             SearchAccessoriesOutputBoundary outputBoundary,
             ProductRepository productRepository
     ) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.formatAccessoriesUseCase = new FormatAccessoriesForDisplayUseCaseControl(null);
     }
 
     @Override
@@ -31,14 +48,48 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
         Exception errorException = null;
 
         try {
+            // Step 1: Get all products and filter to accessories only
             List<SanPham> allProducts = productRepository.findAll();
 
-            List<AccessoryItem> accessories = allProducts.stream()
+            List<PhuKienXeMay> filteredAccessories = allProducts.stream()
                     .filter(p -> p instanceof PhuKienXeMay)
                     .map(p -> (PhuKienXeMay) p)
-                    .filter(p -> matchesSearchCriteria(p, inputData))
-                    .map(this::mapToAccessoryItem)
+                    .filter(a -> inputData == null || inputData.keyword == null || 
+                            a.getTenSanPham().toLowerCase().contains(inputData.keyword.toLowerCase()) ||
+                            (a.getMoTa() != null && a.getMoTa().toLowerCase().contains(inputData.keyword.toLowerCase())))
+                    .filter(a -> inputData == null || inputData.loaiPhuKien == null || 
+                            (a.getLoaiPhuKien() != null && a.getLoaiPhuKien().equalsIgnoreCase(inputData.loaiPhuKien)))
+                    .filter(a -> inputData == null || inputData.thuongHieu == null || 
+                            (a.getThuongHieu() != null && a.getThuongHieu().equalsIgnoreCase(inputData.thuongHieu)))
+                    .filter(a -> inputData == null || inputData.chatLieu == null || 
+                            (a.getChatLieu() != null && a.getChatLieu().equalsIgnoreCase(inputData.chatLieu)))
+                    .filter(a -> inputData == null || inputData.minPrice == null || a.getGia().doubleValue() >= inputData.minPrice)
+                    .filter(a -> inputData == null || inputData.maxPrice == null || a.getGia().doubleValue() <= inputData.maxPrice)
                     .collect(Collectors.toList());
+
+            // Step 2: UC-76 Format accessories for display
+            FormatAccessoriesForDisplayInputData formatInput = new FormatAccessoriesForDisplayInputData(filteredAccessories);
+            var formatResult = ((FormatAccessoriesForDisplayUseCaseControl) formatAccessoriesUseCase).formatInternal(formatInput);
+            
+            if (!formatResult.isSuccess()) {
+                throw new SystemException(formatResult.getErrorMessage(), formatResult.getErrorCode());
+            }
+
+            // Convert from GetAllAccessoriesOutputData.AccessoryItem to SearchAccessoriesOutputData.AccessoryItem
+            List<AccessoryItem> accessories = formatResult.getAccessoryItems().stream()
+                .map(item -> new AccessoryItem(
+                    item.id,
+                    item.name,
+                    item.description,
+                    item.price,
+                    item.stock,
+                    item.imageUrl,
+                    item.loaiPhuKien,
+                    item.thuongHieu,
+                    item.chatLieu,
+                    item.kichThuoc
+                ))
+                .collect(Collectors.toList());
 
             outputData = new SearchAccessoriesOutputData(accessories);
         } catch (Exception e) {
@@ -50,71 +101,5 @@ public class SearchAccessoriesUseCaseControl implements SearchAccessoriesInputBo
         }
 
         outputBoundary.present(outputData);
-    }
-
-    private boolean matchesSearchCriteria(PhuKienXeMay accessory, SearchAccessoriesInputData criteria) {
-        if (criteria == null) {
-            return true;
-        }
-
-        if (criteria.keyword != null && !criteria.keyword.isEmpty()) {
-            String keyword = criteria.keyword.toLowerCase();
-            boolean matchesName = accessory.getTenSanPham().toLowerCase().contains(keyword);
-            boolean matchesDescription = accessory.getMoTa() != null && 
-                                        accessory.getMoTa().toLowerCase().contains(keyword);
-            if (!matchesName && !matchesDescription) {
-                return false;
-            }
-        }
-
-        if (criteria.type != null && !criteria.type.isEmpty()) {
-            if (accessory.getLoaiPhuKien() == null || 
-                !accessory.getLoaiPhuKien().equalsIgnoreCase(criteria.type)) {
-                return false;
-            }
-        }
-
-        if (criteria.brand != null && !criteria.brand.isEmpty()) {
-            if (accessory.getThuongHieu() == null || 
-                !accessory.getThuongHieu().equalsIgnoreCase(criteria.brand)) {
-                return false;
-            }
-        }
-
-        if (criteria.material != null && !criteria.material.isEmpty()) {
-            if (accessory.getChatLieu() == null || 
-                !accessory.getChatLieu().equalsIgnoreCase(criteria.material)) {
-                return false;
-            }
-        }
-
-        if (criteria.minPrice != null) {
-            if (accessory.getGia().doubleValue() < criteria.minPrice) {
-                return false;
-            }
-        }
-
-        if (criteria.maxPrice != null) {
-            if (accessory.getGia().doubleValue() > criteria.maxPrice) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private AccessoryItem mapToAccessoryItem(PhuKienXeMay accessory) {
-        return new AccessoryItem(
-                accessory.getMaSanPham(),
-                accessory.getTenSanPham(),
-                accessory.getMoTa(),
-                accessory.getGia(),
-                accessory.getSoLuongTonKho(),
-                accessory.getHinhAnh(),
-                accessory.getLoaiPhuKien(),
-                accessory.getThuongHieu(),
-                accessory.getChatLieu(),
-                accessory.getKichThuoc()
-        );
     }
 }

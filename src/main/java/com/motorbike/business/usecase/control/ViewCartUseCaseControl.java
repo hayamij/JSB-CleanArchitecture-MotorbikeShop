@@ -1,32 +1,60 @@
+
 package com.motorbike.business.usecase.control;
+import com.motorbike.business.usecase.input.ViewCartInputBoundary;
 
 import com.motorbike.business.dto.viewcart.ViewCartInputData;
 import com.motorbike.business.dto.viewcart.ViewCartOutputData;
+import com.motorbike.business.dto.formatcartitems.FormatCartItemsForDisplayInputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.ViewCartOutputBoundary;
+import com.motorbike.business.dto.calculatecarttotals.CalculateCartTotalsInputData;
+import com.motorbike.business.usecase.input.CalculateCartTotalsInputBoundary;
+import com.motorbike.business.usecase.input.FormatCartItemsForDisplayInputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.exceptions.DomainException;
+import com.motorbike.domain.exceptions.SystemException;
 import com.motorbike.domain.exceptions.ValidationException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
-public class ViewCartUseCaseControl {
+public class ViewCartUseCaseControl implements ViewCartInputBoundary {
     
     private final ViewCartOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final CalculateCartTotalsInputBoundary calculateCartTotalsUseCase;
+    private final FormatCartItemsForDisplayInputBoundary formatCartItemsUseCase;
     
     public ViewCartUseCaseControl(
             ViewCartOutputBoundary outputBoundary,
             CartRepository cartRepository,
-            ProductRepository productRepository) {
+            ProductRepository productRepository,
+            CalculateCartTotalsInputBoundary calculateCartTotalsUseCase,
+            FormatCartItemsForDisplayInputBoundary formatCartItemsUseCase) {
         this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
+        this.calculateCartTotalsUseCase = calculateCartTotalsUseCase;
+        this.formatCartItemsUseCase = formatCartItemsUseCase;
+    }
+
+    // Constructor with 3 parameters (for backward compatibility)
+    public ViewCartUseCaseControl(
+            ViewCartOutputBoundary outputBoundary,
+            CartRepository cartRepository,
+            ProductRepository productRepository
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
+        this.calculateCartTotalsUseCase = new CalculateCartTotalsUseCaseControl(null);
+        this.formatCartItemsUseCase = new FormatCartItemsForDisplayUseCaseControl(null, productRepository);
     }
     
+    @Override
     public void execute(ViewCartInputData inputData) {
         ViewCartOutputData outputData = null;
         Exception errorException = null;
@@ -56,47 +84,43 @@ public class ViewCartUseCaseControl {
         
         if (errorException == null && gioHang != null) {
             try {
-                List<ViewCartOutputData.CartItemData> itemList = new ArrayList<>();
-                for (com.motorbike.domain.entities.ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
-                    SanPham product = productRepository.findById(item.getMaSanPham())
-                        .orElse(null);
-                    
-                    int availableStock = 0;
-                    String imageUrl = null;
-                    boolean hasStockWarning = false;
-                    String stockWarningMessage = null;
-                    
-                    if (product != null) {
-                        availableStock = product.getSoLuongTonKho();
-                        imageUrl = product.getHinhAnh();
-                        
-                        if (item.getSoLuong() > availableStock) {
-                            hasStockWarning = true;
-                            stockWarningMessage = String.format(
-                                "Số lượng trong giỏ (%d) vượt quá tồn kho (%d)",
-                                item.getSoLuong(), availableStock
-                            );
-                        }
-                    }
-                    
-                    ViewCartOutputData.CartItemData cartItem = new ViewCartOutputData.CartItemData(
-                        item.getMaSanPham(),
-                        item.getTenSanPham(),
-                        imageUrl,
-                        item.getGiaSanPham(),
-                        item.getSoLuong(),
-                        item.getTamTinh(),
-                        availableStock,
-                        hasStockWarning,
-                        stockWarningMessage
-                    );
-                    itemList.add(cartItem);
+                // Step 1: UC-78 Format cart items for display (with stock warnings)
+                FormatCartItemsForDisplayInputData formatInput = new FormatCartItemsForDisplayInputData(
+                    gioHang.getDanhSachSanPham()
+                );
+                var formatResult = ((FormatCartItemsForDisplayUseCaseControl) formatCartItemsUseCase)
+                    .formatInternal(formatInput);
+                
+                if (!formatResult.isSuccess()) {
+                    throw new SystemException(formatResult.getErrorMessage(), formatResult.getErrorCode());
                 }
+                
+                // Convert FormatCartItemsForDisplayOutputData.CartItemDisplayData to ViewCartOutputData.CartItemData
+                List<ViewCartOutputData.CartItemData> itemList = formatResult.getFormattedItems().stream()
+                    .map(item -> new ViewCartOutputData.CartItemData(
+                        Long.parseLong(item.getProductId()),
+                        item.getProductName(),
+                        item.getImageUrl(),
+                        item.getPrice(),
+                        item.getQuantity(),
+                        item.getSubtotal(),
+                        item.getAvailableStock(),
+                        item.isHasStockWarning(),
+                        item.getStockWarningMessage()
+                    ))
+                    .collect(Collectors.toList());
+                
+                // Step 2: UC-42 Calculate cart totals
+                CalculateCartTotalsInputData totalsInput = new CalculateCartTotalsInputData(
+                    gioHang.getDanhSachSanPham()
+                );
+                var totalsResult = ((CalculateCartTotalsUseCaseControl) calculateCartTotalsUseCase)
+                    .calculateInternal(totalsInput);
                 
                 outputData = ViewCartOutputData.forSuccess(
                     gioHang.getMaGioHang(),
                     itemList,
-                    gioHang.getTongTien()
+                    totalsResult.getTotalAmount()
                 );
             } catch (Exception e) {
                 errorException = e;

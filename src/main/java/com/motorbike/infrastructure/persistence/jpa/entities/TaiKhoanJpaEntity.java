@@ -1,25 +1,19 @@
 package com.motorbike.infrastructure.persistence.jpa.entities;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tai_khoan")
 public class TaiKhoanJpaEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ma_tai_khoan")
     private Long maTaiKhoan;
+
+    @Column(name = "ho_ten", length = 100)
+    private String hoTen;
 
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
@@ -63,9 +57,10 @@ public class TaiKhoanJpaEntity {
         this.vaiTro = VaiTroEnum.CUSTOMER;
     }
 
-    public TaiKhoanJpaEntity(String email, String tenDangNhap, String matKhau,
+    public TaiKhoanJpaEntity(String hoTen, String email, String tenDangNhap, String matKhau,
                              String soDienThoai, String diaChi) {
         this();
+        this.hoTen = hoTen;
         this.email = email;
         this.tenDangNhap = tenDangNhap;
         this.matKhau = matKhau;
@@ -76,6 +71,13 @@ public class TaiKhoanJpaEntity {
     public Long getMaTaiKhoan() {return maTaiKhoan;}
 
     public void setMaTaiKhoan(Long maTaiKhoan) {this.maTaiKhoan = maTaiKhoan;}
+
+    public String getHoTen() {return hoTen;}
+
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
+        this.ngayCapNhat = LocalDateTime.now();
+    }
 
     public String getEmail() {return email;}
 

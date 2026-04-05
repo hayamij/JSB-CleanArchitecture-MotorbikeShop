@@ -1,30 +1,34 @@
 package com.motorbike.adapters.controllers;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-
-import com.motorbike.adapters.dto.request.UpdateMotorbikeRequest;
+import java.util.stream.Collectors;
 
 import com.motorbike.adapters.dto.request.AddMotorbikeRequest;
-import com.motorbike.adapters.presenters.DeleteMotorbikePresenter;
-import com.motorbike.adapters.presenters.UpdateMotorbikePresenter;
+import com.motorbike.adapters.dto.response.ImportMotorbikesResponse;
 import com.motorbike.business.dto.motorbike.AddMotorbikeInputData;
-import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
+import com.motorbike.business.dto.motorbike.ImportMotorbikesInputData;
+import com.motorbike.business.dto.motorbike.ExportMotorbikesInputData;
 import com.motorbike.business.usecase.input.AddMotorbikeInputBoundary;
-import com.motorbike.business.usecase.input.DeleteMotorbikeInputBoundary;
+import com.motorbike.business.usecase.input.ImportMotorbikesInputBoundary;
+import com.motorbike.business.usecase.input.ExportMotorbikesInputBoundary;
 import com.motorbike.adapters.viewmodels.AddMotorbikeViewModel;
-import com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel;
+import com.motorbike.adapters.viewmodels.ImportMotorbikesViewModel;
+import com.motorbike.adapters.viewmodels.ExportMotorbikesViewModel;
+
+
 import com.motorbike.adapters.viewmodels.GetAllMotorbikesViewModel;
 import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
-import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
+
 import com.motorbike.business.usecase.input.GetAllMotorbikesInputBoundary;
 import com.motorbike.business.usecase.input.SearchMotorbikesInputBoundary;
-import com.motorbike.business.usecase.input.UpdateMotorbikeInputBoundary;
-import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
 import com.motorbike.business.dto.motorbike.SearchMotorbikesInputData;
-import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/motorbikes")
@@ -34,25 +38,17 @@ public class MotorbikeController {
     private final AddMotorbikeInputBoundary addMotorbikeUseCase;
     private final AddMotorbikeViewModel addMotorbikeViewModel;
 
-    private final DeleteMotorbikeOutputBoundary deleteMotorbikePresenter;
+    private final ImportMotorbikesInputBoundary importMotorbikesUseCase;
+    private final ImportMotorbikesViewModel importMotorbikesViewModel;
 
-    private final DeleteMotorbikeViewModel deleteMotorbikeViewModel;
-
-
-    private final UpdateMotorbikePresenter updateMotorbikePresenter;
-    private final UpdateMotorbikeViewModel updateMotorbikeViewModel;
-
+    private final ExportMotorbikesInputBoundary exportMotorbikesUseCase;
+    private final ExportMotorbikesViewModel exportMotorbikesViewModel;
 
     private final GetAllMotorbikesInputBoundary getAllMotorbikesUseCase;
     private final GetAllMotorbikesViewModel getAllViewModel;
 
     private final SearchMotorbikesInputBoundary searchMotorbikesUseCase;
     private final SearchMotorbikesViewModel searchViewModel;
-
-    private final UpdateMotorbikeInputBoundary updateMotorbikeUseCase;
-    private final DeleteMotorbikeInputBoundary deleteMotorbikeUseCase;
-
-
 
     public MotorbikeController(
             GetAllMotorbikesInputBoundary getAllMotorbikesUseCase,
@@ -61,16 +57,10 @@ public class MotorbikeController {
             SearchMotorbikesViewModel searchViewModel,
             AddMotorbikeInputBoundary addMotorbikeUseCase,
             AddMotorbikeViewModel addMotorbikeViewModel,
-            UpdateMotorbikeInputBoundary updateMotorbikeUseCase,
-            UpdateMotorbikePresenter updateMotorbikePresenter,
-            UpdateMotorbikeViewModel updateMotorbikeViewModel,
-            DeleteMotorbikeOutputBoundary deleteMotorbikePresenter,
-
-            DeleteMotorbikeViewModel deleteMotorbikeViewModel,
-            DeleteMotorbikeInputBoundary deleteMotorbikeUseCase
-
-
-
+            ImportMotorbikesInputBoundary importMotorbikesUseCase,
+            ImportMotorbikesViewModel importMotorbikesViewModel,
+            ExportMotorbikesInputBoundary exportMotorbikesUseCase,
+            ExportMotorbikesViewModel exportMotorbikesViewModel
             
     ) {
         this.getAllMotorbikesUseCase = getAllMotorbikesUseCase;
@@ -79,14 +69,10 @@ public class MotorbikeController {
         this.searchViewModel = searchViewModel;
         this.addMotorbikeUseCase = addMotorbikeUseCase;
         this.addMotorbikeViewModel = addMotorbikeViewModel;
-        this.updateMotorbikeUseCase = updateMotorbikeUseCase;
-        this.updateMotorbikePresenter = updateMotorbikePresenter;
-        this.updateMotorbikeViewModel = updateMotorbikeViewModel;
-        this.deleteMotorbikePresenter = deleteMotorbikePresenter;
-        this.deleteMotorbikeViewModel = deleteMotorbikeViewModel;
-        this.deleteMotorbikeUseCase = deleteMotorbikeUseCase;
-
-
+        this.importMotorbikesUseCase = importMotorbikesUseCase;
+        this.importMotorbikesViewModel = importMotorbikesViewModel;
+        this.exportMotorbikesUseCase = exportMotorbikesUseCase;
+        this.exportMotorbikesViewModel = exportMotorbikesViewModel;
     }
 
     // ============================
@@ -95,7 +81,7 @@ public class MotorbikeController {
     @GetMapping
     public ResponseEntity<?> getAllMotorbikes() {
 
-        getAllMotorbikesUseCase.execute(null); // Không có input
+        getAllMotorbikesUseCase.execute(); // Không có input
 
         if (getAllViewModel.hasError) {
             return ResponseEntity
@@ -148,15 +134,14 @@ public class MotorbikeController {
         AddMotorbikeInputData input = new AddMotorbikeInputData(
                 request.name,
                 request.description,
-                new BigDecimal(request.price),  // ✔ CONVERT DOUBLE → BigDecimal
+                new BigDecimal(request.price),
                 request.imageUrl,
                 request.stock,
                 request.brand,
                 request.model,
                 request.color,
                 request.year,
-                request.displacement,
-                request.productType 
+                request.displacement
         );
 
         addMotorbikeUseCase.execute(input);
@@ -167,71 +152,135 @@ public class MotorbikeController {
                     .body(new ErrorResponse(addMotorbikeViewModel.errorCode, addMotorbikeViewModel.errorMessage));
         }
 
-        return ResponseEntity.ok(addMotorbikeViewModel.motorbike);
+        return ResponseEntity.ok(java.util.Map.of(
+            "success", true,
+            "productId", addMotorbikeViewModel.maSanPham,
+            "message", addMotorbikeViewModel.successMessage
+        ));
 
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateMotorbike(
-            @PathVariable Long id,
-            @RequestBody UpdateMotorbikeRequest request
+    // ============================
+    // 4) IMPORT MOTORBIKES FROM EXCEL
+    // ============================
+    @PostMapping("/import")
+    public ResponseEntity<?> importMotorbikes(@RequestParam("file") MultipartFile file) {
+        
+        try {
+            // Validate file
+            if (file.isEmpty()) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(new ErrorResponse("EMPTY_FILE", "File không được để trống"));
+            }
+            
+            // Create input data
+            ImportMotorbikesInputData inputData = new ImportMotorbikesInputData(
+                file.getInputStream(),
+                file.getOriginalFilename()
+            );
+            
+            // Execute use case
+            importMotorbikesUseCase.execute(inputData);
+            
+            // Handle errors
+            if (importMotorbikesViewModel.hasError) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(new ErrorResponse(
+                            importMotorbikesViewModel.errorCode,
+                            importMotorbikesViewModel.errorMessage
+                        ));
+            }
+            
+            // Success - map to response
+            var result = importMotorbikesViewModel.importResult;
+            var errorDetails = result.getErrors() != null
+                ? result.getErrors().stream()
+                    .map(e -> new ImportMotorbikesResponse.ErrorDetail(
+                        e.getRowNumber(),
+                        e.getFieldName(),
+                        e.getErrorMessage()
+                    ))
+                    .collect(Collectors.toList())
+                : null;
+            
+            var response = new ImportMotorbikesResponse(
+                result.getTotalRecords(),
+                result.getSuccessCount(),
+                result.getFailureCount(),
+                errorDetails
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (IOException e) {
+            return ResponseEntity
+                    .status(500)
+                    .body(new ErrorResponse("FILE_READ_ERROR", "Không thể đọc file: " + e.getMessage()));
+        }
+    }
+
+    // ============================
+    // 5) EXPORT MOTORBIKES TO EXCEL
+    // ============================
+    @GetMapping("/export")
+    public ResponseEntity<?> exportMotorbikes(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String model,
+            @RequestParam(required = false) String color
     ) {
-
-        UpdateMotorbikeInputData input = new UpdateMotorbikeInputData(
-                id,
-                request.name,
-                request.description,
-                request.price == null ? null : new BigDecimal(request.price.toString()),
-                request.imageUrl,
-                request.stock == null ? 0 : request.stock,
-                request.brand,
-                request.model,
-                request.color,
-                request.year == null ? 0 : request.year,
-                request.displacement == null ? 0 : request.displacement
-        );
-
-        // Gọi use case -> đi qua presenter -> presenter GÁN DATA vào bean updateMotorbikeViewModel (request-scope)
-        updateMotorbikeUseCase.execute(input);
-
-        // Lấy đúng bean đã được Spring inject ở constructor
-        UpdateMotorbikeViewModel vm = this.updateMotorbikeViewModel;
-
-        if (vm.hasError) {
+        try {
+            // Create input data with filters
+            ExportMotorbikesInputData inputData = new ExportMotorbikesInputData(
+                keyword,
+                brand,
+                model,
+                color
+            );
+            
+            // Execute use case
+            exportMotorbikesUseCase.execute(inputData);
+            
+            // Handle errors
+            if (exportMotorbikesViewModel.hasError) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(new ErrorResponse("EXPORT_ERROR", exportMotorbikesViewModel.errorMessage));
+            }
+            
+            // Success - return file download
+            var result = exportMotorbikesViewModel.exportResult;
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("text/csv"));
+            headers.setContentDisposition(
+                org.springframework.http.ContentDisposition.attachment()
+                    .filename(result.getFileName())
+                    .build()
+            );
+            headers.setCacheControl("no-cache, no-store, must-revalidate");
+            headers.setPragma("no-cache");
+            headers.setExpires(0);
+            
             return ResponseEntity
-                    .badRequest()
-                    .body(new ErrorResponse(vm.errorCode, vm.errorMessage));
-        }
-
-        // Trả ra đúng object motorbike, không phải số 1 nữa
-        return ResponseEntity.ok(vm.motorbike);
-    }
-
-
-    //delete motorbike
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteMotorbike(@PathVariable Long id) {
-
-        DeleteMotorbikeInputData input = new DeleteMotorbikeInputData(id);
-
-        deleteMotorbikeUseCase.execute(input);
-
-        DeleteMotorbikeViewModel vm = this.deleteMotorbikeViewModel;
-
-        if (!vm.success) {
+                    .ok()
+                    .headers(headers)
+                    .body(result.getExcelFileBytes());
+            
+        } catch (Exception e) {
             return ResponseEntity
-                    .badRequest()
-                    .body(new ErrorResponse(vm.errorCode, vm.errorMessage));
+                    .status(500)
+                    .body(new ErrorResponse("EXPORT_ERROR", "Lỗi khi export: " + e.getMessage()));
         }
-
-        return ResponseEntity.ok("Deleted successfully");
     }
 
 
 
-
-
-
+    // ============================
+    // ERROR RESPONSE
+    // ============================
 
     // ============================
     // ERROR RESPONSE

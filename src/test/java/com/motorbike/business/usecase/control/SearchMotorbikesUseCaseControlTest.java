@@ -1,169 +1,128 @@
 package com.motorbike.business.usecase.control;
 
-import com.motorbike.business.dto.motorbike.SearchMotorbikesInputData;
-import com.motorbike.business.dto.motorbike.SearchMotorbikesOutputData;
-import com.motorbike.business.dto.motorbike.SearchMotorbikesOutputData.MotorbikeItem;
-import com.motorbike.business.ports.repository.MotorbikeRepository;
-import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
-import com.motorbike.domain.entities.XeMay;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.util.*;
+import com.motorbike.adapters.presenters.SearchMotorbikesPresenter;
+import com.motorbike.adapters.viewmodels.SearchMotorbikesViewModel;
+import com.motorbike.business.dto.motorbike.SearchMotorbikesInputData;
+import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.business.usecase.output.SearchMotorbikesOutputBoundary;
+import com.motorbike.domain.entities.XeMay;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class SearchMotorbikesUseCaseControlTest {
 
-class SearchMotorbikesUseCaseControlTest {
+	@Test
+	public void testExecute_WithKeyword_Success() {
+		SearchMotorbikesInputData inputData = new SearchMotorbikesInputData("Honda", null, null, null, null, null);
+		
+		MockMotorbikeRepository productRepo = new MockMotorbikeRepository();
+		SearchMotorbikesViewModel viewModel = new SearchMotorbikesViewModel();
+		SearchMotorbikesOutputBoundary outputBoundary = new SearchMotorbikesPresenter(viewModel);
+		
+		SearchMotorbikesUseCaseControl control = new SearchMotorbikesUseCaseControl(outputBoundary, productRepo);
+		control.execute(inputData);
+		
+		assertFalse(viewModel.hasError);
+		assertNotNull(viewModel.motorbikes);
+		assertEquals(1, viewModel.motorbikes.size());
+	}
 
-    private static class MockPresenter implements SearchMotorbikesOutputBoundary {
-        public SearchMotorbikesOutputData receivedData;
+	@Test
+	public void testExecute_NoResults() {
+		SearchMotorbikesInputData inputData = new SearchMotorbikesInputData("xyz123", null, null, null, null, null);
+		
+		MockMotorbikeRepository productRepo = new MockMotorbikeRepository();
+		SearchMotorbikesViewModel viewModel = new SearchMotorbikesViewModel();
+		SearchMotorbikesOutputBoundary outputBoundary = new SearchMotorbikesPresenter(viewModel);
+		
+		SearchMotorbikesUseCaseControl control = new SearchMotorbikesUseCaseControl(outputBoundary, productRepo);
+		control.execute(inputData);
+		
+		assertFalse(viewModel.hasError);
+		assertNotNull(viewModel.motorbikes);
+		assertEquals(0, viewModel.motorbikes.size());
+	}
 
-        @Override
-        public void present(SearchMotorbikesOutputData outputData) {
-            this.receivedData = outputData;
-        }
-    }
+	@Test
+	public void testExecute_NullInputData() {
+		MockMotorbikeRepository productRepo = new MockMotorbikeRepository();
+		SearchMotorbikesViewModel viewModel = new SearchMotorbikesViewModel();
+		SearchMotorbikesOutputBoundary outputBoundary = new SearchMotorbikesPresenter(viewModel);
+		
+		SearchMotorbikesUseCaseControl control = new SearchMotorbikesUseCaseControl(outputBoundary, productRepo);
+		control.execute(null);
+		
+		// Use case catches NullPointerException and returns system error
+		assertTrue(viewModel.hasError);
+		assertNotNull(viewModel.errorMessage);
+	}
 
-    private static class MockMotorbikeRepository implements MotorbikeRepository {
+	private static class MockMotorbikeRepository implements ProductRepository {
+		@Override
+		public List<XeMay> searchMotorbikes(String keyword) {
+			List<XeMay> motorbikes = new ArrayList<>();
+			if (keyword != null && keyword.toLowerCase().contains("honda")) {
+				motorbikes.add(new XeMay("Honda Wave", "Xe số tiết kiệm", new BigDecimal("20000000"), "wave.jpg", 10, "Honda", "Wave", "Đỏ", 2024, 110));
+			}
+			return motorbikes;
+		}
 
-        private final List<XeMay> data;
-        private final boolean throwException;
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findById(Long id) {
+			return Optional.empty();
+		}
 
-        public MockMotorbikeRepository(List<XeMay> data) {
-            this.data = data;
-            this.throwException = false;
-        }
+		@Override
+		public com.motorbike.domain.entities.SanPham save(com.motorbike.domain.entities.SanPham sanPham) {
+			return sanPham;
+		}
 
-        public MockMotorbikeRepository(boolean throwException) {
-            this.data = new ArrayList<>();
-            this.throwException = throwException;
-        }
+		@Override
+		public void deleteById(Long id) {
+		}
 
-        @Override
-        public List<XeMay> findAllMotorbikes() {
-            if (throwException) {
-                throw new RuntimeException("DB error");
-            }
-            return data;
-        }
+		@Override
+		public boolean existsById(Long id) {
+			return false;
+		}
+		
+		@Override
+		public List<com.motorbike.domain.entities.SanPham> findAll() {
+			return new ArrayList<>();
+		}
 
+		@Override
+		public List<XeMay> findAllMotorbikes() {
+			List<XeMay> motorbikes = new ArrayList<>();
+			motorbikes.add(new XeMay("Honda Wave", "Xe số tiết kiệm", new BigDecimal("20000000"), "wave.jpg", 10, "Honda", "Wave", "Đỏ", 2024, 110));
+			motorbikes.add(new XeMay("Yamaha Exciter", "Xe thể thao", new BigDecimal("50000000"), "exciter.jpg", 5, "Yamaha", "Exciter", "Xanh", 2024, 155));
+			return motorbikes;
+		}
+		
+		@Override
+		public List<com.motorbike.domain.entities.PhuKienXeMay> findAllAccessories() {
+			return new ArrayList<>();
+		}
+		
+		@Override
+		public List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
+			return new ArrayList<>();
+		}
 
-        @Override
-        public Optional<XeMay> findById(Long id) {
-            return Optional.empty();
-        }
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
 
-        @Override
-        public XeMay save(XeMay xeMay) {
-            return xeMay;
-        }
-
-        @Override
-        public void deleteById(Long id) {
-        }
-
-    }
-
-    private List<XeMay> sampleData() {
-        List<XeMay> list = new ArrayList<>();
-
-        XeMay xe1 = new XeMay("Honda Wave", "Xe số",
-                BigDecimal.valueOf(20000000), "wave.jpg",
-                10, "Honda", "Wave Alpha", "Đỏ", 2024, 110);
-        xe1.setMaSanPham(1L);
-
-        XeMay xe2 = new XeMay("Exciter 155", "Xe côn tay",
-                BigDecimal.valueOf(45000000), "exc.jpg",
-                5, "Yamaha", "Exciter", "Xanh", 2025, 155);
-        xe2.setMaSanPham(2L);
-
-        XeMay xe3 = new XeMay("Yamaha Sirius", "Xe số phổ thông",
-                BigDecimal.valueOf(21000000), "sir.jpg",
-                7, "Yamaha", "Sirius", "Đen", 2023, 110);
-        xe3.setMaSanPham(3L);
-
-        list.add(xe1);
-        list.add(xe2);
-        list.add(xe3);
-
-        return list;
-    }
-
-    @Test
-    void testSearch_AllNullFilters_ReturnsAll() {
-        MockPresenter presenter = new MockPresenter();
-        SearchMotorbikesUseCaseControl control =
-                new SearchMotorbikesUseCaseControl(presenter, new MockMotorbikeRepository(sampleData()));
-
-        SearchMotorbikesInputData input =
-                new SearchMotorbikesInputData(null, null, null, null, null, null);
-
-        control.execute(input);
-
-        assertNotNull(presenter.receivedData);
-        assertEquals(3, presenter.receivedData.motorbikes.size());
-    }
-
-    @Test
-    void testSearch_ByKeyword() {
-        MockPresenter presenter = new MockPresenter();
-        SearchMotorbikesUseCaseControl control =
-                new SearchMotorbikesUseCaseControl(presenter, new MockMotorbikeRepository(sampleData()));
-
-        SearchMotorbikesInputData input =
-                new SearchMotorbikesInputData("exciter", null, null, null, null, null);
-
-        control.execute(input);
-
-        assertEquals(1, presenter.receivedData.motorbikes.size());
-        assertTrue(presenter.receivedData.motorbikes.get(0).name.toLowerCase().contains("exciter"));
-    }
-
-    @Test
-    void testSearch_ByBrandAndCCRange() {
-        MockPresenter presenter = new MockPresenter();
-        SearchMotorbikesUseCaseControl control =
-                new SearchMotorbikesUseCaseControl(presenter, new MockMotorbikeRepository(sampleData()));
-
-        SearchMotorbikesInputData input =
-                new SearchMotorbikesInputData(null, "Yamaha", null, null, 150, 160);
-
-        control.execute(input);
-
-        assertEquals(1, presenter.receivedData.motorbikes.size());
-        MotorbikeItem result = presenter.receivedData.motorbikes.get(0);
-
-        assertEquals("Yamaha", result.brand);
-        assertEquals(155, result.displacement);
-    }
-
-    @Test
-    void testSearch_NoResult() {
-        MockPresenter presenter = new MockPresenter();
-        SearchMotorbikesUseCaseControl control =
-                new SearchMotorbikesUseCaseControl(presenter, new MockMotorbikeRepository(sampleData()));
-
-        SearchMotorbikesInputData input =
-                new SearchMotorbikesInputData("abc", "Suzuki", null, null, 400, 500);
-
-        control.execute(input);
-
-        assertEquals(0, presenter.receivedData.motorbikes.size());
-    }
-
-    @Test
-    void testSearch_RepositoryException() {
-        MockPresenter presenter = new MockPresenter();
-        SearchMotorbikesUseCaseControl control =
-                new SearchMotorbikesUseCaseControl(presenter, new MockMotorbikeRepository(true));
-
-        SearchMotorbikesInputData input =
-                new SearchMotorbikesInputData(null, null, null, null, null, null);
-
-        control.execute(input);
-
-        assertEquals("SYSTEM_ERROR", presenter.receivedData.errorCode);
-        assertNotNull(presenter.receivedData.errorMessage);
-    }
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}	}
 }

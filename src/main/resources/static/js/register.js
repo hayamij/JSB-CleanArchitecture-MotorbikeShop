@@ -63,6 +63,14 @@ function validateForm() {
         showValidationError('name', '');
     }
 
+    const username = document.getElementById('username').value.trim();
+    if (!username || username.length < 3) {
+        showValidationError('username', 'Tên đăng nhập phải có ít nhất 3 ký tự');
+        isValid = false;
+    } else {
+        showValidationError('username', '');
+    }
+
     const email = document.getElementById('email').value.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -142,6 +150,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
     const formData = {
         name: document.getElementById('name').value.trim(),
+        username: document.getElementById('username').value.trim(),
         email: document.getElementById('email').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         address: document.getElementById('address').value.trim(),
@@ -169,9 +178,26 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
                 sessionStorage.setItem('userId', data.userId);
                 sessionStorage.setItem('email', data.email);
                 sessionStorage.setItem('username', data.username);
+                sessionStorage.setItem('phone', data.phone || '');
+                sessionStorage.setItem('address', data.address || '');
+                
+                // Merge guest cart into newly created user account
+                const mergeResult = await mergeGuestCartToUser(data.userId);
+                
+                if (mergeResult.success && mergeResult.itemsMerged > 0) {
+                    showAlert(`Đã hợp nhất ${mergeResult.itemsMerged} sản phẩm vào giỏ hàng`, 'success');
+                }
+                
+                // Check if user was trying to checkout
+                const returnToCheckout = sessionStorage.getItem('returnToCheckout');
+                sessionStorage.removeItem('returnToCheckout');
                 
                 setTimeout(() => {
-                    window.location.href = 'home.html';
+                    if (returnToCheckout === 'true') {
+                        window.location.href = 'checkout.html';
+                    } else {
+                        window.location.href = 'home.html';
+                    }
                 }, 1500);
             } else {
                 setTimeout(() => {

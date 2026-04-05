@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Motorbike Shop</title>
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/admin.css?v=3">
+</head>
+<body data-page="dashboard">
+    <!-- Admin Sidebar will be loaded by admin-sidebar.js -->
+
+    <!-- Main Content Area -->
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1>Dashboard</h1>
+            <p>Tổng quan hoạt động kinh doanh</p>
+        </div>
+
+        <div class="admin-content">
+            <div id="alertContainer"></div>
+
+            <!-- Revenue Stats -->
+            <section class="dashboard-section">
+                <h2 class="section-title">DOANH THU</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">DOANH THU THÁNG NÀY</div>
+                        <div class="stat-value" id="revenueMonth">0 đ</div>
+                        <div class="stat-change" id="revenueMonthChange">+0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">DOANH THU NĂM NAY</div>
+                        <div class="stat-value" id="revenueYear">0 đ</div>
+                        <div class="stat-change" id="revenueYearChange">+0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">TỔNG DOANH THU</div>
+                        <div class="stat-value" id="revenueAllTime">0 đ</div>
+                        <div class="stat-change positive">All Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">ĐƠN HÀNG THÁNG NÀY</div>
+                        <div class="stat-value" id="ordersMonth">0</div>
+                        <div class="stat-change" id="ordersMonthChange">+0%</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Stats -->
+            <section class="dashboard-section">
+                <h2 class="section-title">THỐNG KÊ HỆ THỐNG</h2>
+                <div class="stats-grid-4">
+                    <div class="stat-card-small">
+                        <div class="stat-label">TỔNG USERS</div>
+                        <div class="stat-number" id="totalUsers">0</div>
+                    </div>
+                    <div class="stat-card-small">
+                        <div class="stat-label">XE MÁY</div>
+                        <div class="stat-number" id="totalMotorbikes">0</div>
+                    </div>
+                    <div class="stat-card-small">
+                        <div class="stat-label">PHỤ KIỆN</div>
+                        <div class="stat-number" id="totalAccessories">0</div>
+                    </div>
+                    <div class="stat-card-small">
+                        <div class="stat-label">ĐƠN HÀNG</div>
+                        <div class="stat-number" id="totalOrders">0</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts and Top Products -->
+            <div class="dashboard-row">
+                <!-- Growth Chart -->
+                <section class="dashboard-section dashboard-chart">
+                    <h2 class="section-title">TĂNG TRƯỞNG DOANH THU</h2>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Top Products -->
+                <section class="dashboard-section dashboard-top">
+                    <h2 class="section-title">SẢN PHẨM BÁN CHẠY</h2>
+                    <div class="top-products-list" id="topProductsList">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Recent Activities -->
+            <section class="dashboard-section">
+                <h2 class="section-title">HOẠT ĐỘNG GẦN ĐÂY</h2>
+                <div class="activities-list" id="activitiesList">
+                    <div class="loading-spinner"></div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/admin-sidebar.js?v=1"></script>
+    <script src="js/common.js?v=3"></script>
+    <script src="js/admin.js?v=3"></script>
+</body>
+</html>

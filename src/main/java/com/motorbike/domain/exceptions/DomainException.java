@@ -22,8 +22,8 @@ public class DomainException extends RuntimeException {
     }
     
     // ===== ENTITY NOT FOUND =====
-    public static DomainException userNotFound(String email) {
-        return new DomainException("Không tìm thấy tài khoản với email: " + email, "USER_NOT_FOUND");
+    public static DomainException userNotFound(String identifier) {
+        return new DomainException("Không tìm thấy tài khoản với thông tin: " + identifier, "USER_NOT_FOUND");
     }
     
     public static DomainException productNotFound(String productId) {
@@ -46,9 +46,9 @@ public class DomainException extends RuntimeException {
     public static DomainException emailAlreadyExists(String email) {
         return new DomainException("Email đã được sử dụng: " + email, "EMAIL_EXISTS");
     }
-
-    public static DomainException orderNotFound(Long orderId) {
-        return new DomainException("Không tìm thấy đơn hàng: " + orderId, "ORDER_NOT_FOUND");
+    
+    public static DomainException usernameAlreadyExists(String username) {
+        return new DomainException("Tên đăng nhập đã được sử dụng: " + username, "USERNAME_EXISTS");
     }
     
     // ===== CART & ORDER =====
@@ -101,10 +101,6 @@ public class DomainException extends RuntimeException {
     public static DomainException alreadyCancelled() {
         return new DomainException("Đơn hàng đã bị hủy trước đó", "ALREADY_CANCELLED");
     }
-
-    public static DomainException cannotUpdateOrder(String reason) {
-        return new DomainException("Không thể cập nhật đơn hàng: " + reason, "CANNOT_UPDATE_ORDER");
-    }
     
     // ===== PRODUCT =====
     public static DomainException noStockToRestore() {
@@ -112,5 +108,39 @@ public class DomainException extends RuntimeException {
             "Không thể khôi phục kinh doanh khi không có hàng trong kho", 
             "NO_STOCK_TO_RESTORE"
         );
+    }
+    
+    public static DomainException productNotFound(Long productId) {
+        return new DomainException("Không tìm thấy sản phẩm với mã: " + productId, "PRODUCT_NOT_FOUND");
+    }
+    
+    public static DomainException productNotMotorbike() {
+        return new DomainException("Sản phẩm không phải là xe máy", "PRODUCT_NOT_MOTORBIKE");
+    }
+    
+    public static DomainException productNotAccessory() {
+        return new DomainException("Sản phẩm không phải là phụ kiện", "PRODUCT_NOT_ACCESSORY");
+    }
+    
+    // ===== ORDER =====
+    public static DomainException orderNotFound(Long orderId) {
+        return new DomainException("Không tìm thấy đơn hàng với mã: " + orderId, "ORDER_NOT_FOUND");
+    }
+    
+    public static DomainException userNotFound(Long userId) {
+        return new DomainException("Không tìm thấy tài khoản với mã: " + userId, "USER_NOT_FOUND");
+    }
+    
+    public static DomainException productAlreadyExists(String productName) {
+        return new DomainException("Sản phẩm đã tồn tại: " + productName, "PRODUCT_EXISTS");
+    }
+    
+    // Overload methods for compatibility
+    public static DomainException userNotFound() {
+        return new DomainException("Không tìm thấy tài khoản", "USER_NOT_FOUND");
+    }
+    
+    public static DomainException notFound(String entity, String id) {
+        return new DomainException(entity + " không tìm thấy: " + id, "NOT_FOUND");
     }
 }

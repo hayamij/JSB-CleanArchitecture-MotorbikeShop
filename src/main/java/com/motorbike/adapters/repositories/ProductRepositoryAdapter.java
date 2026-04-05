@@ -1,17 +1,16 @@
 package com.motorbike.adapters.repositories;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-
 import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.domain.entities.PhuKienXeMay;
 import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.XeMay;
-import com.motorbike.infrastructure.persistence.jpa.entities.PhuKienXeMayJpaEntity;
+import com.motorbike.domain.entities.PhuKienXeMay;
 import com.motorbike.infrastructure.persistence.jpa.entities.SanPhamJpaEntity;
 import com.motorbike.infrastructure.persistence.jpa.entities.XeMayJpaEntity;
+import com.motorbike.infrastructure.persistence.jpa.entities.PhuKienXeMayJpaEntity;
 import com.motorbike.infrastructure.persistence.jpa.repositories.SanPhamJpaRepository;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class ProductRepositoryAdapter implements ProductRepository {
@@ -26,6 +25,24 @@ public class ProductRepositoryAdapter implements ProductRepository {
     public Optional<SanPham> findById(Long id) {
         return jpaRepository.findById(id)
                 .map(this::toDomain);
+    }
+    
+    @Override
+    public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity.getTenSanPham().equalsIgnoreCase(tenSanPham))
+                .findFirst()
+                .map(this::toDomain);
+    }
+    
+    @Override
+    public Optional<SanPham> findByMaSanPham(String maSanPham) {
+        try {
+            Long id = Long.parseLong(maSanPham);
+            return findById(id);
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
     
     @Override
@@ -44,6 +61,51 @@ public class ProductRepositoryAdapter implements ProductRepository {
     public java.util.List<SanPham> findAll() {
         return jpaRepository.findAll().stream()
                 .map(this::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    @Override
+    public void deleteById(Long productId) {
+        jpaRepository.deleteById(productId);
+    }
+    
+    @Override
+    public java.util.List<PhuKienXeMay> findAllAccessories() {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity instanceof PhuKienXeMayJpaEntity)
+                .map(entity -> (PhuKienXeMay) toDomain(entity))
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    @Override
+    public java.util.List<PhuKienXeMay> searchAccessories(String keyword) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity instanceof PhuKienXeMayJpaEntity)
+                .filter(entity -> 
+                    entity.getTenSanPham().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getMoTa() != null && entity.getMoTa().toLowerCase().contains(keyword.toLowerCase()))
+                )
+                .map(entity -> (PhuKienXeMay) toDomain(entity))
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    @Override
+    public java.util.List<XeMay> findAllMotorbikes() {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity instanceof XeMayJpaEntity)
+                .map(entity -> (XeMay) toDomain(entity))
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    @Override
+    public java.util.List<XeMay> searchMotorbikes(String keyword) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> entity instanceof XeMayJpaEntity)
+                .filter(entity -> 
+                    entity.getTenSanPham().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getMoTa() != null && entity.getMoTa().toLowerCase().contains(keyword.toLowerCase()))
+                )
+                .map(entity -> (XeMay) toDomain(entity))
                 .collect(java.util.stream.Collectors.toList());
     }
     
@@ -100,7 +162,6 @@ public class ProductRepositoryAdapter implements ProductRepository {
             jpa.setHinhAnh(xeMay.getHinhAnh());
             jpa.setSoLuongTonKho(xeMay.getSoLuongTonKho());
             jpa.setConHang(xeMay.isConHang());
-            jpa.setLoaiSanPham("XE_MAY");  // FIX: Set loaiSanPham
             jpa.setHangXe(xeMay.getHangXe());
             jpa.setDongXe(xeMay.getDongXe());
             jpa.setMauSac(xeMay.getMauSac());
@@ -118,7 +179,6 @@ public class ProductRepositoryAdapter implements ProductRepository {
             jpa.setHinhAnh(phuKien.getHinhAnh());
             jpa.setSoLuongTonKho(phuKien.getSoLuongTonKho());
             jpa.setConHang(phuKien.isConHang());
-            jpa.setLoaiSanPham("PHU_KIEN");  // FIX: Set loaiSanPham
             jpa.setLoaiPhuKien(phuKien.getLoaiPhuKien());
             jpa.setThuongHieu(phuKien.getThuongHieu());
             jpa.setChatLieu(phuKien.getChatLieu());

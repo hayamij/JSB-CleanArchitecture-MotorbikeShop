@@ -1,19 +1,23 @@
 package com.motorbike.adapters.repositories;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.motorbike.business.ports.repository.OrderRepository;
+import com.motorbike.domain.entities.DonHang;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
+import com.motorbike.domain.entities.ChiTietDonHang;
+import com.motorbike.domain.entities.ProductSalesStats;
+import com.motorbike.domain.entities.TrangThaiDonHang;
+import com.motorbike.infrastructure.persistence.jpa.entities.DonHangJpaEntity;
+import com.motorbike.infrastructure.persistence.jpa.entities.ChiTietDonHangJpaEntity;
+import com.motorbike.infrastructure.persistence.jpa.repositories.DonHangJpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.motorbike.business.ports.repository.OrderRepository;
-import com.motorbike.domain.entities.ChiTietDonHang;
-import com.motorbike.domain.entities.DonHang;
-import com.motorbike.domain.entities.TrangThaiDonHang;
-import com.motorbike.infrastructure.persistence.jpa.entities.ChiTietDonHangJpaEntity;
-import com.motorbike.infrastructure.persistence.jpa.entities.DonHangJpaEntity;
-import com.motorbike.infrastructure.persistence.jpa.repositories.DonHangJpaRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class OrderRepositoryAdapter implements OrderRepository {
@@ -51,18 +55,6 @@ public class OrderRepositoryAdapter implements OrderRepository {
                 .map(this::toDomain)
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public List<DonHang> searchForAdmin(String keyword) {
-        String normalized = keyword == null ? "" : keyword.trim();
-        if (normalized.isEmpty()) {
-            return List.of();
-        }
-
-        return jpaRepository.searchAdminOrders(normalized).stream()
-                .map(this::toDomain)
-                .collect(Collectors.toList());
-    }
     
     @Override
     public List<DonHang> findByStatus(TrangThaiDonHang trangThai) {
@@ -89,12 +81,41 @@ public class OrderRepositoryAdapter implements OrderRepository {
         return jpaRepository.existsById(orderId);
     }
     
+    @Override
+    public List<DonHang> searchOrders(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            // Return all orders if no keyword
+            return jpaRepository.findAll().stream()
+                    .map(this::toDomain)
+                    .collect(Collectors.toList());
+        }
+        
+        return jpaRepository.findAll().stream()
+                .filter(entity -> 
+                    entity.getMaDonHang().toString().contains(keyword) ||
+                    entity.getTenNguoiNhan().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getSoDienThoai() != null && entity.getSoDienThoai().contains(keyword)) ||
+                    entity.getTrangThai().toLowerCase().contains(keyword.toLowerCase())
+                )
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+    
     
     
     private DonHang toDomain(DonHangJpaEntity jpaEntity) {
         List<ChiTietDonHang> items = jpaEntity.getDanhSachSanPham().stream()
                 .map(this::itemToDomain)
                 .collect(Collectors.toList());
+        
+        PhuongThucThanhToan phuongThucThanhToan = PhuongThucThanhToan.THANH_TOAN_TRUC_TIEP;
+        if (jpaEntity.getPhuongThucThanhToan() != null) {
+            try {
+                phuongThucThanhToan = PhuongThucThanhToan.valueOf(jpaEntity.getPhuongThucThanhToan());
+            } catch (IllegalArgumentException e) {
+                // Default to COD if invalid
+            }
+        }
         
         DonHang donHang = new DonHang(
                 jpaEntity.getMaDonHang(),
@@ -106,6 +127,7 @@ public class OrderRepositoryAdapter implements OrderRepository {
                 jpaEntity.getSoDienThoai(),
                 jpaEntity.getDiaChiGiaoHang(),
                 jpaEntity.getGhiChu(),
+                phuongThucThanhToan,
                 jpaEntity.getNgayDat(),
                 jpaEntity.getNgayCapNhat()
         );
@@ -161,5 +183,58 @@ public class OrderRepositoryAdapter implements OrderRepository {
         jpaEntity.setThanhTien(item.getThanhTien());
         
         return jpaEntity;
+    }
+    
+    @Override
+    public List<ProductSalesStats> getTopSellingProducts(int limit) {
+        // Lấy tất cả đơn hàng đã xác nhận (DA_XAC_NHAN, DANG_GIAO, DA_GIAO)
+        List<DonHangJpaEntity> confirmedOrders = jpaRepository.findAll().stream()
+                .filter(order -> {
+                    String status = order.getTrangThai();
+                    return "DA_XAC_NHAN".equals(status) || 
+                           "DANG_GIAO".equals(status) || 
+                           "DA_GIAO".equals(status);
+                })
+                .collect(Collectors.toList());
+        
+        // Aggregate số lượng bán theo sản phẩm
+        Map<Long, ProductSalesData> salesMap = new HashMap<>();
+        
+        for (DonHangJpaEntity order : confirmedOrders) {
+            for (ChiTietDonHangJpaEntity item : order.getDanhSachSanPham()) {
+                Long productId = item.getMaSanPham();
+                String productName = item.getTenSanPham();
+                int quantity = item.getSoLuong();
+                
+                salesMap.merge(productId, 
+                    new ProductSalesData(productId, productName, quantity),
+                    (existing, newData) -> new ProductSalesData(
+                        productId, 
+                        productName, 
+                        existing.totalSold + quantity
+                    )
+                );
+            }
+        }
+        
+        // Convert sang domain entities và sort
+        return salesMap.values().stream()
+                .map(data -> new ProductSalesStats(data.productId, data.productName, data.totalSold))
+                .sorted() // Sử dụng Comparable của ProductSalesStats
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+    
+    // Helper class for aggregation
+    private static class ProductSalesData {
+        Long productId;
+        String productName;
+        int totalSold;
+        
+        ProductSalesData(Long productId, String productName, int totalSold) {
+            this.productId = productId;
+            this.productName = productName;
+            this.totalSold = totalSold;
+        }
     }
 }

@@ -9,15 +9,17 @@ class TaiKhoanTest {
 
     @Test
     void testCreateTaiKhoan_Success() {
+        String hoTen = "Nguyễn Văn A";
         String email = "customer@gmail.com";
         String tenDangNhap = "customer1";
         String matKhau = "password123";
         String soDienThoai = "0912345678";
         String diaChi = "Hà Nội";
 
-        TaiKhoan taiKhoan = new TaiKhoan(email, tenDangNhap, matKhau, soDienThoai, diaChi);
+        TaiKhoan taiKhoan = new TaiKhoan(hoTen, email, tenDangNhap, matKhau, soDienThoai, diaChi);
 
         assertNotNull(taiKhoan);
+        assertEquals(hoTen, taiKhoan.getHoTen());
         assertEquals(email, taiKhoan.getEmail());
         assertEquals(tenDangNhap, taiKhoan.getTenDangNhap());
         assertEquals(VaiTro.CUSTOMER, taiKhoan.getVaiTro());
@@ -27,28 +29,28 @@ class TaiKhoanTest {
     @Test
     void testCreateTaiKhoan_InvalidEmail_ThrowsException() {
         assertThrows(ValidationException.class, () -> {
-            new TaiKhoan("invalid-email", "user1", "password123", "0912345678", "Hà Nội");
+            new TaiKhoan("Nguyễn Văn A", "invalid-email", "user1", "password123", "0912345678", "Hà Nội");
         });
     }
 
     @Test
     void testCreateTaiKhoan_EmptyUsername_ThrowsException() {
         assertThrows(ValidationException.class, () -> {
-            new TaiKhoan("test@gmail.com", "", "password123", "0912345678", "Hà Nội");
+            new TaiKhoan("Nguyễn Văn A", "test@gmail.com", "", "password123", "0912345678", "Hà Nội");
         });
     }
 
     @Test
     void testCreateTaiKhoan_ShortPassword_ThrowsException() {
         assertThrows(ValidationException.class, () -> {
-            new TaiKhoan("test@gmail.com", "user1", "12345", "0912345678", "Hà Nội");
+            new TaiKhoan("Nguyễn Văn A", "test@gmail.com", "user1", "12345", "0912345678", "Hà Nội");
         });
     }
 
     @Test
     void testCreateTaiKhoan_InvalidPhoneNumber_ThrowsException() {
         assertThrows(ValidationException.class, () -> {
-            new TaiKhoan("test@gmail.com", "user1", "password123", "123", "Hà Nội");
+            new TaiKhoan("Nguyễn Văn A", "test@gmail.com", "user1", "password123", "123", "Hà Nội");
         });
     }
 
@@ -68,7 +70,7 @@ class TaiKhoanTest {
 
     @Test
     void testKiemTraMatKhau_CorrectPassword_ReturnsTrue() {
-        TaiKhoan taiKhoan = new TaiKhoan("test@gmail.com", "user1", "password123",
+        TaiKhoan taiKhoan = new TaiKhoan("Nguyễn Văn A", "test@gmail.com", "user1", "password123",
                                         "0912345678", "Hà Nội");
 
         assertTrue(taiKhoan.kiemTraMatKhau("password123"));
@@ -76,7 +78,7 @@ class TaiKhoanTest {
 
     @Test
     void testKiemTraMatKhau_WrongPassword_ReturnsFalse() {
-        TaiKhoan taiKhoan = new TaiKhoan("test@gmail.com", "user1", "password123",
+        TaiKhoan taiKhoan = new TaiKhoan("Nguyễn Văn A", "test@gmail.com", "user1", "password123",
                                         "0912345678", "Hà Nội");
 
         assertFalse(taiKhoan.kiemTraMatKhau("wrongpassword"));
@@ -84,7 +86,7 @@ class TaiKhoanTest {
 
     @Test
     void testCapNhatMatKhau_Success() {
-        TaiKhoan taiKhoan = new TaiKhoan("test@gmail.com", "user1", "oldpassword",
+        TaiKhoan taiKhoan = new TaiKhoan("Nguyễn Văn A", "test@gmail.com", "user1", "oldpassword",
                                         "0912345678", "Hà Nội");
 
         taiKhoan.capNhatMatKhau("newpassword123");
@@ -95,7 +97,7 @@ class TaiKhoanTest {
 
     @Test
     void testDangNhapThanhCong_ActiveAccount_UpdatesLastLogin() {
-        TaiKhoan taiKhoan = new TaiKhoan("test@gmail.com", "user1", "password123",
+        TaiKhoan taiKhoan = new TaiKhoan("Nguyễn Văn A", "test@gmail.com", "user1", "password123",
                                         "0912345678", "Hà Nội");
         assertNull(taiKhoan.getLanDangNhapCuoi());
 
@@ -106,7 +108,7 @@ class TaiKhoanTest {
 
     @Test
     void testDangNhapThanhCong_InactiveAccount_ThrowsException() {
-        TaiKhoan taiKhoan = new TaiKhoan("test@gmail.com", "user1", "password123",
+        TaiKhoan taiKhoan = new TaiKhoan("Nguyễn Văn B", "test@gmail.com", "user1", "password123",
                                         "0912345678", "Hà Nội");
         taiKhoan.khoaTaiKhoan();
 
@@ -117,7 +119,7 @@ class TaiKhoanTest {
 
     @Test
     void testKhoaTaiKhoan_Success() {
-        TaiKhoan taiKhoan = new TaiKhoan("test@gmail.com", "user1", "password123",
+        TaiKhoan taiKhoan = new TaiKhoan("Trần Thị C", "test@gmail.com", "user1", "password123",
                                         "0912345678", "Hà Nội");
 
         taiKhoan.khoaTaiKhoan();
@@ -127,7 +129,7 @@ class TaiKhoanTest {
 
     @Test
     void testMoKhoaTaiKhoan_Success() {
-        TaiKhoan taiKhoan = new TaiKhoan("test@gmail.com", "user1", "password123",
+        TaiKhoan taiKhoan = new TaiKhoan("Lê Văn D", "test@gmail.com", "user1", "password123",
                                         "0912345678", "Hà Nội");
         taiKhoan.khoaTaiKhoan();
 
@@ -138,7 +140,7 @@ class TaiKhoanTest {
 
     @Test
     void testThangCapAdmin_Success() {
-        TaiKhoan taiKhoan = new TaiKhoan("test@gmail.com", "user1", "password123",
+        TaiKhoan taiKhoan = new TaiKhoan("Phạm Thị E", "test@gmail.com", "user1", "password123",
                                         "0912345678", "Hà Nội");
         assertEquals(VaiTro.CUSTOMER, taiKhoan.getVaiTro());
 
@@ -151,7 +153,7 @@ class TaiKhoanTest {
 
     @Test
     void testHaCapCustomer_Success() {
-        TaiKhoan taiKhoan = new TaiKhoan("admin@motorbike.com", "admin", "password123",
+        TaiKhoan taiKhoan = new TaiKhoan("Quản Trị Viên", "admin@motorbike.com", "admin", "password123",
                                         "0901234567", "Hà Nội");
         taiKhoan.thangCapAdmin();
 

@@ -1,18 +1,14 @@
 package com.motorbike.adapters.presenters;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Locale;
-
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 
+import java.math.BigDecimal;
+
 public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
     
     private final ProductDetailViewModel viewModel;
-    private static final NumberFormat VND_FORMAT = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     
     public ProductDetailPresenter(ProductDetailViewModel viewModel) {
         this.viewModel = viewModel;
@@ -34,9 +30,9 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
         viewModel.productId = String.valueOf(outputData.productId);
         viewModel.name = outputData.name;
         viewModel.description = outputData.description != null ? outputData.description : "No description available";
-        viewModel.formattedPrice = formatPrice(outputData.price);
+        viewModel.price = outputData.price;
         viewModel.imageUrl = outputData.imageUrl != null ? outputData.imageUrl : "/images/no-image.jpg";
-        viewModel.specifications = outputData.specifications != null ? outputData.specifications : new HashMap<>();
+        viewModel.specifications = outputData.specifications != null ? outputData.specifications : "{}";
         viewModel.categoryDisplay = formatCategory(outputData.category);
         viewModel.stockQuantity = formatStockQuantity(outputData.stockQuantity);
         
@@ -51,15 +47,6 @@ public class ProductDetailPresenter implements GetProductDetailOutputBoundary {
             viewModel.stockStatusColor = "RED";
         }
     }
-    
-    
-    private String formatPrice(BigDecimal price) {
-        if (price == null) {
-            return "Liên hệ";
-        }
-        return VND_FORMAT.format(price);
-    }
-    
     
     private String formatCategory(String category) {
         if (category == null) {

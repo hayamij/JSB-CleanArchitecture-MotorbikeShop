@@ -11,13 +11,15 @@ public class RegisterOutputData {
     private final Long userId;
     private final String email;
     private final String username;
+    private final String phoneNumber;
+    private final String address;
     private final VaiTro role;
     private final LocalDateTime createdAt;
     
     private final boolean autoLoginEnabled;
     private final String sessionToken;
 
-    public RegisterOutputData(Long userId, String email, String username,
+    public RegisterOutputData(Long userId, String email, String username, String phoneNumber, String address,
                              VaiTro role, LocalDateTime createdAt,
                              boolean autoLoginEnabled, String sessionToken) {
         this.success = true;
@@ -26,13 +28,15 @@ public class RegisterOutputData {
         this.userId = userId;
         this.email = email;
         this.username = username;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
         this.role = role;
         this.createdAt = createdAt;
         this.autoLoginEnabled = autoLoginEnabled;
         this.sessionToken = sessionToken;
     }
 
-    public RegisterOutputData(Long userId, String email, String username,
+    public RegisterOutputData(Long userId, String email, String username, String phoneNumber, String address,
                              VaiTro role, LocalDateTime createdAt) {
         this.success = true;
         this.errorCode = null;
@@ -40,6 +44,8 @@ public class RegisterOutputData {
         this.userId = userId;
         this.email = email;
         this.username = username;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
         this.role = role;
         this.createdAt = createdAt;
         this.autoLoginEnabled = false;
@@ -53,6 +59,8 @@ public class RegisterOutputData {
         this.userId = null;
         this.email = null;
         this.username = null;
+        this.phoneNumber = null;
+        this.address = null;
         this.role = null;
         this.createdAt = null;
         this.autoLoginEnabled = false;
@@ -73,6 +81,10 @@ public class RegisterOutputData {
 
     public String getUsername() {return username;}
 
+    public String getPhoneNumber() {return phoneNumber;}
+
+    public String getAddress() {return address;}
+
     public VaiTro getRole() {return role;}
 
     public LocalDateTime getCreatedAt() {return createdAt;}
@@ -84,9 +96,9 @@ public class RegisterOutputData {
     public String getSessionToken() {return sessionToken;}
     
     public static RegisterOutputData forSuccess(
-            Long userId, String email, String username,
+            Long userId, String email, String username, String phoneNumber, String address,
             VaiTro role, LocalDateTime createdAt) {
-        return new RegisterOutputData(userId, email, username, role, createdAt);
+        return new RegisterOutputData(userId, email, username, phoneNumber, address, role, createdAt);
     }
     
     public static RegisterOutputData forError(String errorCode, String errorMessage) {

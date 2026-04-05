@@ -1,12 +1,10 @@
 package com.motorbike.adapters.controllers;
 
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
-import com.motorbike.business.usecase.control.GetProductDetailUseCaseControl;
-import com.motorbike.business.ports.repository.ProductRepository;
-import com.motorbike.domain.entities.SanPham;
-import com.motorbike.domain.entities.XeMay;
-import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.business.usecase.input.GetAllProductsInputBoundary;
+import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
+import com.motorbike.adapters.viewmodels.GetAllProductsViewModel;
 import com.motorbike.adapters.dto.response.ProductDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,17 +20,20 @@ import java.util.HashMap;
 @CrossOrigin(origins = "*")
 public class ProductController {
 
-    private final GetProductDetailUseCaseControl getProductDetailUseCase;
+    private final GetProductDetailInputBoundary getProductDetailUseCase;
     private final ProductDetailViewModel productDetailViewModel;
-    private final ProductRepository productRepository;
+    private final GetAllProductsInputBoundary getAllProductsUseCase;
+    private final GetAllProductsViewModel getAllProductsViewModel;
 
     @Autowired
-    public ProductController(GetProductDetailUseCaseControl getProductDetailUseCase,
+    public ProductController(GetProductDetailInputBoundary getProductDetailUseCase,
                             ProductDetailViewModel productDetailViewModel,
-                            ProductRepository productRepository) {
+                            GetAllProductsInputBoundary getAllProductsUseCase,
+                            GetAllProductsViewModel getAllProductsViewModel) {
         this.getProductDetailUseCase = getProductDetailUseCase;
         this.productDetailViewModel = productDetailViewModel;
-        this.productRepository = productRepository;
+        this.getAllProductsUseCase = getAllProductsUseCase;
+        this.getAllProductsViewModel = getAllProductsViewModel;
     }
 
     @GetMapping("/{id}")
@@ -47,7 +48,7 @@ public class ProductController {
                 productDetailViewModel.productId,
                 productDetailViewModel.name,
                 productDetailViewModel.description,
-                productDetailViewModel.formattedPrice,
+                productDetailViewModel.price,
                 productDetailViewModel.imageUrl,
                 productDetailViewModel.specifications,
                 productDetailViewModel.categoryDisplay,
@@ -70,30 +71,43 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllProducts() {
-        List<SanPham> products = productRepository.findAll();
+        getAllProductsUseCase.execute();
         
-        List<Map<String, Object>> productList = products.stream()
-            .map(product -> {
-                Map<String, Object> productMap = new HashMap<>();
-                productMap.put("id", product.getMaSanPham());
-                productMap.put("name", product.getTenSanPham());
-                productMap.put("description", product.getMoTa());
-                productMap.put("price", product.getGia());
-                productMap.put("stock", product.getSoLuongTonKho());
-                productMap.put("imageUrl", product.getHinhAnh());
-                
-                if (product instanceof XeMay) {
-                    productMap.put("category", "XE_MAY");
-                } else if (product instanceof PhuKienXeMay) {
-                    productMap.put("category", "PHU_KIEN");
-                } else {
-                    productMap.put("category", "KHAC");
-                }
-                
-                return productMap;
-            })
-            .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(productList);
+        if (getAllProductsViewModel.success) {
+            List<Map<String, Object>> productList = getAllProductsViewModel.products.stream()
+                .map(product -> {
+                    Map<String, Object> productMap = new HashMap<>();
+                    productMap.put("id", product.id);
+                    productMap.put("name", product.name);
+                    productMap.put("description", product.description);
+                    productMap.put("price", product.price);
+                    productMap.put("stock", product.stock);
+                    productMap.put("imageUrl", product.imageUrl);
+                    productMap.put("createdDate", product.formattedCreatedDate);
+                    productMap.put("available", product.available);
+                    productMap.put("category", product.category);
+                    
+                    if ("XE_MAY".equals(product.category)) {
+                        productMap.put("brand", product.brand);
+                        productMap.put("model", product.model);
+                        productMap.put("color", product.color);
+                        productMap.put("engineCapacity", product.engineCapacity);
+                        productMap.put("year", product.year);
+                    } else if ("PHU_KIEN".equals(product.category)) {
+                        productMap.put("type", product.type);
+                        productMap.put("brand", product.brand);
+                        productMap.put("material", product.material);
+                        productMap.put("size", product.size);
+                    }
+                    
+                    return productMap;
+                })
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(productList);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(null);
+        }
     }
 }

@@ -32,6 +32,11 @@ public class ChiTietGioHang {
         this.soLuong = soLuong;
         this.tamTinh = tamTinh;
     }
+    
+    // Constructor with primitive long (for tests)
+    public ChiTietGioHang(long maGioHang, long maSanPham, int soLuong) {
+        this(null, maGioHang, maSanPham, null, null, soLuong, null);
+    }
 
     public static void validateSoLuong(int soLuong) {
         if (soLuong <= 0) {
@@ -79,6 +84,8 @@ public class ChiTietGioHang {
         this.tamTinh = tinhTamTinh();
     }
 
+    private SanPham sanPham; // Add field for entity reference
+    
     public Long getMaChiTiet() {return maChiTiet;}
     public Long getMaGioHang() {return maGioHang;}
     public Long getMaSanPham() {return maSanPham;}
@@ -86,7 +93,18 @@ public class ChiTietGioHang {
     public BigDecimal getGiaSanPham() {return giaSanPham;}
     public int getSoLuong() {return soLuong;}
     public BigDecimal getTamTinh() {return tamTinh;}
+    public SanPham getSanPham() {return sanPham;}
+    
     public void setMaChiTiet(Long maChiTiet) {this.maChiTiet = maChiTiet;}
     public void setMaGioHang(Long maGioHang) {this.maGioHang = maGioHang;}
     public void setTenSanPham(String tenSanPham) {this.tenSanPham = tenSanPham;}
+    public void setSanPham(SanPham sanPham) {
+        this.sanPham = sanPham;
+        if (sanPham != null) {
+            this.maSanPham = sanPham.getMaSanPham();
+            this.tenSanPham = sanPham.getTenSanPham();
+            this.giaSanPham = sanPham.getGia();
+            this.tamTinh = tinhTamTinh();
+        }
+    }
 }

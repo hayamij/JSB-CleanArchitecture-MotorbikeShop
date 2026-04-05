@@ -18,13 +18,16 @@ public class CheckoutOutputData {
     private final int totalQuantity;
     private final List<OrderItemData> items;
     private final LocalDateTime orderDate;
+    private final String paymentMethod;
+    private final String paymentMethodDisplay;
     private final String errorCode;
     private final String errorMessage;
 
     public CheckoutOutputData(Long orderId, Long customerId, String customerName,
                              String customerEmail, String customerPhone, String shippingAddress,
                              String orderStatus, BigDecimal totalAmount, int totalItems,
-                             int totalQuantity, List<OrderItemData> items, LocalDateTime orderDate) {
+                             int totalQuantity, List<OrderItemData> items, LocalDateTime orderDate,
+                             String paymentMethod, String paymentMethodDisplay) {
         this.success = true;
         this.orderId = orderId;
         this.customerId = customerId;
@@ -38,6 +41,8 @@ public class CheckoutOutputData {
         this.totalQuantity = totalQuantity;
         this.items = items;
         this.orderDate = orderDate;
+        this.paymentMethod = paymentMethod;
+        this.paymentMethodDisplay = paymentMethodDisplay;
         this.errorCode = null;
         this.errorMessage = null;
     }
@@ -56,6 +61,8 @@ public class CheckoutOutputData {
         this.totalQuantity = 0;
         this.items = null;
         this.orderDate = null;
+        this.paymentMethod = null;
+        this.paymentMethodDisplay = null;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
@@ -87,6 +94,10 @@ public class CheckoutOutputData {
     public List<OrderItemData> getItems() {return items;}
 
     public LocalDateTime getOrderDate() {return orderDate;}
+
+    public String getPaymentMethod() {return paymentMethod;}
+
+    public String getPaymentMethodDisplay() {return paymentMethodDisplay;}
 
     public String getErrorCode() {return errorCode;}
 
@@ -123,11 +134,12 @@ public class CheckoutOutputData {
     public static CheckoutOutputData forSuccess(Long orderId, Long customerId, String customerName,
                                                String customerPhone, String shippingAddress,
                                                String orderStatus, BigDecimal totalAmount,
-                                               int totalItems, List<OrderItemData> items) {
+                                               int totalItems, List<OrderItemData> items,
+                                               String paymentMethod, String paymentMethodDisplay) {
         return new CheckoutOutputData(orderId, customerId, customerName, null, customerPhone,
                 shippingAddress, orderStatus, totalAmount, totalItems,
                 items.stream().mapToInt(OrderItemData::getQuantity).sum(),
-                items, LocalDateTime.now());
+                items, LocalDateTime.now(), paymentMethod, paymentMethodDisplay);
     }
     
     public static CheckoutOutputData forError(String errorCode, String errorMessage) {

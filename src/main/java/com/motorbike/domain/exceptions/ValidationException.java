@@ -24,6 +24,10 @@ public class ValidationException extends IllegalArgumentException {
         return new ValidationException("Email không hợp lệ", "INVALID_EMAIL");
     }
     
+    public static ValidationException emptyLoginIdentifier() {
+        return new ValidationException("Vui lòng nhập email, tên đăng nhập hoặc số điện thoại", "EMPTY_LOGIN_IDENTIFIER");
+    }
+    
     // ===== VALIDATION METHODS - PASSWORD =====
     public static ValidationException emptyPassword() {
         return new ValidationException("Mật khẩu không được để trống", "EMPTY_PASSWORD");
@@ -44,6 +48,14 @@ public class ValidationException extends IllegalArgumentException {
     }
     
     // ===== VALIDATION METHODS - USER =====
+    public static ValidationException emptyFullName() {
+        return new ValidationException("Họ và tên không được để trống", "EMPTY_FULL_NAME");
+    }
+    
+    public static ValidationException fullNameTooShort() {
+        return new ValidationException("Họ và tên phải có ít nhất 2 ký tự", "FULL_NAME_TOO_SHORT");
+    }
+    
     public static ValidationException emptyUsername() {
         return new ValidationException("Tên đăng nhập không được rỗng", "EMPTY_USERNAME");
     }
@@ -172,5 +184,37 @@ public class ValidationException extends IllegalArgumentException {
     
     public static ValidationException invalidOrderPrice(String message) {
         return new ValidationException(message, "INVALID_PRICE");
+    }
+    
+    public static ValidationException invalidStock() {
+        return new ValidationException("Số lượng tồn kho không hợp lệ", "INVALID_STOCK");
+    }
+    
+    public static ValidationException invalidOrderId() {
+        return new ValidationException("Mã đơn hàng không hợp lệ", "INVALID_ORDER_ID");
+    }
+    
+    public static ValidationException fieldRequired(String fieldName) {
+        return new ValidationException(fieldName + " không được để trống", "FIELD_REQUIRED");
+    }
+    
+    public static ValidationException invalidYear() {
+        return new ValidationException("Năm sản xuất không hợp lệ", "INVALID_YEAR");
+    }
+    
+    public static ValidationException invalidEngineCapacity() {
+        return new ValidationException("Dung tích động cơ không hợp lệ", "INVALID_ENGINE_CAPACITY");
+    }
+    
+    public static ValidationException invalidCartId() {
+        return new ValidationException("Mã giỏ hàng không hợp lệ", "INVALID_CART_ID");
+    }
+    
+    public static ValidationException invalidInput(String message) {
+        return new ValidationException(message, "INVALID_INPUT");
+    }
+    
+    public static ValidationException nullOrderStatus() {
+        return new ValidationException("Trạng thái đơn hàng không được null", "NULL_ORDER_STATUS");
     }
 }

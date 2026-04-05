@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sản phẩm - Admin Panel</title>
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/admin.css?v=3">
+</head>
+<body data-page="products">
+    <!-- Admin Sidebar will be loaded by admin-sidebar.js -->
+
+    <!-- Main Content Area -->
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1>Quản lý Sản phẩm</h1>
+            <p>Quản lý xe máy và phụ kiện</p>
+        </div>
+
+        <div class="admin-content">
+            <div id="alertContainer"></div>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('motorbikes')">XE MÁY</button>
+                <button class="tab-btn" onclick="switchTab('accessories')">PHỤ KIỆN</button>
+            </div>
+
+            <!-- Motorbikes Tab -->
+            <div id="motorbikesTab" class="tab-content active">
+                <div class="section-actions">
+                    <button class="btn-add" onclick="exportMotorbikes()" style="background: #f59e0b;">📄 Export Excel</button>
+                    <button class="btn-add" onclick="showImportMotorbikeModal()" style="background: #10b981;">📊 Import Excel</button>
+                    <button class="btn-add" onclick="showAddMotorbikeModal()">+ THÊM XE MÁY</button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <form class="search-form" onsubmit="searchMotorbikes(event)">
+                        <div class="form-group">
+                            <label>TÊN XE</label>
+                            <input type="text" id="searchMotorbikeName" placeholder="Nhập tên xe máy...">
+                        </div>
+                        <div class="form-group">
+                            <label>HÃNG XE</label>
+                            <select id="filterMotorbikeBrand" onchange="applyMotorbikeFilters()">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>MÀU SẮC</label>
+                            <select id="filterMotorbikeColor" onchange="applyMotorbikeFilters()">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>TRẠNG THÁI</label>
+                            <select id="filterMotorbikeAvailability" onchange="applyMotorbikeFilters()">
+                                <option value="">Tất cả</option>
+                                <option value="available">Hiển thị</option>
+                                <option value="hidden">Đã ẩn</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>SẮP XẾP</label>
+                            <select id="sortMotorbikeOrder" onchange="applyMotorbikeFilters()">
+                                <option value="newest">Mới nhất</option>
+                                <option value="oldest">Cũ nhất</option>
+                                <option value="price-high">Giá cao nhất</option>
+                                <option value="price-low">Giá thấp nhất</option>
+                                <option value="name-asc">Tên A-Z</option>
+                                <option value="name-desc">Tên Z-A</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Motorbikes Table -->
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>HÌNH ẢNH</th>
+                                <th>TÊN XE</th>
+                                <th>HÃNG</th>
+                                <th>DÒNG XE</th>
+                                <th>MÀU SẮC</th>
+                                <th>NĂM SX</th>
+                                <th>DUNG TÍCH</th>
+                                <th>GIÁ</th>
+                                <th>TỔN KHO</th>
+                                <th>TRẠNG THÁI</th>
+                                <th>NGÀY TẠO</th>
+                                <th>HÀNH ĐỘNG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="motorbikesTableBody">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px;">
+                                    <div class="loading-spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Accessories Tab -->
+            <div id="accessoriesTab" class="tab-content">
+                <div class="section-actions">
+                    <button class="btn-add" onclick="exportAccessories()" style="background: #f59e0b;">📄 Export Excel</button>
+                    <button class="btn-add" onclick="showImportAccessoryModal()" style="background: #10b981;">📊 Import Excel</button>
+                    <button class="btn-add" onclick="showAddAccessoryModal()">+ THÊM PHỤ KIỆN</button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <form class="search-form" onsubmit="searchAccessories(event)">
+                        <div class="form-group">
+                            <label>TÊN PHỤ KIỆN</label>
+                            <input type="text" id="searchAccessoryName" placeholder="Nhập tên phụ kiện...">
+                        </div>
+                        <div class="form-group">
+                            <label>LOẠI PHỤ KIỆN</label>
+                            <select id="filterAccessoryType" onchange="applyAccessoryFilters()">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>THƯƠNG HIỆU</label>
+                            <select id="filterAccessoryBrand" onchange="applyAccessoryFilters()">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>TRẠNG THÁI</label>
+                            <select id="filterAccessoryAvailability" onchange="applyAccessoryFilters()">
+                                <option value="">Tất cả</option>
+                                <option value="available">Hiển thị</option>
+                                <option value="hidden">Đã ẩn</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>SẮP XẾP</label>
+                            <select id="sortAccessoryOrder" onchange="applyAccessoryFilters()">
+                                <option value="newest">Mới nhất</option>
+                                <option value="oldest">Cũ nhất</option>
+                                <option value="price-high">Giá cao nhất</option>
+                                <option value="price-low">Giá thấp nhất</option>
+                                <option value="name-asc">Tên A-Z</option>
+                                <option value="name-desc">Tên Z-A</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Accessories Table -->
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>HÌNH ẢNH</th>
+                                <th>TÊN PHỤ KIỆN</th>
+                                <th>LOẠI</th>
+                                <th>THƯƠNG HIỆU</th>
+                                <th>CHẤT LIỆU</th>
+                                <th>KÍCH THƯỚC</th>
+                                <th>GIÁ</th>
+                                <th>TỔN KHO</th>
+                                <th>TRẠNG THÁI</th>
+                                <th>NGÀY TẠO</th>
+                                <th>HÀNH ĐỘNG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accessoriesTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px;">
+                                    <div class="loading-spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Motorbike Modal -->
+    <div id="motorbikeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="motorbikeModalTitle">THÊM XE MÁY</h2>
+            </div>
+            <div class="modal-body">
+                <form id="motorbikeForm">
+                    <input type="hidden" id="motorbikeId">
+                    
+                    <div class="form-group">
+                        <label>TÊN XE *</label>
+                        <input type="text" id="motorbikeName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>HÃNG *</label>
+                        <input type="text" id="motorbikeBrand" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>DÒNG XE *</label>
+                        <input type="text" id="motorbikeModel" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>MÀU SẮC *</label>
+                        <input type="text" id="motorbikeColor" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>NĂM SẢN XUẤT *</label>
+                        <input type="number" id="motorbikeYear" required min="2000" max="2030">
+                    </div>
+
+                    <div class="form-group">
+                        <label>DUNG TÍCH (cc) *</label>
+                        <input type="number" id="motorbikeDisplacement" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>GIÁ *</label>
+                        <input type="number" id="motorbikePrice" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>SỐ LƯỢNG *</label>
+                        <input type="number" id="motorbikeStock" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>LINK HÌNH ẢNH</label>
+                        <input type="text" id="motorbikeImage" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>MÔ TẢ</label>
+                        <textarea id="motorbikeDescription" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeMotorbikeModal()">HỦY</button>
+                <button class="btn-submit" onclick="saveMotorbike()">LƯU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Accessory Modal -->
+    <div id="accessoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="accessoryModalTitle">THÊM PHỤ KIỆN</h2>
+            </div>
+            <div class="modal-body">
+                <form id="accessoryForm">
+                    <input type="hidden" id="accessoryId">
+                    
+                    <div class="form-group">
+                        <label>TÊN PHỤ KIỆN *</label>
+                        <input type="text" id="accessoryName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>LOẠI *</label>
+                        <input type="text" id="accessoryType" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>THƯƠNG HIỆU *</label>
+                        <input type="text" id="accessoryBrand" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CHẤT LIỆU *</label>
+                        <input type="text" id="accessoryMaterial" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>KÍCH THƯỚC *</label>
+                        <input type="text" id="accessorySize" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>GIÁ *</label>
+                        <input type="number" id="accessoryPrice" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>SỐ LƯỢNG *</label>
+                        <input type="number" id="accessoryStock" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>LINK HÌNH ẢNH</label>
+                        <input type="text" id="accessoryImage" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>MÔ TẢ</label>
+                        <textarea id="accessoryDescription" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeAccessoryModal()">HỦY</button>
+                <button class="btn-submit" onclick="saveAccessory()">LƯU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Motorbike Modal -->
+    <div id="importMotorbikeModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Import Xe máy từ Excel</h2>
+            </div>
+            <div class="modal-body">
+                <!-- Template Download -->
+                <div style="background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; color: #0369a1;">📄 Tải Template Excel</h3>
+                    <p style="margin: 0 0 12px 0; color: #075985; font-size: 14px;">Tải file mẫu để biết định dạng đúng. File Excel cần 10 cột theo thứ tự:</p>
+                    <p style="margin: 0 0 12px 0; color: #0c4a6e; font-size: 13px; font-weight: 600;">
+                        Tên SP | Mô tả | Giá | Hình ảnh | Tồn kho | Hãng | Dòng | Màu | Năm SX | Dung tích
+                    </p>
+                    <button class="btn-add" onclick="downloadMotorbikeTemplate()" style="background: #0ea5e9;">⬇️ Tải Template Excel</button>
+                </div>
+
+                <!-- File Upload Area -->
+                <div id="uploadAreaMotorbike" class="upload-area" 
+                     ondrop="handleMotorbikeFileDrop(event)" 
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Kéo thả file Excel/CSV vào đây hoặc</p>
+                    <input type="file" id="excelFileInputMotorbike" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleMotorbikeFileSelect(event)">
+                    <button class="btn-add" onclick="document.getElementById('excelFileInputMotorbike').click()">Chọn file</button>
+                    <p class="upload-hint">Hỗ trợ: .xlsx, .xls, .csv (tối đa 10MB)</p>
+                </div>
+
+                <!-- Selected File Info -->
+                <div id="fileInfoMotorbike" class="file-info hidden">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px;">📊</span>
+                        <div style="flex: 1;">
+                            <p style="margin: 0; font-weight: 600;" id="fileNameMotorbike"></p>
+                            <p style="margin: 0; font-size: 14px; color: #666;" id="fileSizeMotorbike"></p>
+                        </div>
+                        <button class="btn-action btn-delete" onclick="clearMotorbikeFileSelection()">✕</button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="importProgressMotorbike" class="import-progress hidden">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFillMotorbike"></div>
+                    </div>
+                    <p id="progressTextMotorbike" style="text-align: center; margin-top: 8px; color: #666;">Đang xử lý...</p>
+                </div>
+
+                <!-- Import Results -->
+                <div id="importResultsMotorbike" class="import-results hidden">
+                    <h3 style="margin: 0 0 16px 0; color: #059669;">✅ Kết quả Import</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                        <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #0369a1;" id="totalRecordsMotorbike">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #075985;">Tổng số</p>
+                        </div>
+                        <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #059669;" id="successCountMotorbike">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #047857;">Thành công</p>
+                        </div>
+                        <div style="background: #fef2f2; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #dc2626;" id="failureCountMotorbike">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #991b1b;">Thất bại</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Error List -->
+                    <div id="errorListContainerMotorbike" class="hidden">
+                        <h4 style="margin: 0 0 8px 0; color: #dc2626;">❌ Lỗi chi tiết:</h4>
+                        <div id="errorListMotorbike" style="max-height: 200px; overflow-y: auto; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px;">
+                            <!-- Errors will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeImportMotorbikeModal()">Đóng</button>
+                <button class="btn-submit" id="btnImportMotorbike" onclick="submitMotorbikeImport()" disabled>📤 Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Accessory Modal -->
+    <div id="importAccessoryModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Import Phụ kiện từ Excel</h2>
+            </div>
+            <div class="modal-body">
+                <!-- Template Download -->
+                <div style="background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 8px 0; color: #0369a1;">📄 Tải Template Excel</h3>
+                    <p style="margin: 0 0 12px 0; color: #075985; font-size: 14px;">Tải file mẫu để biết định dạng đúng. File Excel cần 8 cột theo thứ tự:</p>
+                    <p style="margin: 0 0 12px 0; color: #0c4a6e; font-size: 13px; font-weight: 600;">
+                        Tên SP | Mô tả | Giá | Hình ảnh | Tồn kho | Loại | Thương hiệu | Chất liệu
+                    </p>
+                    <button class="btn-add" onclick="downloadAccessoryTemplate()" style="background: #0ea5e9;">⬇️ Tải Template Excel</button>
+                </div>
+
+                <!-- File Upload Area -->
+                <div id="uploadAreaAccessory" class="upload-area" 
+                     ondrop="handleAccessoryFileDrop(event)" 
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Kéo thả file Excel/CSV vào đây hoặc</p>
+                    <input type="file" id="excelFileInputAccessory" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleAccessoryFileSelect(event)">
+                    <button class="btn-add" onclick="document.getElementById('excelFileInputAccessory').click()">Chọn file</button>
+                    <p class="upload-hint">Hỗ trợ: .xlsx, .xls, .csv (tối đa 10MB)</p>
+                </div>
+
+                <!-- Selected File Info -->
+                <div id="fileInfoAccessory" class="file-info hidden">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px;">📊</span>
+                        <div style="flex: 1;">
+                            <p style="margin: 0; font-weight: 600;" id="fileNameAccessory"></p>
+                            <p style="margin: 0; font-size: 14px; color: #666;" id="fileSizeAccessory"></p>
+                        </div>
+                        <button class="btn-action btn-delete" onclick="clearAccessoryFileSelection()">✕</button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="importProgressAccessory" class="import-progress hidden">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFillAccessory"></div>
+                    </div>
+                    <p id="progressTextAccessory" style="text-align: center; margin-top: 8px; color: #666;">Đang xử lý...</p>
+                </div>
+
+                <!-- Import Results -->
+                <div id="importResultsAccessory" class="import-results hidden">
+                    <h3 style="margin: 0 0 16px 0; color: #059669;">✅ Kết quả Import</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                        <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #0369a1;" id="totalRecordsAccessory">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #075985;">Tổng số</p>
+                        </div>
+                        <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #059669;" id="successCountAccessory">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #047857;">Thành công</p>
+                        </div>
+                        <div style="background: #fef2f2; padding: 12px; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #dc2626;" id="failureCountAccessory">0</p>
+                            <p style="margin: 4px 0 0 0; font-size: 14px; color: #991b1b;">Thất bại</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Error List -->
+                    <div id="errorListContainerAccessory" class="hidden">
+                        <h4 style="margin: 0 0 8px 0; color: #dc2626;">❌ Lỗi chi tiết:</h4>
+                        <div id="errorListAccessory" style="max-height: 200px; overflow-y: auto; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px;">
+                            <!-- Errors will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeImportAccessoryModal()">Đóng</button>
+                <button class="btn-submit" id="btnImportAccessory" onclick="submitAccessoryImport()" disabled>📤 Import</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-sidebar.js?v=1"></script>
+    <script src="js/common.js?v=3"></script>
+    <script src="js/admin-products.js?v=3"></script>
+</body>
+</html>

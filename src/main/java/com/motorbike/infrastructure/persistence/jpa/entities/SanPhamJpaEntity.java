@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "loai_san_pham", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "san_pham")
 public abstract class SanPhamJpaEntity {
     
@@ -38,7 +39,7 @@ public abstract class SanPhamJpaEntity {
     @Column(name = "ngay_cap_nhat", nullable = false)
     private LocalDateTime ngayCapNhat;
 
-    @Column(name = "loai_san_pham", nullable = false, length = 50)
+    @Column(name = "loai_san_pham", nullable = false, length = 50, insertable = false, updatable = false)
     private String loaiSanPham;
 
     protected SanPhamJpaEntity() {

@@ -1,9 +1,15 @@
+
 package com.motorbike.business.usecase.control;
+import com.motorbike.business.usecase.input.UpdateCartQuantityInputBoundary;
 
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityInputData;
 import com.motorbike.business.dto.updatecart.UpdateCartQuantityOutputData;
+import com.motorbike.business.dto.checkinventory.CheckInventoryAvailabilityInputData;
+import com.motorbike.business.dto.calculatecarttotals.CalculateCartTotalsInputData;
 import com.motorbike.business.ports.repository.CartRepository;
 import com.motorbike.business.usecase.output.UpdateCartQuantityOutputBoundary;
+import com.motorbike.business.usecase.input.CheckInventoryAvailabilityInputBoundary;
+import com.motorbike.business.usecase.input.CalculateCartTotalsInputBoundary;
 import com.motorbike.domain.entities.GioHang;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.exceptions.DomainException;
@@ -12,22 +18,30 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateCartQuantityUseCaseControl {
+public class UpdateCartQuantityUseCaseControl implements UpdateCartQuantityInputBoundary {
     
     private final UpdateCartQuantityOutputBoundary outputBoundary;
     private final CartRepository cartRepository;
+    private final CheckInventoryAvailabilityInputBoundary checkInventoryUseCase;
+    private final CalculateCartTotalsInputBoundary calculateTotalsUseCase;
     
     public UpdateCartQuantityUseCaseControl(
             UpdateCartQuantityOutputBoundary outputBoundary,
-            CartRepository cartRepository) {
+            CartRepository cartRepository,
+            CheckInventoryAvailabilityInputBoundary checkInventoryUseCase,
+            CalculateCartTotalsInputBoundary calculateTotalsUseCase) {
         this.outputBoundary = outputBoundary;
         this.cartRepository = cartRepository;
+        this.checkInventoryUseCase = checkInventoryUseCase;
+        this.calculateTotalsUseCase = calculateTotalsUseCase;
     }
     
+    @Override
     public void execute(UpdateCartQuantityInputData inputData) {
         UpdateCartQuantityOutputData outputData = null;
         Exception errorException = null;
         
+        // Step 1: Validation
         try {
             if (inputData == null) {
                 throw ValidationException.invalidInput();
@@ -46,6 +60,7 @@ public class UpdateCartQuantityUseCaseControl {
         int oldQuantity = 0;
         String productName = null;
         
+        // Step 2: Get cart and existing item info
         if (errorException == null) {
             try {
                 gioHang = cartRepository.findById(inputData.getCartId())
@@ -65,19 +80,64 @@ public class UpdateCartQuantityUseCaseControl {
             }
         }
         
+        // Step 3: Delegate to atomic use cases based on operation
         if (errorException == null && gioHang != null) {
             try {
-                if (inputData.getNewQuantity() == 0) {
-                    gioHang.xoaSanPham(inputData.getProductId());
-                } else {
-                    gioHang.capNhatSoLuong(inputData.getProductId(), inputData.getNewQuantity());
+                // UC-39: Check inventory before updating (only if newQuantity > 0)
+                if (inputData.getNewQuantity() > 0 && checkInventoryUseCase != null) {
+                    CheckInventoryAvailabilityInputData checkInput = new CheckInventoryAvailabilityInputData(
+                        inputData.getProductId(),
+                        inputData.getNewQuantity()
+                    );
+                    
+                    // Delegate to CheckInventoryAvailabilityUseCaseControl
+                    var inventoryResult = ((CheckInventoryAvailabilityUseCaseControl) checkInventoryUseCase)
+                        .checkInventoryInternal(checkInput);
+                    
+                    if (!inventoryResult.isSuccess()) {
+                        throw new DomainException(inventoryResult.getErrorMessage(), inventoryResult.getErrorCode());
+                    }
+                    
+                    if (!inventoryResult.isAvailable()) {
+                        throw DomainException.insufficientStock(
+                            inventoryResult.getProductName() != null ? inventoryResult.getProductName() : productName,
+                            inventoryResult.getAvailableStock()
+                        );
+                    }
                 }
                 
-                GioHang savedCart = cartRepository.save(gioHang);
+                // Update quantity (core responsibility of this use case)
+                // This also handles removal (newQuantity = 0)
+                gioHang.capNhatSoLuong(inputData.getProductId(), inputData.getNewQuantity());
+                gioHang = cartRepository.save(gioHang);
                 
+                // UC-42: Calculate cart totals
+                int totalItems = 0;
+                int totalQuantity = 0;
+                BigDecimal totalAmount = BigDecimal.ZERO;
+                
+                if (calculateTotalsUseCase != null) {
+                    CalculateCartTotalsInputData totalsInput = new CalculateCartTotalsInputData(
+                        gioHang.getDanhSachSanPham()
+                    );
+                    var totalsResult = ((CalculateCartTotalsUseCaseControl) calculateTotalsUseCase)
+                        .calculateInternal(totalsInput);
+                    totalItems = totalsResult.getTotalItems();
+                    totalQuantity = totalsResult.getTotalQuantity();
+                    totalAmount = totalsResult.getTotalAmount();
+                } else {
+                    // Fallback: calculate manually if use case not provided
+                    totalItems = gioHang.getDanhSachSanPham().size();
+                    for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
+                        totalQuantity += item.getSoLuong();
+                        totalAmount = totalAmount.add(item.getTamTinh());
+                    }
+                }
+                
+                // Build response with all cart items
                 List<UpdateCartQuantityOutputData.CartItemData> allItems = new ArrayList<>();
                 BigDecimal newSubtotal = BigDecimal.ZERO;
-                for (ChiTietGioHang item : savedCart.getDanhSachSanPham()) {
+                for (ChiTietGioHang item : gioHang.getDanhSachSanPham()) {
                     allItems.add(new UpdateCartQuantityOutputData.CartItemData(
                         item.getMaSanPham(),
                         item.getTenSanPham(),
@@ -91,16 +151,16 @@ public class UpdateCartQuantityUseCaseControl {
                 }
                 
                 outputData = new UpdateCartQuantityOutputData(
-                    savedCart.getMaGioHang(),
-                    savedCart.getMaTaiKhoan(),
+                    gioHang.getMaGioHang(),
+                    gioHang.getMaTaiKhoan(),
                     inputData.getProductId(),
                     productName,
                     oldQuantity,
                     inputData.getNewQuantity(),
                     inputData.getNewQuantity() == 0,
-                    savedCart.getDanhSachSanPham().size(),
-                    savedCart.getDanhSachSanPham().stream().mapToInt(ChiTietGioHang::getSoLuong).sum(),
-                    savedCart.getTongTien(),
+                    totalItems,
+                    totalQuantity,
+                    totalAmount,
                     newSubtotal,
                     allItems
                 );
@@ -109,6 +169,7 @@ public class UpdateCartQuantityUseCaseControl {
             }
         }
         
+        // Step 4: Handle error
         if (errorException != null) {
             String errorCode = "SYSTEM_ERROR";
             String message = errorException.getMessage();
@@ -124,6 +185,7 @@ public class UpdateCartQuantityUseCaseControl {
             outputData = UpdateCartQuantityOutputData.forError(errorCode, message);
         }
         
+        // Step 5: Present result
         outputBoundary.present(outputData);
     }
 }

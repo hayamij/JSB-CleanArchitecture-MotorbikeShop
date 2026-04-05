@@ -31,11 +31,11 @@ function setLoading(loading) {
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const rememberMe = document.getElementById('rememberMe').checked;
 
-    if (!email || !password) {
+    if (!username || !password) {
         showAlert('Vui lòng điền đầy đủ thông tin', 'error');
         return;
     }
@@ -49,7 +49,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                email: email,
+                username: username,
                 password: password
             })
         });
@@ -57,43 +57,45 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (data.success) {
+            // Store user information in sessionStorage
             sessionStorage.setItem('userId', data.userId);
             sessionStorage.setItem('email', data.email);
             sessionStorage.setItem('username', data.username);
             sessionStorage.setItem('role', data.role);
+            sessionStorage.setItem('phone', data.phone || '');
+            sessionStorage.setItem('address', data.address || '');
             sessionStorage.setItem('cartId', data.cartId);
 
             if (rememberMe) {
                 localStorage.setItem('userId', data.userId);
                 localStorage.setItem('email', data.email);
                 localStorage.setItem('username', data.username);
+                localStorage.setItem('role', data.role);
+                localStorage.setItem('phone', data.phone || '');
+                localStorage.setItem('address', data.address || '');
             }
 
-            console.log('✅ Đăng nhập thành công');
-            console.log('Role từ API:', data.role);
-            console.log('Role lưu trong sessionStorage:', sessionStorage.getItem('role'));
-
+            // Merge guest cart into user cart
+            const mergeResult = await mergeGuestCartToUser(data.userId);
+            
             showAlert('Đăng nhập thành công! Đang chuyển hướng...', 'success');
 
-            if (data.cartMerged) {
+            if (mergeResult.success && mergeResult.itemsMerged > 0) {
+                showAlert(`Đã hợp nhất ${mergeResult.itemsMerged} sản phẩm vào giỏ hàng`, 'success');
+            } else if (data.cartMerged) {
                 showAlert(`Đã hợp nhất ${data.mergedItemsCount} sản phẩm vào giỏ hàng`, 'success');
             }
 
-            // Chuyển hướng dựa trên vai trò
-            const role = data.role ? String(data.role).trim().toUpperCase() : '';
-            console.log('Role đã format:', role);
+            // Check if user was trying to checkout
+            const returnToCheckout = sessionStorage.getItem('returnToCheckout');
+            sessionStorage.removeItem('returnToCheckout');
             
-            const isAdmin = role.includes('ADMIN') || 
-                           role.includes('QUẢN TRỊ') ||
-                           role.includes('ADMIN_ROLE') ||
-                           role.includes('ROLE_ADMIN');
-            const redirectUrl = isAdmin ? 'home-admin.html' : 'home.html';
-            
-            console.log('Is Admin?', isAdmin);
-            console.log('Chuyển hướng đến:', redirectUrl);
-
             setTimeout(() => {
-                window.location.href = redirectUrl;
+                if (returnToCheckout === 'true') {
+                    window.location.href = 'checkout.html';
+                } else {
+                    window.location.href = 'home.html';
+                }
             }, 1500);
         } else {
             showAlert(data.errorMessage || 'Đăng nhập thất bại', 'error');
@@ -107,9 +109,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 });
 
 window.onload = function() {
-    const savedEmail = localStorage.getItem('email');
-    if (savedEmail) {
-        document.getElementById('email').value = savedEmail;
+    const savedUsername = localStorage.getItem('username') || localStorage.getItem('email');
+    if (savedUsername) {
+        document.getElementById('username').value = savedUsername;
         document.getElementById('rememberMe').checked = true;
     }
 };

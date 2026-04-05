@@ -17,4 +17,13 @@ public interface MotorbikeRepository {
 
     // Xóa xe máy
     void deleteById(Long id);
+    
+    // Kiểm tra xe máy có tồn tại không
+    boolean existsById(Long id);
+    
+    // Tìm kiếm xe máy theo keyword
+    List<XeMay> searchMotorbikes(String keyword);
+    
+    // Thêm hàng loạt xe máy (bulk insert)
+    List<XeMay> saveAll(List<XeMay> xeMayList);
 }

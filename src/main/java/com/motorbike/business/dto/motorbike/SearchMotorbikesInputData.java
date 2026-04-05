@@ -7,6 +7,8 @@ public class SearchMotorbikesInputData {
     public String color;
     public Integer minCC;
     public Integer maxCC;
+    public String sortBy;
+    public String sortDirection;
 
     public SearchMotorbikesInputData(
             String keyword,
@@ -22,5 +24,7 @@ public class SearchMotorbikesInputData {
         this.color = color;
         this.minCC = minCC;
         this.maxCC = maxCC;
+        this.sortBy = null;
+        this.sortDirection = null;
     }
 }

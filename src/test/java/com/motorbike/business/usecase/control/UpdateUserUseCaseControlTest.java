@@ -1,174 +1,152 @@
 package com.motorbike.business.usecase.control;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import com.motorbike.business.dto.updateuser.UpdateUserInputData;
-import com.motorbike.business.dto.updateuser.UpdateUserOutputData;
+import com.motorbike.adapters.presenters.UpdateUserPresenter;
+import com.motorbike.adapters.viewmodels.UpdateUserViewModel;
+import com.motorbike.business.dto.user.UpdateUserInputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.output.UpdateUserOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.VaiTro;
-import com.motorbike.domain.exceptions.ValidationException;
 
-class UpdateUserUseCaseControlTest {
+public class UpdateUserUseCaseControlTest {
 
-    private UserRepository userRepository;
-    private UpdateUserOutputBoundary outputBoundary;
-    private UpdateUserUseCaseControl useCase;
+	@Test
+	public void testExecute_ValidUpdate_Success() {
+		UpdateUserInputData inputData = new UpdateUserInputData(
+			1L,
+			null, // tenDangNhap
+			"Updated Name",
+			"user@test.com",
+			"0987654321",
+			"456 New Street",
+			VaiTro.CUSTOMER,
+			true
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		UpdateUserViewModel viewModel = new UpdateUserViewModel();
+		UpdateUserOutputBoundary outputBoundary = new UpdateUserPresenter(viewModel);
+		
+		UpdateUserUseCaseControl control = new UpdateUserUseCaseControl(outputBoundary, userRepo);
+		control.execute(inputData);
+		
+		assertTrue(viewModel.success);
+		assertFalse(viewModel.hasError);
+	}
 
-    @BeforeEach
-    void setUp() {
-        userRepository = mock(UserRepository.class);
-        outputBoundary = mock(UpdateUserOutputBoundary.class);
-        useCase = new UpdateUserUseCaseControl(outputBoundary, userRepository);
-    }
+	@Test
+	public void testExecute_UserNotFound() {
+		UpdateUserInputData inputData = new UpdateUserInputData(
+			999L,
+			null, // tenDangNhap
+			"Test User",
+			"user@test.com",
+			"0987654321",
+			"Street",
+			VaiTro.CUSTOMER,
+			true
+		);
+		
+		UserRepository userRepo = new MockUserRepository();
+		UpdateUserViewModel viewModel = new UpdateUserViewModel();
+		UpdateUserOutputBoundary outputBoundary = new UpdateUserPresenter(viewModel);
+		
+		UpdateUserUseCaseControl control = new UpdateUserUseCaseControl(outputBoundary, userRepo);
+		control.execute(inputData);
+		
+		assertFalse(viewModel.success);
+		assertTrue(viewModel.hasError);
+	}
 
-    // ===== TC01 =====
-    @Test
-    void should_return_error_when_input_is_null() {
-        useCase.execute(null);
+	@Test
+	public void testExecute_NullInputData() {
+		UserRepository userRepo = new MockUserRepository();
+		UpdateUserViewModel viewModel = new UpdateUserViewModel();
+		UpdateUserOutputBoundary outputBoundary = new UpdateUserPresenter(viewModel);
+		
+		UpdateUserUseCaseControl control = new UpdateUserUseCaseControl(outputBoundary, userRepo);
+		control.execute(null);
+		
+		assertFalse(viewModel.success);
+		assertTrue(viewModel.hasError);
+	}
 
-        UpdateUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals(ValidationException.invalidInput().getErrorCode(), output.getErrorCode());
-    }
+	private static class MockUserRepository implements UserRepository {
+		@Override
+		public Optional<TaiKhoan> findByEmail(String email) {
+			return Optional.empty();
+		}
 
-    // ===== TC02 =====
-    @Test
-    void should_return_error_when_not_admin() {
-        UpdateUserInputData input = UpdateUserInputData.forAdmin(
-                false,            // admin
-                1L,               // userId
-                null, null, null, null, null, null, null
-        );
+		@Override
+		public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+			return findByEmail(username);
+		}
 
-        useCase.execute(input);
+		@Override
+		public boolean existsByTenDangNhap(String tenDangNhap) {
+			return false;
+		}
 
-        UpdateUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals(ValidationException.invalidInput().getErrorCode(), output.getErrorCode());
-    }
+		@Override
+		public Optional<TaiKhoan> findById(Long id) {
+			if (id == 1L) {
+				return Optional.of(new TaiKhoan(
+					1L, "Test User", "user@test.com", "user", "password", "0912345678",
+					"123 Street", VaiTro.CUSTOMER, true,
+					LocalDateTime.now(), LocalDateTime.now(), null
+				));
+			}
+			return Optional.empty();
+		}
 
-    // ===== TC03 =====
-    @Test
-    void should_return_error_when_userId_is_null() {
-        UpdateUserInputData input = UpdateUserInputData.forAdmin(
-                true,             // admin
-                null,             // userId
-                null, null, null, null, null, null, null
-        );
+		@Override
+		public boolean existsByEmail(String email) {
+			return false;
+		}
 
-        useCase.execute(input);
+		@Override
+		public boolean existsByUsername(String username) {
+			return false;
+		}
 
-        UpdateUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals(ValidationException.invalidUserId().getErrorCode(), output.getErrorCode());
-    }
+		@Override
+		public TaiKhoan save(TaiKhoan taiKhoan) {
+			return taiKhoan;
+		}
 
-    // ===== TC04 =====
-    @Test
-    void should_return_system_error_when_user_not_found() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+		@Override
+		public void updateLastLogin(Long userId) {
+		}
 
-        UpdateUserInputData input = UpdateUserInputData.forAdmin(
-                true,
-                99L,
-                "a@gmail.com", null, null, null, null, null, null
-        );
+		@Override
+		public java.util.List<TaiKhoan> findAll() {
+			return new java.util.ArrayList<>();
+		}
 
-        useCase.execute(input);
+		@Override
+		public void deleteById(Long userId) {
+		}
 
-        UpdateUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals("SYSTEM_ERROR", output.getErrorCode());
-    }
+		@Override
+		public boolean existsById(Long userId) {
+			return userId == 1L;
+		}
 
-    // ===== TC05 =====
-    @Test
-    void should_update_user_successfully() {
-        TaiKhoan existing = mock(TaiKhoan.class);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(userRepository.save(existing)).thenReturn(existing);
-
-        UpdateUserInputData input = UpdateUserInputData.forAdmin(
-                true,
-                1L,
-                "new@gmail.com",   // email
-                "newname",         // username
-                null,              // password
-                null,              // phoneNumber
-                null,              // address
-                null,              // role
-                null               // active
-        );
-
-        useCase.execute(input);
-
-        UpdateUserOutputData output = captureOutput();
-        assertTrue(output.isSuccess());
-
-        verify(existing).setEmail("new@gmail.com");
-        verify(existing).setTenDangNhap("newname");
-        verify(userRepository).save(existing);
-    }
-
-    // ===== TC06 =====
-    @Test
-    void should_ignore_invalid_role() {
-        TaiKhoan existing = mock(TaiKhoan.class);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(userRepository.save(existing)).thenReturn(existing);
-
-        UpdateUserInputData input = UpdateUserInputData.forAdmin(
-                true,
-                1L,
-                null, null, null, null, null,
-                "INVALID_ROLE",
-                null
-        );
-
-        useCase.execute(input);
-
-        UpdateUserOutputData output = captureOutput();
-        assertTrue(output.isSuccess());
-
-        verify(existing, never()).setVaiTro(any(VaiTro.class));
-    }
-
-    // ===== TC07 =====
-    @Test
-    void should_return_system_error_when_repository_throw_exception() {
-        when(userRepository.findById(any()))
-                .thenThrow(new RuntimeException("DB error"));
-
-        UpdateUserInputData input = UpdateUserInputData.forAdmin(
-                true,
-                1L,
-                "a@gmail.com", null, null, null, null, null, null
-        );
-
-        useCase.execute(input);
-
-        UpdateUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals("SYSTEM_ERROR", output.getErrorCode());
-    }
-
-    private UpdateUserOutputData captureOutput() {
-        ArgumentCaptor<UpdateUserOutputData> captor = ArgumentCaptor.forClass(UpdateUserOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        return captor.getValue();
-    }
+		@Override
+		public java.util.List<TaiKhoan> searchUsers(String keyword) {
+			return new java.util.ArrayList<>();
+	}
+	
+	@Override
+	public Optional<com.motorbike.domain.entities.TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+		return Optional.empty();
+	}
+	}
 }

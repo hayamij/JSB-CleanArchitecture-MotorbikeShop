@@ -1,147 +1,244 @@
 package com.motorbike.adapters.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.motorbike.adapters.dto.request.UpdateUserRequest;
-import com.motorbike.adapters.dto.response.AddUserResponse;
-import com.motorbike.adapters.dto.response.DeleteUserResponse;
-import com.motorbike.adapters.dto.response.ListUsersResponse;
-import com.motorbike.adapters.dto.response.UpdateUserResponse;
-import com.motorbike.adapters.viewmodels.AddUserViewModel;
-import com.motorbike.adapters.viewmodels.DeleteUserViewModel;
-import com.motorbike.adapters.viewmodels.ListUsersViewModel;
-import com.motorbike.adapters.viewmodels.UpdateUserViewModel;
-import com.motorbike.business.dto.adduser.AddUserInputData;
-import com.motorbike.business.dto.deleteuser.DeleteUserInputData;
-import com.motorbike.business.dto.listusers.ListUsersInputData;
-import com.motorbike.business.dto.updateuser.UpdateUserInputData;
-import com.motorbike.business.usecase.input.AddUserInputBoundary;
+import com.motorbike.business.usecase.input.GetAllUsersInputBoundary;
+import com.motorbike.business.usecase.input.SearchUsersInputBoundary;
 import com.motorbike.business.usecase.input.DeleteUserInputBoundary;
-import com.motorbike.business.usecase.input.ListUsersInputBoundary;
+import com.motorbike.business.usecase.input.AddUserInputBoundary;
 import com.motorbike.business.usecase.input.UpdateUserInputBoundary;
+import com.motorbike.business.dto.user.SearchUsersInputData;
+import com.motorbike.business.dto.user.DeleteUserInputData;
+import com.motorbike.business.dto.user.AddUserInputData;
+import com.motorbike.business.dto.user.UpdateUserInputData;
+import com.motorbike.adapters.viewmodels.GetAllUsersViewModel;
+import com.motorbike.adapters.viewmodels.SearchUsersViewModel;
+import com.motorbike.adapters.viewmodels.DeleteUserViewModel;
+import com.motorbike.adapters.viewmodels.AddUserViewModel;
+import com.motorbike.adapters.viewmodels.UpdateUserViewModel;
+import com.motorbike.adapters.util.RoleConverter;
 
-
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/users")
 @CrossOrigin(origins = "*")
 public class AdminUserController {
 
-    private final ListUsersInputBoundary listUsersInputBoundary;
-    private final ListUsersViewModel listUsersViewModel;
-
-    private final AddUserInputBoundary addUserInputBoundary;
-    private final AddUserViewModel addUserViewModel;
-
-   private final DeleteUserInputBoundary deleteUserInputBoundary;
+    private final GetAllUsersInputBoundary getAllUsersUseCase;
+    private final GetAllUsersViewModel getAllUsersViewModel;
+    
+    private final SearchUsersInputBoundary searchUsersUseCase;
+    private final SearchUsersViewModel searchUsersViewModel;
+    
+    private final DeleteUserInputBoundary deleteUserUseCase;
     private final DeleteUserViewModel deleteUserViewModel;
-
-    private final UpdateUserInputBoundary updateUserInputBoundary;
+    
+    private final AddUserInputBoundary addUserUseCase;
+    private final AddUserViewModel addUserViewModel;
+    
+    private final UpdateUserInputBoundary updateUserUseCase;
     private final UpdateUserViewModel updateUserViewModel;
 
-    @Autowired
     public AdminUserController(
-            ListUsersInputBoundary listUsersInputBoundary,
-            ListUsersViewModel listUsersViewModel,
-            AddUserInputBoundary addUserInputBoundary,
-            AddUserViewModel addUserViewModel,
-             DeleteUserInputBoundary deleteUserInputBoundary,
+            GetAllUsersInputBoundary getAllUsersUseCase,
+            GetAllUsersViewModel getAllUsersViewModel,
+            SearchUsersInputBoundary searchUsersUseCase,
+            SearchUsersViewModel searchUsersViewModel,
+            DeleteUserInputBoundary deleteUserUseCase,
             DeleteUserViewModel deleteUserViewModel,
-           UpdateUserInputBoundary updateUserInputBoundary,
+            AddUserInputBoundary addUserUseCase,
+            AddUserViewModel addUserViewModel,
+            UpdateUserInputBoundary updateUserUseCase,
             UpdateUserViewModel updateUserViewModel) {
-
-        this.listUsersInputBoundary = listUsersInputBoundary;
-        this.listUsersViewModel = listUsersViewModel;
-        this.addUserInputBoundary = addUserInputBoundary;
-        this.addUserViewModel = addUserViewModel;
-         this.deleteUserInputBoundary = deleteUserInputBoundary;
+        this.getAllUsersUseCase = getAllUsersUseCase;
+        this.getAllUsersViewModel = getAllUsersViewModel;
+        this.searchUsersUseCase = searchUsersUseCase;
+        this.searchUsersViewModel = searchUsersViewModel;
+        this.deleteUserUseCase = deleteUserUseCase;
         this.deleteUserViewModel = deleteUserViewModel;
-        this.updateUserInputBoundary = updateUserInputBoundary;
+        this.addUserUseCase = addUserUseCase;
+        this.addUserViewModel = addUserViewModel;
+        this.updateUserUseCase = updateUserUseCase;
         this.updateUserViewModel = updateUserViewModel;
     }
 
-    @GetMapping
-    public ResponseEntity<ListUsersResponse> listUsers(
-            @RequestParam(name = "admin", defaultValue = "false") boolean admin,
-            @RequestParam(name = "keyword", required = false) String keyword) {
-        ListUsersInputData input = ListUsersInputData.forAdmin(admin, keyword);
-        //listUsersUseCase.execute(input);
-        listUsersInputBoundary.execute(input);
-        return listUsersViewModel.getResponse();
-    }
+    // Use Case: GetAllUsers
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUsers() {
+        getAllUsersUseCase.execute(null);
 
-    @PostMapping
-    public ResponseEntity<AddUserResponse> addUser(@RequestParam(name = "admin", defaultValue = "false") boolean admin,
-                                                   @RequestBody AddUserRequestBody body) {
-        // Simple admin flag check; ideally check auth / role from security context
-        if (!admin) {
-            return ResponseEntity.status(403).body(AddUserResponse.error("FORBIDDEN", "Only admin can create users"));
+        if (getAllUsersViewModel.hasError) {
+            return ResponseEntity.status(500)
+                    .body(Map.of(
+                        "success", false,
+                        "errorCode", getAllUsersViewModel.errorCode,
+                        "errorMessage", getAllUsersViewModel.errorMessage
+                    ));
         }
 
-        AddUserInputData input = AddUserInputData.of(
-                body.email, body.username, body.password, body.phoneNumber, body.address, body.role, body.active
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "users", getAllUsersViewModel.users
+        ));
+    }
+
+    // Use Case: SearchUsers
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsers(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String role) {
+
+        SearchUsersInputData input = new SearchUsersInputData(keyword, null, null);
+        searchUsersUseCase.execute(input);
+
+        if (searchUsersViewModel.hasError) {
+            return ResponseEntity.status(400)
+                    .body(Map.of(
+                        "success", false,
+                        "errorCode", searchUsersViewModel.errorCode,
+                        "errorMessage", searchUsersViewModel.errorMessage
+                    ));
+        }
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "users", searchUsersViewModel.users
+        ));
+    }
+
+    // Use Case: DeleteUser
+    @DeleteMapping("/{userId}/delete")
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        DeleteUserInputData input = new DeleteUserInputData(userId);
+        deleteUserUseCase.execute(input);
+
+        if (deleteUserViewModel.hasError) {
+            return ResponseEntity.status(400)
+                    .body(Map.of(
+                        "success", false,
+                        "errorCode", deleteUserViewModel.errorCode,
+                        "errorMessage", deleteUserViewModel.errorMessage
+                    ));
+        }
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", deleteUserViewModel.successMessage
+        ));
+    }
+
+    // Use Case: AddUser / CreateUser
+    @PostMapping("/create")
+    public ResponseEntity<?> createUser(@RequestBody Map<String, Object> request) {
+        String roleStr = (String) request.get("role");
+        Boolean active = request.get("active") != null ? (Boolean) request.get("active") : true;
+        
+        AddUserInputData input = new AddUserInputData(
+            (String) request.get("name"),
+            (String) request.get("email"),
+            (String) request.get("username"),
+            (String) request.get("password"),
+            (String) request.get("phone"),
+            (String) request.get("address"),
+            RoleConverter.fromString(roleStr),
+            active
         );
+        addUserUseCase.execute(input);
 
-        addUserInputBoundary.execute(input);
-        return addUserViewModel.getResponse();
-    }
-        //delete user
-    @DeleteMapping("/{id}")
-    public ResponseEntity<DeleteUserResponse> deleteUser(@PathVariable("id") Long id,
-                                                         @RequestParam(name = "admin", defaultValue = "false") boolean admin) {
-        if (!admin) {
-            return ResponseEntity.status(403).body(DeleteUserResponse.error("FORBIDDEN", "Only admin can delete users"));
+        if (addUserViewModel.hasError) {
+            return ResponseEntity.status(400)
+                    .body(Map.of(
+                        "success", false,
+                        "errorCode", addUserViewModel.errorCode,
+                        "errorMessage", addUserViewModel.errorMessage
+                    ));
         }
 
-        DeleteUserInputData input = DeleteUserInputData.forAdmin(admin, id);
-        deleteUserInputBoundary.execute(input);
-        return deleteUserViewModel.getResponse();
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "userId", addUserViewModel.maTaiKhoan,
+            "message", addUserViewModel.successMessage
+        ));
     }
 
-    //sữa thông tin người dùng
-     @PutMapping("/{id}")
-    public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable("id") Long id,
-                                                         @RequestParam(name = "admin", defaultValue = "false") boolean admin,
-                                                         @RequestBody UpdateUserRequest body) {
-        if (!admin) {
-            return ResponseEntity.status(403).body(UpdateUserResponse.error("FORBIDDEN", "Only admin can update users"));
-        }
-
-        UpdateUserInputData input = UpdateUserInputData.forAdmin(
-                admin,
-                id,
-                body.email,
-                body.username,
-                body.password,
-                body.phoneNumber,
-                body.address,
-                body.role,
-                body.active
+    // Use Case: UpdateUser
+    @PostMapping("/{userId}/update")
+    public ResponseEntity<?> updateUser(
+            @PathVariable Long userId,
+            @RequestBody Map<String, Object> request) {
+        
+        String roleStr = (String) request.get("role");
+        Boolean active = request.get("active") != null ? (Boolean) request.get("active") : true;
+        
+        UpdateUserInputData input = new UpdateUserInputData(
+            userId,
+            (String) request.get("username"),
+            (String) request.get("name"),
+            (String) request.get("email"),
+            (String) request.get("phone"),
+            (String) request.get("address"),
+            RoleConverter.fromString(roleStr),
+            active
         );
+        
+        updateUserUseCase.execute(input);
 
-        updateUserInputBoundary.execute(input);
-        return updateUserViewModel.getResponse();
+        if (updateUserViewModel.hasError) {
+            return ResponseEntity.status(400)
+                    .body(Map.of(
+                        "success", false,
+                        "errorCode", updateUserViewModel.errorCode,
+                        "errorMessage", updateUserViewModel.errorMessage
+                    ));
+        }
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", updateUserViewModel.successMessage
+        ));
     }
 
-    // small internal class for request body mapping
-    public static class AddUserRequestBody {
-        public String email;
-        public String username;
-        public String password;
-        public String phoneNumber;
-        public String address;
-        public String role;
-        public Boolean active;
+    // Toggle user status (lock/unlock)
+    @PatchMapping("/{userId}/status")
+    public ResponseEntity<?> toggleUserStatus(
+            @PathVariable Long userId,
+            @RequestBody Map<String, Object> request) {
+        
+        Boolean isActive = (Boolean) request.get("isActive");
+        if (isActive == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                        "success", false,
+                        "errorMessage", "Missing isActive parameter"
+                    ));
+        }
+        
+        UpdateUserInputData input = new UpdateUserInputData(
+            userId,
+            null, // tenDangNhap
+            null, // hoTen
+            null, // email
+            null, // soDienThoai
+            null, // diaChi
+            null, // vaiTro
+            isActive // hoatDong
+        );
+        
+        updateUserUseCase.execute(input);
+
+        if (updateUserViewModel.hasError) {
+            return ResponseEntity.status(400)
+                    .body(Map.of(
+                        "success", false,
+                        "errorCode", updateUserViewModel.errorCode,
+                        "errorMessage", updateUserViewModel.errorMessage
+                    ));
+        }
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", updateUserViewModel.successMessage
+        ));
     }
 }

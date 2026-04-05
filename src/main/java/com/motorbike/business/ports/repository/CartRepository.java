@@ -17,6 +17,11 @@ public interface CartRepository {
     
     void delete(Long cartId);
     
+    void deleteById(Long cartId);
+    
+    void deleteAllByUserId(Long userId);
+    
+    Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId);
     
     int mergeGuestCartToUserCart(Long guestCartId, Long userCartId);
 }

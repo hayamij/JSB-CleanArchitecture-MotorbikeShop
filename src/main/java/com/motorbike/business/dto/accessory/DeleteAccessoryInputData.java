@@ -1,10 +1,11 @@
 package com.motorbike.business.dto.accessory;
 
 public class DeleteAccessoryInputData {
-
-    public final Long id;
-
-    public DeleteAccessoryInputData(Long id) {
-        this.id = id;
+    private final Long maSanPham;
+    
+    public DeleteAccessoryInputData(Long maSanPham) {
+        this.maSanPham = maSanPham;
     }
+    
+    public Long getMaSanPham() { return maSanPham; }
 }

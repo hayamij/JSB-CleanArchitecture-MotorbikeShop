@@ -8,6 +8,8 @@ public class RegisterViewModel {
     public Long userId;
     public String email;
     public String username;
+    public String phone;
+    public String address;
     public String roleDisplay;
     public String registeredAtDisplay;
     

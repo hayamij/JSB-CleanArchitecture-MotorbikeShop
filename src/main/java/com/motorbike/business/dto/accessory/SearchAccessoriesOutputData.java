@@ -9,6 +9,7 @@ public class SearchAccessoriesOutputData {
     public String errorMessage;
     public List<AccessoryItem> accessories;
 
+    // Trường hợp thành công
     public SearchAccessoriesOutputData(List<AccessoryItem> accessories) {
         this.hasError = false;
         this.errorCode = null;
@@ -16,6 +17,7 @@ public class SearchAccessoriesOutputData {
         this.accessories = accessories;
     }
 
+    // Trường hợp lỗi
     public SearchAccessoriesOutputData(String errorCode, String errorMessage) {
         this.hasError = true;
         this.errorCode = errorCode;
@@ -23,6 +25,7 @@ public class SearchAccessoriesOutputData {
         this.accessories = null;
     }
 
+    // DTO con cho từng phụ kiện
     public static class AccessoryItem {
         public Long id;
         public String name;
@@ -30,31 +33,31 @@ public class SearchAccessoriesOutputData {
         public java.math.BigDecimal price;
         public int stock;
         public String imageUrl;
-        public String type;
-        public String brand;
-        public String material;
-        public String size;
+        public String loaiPhuKien;
+        public String thuongHieu;
+        public String chatLieu;
+        public String kichThuoc;
 
         public AccessoryItem(Long id,
-                             String name,
-                             String description,
-                             java.math.BigDecimal price,
-                             int stock,
-                             String imageUrl,
-                             String type,
-                             String brand,
-                             String material,
-                             String size) {
+                            String name,
+                            String description,
+                            java.math.BigDecimal price,
+                            int stock,
+                            String imageUrl,
+                            String loaiPhuKien,
+                            String thuongHieu,
+                            String chatLieu,
+                            String kichThuoc) {
             this.id = id;
             this.name = name;
             this.description = description;
             this.price = price;
             this.stock = stock;
             this.imageUrl = imageUrl;
-            this.type = type;
-            this.brand = brand;
-            this.material = material;
-            this.size = size;
+            this.loaiPhuKien = loaiPhuKien;
+            this.thuongHieu = thuongHieu;
+            this.chatLieu = chatLieu;
+            this.kichThuoc = kichThuoc;
         }
     }
 }

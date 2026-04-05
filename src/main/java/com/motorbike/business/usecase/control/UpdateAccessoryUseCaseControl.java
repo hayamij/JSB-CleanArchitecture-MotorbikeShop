@@ -1,97 +1,183 @@
 package com.motorbike.business.usecase.control;
 
-import java.util.Optional;
-
 import com.motorbike.business.dto.accessory.UpdateAccessoryInputData;
 import com.motorbike.business.dto.accessory.UpdateAccessoryOutputData;
-import com.motorbike.business.dto.accessory.UpdateAccessoryOutputData.AccessoryItem;
-import com.motorbike.business.ports.repository.AccessoryRepository;
+import com.motorbike.business.dto.validateproductdata.ValidateProductDataInputData;
+import com.motorbike.business.dto.checkproductduplication.CheckProductDuplicationInputData;
+import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.UpdateAccessoryInputBoundary;
+import com.motorbike.business.usecase.input.ValidateProductDataInputBoundary;
+import com.motorbike.business.usecase.input.CheckProductDuplicationInputBoundary;
 import com.motorbike.business.usecase.output.UpdateAccessoryOutputBoundary;
 import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.exceptions.*;
 
 public class UpdateAccessoryUseCaseControl implements UpdateAccessoryInputBoundary {
 
     private final UpdateAccessoryOutputBoundary outputBoundary;
-    private final AccessoryRepository accessoryRepository;
+    private final ProductRepository productRepository;
+    private final ValidateProductDataInputBoundary validateProductDataUseCase;
+    private final CheckProductDuplicationInputBoundary checkDuplicationUseCase;
 
     public UpdateAccessoryUseCaseControl(
             UpdateAccessoryOutputBoundary outputBoundary,
-            AccessoryRepository accessoryRepository
+            ProductRepository productRepository,
+            ValidateProductDataInputBoundary validateProductDataUseCase,
+            CheckProductDuplicationInputBoundary checkDuplicationUseCase
     ) {
         this.outputBoundary = outputBoundary;
-        this.accessoryRepository = accessoryRepository;
+        this.productRepository = productRepository;
+        this.validateProductDataUseCase = validateProductDataUseCase;
+        this.checkDuplicationUseCase = checkDuplicationUseCase;
+    }
+
+    // Constructor with 2 parameters (for backward compatibility)
+    public UpdateAccessoryUseCaseControl(
+            UpdateAccessoryOutputBoundary outputBoundary,
+            ProductRepository productRepository
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.validateProductDataUseCase = new ValidateProductDataUseCaseControl(null);
+        this.checkDuplicationUseCase = new CheckProductDuplicationUseCaseControl(null, productRepository);
     }
 
     @Override
-    public void execute(UpdateAccessoryInputData input) {
-        UpdateAccessoryOutputData outputData;
+    public void execute(UpdateAccessoryInputData inputData) {
+        UpdateAccessoryOutputData outputData = null;
+        Exception errorException = null;
+        PhuKienXeMay phuKien = null;
 
+        // Step 1: Basic validation
         try {
-            // Validate
-            if (input.id == null) {
-                throw new IllegalArgumentException("ID cannot be null");
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
             }
-
-            Optional<PhuKienXeMay> optionalAccessory = accessoryRepository.findById(input.id);
-            if (optionalAccessory.isEmpty()) {
-                throw new IllegalArgumentException("Accessory not found with ID: " + input.id);
+            
+            if (inputData.getMaSanPham() == null) {
+                throw ValidationException.nullProductId();
             }
-
-            PhuKienXeMay accessory = optionalAccessory.get();
-
-            // Update fields
-            if (input.name != null && !input.name.isBlank()) {
-                accessory.setTenSanPham(input.name);
-            }
-            if (input.description != null) {
-                accessory.setMoTa(input.description);
-            }
-            if (input.price != null && input.price.compareTo(new java.math.BigDecimal("0")) > 0) {
-                accessory.setGia(input.price);
-            }
-            if (input.imageUrl != null) {
-                accessory.setHinhAnh(input.imageUrl);
-            }
-            if (input.stock >= 0) {
-                accessory.setSoLuongTonKho(input.stock);
-            }
-            if (input.type != null) {
-                accessory.setLoaiPhuKien(input.type);
-            }
-            if (input.brand != null) {
-                accessory.setThuongHieu(input.brand);
-            }
-            if (input.material != null) {
-                accessory.setChatLieu(input.material);
-            }
-            if (input.size != null) {
-                accessory.setKichThuoc(input.size);
-            }
-
-            PhuKienXeMay saved = accessoryRepository.save(accessory);
-
-            AccessoryItem item = new AccessoryItem(
-                    saved.getMaSanPham(),
-                    saved.getTenSanPham(),
-                    saved.getMoTa(),
-                    saved.getGia(),
-                    saved.getSoLuongTonKho(),
-                    saved.getHinhAnh(),
-                    saved.getLoaiPhuKien(),
-                    saved.getThuongHieu(),
-                    saved.getChatLieu(),
-                    saved.getKichThuoc()
-            );
-
-            outputData = new UpdateAccessoryOutputData(item);
-
-        } catch (IllegalArgumentException e) {
-            outputData = new UpdateAccessoryOutputData("VALIDATION_ERROR", e.getMessage());
         } catch (Exception e) {
-            outputData = new UpdateAccessoryOutputData("SYSTEM_ERROR", e.getMessage());
+            errorException = e;
+        }
+        
+        // Step 2: UC-51 - Validate product data
+        if (errorException == null) {
+            try {
+                ValidateProductDataInputData validateInput = new ValidateProductDataInputData(
+                    inputData.getTenSanPham(),
+                    null,
+                    inputData.getGia(),
+                    inputData.getSoLuongTonKho(),
+                    "phu_tung"
+                );
+                var validateResult = ((ValidateProductDataUseCaseControl) validateProductDataUseCase)
+                    .validateInternal(validateInput);
+                
+                if (!validateResult.isSuccess()) {
+                    throw new DomainException(validateResult.getErrorMessage(), validateResult.getErrorCode());
+                }
+                
+                if (!validateResult.isValid()) {
+                    throw new ValidationException(
+                        String.join("; ", validateResult.getErrors()),
+                        "INVALID_PRODUCT_DATA"
+                    );
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
         }
 
+        // Step 3: Check if accessory exists
+        if (errorException == null) {
+            try {
+                SanPham sanPham = productRepository.findById(inputData.getMaSanPham())
+                        .orElseThrow(() -> DomainException.productNotFound(inputData.getMaSanPham()));
+                        
+                if (!(sanPham instanceof PhuKienXeMay)) {
+                    throw DomainException.productNotAccessory();
+                }
+                
+                phuKien = (PhuKienXeMay) sanPham;
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+        
+        // Step 3.5: UC-52 - Check duplication ONLY if product name is changing
+        if (errorException == null && phuKien != null) {
+            try {
+                String nameToCheck = (inputData.getTenSanPham() != null && !phuKien.getTenSanPham().equals(inputData.getTenSanPham())) 
+                    ? inputData.getTenSanPham() : null;
+                
+                if (nameToCheck != null) {
+                    CheckProductDuplicationInputData checkDupInput = new CheckProductDuplicationInputData(
+                        nameToCheck,
+                        null, // productCode - not used for accessories
+                        inputData.getMaSanPham() // Exclude current product from duplication check
+                    );
+                    var dupResult = ((CheckProductDuplicationUseCaseControl) checkDuplicationUseCase)
+                        .checkInternal(checkDupInput);
+                    
+                    if (dupResult.isDuplicate()) {
+                        throw DomainException.productAlreadyExists(inputData.getTenSanPham());
+                    }
+                }
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+
+        // Step 4: Update accessory entity
+        if (errorException == null && phuKien != null) {
+            try {
+                // Cập nhật thông tin
+                phuKien.setTenSanPham(inputData.getTenSanPham());
+                phuKien.setMoTa(inputData.getMoTa());
+                phuKien.capNhatGia(inputData.getGia());
+                phuKien.setHinhAnh(inputData.getHinhAnh());
+                phuKien.setSoLuongTonKho(inputData.getSoLuongTonKho());
+                phuKien.setLoaiPhuKien(inputData.getLoaiPhuKien());
+                phuKien.setThuongHieu(inputData.getThuongHieu());
+                phuKien.setChatLieu(inputData.getChatLieu());
+                phuKien.setKichThuoc(inputData.getKichThuoc());
+
+                phuKien = (PhuKienXeMay) productRepository.save(phuKien);
+
+                outputData = UpdateAccessoryOutputData.forSuccess(
+                        phuKien.getMaSanPham(),
+                        phuKien.getTenSanPham(),
+                        phuKien.getLoaiPhuKien(),
+                        phuKien.getThuongHieu(),
+                        phuKien.getChatLieu(),
+                        phuKien.getKichThuoc(),
+                        phuKien.getGia(),
+                        phuKien.getNgayCapNhat()
+                );
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+
+        // Step 4: Handle error
+        if (errorException != null) {
+            String errorCode = "SYSTEM_ERROR";
+            String message = errorException.getMessage();
+
+            if (errorException instanceof ValidationException) {
+                errorCode = ((ValidationException) errorException).getErrorCode();
+            } else if (errorException instanceof DomainException) {
+                errorCode = ((DomainException) errorException).getErrorCode();
+            } else if (errorException instanceof SystemException) {
+                errorCode = ((SystemException) errorException).getErrorCode();
+            }
+
+            outputData = UpdateAccessoryOutputData.forError(errorCode, message);
+        }
+
+        // Step 5: Present result
         outputBoundary.present(outputData);
     }
 }

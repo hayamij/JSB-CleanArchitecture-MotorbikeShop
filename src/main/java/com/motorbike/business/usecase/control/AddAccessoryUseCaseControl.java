@@ -2,11 +2,12 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.accessory.AddAccessoryInputData;
 import com.motorbike.business.dto.accessory.AddAccessoryOutputData;
-import com.motorbike.business.dto.accessory.AddAccessoryOutputData.AccessoryItem;
 import com.motorbike.business.ports.repository.AccessoryRepository;
 import com.motorbike.business.usecase.input.AddAccessoryInputBoundary;
 import com.motorbike.business.usecase.output.AddAccessoryOutputBoundary;
 import com.motorbike.domain.entities.PhuKienXeMay;
+import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.exceptions.*;
 
 public class AddAccessoryUseCaseControl implements AddAccessoryInputBoundary {
 
@@ -22,76 +23,69 @@ public class AddAccessoryUseCaseControl implements AddAccessoryInputBoundary {
     }
 
     @Override
-    public void execute(AddAccessoryInputData input) {
-        AddAccessoryOutputData outputData;
+    public void execute(AddAccessoryInputData inputData) {
+        AddAccessoryOutputData outputData = null;
+        Exception errorException = null;
+        PhuKienXeMay phuKien = null;
 
         try {
-            // Validate
-            if (input.name == null || input.name.isBlank()) {
-                throw new IllegalArgumentException("Product name cannot be empty");
+            if (inputData == null) {
+                throw ValidationException.invalidInput();
             }
-            if (input.price == null || input.price.compareTo(new java.math.BigDecimal("0")) <= 0) {
-                throw new IllegalArgumentException("Price must be > 0");
-            }
-            if (input.stock < 0) {
-                throw new IllegalArgumentException("Stock must be >= 0");
-            }
+            
+            // Validation
+            SanPham.validateTenSanPham(inputData.getTenSanPham());
+            SanPham.validateGia(inputData.getGia());
+            SanPham.validateSoLuongTonKho(inputData.getSoLuongTonKho());
+            
+        } catch (Exception e) {
+            errorException = e;
+        }
 
-            // Tìm xem đã có phụ kiện trùng chưa
-            PhuKienXeMay existing = accessoryRepository
-                    .findAllAccessories()
-                    .stream()
-                    .filter(x ->
-                            x.getTenSanPham().equalsIgnoreCase(input.name) &&
-                            x.getLoaiPhuKien().equalsIgnoreCase(input.type) &&
-                            x.getThuongHieu().equalsIgnoreCase(input.brand)
-                    )
-                    .findFirst()
-                    .orElse(null);
-
-            PhuKienXeMay saved;
-
-            if (existing != null) {
-                // ĐÃ CÓ → CỘNG THÊM TỒN KHO
-                existing.setSoLuongTonKho(existing.getSoLuongTonKho() + input.stock);
-                saved = accessoryRepository.save(existing);
-            } else {
-                // CHƯA CÓ → TẠO MỚI
-                PhuKienXeMay accessory = new PhuKienXeMay(
-                        input.name,
-                        input.description,
-                        input.price,
-                        input.imageUrl,
-                        input.stock,
-                        input.type,
-                        input.brand,
-                        input.material,
-                        input.size
+        if (errorException == null) {
+            try {
+                phuKien = new PhuKienXeMay(
+                        inputData.getTenSanPham(),
+                        inputData.getMoTa(),
+                        inputData.getGia(),
+                        inputData.getHinhAnh(),
+                        inputData.getSoLuongTonKho(),
+                        inputData.getLoaiPhuKien(),
+                        inputData.getThuongHieu(),
+                        inputData.getChatLieu(),
+                        inputData.getKichThuoc()
                 );
 
-                saved = accessoryRepository.save(accessory);
+                phuKien = accessoryRepository.save(phuKien);
+
+                outputData = AddAccessoryOutputData.forSuccess(
+                        phuKien.getMaSanPham(),
+                        phuKien.getTenSanPham(),
+                        phuKien.getLoaiPhuKien(),
+                        phuKien.getThuongHieu(),
+                        phuKien.getChatLieu(),
+                        phuKien.getKichThuoc(),
+                        phuKien.getGia(),
+                        phuKien.getNgayTao()
+                );
+            } catch (Exception e) {
+                errorException = e;
+            }
+        }
+
+        if (errorException != null) {
+            String errorCode = "SYSTEM_ERROR";
+            String message = errorException.getMessage();
+
+            if (errorException instanceof ValidationException) {
+                errorCode = ((ValidationException) errorException).getErrorCode();
+            } else if (errorException instanceof DomainException) {
+                errorCode = ((DomainException) errorException).getErrorCode();
+            } else if (errorException instanceof SystemException) {
+                errorCode = ((SystemException) errorException).getErrorCode();
             }
 
-            // Map to output
-            AccessoryItem item = new AccessoryItem(
-                    saved.getMaSanPham(),
-                    saved.getTenSanPham(),
-                    saved.getMoTa(),
-                    saved.getGia(),
-                    saved.getSoLuongTonKho(),
-                    saved.getHinhAnh(),
-                    saved.getLoaiPhuKien(),
-                    saved.getThuongHieu(),
-                    saved.getChatLieu(),
-                    saved.getKichThuoc()
-            );
-
-            outputData = new AddAccessoryOutputData(item);
-
-        } catch (IllegalArgumentException e) {
-            outputData = new AddAccessoryOutputData("VALIDATION_ERROR", e.getMessage());
-        } catch (Exception e) {
-            outputData = new AddAccessoryOutputData("SYSTEM_ERROR", e.getMessage());
+            outputData = AddAccessoryOutputData.forError(errorCode, message);
         }
 
         outputBoundary.present(outputData);

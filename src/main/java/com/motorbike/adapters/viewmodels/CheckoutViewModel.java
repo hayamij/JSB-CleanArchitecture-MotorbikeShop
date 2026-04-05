@@ -16,6 +16,8 @@ public class CheckoutViewModel {
     public int totalQuantity;
     public List<OrderItemViewModel> items;
     public String formattedOrderDate;
+    public String paymentMethod;
+    public String paymentMethodDisplay;
     public boolean hasError;
     public String errorCode;
     public String errorMessage;

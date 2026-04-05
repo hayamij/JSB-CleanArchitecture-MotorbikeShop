@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "xe_may")
 @PrimaryKeyJoinColumn(name = "ma_san_pham")
+@DiscriminatorValue("XE_MAY")
 public class XeMayJpaEntity extends SanPhamJpaEntity {
 
     @Column(name = "hang_xe", length = 100)

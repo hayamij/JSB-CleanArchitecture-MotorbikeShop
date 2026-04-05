@@ -1,129 +1,134 @@
 package com.motorbike.business.usecase.control;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import com.motorbike.business.dto.deleteuser.DeleteUserInputData;
-import com.motorbike.business.dto.deleteuser.DeleteUserOutputData;
+import com.motorbike.adapters.presenters.DeleteUserPresenter;
+import com.motorbike.adapters.viewmodels.DeleteUserViewModel;
+import com.motorbike.business.dto.user.DeleteUserInputData;
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.business.usecase.output.DeleteUserOutputBoundary;
 import com.motorbike.domain.entities.TaiKhoan;
-import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.domain.entities.VaiTro;
 
-class DeleteUserUseCaseControlTest {
+public class DeleteUserUseCaseControlTest {
 
-    private UserRepository userRepository;
-    private DeleteUserOutputBoundary outputBoundary;
-    private DeleteUserUseCaseControl useCase;
+	@Test
+	public void testExecute_ValidDelete_Success() {
+		DeleteUserInputData inputData = new DeleteUserInputData(1L);
+		
+		UserRepository userRepo = new MockUserRepository();
+		DeleteUserViewModel viewModel = new DeleteUserViewModel();
+		DeleteUserOutputBoundary outputBoundary = new DeleteUserPresenter(viewModel);
+		
+		DeleteUserUseCaseControl control = new DeleteUserUseCaseControl(outputBoundary, userRepo);
+		control.execute(inputData);
+		
+		assertTrue(viewModel.success);
+		assertFalse(viewModel.hasError);
+	}
 
-    @BeforeEach
-    void setUp() {
-        userRepository = mock(UserRepository.class);
-        outputBoundary = mock(DeleteUserOutputBoundary.class);
-        useCase = new DeleteUserUseCaseControl(outputBoundary, userRepository);
-    }
+	@Test
+	public void testExecute_UserNotFound() {
+		DeleteUserInputData inputData = new DeleteUserInputData(999L);
+		
+		UserRepository userRepo = new MockUserRepository();
+		DeleteUserViewModel viewModel = new DeleteUserViewModel();
+		DeleteUserOutputBoundary outputBoundary = new DeleteUserPresenter(viewModel);
+		
+		DeleteUserUseCaseControl control = new DeleteUserUseCaseControl(outputBoundary, userRepo);
+		control.execute(inputData);
+		
+		assertFalse(viewModel.success);
+		assertTrue(viewModel.hasError);
+	}
 
-    // ===== TC01 =====
-    @Test
-    void should_return_error_when_input_is_null() {
-        useCase.execute(null);
+	@Test
+	public void testExecute_NullInputData() {
+		UserRepository userRepo = new MockUserRepository();
+		DeleteUserViewModel viewModel = new DeleteUserViewModel();
+		DeleteUserOutputBoundary outputBoundary = new DeleteUserPresenter(viewModel);
+		
+		DeleteUserUseCaseControl control = new DeleteUserUseCaseControl(outputBoundary, userRepo);
+		control.execute(null);
+		
+		assertFalse(viewModel.success);
+		assertTrue(viewModel.hasError);
+	}
 
-        DeleteUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals(
-                ValidationException.invalidInput().getErrorCode(),
-                output.getErrorCode()
-        );
-    }
+	private static class MockUserRepository implements UserRepository {
+		@Override
+		public Optional<TaiKhoan> findByEmail(String email) {
+			return Optional.empty();
+		}
 
-    // ===== TC02 =====
-    @Test
-    void should_return_error_when_not_admin() {
-        DeleteUserInputData input = DeleteUserInputData.forAdmin(false, 1L);
+		@Override
+		public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+			return findByEmail(username);
+		}
 
-        useCase.execute(input);
+		@Override
+		public boolean existsByTenDangNhap(String tenDangNhap) {
+			return false;
+		}
 
-        DeleteUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals(
-                ValidationException.invalidInput().getErrorCode(),
-                output.getErrorCode()
-        );
-    }
+		@Override
+		public Optional<TaiKhoan> findById(Long id) {
+			if (id == 1L) {
+				return Optional.of(new TaiKhoan(
+					1L, "Test User", "user@test.com", "user", "password", "0912345678",
+					"123 Street", VaiTro.CUSTOMER, true,
+					LocalDateTime.now(), LocalDateTime.now(), null
+				));
+			}
+			return Optional.empty();
+		}
 
-    // ===== TC03 =====
-    @Test
-    void should_return_error_when_userId_is_null() {
-        DeleteUserInputData input = DeleteUserInputData.forAdmin(true, null);
+		@Override
+		public boolean existsByEmail(String email) {
+			return false;
+		}
 
-        useCase.execute(input);
+		@Override
+		public boolean existsByUsername(String username) {
+			return false;
+		}
 
-        DeleteUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals(
-                ValidationException.invalidUserId().getErrorCode(),
-                output.getErrorCode()
-        );
-    }
+		@Override
+		public TaiKhoan save(TaiKhoan taiKhoan) {
+			return taiKhoan;
+		}
 
-    // ===== TC04 =====
-    @Test
-    void should_return_error_when_user_not_found() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+		@Override
+		public void updateLastLogin(Long userId) {
+		}
 
-        DeleteUserInputData input = DeleteUserInputData.forAdmin(true, 99L);
-        useCase.execute(input);
+		@Override
+		public java.util.List<TaiKhoan> findAll() {
+			return new java.util.ArrayList<>();
+		}
 
-        DeleteUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals("SYSTEM_ERROR", output.getErrorCode());
-    }
+		@Override
+		public void deleteById(Long userId) {
+		}
 
-    // ===== TC05 =====
-    @Test
-    void should_delete_user_successfully() {
-        TaiKhoan user = mock(TaiKhoan.class);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+		@Override
+		public boolean existsById(Long userId) {
+			return userId == 1L;
+		}
 
-        DeleteUserInputData input = DeleteUserInputData.forAdmin(true, 1L);
-        useCase.execute(input);
-
-        DeleteUserOutputData output = captureOutput();
-        assertTrue(output.isSuccess());
-
-        verify(userRepository, times(1)).deleteById(1L);
-    }
-
-    // ===== TC06 =====
-    @Test
-    void should_return_system_error_when_repository_throw_exception() {
-        when(userRepository.findById(any()))
-                .thenThrow(new RuntimeException("DB error"));
-
-        DeleteUserInputData input = DeleteUserInputData.forAdmin(true, 1L);
-        useCase.execute(input);
-
-        DeleteUserOutputData output = captureOutput();
-        assertFalse(output.isSuccess());
-        assertEquals("SYSTEM_ERROR", output.getErrorCode());
-    }
-
-    // ===== helper =====
-    private DeleteUserOutputData captureOutput() {
-        ArgumentCaptor<DeleteUserOutputData> captor =
-                ArgumentCaptor.forClass(DeleteUserOutputData.class);
-        verify(outputBoundary).present(captor.capture());
-        return captor.getValue();
-    }
+		@Override
+		public java.util.List<TaiKhoan> searchUsers(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+			return Optional.empty();
+		}
+	}
 }

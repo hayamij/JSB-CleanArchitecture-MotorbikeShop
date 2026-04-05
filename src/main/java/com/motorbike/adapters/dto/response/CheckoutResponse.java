@@ -18,6 +18,8 @@ public class CheckoutResponse {
     private int totalQuantity;
     private String orderDateDisplay;
     private List<OrderItemResponse> items;
+    private String paymentMethod;
+    private String paymentMethodDisplay;
     private String errorCode;
     private String errorMessage;
 
@@ -25,7 +27,8 @@ public class CheckoutResponse {
                            String customerName, String customerEmail, String customerPhone,
                            String shippingAddress, String orderStatus, BigDecimal totalAmount,
                            int totalItems, int totalQuantity, String orderDateDisplay,
-                           List<OrderItemResponse> items, String errorCode, String errorMessage) {
+                           List<OrderItemResponse> items, String paymentMethod, 
+                           String paymentMethodDisplay, String errorCode, String errorMessage) {
         this.success = success;
         this.message = message;
         this.orderId = orderId;
@@ -40,6 +43,8 @@ public class CheckoutResponse {
         this.totalQuantity = totalQuantity;
         this.orderDateDisplay = orderDateDisplay;
         this.items = items;
+        this.paymentMethod = paymentMethod;
+        this.paymentMethodDisplay = paymentMethodDisplay;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
@@ -58,6 +63,8 @@ public class CheckoutResponse {
     public int getTotalQuantity() { return totalQuantity; }
     public String getOrderDateDisplay() { return orderDateDisplay; }
     public List<OrderItemResponse> getItems() { return items; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public String getPaymentMethodDisplay() { return paymentMethodDisplay; }
     public String getErrorCode() { return errorCode; }
     public String getErrorMessage() { return errorMessage; }
 

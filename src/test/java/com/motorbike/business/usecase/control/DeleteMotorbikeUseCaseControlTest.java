@@ -1,127 +1,141 @@
 package com.motorbike.business.usecase.control;
 
-import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
-import com.motorbike.business.dto.motorbike.DeleteMotorbikeOutputData;
-import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
-import com.motorbike.business.ports.repository.MotorbikeRepository;
-import com.motorbike.domain.entities.XeMay;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-class DeleteMotorbikeUseCaseControlTest {
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-    private static class MockPresenter implements DeleteMotorbikeOutputBoundary {
-        public DeleteMotorbikeOutputData received;
+import org.junit.jupiter.api.Test;
 
-        @Override
-        public void present(DeleteMotorbikeOutputData outputData) {
-            this.received = outputData;
-        }
-    }
+import com.motorbike.adapters.presenters.DeleteMotorbikePresenter;
+import com.motorbike.adapters.viewmodels.DeleteMotorbikeViewModel;
+import com.motorbike.business.dto.motorbike.DeleteMotorbikeInputData;
+import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.business.usecase.output.DeleteMotorbikeOutputBoundary;
+import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.entities.XeMay;
+import com.motorbike.domain.entities.PhuKienXeMay;
 
-    private static class MockRepo implements MotorbikeRepository {
+public class DeleteMotorbikeUseCaseControlTest {
 
-        public Map<Long, XeMay> store = new HashMap<>();
-        public boolean throwException = false;
+	@Test
+	public void testExecute_ValidDelete_Success() {
+		DeleteMotorbikeInputData inputData = new DeleteMotorbikeInputData(1L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		DeleteMotorbikeViewModel viewModel = new DeleteMotorbikeViewModel();
+		DeleteMotorbikeOutputBoundary outputBoundary = new DeleteMotorbikePresenter(viewModel);
+		
+		DeleteMotorbikeUseCaseControl control = new DeleteMotorbikeUseCaseControl(outputBoundary, productRepo);
+		control.execute(inputData);
+		
+		assertTrue(viewModel.success);
+		assertFalse(viewModel.hasError);
+		assertEquals(1L, viewModel.maSanPham);
+	}
 
-        @Override
-        public Optional<XeMay> findById(Long id) {
-            if (throwException) {
-                throw new RuntimeException("DB find error");
-            }
-            return Optional.ofNullable(store.get(id));
-        }
+	@Test
+	public void testExecute_ProductNotFound() {
+		DeleteMotorbikeInputData inputData = new DeleteMotorbikeInputData(999L);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		DeleteMotorbikeViewModel viewModel = new DeleteMotorbikeViewModel();
+		DeleteMotorbikeOutputBoundary outputBoundary = new DeleteMotorbikePresenter(viewModel);
+		
+		DeleteMotorbikeUseCaseControl control = new DeleteMotorbikeUseCaseControl(outputBoundary, productRepo);
+		control.execute(inputData);
+		
+		assertFalse(viewModel.success);
+		assertTrue(viewModel.hasError);
+		assertEquals("PRODUCT_NOT_FOUND", viewModel.errorCode);
+	}
 
-        @Override
-        public void deleteById(Long id) {
-            if (throwException) {
-                throw new RuntimeException("DB delete error");
-            }
-            store.remove(id);
-        }
+	@Test
+	public void testExecute_NullInputData() {
+		ProductRepository productRepo = new MockProductRepository();
+		DeleteMotorbikeViewModel viewModel = new DeleteMotorbikeViewModel();
+		DeleteMotorbikeOutputBoundary outputBoundary = new DeleteMotorbikePresenter(viewModel);
+		
+		DeleteMotorbikeUseCaseControl control = new DeleteMotorbikeUseCaseControl(outputBoundary, productRepo);
+		control.execute(null);
+		
+		assertFalse(viewModel.success);
+		assertTrue(viewModel.hasError);
+	}
 
-        @Override
-        public List<XeMay> findAllMotorbikes() {
-            return new ArrayList<>(store.values());
-        }
+	private static class MockProductRepository implements ProductRepository {
+		@Override
+		public Optional<SanPham> findById(Long id) {
+			if (id == 1L) {
+				XeMay xeMay = new XeMay(
+					1L,
+					"Honda Wave Alpha",
+					"Xe số",
+					new BigDecimal("30000000"),
+					"honda.jpg",
+					50,
+					true,
+					LocalDateTime.now(),
+					LocalDateTime.now(),
+					"Honda",
+					"Wave Alpha",
+					"Đỏ",
+					2024,
+					110
+				);
+				return Optional.of(xeMay);
+			}
+			return Optional.empty();
+		}
 
-        @Override
-        public XeMay save(XeMay xe) {
-            store.put(xe.getMaSanPham(), xe);
-            return xe;
-        }
-    }
+		@Override
+		public SanPham save(SanPham sanPham) {
+			return sanPham;
+		}
 
-    @Test
-    void testDelete_Success() {
-        MockPresenter presenter = new MockPresenter();
-        MockRepo repo = new MockRepo();
+		@Override
+		public boolean existsById(Long productId) {
+			return productId == 1L;
+		}
 
-        XeMay xe = new XeMay(
-                "Test Name",
-                "Test Desc",
-                new BigDecimal("1000"),
-                "img.jpg",
-                5,
-                "Honda",
-                "Wave",
-                "Đỏ",
-                2023,
-                110
-        );
-        xe.setMaSanPham(1L);
-        repo.store.put(1L, xe);
+		@Override
+		public java.util.List<SanPham> findAll() {
+			return new java.util.ArrayList<>();
+		}
 
-        DeleteMotorbikeUseCaseControl control =
-                new DeleteMotorbikeUseCaseControl(presenter, repo);
+		@Override
+		public void deleteById(Long productId) {
+		}
 
-        DeleteMotorbikeInputData input = new DeleteMotorbikeInputData(1L);
+		@Override
+		public java.util.List<PhuKienXeMay> findAllAccessories() {
+			return new java.util.ArrayList<>();
+		}
 
-        control.execute(input);
+		@Override
+		public java.util.List<PhuKienXeMay> searchAccessories(String keyword) {
+			return new java.util.ArrayList<>();
+		}
 
-        assertNotNull(presenter.received);
-        assertTrue(presenter.received.success);
-        assertNull(presenter.received.errorCode);
-        assertNull(presenter.received.errorMessage);
-        assertFalse(repo.store.containsKey(1L));
-    }
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+			return new java.util.ArrayList<>();
+		}
 
-    @Test
-    void testDelete_NotFound() {
-        MockPresenter presenter = new MockPresenter();
-        MockRepo repo = new MockRepo(); // store rỗng
-
-        DeleteMotorbikeUseCaseControl control =
-                new DeleteMotorbikeUseCaseControl(presenter, repo);
-
-        DeleteMotorbikeInputData input = new DeleteMotorbikeInputData(999L);
-
-        control.execute(input);
-
-        assertFalse(presenter.received.success);
-        assertEquals("NOT_FOUND", presenter.received.errorCode);
-        assertEquals("Motorbike not found", presenter.received.errorMessage);
-    }
-
-    @Test
-    void testDelete_RepositoryThrows() {
-        MockPresenter presenter = new MockPresenter();
-        MockRepo repo = new MockRepo();
-        repo.throwException = true; // ép repo ném lỗi
-
-        DeleteMotorbikeUseCaseControl control =
-                new DeleteMotorbikeUseCaseControl(presenter, repo);
-
-        DeleteMotorbikeInputData input = new DeleteMotorbikeInputData(1L);
-
-        control.execute(input);
-
-        assertFalse(presenter.received.success);
-        assertEquals("SYSTEM_ERROR", presenter.received.errorCode);
-        assertNotNull(presenter.received.errorMessage);
-    }
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
+	}
 }

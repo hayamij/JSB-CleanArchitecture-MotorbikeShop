@@ -33,25 +33,32 @@ public class ListAllOrdersResponse {
         private String shippingAddress;
         private String orderStatus;
         private String formattedTotalAmount;
+        private java.math.BigDecimal totalAmount;
         private int totalItems;
         private int totalQuantity;
         private String formattedOrderDate;
+        private String orderDate;
         private String statusColor;
+        private String paymentMethodText;
 
         public OrderItemResponse(Long orderId, Long customerId, String customerName, String customerPhone,
                                String shippingAddress, String orderStatus, String formattedTotalAmount,
-                               int totalItems, int totalQuantity, String formattedOrderDate,
-                               String statusColor) {
+                               java.math.BigDecimal totalAmount, int totalItems, int totalQuantity, 
+                               String formattedOrderDate, String orderDate,
+                               String statusColor, String paymentMethodText) {
             this.orderId = orderId;
             this.customerId = customerId;
             this.customerName = customerName;
             this.customerPhone = customerPhone;
             this.shippingAddress = shippingAddress;
             this.orderStatus = orderStatus;
+            this.paymentMethodText = paymentMethodText;
             this.formattedTotalAmount = formattedTotalAmount;
+            this.totalAmount = totalAmount;
             this.totalItems = totalItems;
             this.totalQuantity = totalQuantity;
             this.formattedOrderDate = formattedOrderDate;
+            this.orderDate = orderDate;
             this.statusColor = statusColor;
         }
 
@@ -62,9 +69,12 @@ public class ListAllOrdersResponse {
         public String getShippingAddress() { return shippingAddress; }
         public String getOrderStatus() { return orderStatus; }
         public String getFormattedTotalAmount() { return formattedTotalAmount; }
+        public java.math.BigDecimal getTotalAmount() { return totalAmount; }
         public int getTotalItems() { return totalItems; }
         public int getTotalQuantity() { return totalQuantity; }
         public String getFormattedOrderDate() { return formattedOrderDate; }
+        public String getOrderDate() { return orderDate; }
         public String getStatusColor() { return statusColor; }
+        public String getPaymentMethodText() { return paymentMethodText; }
     }
 }

@@ -4,7 +4,9 @@ public enum TrangThaiDonHang {
     CHO_XAC_NHAN("Chờ xác nhận"),
     DA_XAC_NHAN("Đã xác nhận"),
     DANG_GIAO("Đang giao hàng"),
+    DANG_GIAO_HANG("Đang giao hàng"), // Alias for DANG_GIAO
     DA_GIAO("Đã giao hàng"),
+    DA_GIAO_HANG("Đã giao hàng"), // Alias for DA_GIAO
     DA_HUY("Đã hủy");
 
     private final String moTa;

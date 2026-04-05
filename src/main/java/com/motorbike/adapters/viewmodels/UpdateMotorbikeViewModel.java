@@ -1,24 +1,21 @@
 package com.motorbike.adapters.viewmodels;
 
-import com.motorbike.business.dto.motorbike.UpdateMotorbikeOutputData.MotorbikeItem;
+import java.math.BigDecimal;
 
 public class UpdateMotorbikeViewModel {
-
-    public boolean hasError = false;
+    public boolean success;
+    public boolean hasError;
     public String errorCode;
     public String errorMessage;
-
-    public MotorbikeItem motorbike;   // ❗ BẮT BUỘC PHẢI CÓ FIELD NÀY
-
-    public UpdateMotorbikeViewModel() {}
-
-    public UpdateMotorbikeViewModel(String errorCode, String errorMessage) {
-        this.hasError = true;
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
-    }
-
-    public UpdateMotorbikeViewModel(MotorbikeItem motorbike) {
-        this.motorbike = motorbike;
-    }
+    
+    public Long maSanPham;
+    public String tenSanPham;
+    public String hangXe;
+    public String dongXe;
+    public String mauSac;
+    public int namSanXuat;
+    public int dungTich;
+    public BigDecimal gia;
+    public String ngayCapNhat;
+    public String successMessage;
 }

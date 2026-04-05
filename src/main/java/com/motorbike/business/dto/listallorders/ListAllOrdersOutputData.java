@@ -50,10 +50,12 @@ public class ListAllOrdersOutputData {
         private final int totalQuantity;
         private final LocalDateTime orderDate;
         private final String note;
+        private final String paymentMethod;
 
         public OrderItemData(Long orderId, Long customerId, String customerName, String customerPhone,
                            String shippingAddress, String orderStatus, BigDecimal totalAmount,
-                           int totalItems, int totalQuantity, LocalDateTime orderDate, String note) {
+                           int totalItems, int totalQuantity, LocalDateTime orderDate, String note,
+                           String paymentMethod) {
             this.orderId = orderId;
             this.customerId = customerId;
             this.customerName = customerName;
@@ -65,6 +67,7 @@ public class ListAllOrdersOutputData {
             this.totalQuantity = totalQuantity;
             this.orderDate = orderDate;
             this.note = note;
+            this.paymentMethod = paymentMethod;
         }
 
         public Long getOrderId() { return orderId; }
@@ -78,5 +81,6 @@ public class ListAllOrdersOutputData {
         public int getTotalQuantity() { return totalQuantity; }
         public LocalDateTime getOrderDate() { return orderDate; }
         public String getNote() { return note; }
+        public String getPaymentMethod() { return paymentMethod; }
     }
 }

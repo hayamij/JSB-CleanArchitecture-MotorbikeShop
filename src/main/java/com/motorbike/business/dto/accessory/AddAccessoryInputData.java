@@ -2,47 +2,43 @@ package com.motorbike.business.dto.accessory;
 
 import java.math.BigDecimal;
 
-/**
- * InputData cho use case Thêm phụ kiện.
- */
 public class AddAccessoryInputData {
-
-    // Thông tin chung của sản phẩm
-    public final String name;          // tenSanPham
-    public final String description;   // moTa
-    public final BigDecimal price;     // gia
-    public final String imageUrl;      // hinhAnh
-    public final int stock;            // soLuongTonKho
-
-    // Thông tin riêng của phụ kiện
-    public final String type;          // loaiPhuKien
-    public final String brand;         // thuongHieu
-    public final String material;      // chatLieu
-    public final String size;          // kichThuoc
-
-    public final String productType;
-
-    public AddAccessoryInputData(
-            String name,
-            String description,
-            BigDecimal price,
-            String imageUrl,
-            int stock,
-            String type,
-            String brand,
-            String material,
-            String size,
-            String productType
-    ) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.imageUrl = imageUrl;
-        this.stock = stock;
-        this.type = type;
-        this.brand = brand;
-        this.material = material;
-        this.size = size;
-        this.productType = productType;
+    private final String tenSanPham;
+    private final String moTa;
+    private final BigDecimal gia;
+    private final String hinhAnh;
+    private final int soLuongTonKho;
+    private final String loaiPhuKien;
+    private final String thuongHieu;
+    private final String chatLieu;
+    private final String kichThuoc;
+    
+    public AddAccessoryInputData(String tenSanPham, String moTa, BigDecimal gia,
+                                String hinhAnh, int soLuongTonKho, String loaiPhuKien,
+                                String thuongHieu, String chatLieu, String kichThuoc) {
+        this.tenSanPham = tenSanPham;
+        this.moTa = moTa;
+        this.gia = gia;
+        this.hinhAnh = hinhAnh;
+        this.soLuongTonKho = soLuongTonKho;
+        this.loaiPhuKien = loaiPhuKien;
+        this.thuongHieu = thuongHieu;
+        this.chatLieu = chatLieu;
+        this.kichThuoc = kichThuoc;
     }
+    
+    public String getTenSanPham() { return tenSanPham; }
+    public String getMoTa() { return moTa; }
+    public BigDecimal getGia() { return gia; }
+    public String getHinhAnh() { return hinhAnh; }
+    public int getSoLuongTonKho() { return soLuongTonKho; }
+    public String getLoaiPhuKien() { return loaiPhuKien; }
+    public String getThuongHieu() { return thuongHieu; }
+    public String getChatLieu() { return chatLieu; }
+    public String getKichThuoc() { return kichThuoc; }
+    
+    // Alias methods for compatibility
+    public String getNhaCungCap() { return thuongHieu; }
+    public String getXuatXu() { return chatLieu; }
+    public String getBaoHanh() { return kichThuoc; }
 }

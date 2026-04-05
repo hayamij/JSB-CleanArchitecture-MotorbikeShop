@@ -3,44 +3,44 @@ package com.motorbike.business.dto.motorbike;
 import java.math.BigDecimal;
 
 public class UpdateMotorbikeInputData {
-
-    public Long id;
-
-    public String name;
-    public String description;
-    public BigDecimal price;
-    public String imageUrl;
-
-    public Integer stock;
-    public String brand;
-    public String model;
-    public String color;
-    public Integer year;
-    public Integer displacement;
-
-    public UpdateMotorbikeInputData(
-            Long id,
-            String name,
-            String description,
-            BigDecimal price,
-            String imageUrl,
-            Integer stock,
-            String brand,
-            String model,
-            String color,
-            Integer year,
-            Integer displacement
-    ) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.imageUrl = imageUrl;
-        this.stock = stock;
-        this.brand = brand;
-        this.model = model;
-        this.color = color;
-        this.year = year;
-        this.displacement = displacement;
+    private final Long maSanPham;
+    private final String tenSanPham;
+    private final String moTa;
+    private final BigDecimal gia;
+    private final String hinhAnh;
+    private final int soLuongTonKho;
+    private final String hangXe;
+    private final String dongXe;
+    private final String mauSac;
+    private final int namSanXuat;
+    private final int dungTich;
+    
+    public UpdateMotorbikeInputData(Long maSanPham, String tenSanPham, String moTa,
+                                   BigDecimal gia, String hinhAnh, int soLuongTonKho,
+                                   String hangXe, String dongXe, String mauSac,
+                                   int namSanXuat, int dungTich) {
+        this.maSanPham = maSanPham;
+        this.tenSanPham = tenSanPham;
+        this.moTa = moTa;
+        this.gia = gia;
+        this.hinhAnh = hinhAnh;
+        this.soLuongTonKho = soLuongTonKho;
+        this.hangXe = hangXe;
+        this.dongXe = dongXe;
+        this.mauSac = mauSac;
+        this.namSanXuat = namSanXuat;
+        this.dungTich = dungTich;
     }
+    
+    public Long getMaSanPham() { return maSanPham; }
+    public String getTenSanPham() { return tenSanPham; }
+    public String getMoTa() { return moTa; }
+    public BigDecimal getGia() { return gia; }
+    public String getHinhAnh() { return hinhAnh; }
+    public int getSoLuongTonKho() { return soLuongTonKho; }
+    public String getHangXe() { return hangXe; }
+    public String getDongXe() { return dongXe; }
+    public String getMauSac() { return mauSac; }
+    public int getNamSanXuat() { return namSanXuat; }
+    public int getDungTich() { return dungTich; }
 }

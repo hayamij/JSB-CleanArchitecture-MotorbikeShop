@@ -1,174 +1,165 @@
 package com.motorbike.business.usecase.control;
 
-import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
-import com.motorbike.business.dto.motorbike.UpdateMotorbikeOutputData;
-import com.motorbike.business.dto.motorbike.UpdateMotorbikeOutputData.MotorbikeItem;
-import com.motorbike.business.ports.repository.MotorbikeRepository;
-import com.motorbike.business.usecase.output.UpdateMotorbikeOutputBoundary;
-import com.motorbike.domain.entities.XeMay;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-class UpdateMotorbikeUseCaseControlTest {
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-    private static class MockPresenter implements UpdateMotorbikeOutputBoundary {
-        public UpdateMotorbikeOutputData received;
+import org.junit.jupiter.api.Test;
 
-        @Override
-        public void present(UpdateMotorbikeOutputData outputData) {
-            this.received = outputData;
-        }
-    }
+import com.motorbike.adapters.presenters.UpdateMotorbikePresenter;
+import com.motorbike.adapters.viewmodels.UpdateMotorbikeViewModel;
+import com.motorbike.business.dto.motorbike.UpdateMotorbikeInputData;
+import com.motorbike.business.ports.repository.ProductRepository;
+import com.motorbike.business.usecase.output.UpdateMotorbikeOutputBoundary;
+import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.entities.XeMay;
+import com.motorbike.domain.entities.PhuKienXeMay;
 
-    private static class MockRepo implements MotorbikeRepository {
+public class UpdateMotorbikeUseCaseControlTest {
 
-        public List<XeMay> store = new ArrayList<>();
-        public boolean throwException = false;
+	@Test
+	public void testExecute_ValidUpdate_Success() {
+		UpdateMotorbikeInputData inputData = new UpdateMotorbikeInputData(
+			1L,
+			"Honda Wave Alpha Updated",
+			"Xe số tiết kiệm nhiên liệu - Phiên bản mới",
+			new BigDecimal("32000000"),
+			"honda-wave-new.jpg",
+			100,
+			"Honda",
+			"Wave Alpha",
+			"Xanh",
+			2024,
+			110
+		);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		UpdateMotorbikeViewModel viewModel = new UpdateMotorbikeViewModel();
+		UpdateMotorbikeOutputBoundary outputBoundary = new UpdateMotorbikePresenter(viewModel);
+		
+		UpdateMotorbikeUseCaseControl control = new UpdateMotorbikeUseCaseControl(outputBoundary, productRepo);
+		control.execute(inputData);
+		
+		assertTrue(viewModel.success);
+		assertFalse(viewModel.hasError);
+		assertEquals(1L, viewModel.maSanPham);
+	}
 
-        @Override
-        public Optional<XeMay> findById(Long id) {
-            if (throwException) throw new RuntimeException("DB error");
+	@Test
+	public void testExecute_ProductNotFound() {
+		UpdateMotorbikeInputData inputData = new UpdateMotorbikeInputData(
+			999L,
+			"Honda Wave",
+			"Mô tả",
+			new BigDecimal("30000000"),
+			"image.jpg",
+			50,
+			"Honda",
+			"Wave",
+			"Đỏ",
+			2024,
+			110
+		);
+		
+		ProductRepository productRepo = new MockProductRepository();
+		UpdateMotorbikeViewModel viewModel = new UpdateMotorbikeViewModel();
+		UpdateMotorbikeOutputBoundary outputBoundary = new UpdateMotorbikePresenter(viewModel);
+		
+		UpdateMotorbikeUseCaseControl control = new UpdateMotorbikeUseCaseControl(outputBoundary, productRepo);
+		control.execute(inputData);
+		
+		assertFalse(viewModel.success);
+		assertTrue(viewModel.hasError);
+		assertEquals("PRODUCT_NOT_FOUND", viewModel.errorCode);
+	}
 
-            return store.stream()
-                    .filter(x -> x.getMaSanPham().equals(id))
-                    .findFirst();
-        }
+	@Test
+	public void testExecute_NullInputData() {
+		ProductRepository productRepo = new MockProductRepository();
+		UpdateMotorbikeViewModel viewModel = new UpdateMotorbikeViewModel();
+		UpdateMotorbikeOutputBoundary outputBoundary = new UpdateMotorbikePresenter(viewModel);
+		
+		UpdateMotorbikeUseCaseControl control = new UpdateMotorbikeUseCaseControl(outputBoundary, productRepo);
+		control.execute(null);
+		
+		assertFalse(viewModel.success);
+		assertTrue(viewModel.hasError);
+	}
 
-        @Override
-        public XeMay save(XeMay xe) {
-            if (throwException) throw new RuntimeException("Save failed");
+	private static class MockProductRepository implements ProductRepository {
+		@Override
+		public Optional<SanPham> findById(Long id) {
+			if (id == 1L) {
+				XeMay xeMay = new XeMay(
+					1L,
+					"Honda Wave Alpha",
+					"Xe số tiết kiệm",
+					new BigDecimal("30000000"),
+					"honda.jpg",
+					50,
+					true,
+					LocalDateTime.now(),
+					LocalDateTime.now(),
+					"Honda",
+					"Wave Alpha",
+					"Đỏ",
+					2024,
+					110
+				);
+				return Optional.of(xeMay);
+			}
+			return Optional.empty();
+		}
 
-            store.removeIf(x -> x.getMaSanPham().equals(xe.getMaSanPham()));
-            this.store.add(xe);
-            return xe;
-        }
+		@Override
+		public SanPham save(SanPham sanPham) {
+			return sanPham;
+		}
 
-        @Override
-        public List<XeMay> findAllMotorbikes() { return store; }
+		@Override
+		public boolean existsById(Long productId) {
+			return productId == 1L;
+		}
 
-        @Override
-        public void deleteById(Long id) {}
-    }
+		@Override
+		public java.util.List<SanPham> findAll() {
+			return new java.util.ArrayList<>();
+		}
 
-    @Test
-    void testUpdate_Success() {
-        MockPresenter presenter = new MockPresenter();
-        MockRepo repo = new MockRepo();
+		@Override
+		public void deleteById(Long productId) {
+		}
 
-        XeMay xe = new XeMay(
-                "Old Name", "Old Desc", new BigDecimal("1000"),
-                "old.jpg", 5, "Honda", "Wave", "Đỏ", 2020, 110
-        );
-        xe.setMaSanPham(1L);
-        repo.store.add(xe);
+		@Override
+		public java.util.List<PhuKienXeMay> findAllAccessories() {
+			return new java.util.ArrayList<>();
+		}
 
-        UpdateMotorbikeUseCaseControl control =
-                new UpdateMotorbikeUseCaseControl(presenter, repo);
+		@Override
+		public java.util.List<PhuKienXeMay> searchAccessories(String keyword) {
+			return new java.util.ArrayList<>();
+		}
 
-        UpdateMotorbikeInputData input = new UpdateMotorbikeInputData(
-                1L,
-                "New Name",
-                null,
-                new BigDecimal("2000"),
-                null,
-                10,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+			return new java.util.ArrayList<>();
+		}
 
-        control.execute(input);
-
-        assertNotNull(presenter.received);
-        assertNull(presenter.received.getErrorCode());
-
-        MotorbikeItem item = presenter.received.getMotorbike();
-        assertEquals("New Name", item.name);
-        assertEquals(new BigDecimal("2000"), item.price);
-        assertEquals(10, item.stock);
-    }
-
-    @Test
-    void testUpdate_NotFound() {
-        MockPresenter presenter = new MockPresenter();
-        MockRepo repo = new MockRepo();
-
-        UpdateMotorbikeUseCaseControl control =
-                new UpdateMotorbikeUseCaseControl(presenter, repo);
-
-        UpdateMotorbikeInputData input = new UpdateMotorbikeInputData(
-                999L, "X", null, null, null, null,
-                null, null, null, null, null
-        );
-
-        control.execute(input);
-
-        assertEquals("NOT_FOUND", presenter.received.getErrorCode());
-        assertEquals("Motorbike not found", presenter.received.getErrorMessage());
-    }
-
-    @Test
-    void testUpdate_OnlyOneField() {
-        MockPresenter presenter = new MockPresenter();
-        MockRepo repo = new MockRepo();
-
-        XeMay xe = new XeMay(
-                "Name", "Desc", new BigDecimal("1000"),
-                "img.jpg", 5, "Yamaha", "Sirius", "Xanh", 2021, 110
-        );
-        xe.setMaSanPham(10L);
-        repo.store.add(xe);
-
-        UpdateMotorbikeUseCaseControl control =
-                new UpdateMotorbikeUseCaseControl(presenter, repo);
-
-        UpdateMotorbikeInputData input = new UpdateMotorbikeInputData(
-                10L,
-                null,            // KHÔNG đổi tên
-                "New Desc",      // Chỉ đổi description
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-
-        control.execute(input);
-
-        MotorbikeItem item = presenter.received.getMotorbike();
-        assertEquals("Name", item.name); // giữ nguyên
-        assertEquals("New Desc", item.description); // thay đổi
-    }
-
-    @Test
-    void testUpdate_RepositoryThrows() {
-        MockPresenter presenter = new MockPresenter();
-        MockRepo repo = new MockRepo();
-        repo.throwException = true;
-
-        UpdateMotorbikeUseCaseControl control =
-                new UpdateMotorbikeUseCaseControl(presenter, repo);
-
-        UpdateMotorbikeInputData input = new UpdateMotorbikeInputData(
-                1L,
-                "Test", null, null, null, null,
-                null, null, null, null, null
-        );
-
-        control.execute(input);
-
-        assertEquals("SYSTEM_ERROR", presenter.received.getErrorCode());
-        assertNotNull(presenter.received.getErrorMessage());
-    }
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
+	}
 }

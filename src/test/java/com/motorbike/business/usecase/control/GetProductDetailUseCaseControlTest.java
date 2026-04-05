@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,10 @@ import org.junit.jupiter.api.Test;
 import com.motorbike.adapters.presenters.ProductDetailPresenter;
 import com.motorbike.adapters.viewmodels.ProductDetailViewModel;
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
+import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
+import com.motorbike.domain.entities.SanPham;
 import com.motorbike.domain.entities.XeMay;
 
 public class GetProductDetailUseCaseControlTest {
@@ -69,7 +72,7 @@ public class GetProductDetailUseCaseControlTest {
 		control.execute(inputData);
 		
 		assertEquals(false, viewModel.hasError);
-		assertNotEquals(null, viewModel.formattedPrice);
+		assertNotEquals(null, viewModel.price);
 	}
 	
 	@Test
@@ -292,5 +295,40 @@ public class GetProductDetailUseCaseControlTest {
 		public java.util.List<com.motorbike.domain.entities.SanPham> findAll() {
 			return new java.util.ArrayList<>();
 		}
+		
+		@Override
+		public void deleteById(Long productId) {
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> findAllAccessories() {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+			return new java.util.ArrayList<>();
+		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
 	}
 }
+

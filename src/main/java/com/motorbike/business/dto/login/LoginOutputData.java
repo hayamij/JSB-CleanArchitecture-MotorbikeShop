@@ -11,6 +11,8 @@ public class LoginOutputData {
     private final Long userId;
     private final String email;
     private final String username;
+    private final String phoneNumber;
+    private final String address;
     private final VaiTro role;
     private final LocalDateTime lastLoginAt;
     
@@ -20,7 +22,7 @@ public class LoginOutputData {
     private final boolean cartMerged;
     private final int mergedItemsCount;
 
-    public LoginOutputData(Long userId, String email, String username,
+    public LoginOutputData(Long userId, String email, String username, String phoneNumber, String address,
                           VaiTro role, LocalDateTime lastLoginAt,
                           String sessionToken, Long cartId, boolean cartMerged, int mergedItemsCount) {
         this.success = true;
@@ -29,6 +31,8 @@ public class LoginOutputData {
         this.userId = userId;
         this.email = email;
         this.username = username;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
         this.role = role;
         this.lastLoginAt = lastLoginAt;
         this.sessionToken = sessionToken;
@@ -44,6 +48,8 @@ public class LoginOutputData {
         this.userId = null;
         this.email = null;
         this.username = null;
+        this.phoneNumber = null;
+        this.address = null;
         this.role = null;
         this.lastLoginAt = null;
         this.sessionToken = null;
@@ -66,6 +72,10 @@ public class LoginOutputData {
 
     public String getUsername() {return username;}
 
+    public String getPhoneNumber() {return phoneNumber;}
+
+    public String getAddress() {return address;}
+
     public VaiTro getRole() {return role;}
 
     public LocalDateTime getLastLoginAt() {return lastLoginAt;}
@@ -81,10 +91,10 @@ public class LoginOutputData {
     public int getMergedItemsCount() {return mergedItemsCount;}
     
     public static LoginOutputData forSuccess(
-            Long userId, String email, String username,
+            Long userId, String email, String username, String phoneNumber, String address,
             VaiTro role, LocalDateTime lastLoginAt,
             String sessionToken, Long cartId, boolean cartMerged, int mergedItemsCount) {
-        return new LoginOutputData(userId, email, username, role, lastLoginAt,
+        return new LoginOutputData(userId, email, username, phoneNumber, address, role, lastLoginAt,
                 sessionToken, cartId, cartMerged, mergedItemsCount);
     }
     

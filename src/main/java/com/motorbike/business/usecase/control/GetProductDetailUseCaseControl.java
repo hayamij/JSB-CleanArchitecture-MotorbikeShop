@@ -1,28 +1,41 @@
+
 package com.motorbike.business.usecase.control;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
+import com.motorbike.business.usecase.input.GetProductDetailInputBoundary;
+import com.motorbike.business.usecase.input.CalculateProductPriceInputBoundary;
 
 import com.motorbike.business.dto.productdetail.GetProductDetailInputData;
 import com.motorbike.business.dto.productdetail.GetProductDetailOutputData;
+import com.motorbike.business.dto.calculateproductprice.CalculateProductPriceInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.output.GetProductDetailOutputBoundary;
 import com.motorbike.domain.entities.SanPham;
-import com.motorbike.domain.exceptions.DomainException;
 import com.motorbike.domain.exceptions.ValidationException;
+import com.motorbike.domain.exceptions.DomainException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
-public class GetProductDetailUseCaseControl {
+public class GetProductDetailUseCaseControl implements GetProductDetailInputBoundary {
     
     private final GetProductDetailOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final CalculateProductPriceInputBoundary calculatePriceUseCase;
     
+    public GetProductDetailUseCaseControl(
+            GetProductDetailOutputBoundary outputBoundary,
+            ProductRepository productRepository,
+            CalculateProductPriceInputBoundary calculatePriceUseCase) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.calculatePriceUseCase = calculatePriceUseCase;
+    }
+
     public GetProductDetailUseCaseControl(
             GetProductDetailOutputBoundary outputBoundary,
             ProductRepository productRepository) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.calculatePriceUseCase = null;
     }
     
     public void execute(GetProductDetailInputData inputData) {
@@ -50,26 +63,59 @@ public class GetProductDetailUseCaseControl {
         
         if (errorException == null && sanPham != null) {
             try {
-                String chiTietString = sanPham.layThongTinChiTiet();
-                Map<String, String> specifications = parseSpecifications(chiTietString);
+                String chiTiet = sanPham.layThongTinChiTiet();
                 BigDecimal giaGoc = sanPham.getGia();
-                BigDecimal giaSauKhuyenMai = sanPham.tinhGiaSauKhuyenMai();
-                double phanTramGiam = giaGoc.subtract(giaSauKhuyenMai)
-                    .divide(giaGoc, 4, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100))
-                    .doubleValue();
+                Integer discountPercent = sanPham.getPhanTramGiamGia() != null ? sanPham.getPhanTramGiamGia().intValue() : 0;
+                
+                // UC-53: Calculate product price
+                BigDecimal giaSauKhuyenMai = giaGoc;
+                double phanTramGiam = 0.0;
+                
+                if (calculatePriceUseCase != null) {
+                    CalculateProductPriceInputData priceInput = new CalculateProductPriceInputData(
+                        giaGoc,
+                        discountPercent
+                    );
+                    var priceResult = ((CalculateProductPriceUseCaseControl) calculatePriceUseCase)
+                        .calculateInternal(priceInput);
+                    
+                    if (!priceResult.isSuccess()) {
+                        throw new DomainException(priceResult.getErrorMessage(), priceResult.getErrorCode());
+                    }
+                    
+                    giaSauKhuyenMai = priceResult.getFinalPrice();
+                    phanTramGiam = priceResult.getDiscountAmount()
+                        .divide(giaGoc, 4, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100))
+                        .doubleValue();
+                } else {
+                    // Fallback: calculate manually if use case not provided
+                    if (discountPercent > 0) {
+                        BigDecimal discount = giaGoc.multiply(BigDecimal.valueOf(discountPercent))
+                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                        giaSauKhuyenMai = giaGoc.subtract(discount);
+                        phanTramGiam = discountPercent.doubleValue();
+                    }
+                }
+                
                 boolean conHang = sanPham.getSoLuongTonKho() > 0;
+                
+                // Determine category based on instance type
+                String category = (sanPham instanceof com.motorbike.domain.entities.XeMay) 
+                    ? "MOTORCYCLE" : "ACCESSORY";
                 
                 outputData = GetProductDetailOutputData.forSuccess(
                     sanPham.getMaSanPham(),
                     sanPham.getTenSanPham(),
                     sanPham.getMoTa(),
-                    specifications,
+                    chiTiet,
                     giaGoc,
                     giaSauKhuyenMai,
                     phanTramGiam,
                     sanPham.getSoLuongTonKho(),
-                    conHang
+                    conHang,
+                    sanPham.getHinhAnh(),
+                    category
                 );
             } catch (Exception e) {
                 errorException = e;
@@ -92,28 +138,5 @@ public class GetProductDetailUseCaseControl {
         }
         
         outputBoundary.present(outputData);
-    }
-    
-    private Map<String, String> parseSpecifications(String specString) {
-        Map<String, String> specs = new HashMap<>();
-        if (specString == null || specString.isEmpty()) {
-            return specs;
-        }
-        
-        // Parse the specifications string into key-value pairs
-        String[] lines = specString.split("\n");
-        for (String line : lines) {
-            line = line.trim();
-            if (line.isEmpty()) continue;
-            
-            int colonIndex = line.indexOf(":");
-            if (colonIndex > 0) {
-                String key = line.substring(0, colonIndex).trim();
-                String value = line.substring(colonIndex + 1).trim();
-                specs.put(key, value);
-            }
-        }
-        
-        return specs;
     }
 }

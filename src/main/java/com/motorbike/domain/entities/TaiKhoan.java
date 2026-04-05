@@ -1,12 +1,12 @@
 package com.motorbike.domain.entities;
 
+import com.motorbike.domain.exceptions.*;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
-import com.motorbike.domain.exceptions.ValidationException;
-
 public class TaiKhoan {
     private Long maTaiKhoan;
+    private String hoTen;
     private String email;
     private String tenDangNhap;
     private String matKhau;
@@ -22,13 +22,15 @@ public class TaiKhoan {
     
     private static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)[0-9]{9,10}$");
 
-    public TaiKhoan(String email, String tenDangNhap, String matKhau,
+    public TaiKhoan(String hoTen, String email, String tenDangNhap, String matKhau,
                     String soDienThoai, String diaChi) {
+        validateHoTen(hoTen);
         validateEmail(email);
         validateTenDangNhap(tenDangNhap);
         validateMatKhau(matKhau);
         validateSoDienThoai(soDienThoai);
         
+        this.hoTen = hoTen;
         this.email = email;
         this.tenDangNhap = tenDangNhap;
         this.matKhau = matKhau;
@@ -40,10 +42,11 @@ public class TaiKhoan {
         this.ngayCapNhat = LocalDateTime.now();
     }
 
-    public TaiKhoan(Long maTaiKhoan, String email, String tenDangNhap, String matKhau,
+    public TaiKhoan(Long maTaiKhoan, String hoTen, String email, String tenDangNhap, String matKhau,
                     String soDienThoai, String diaChi, VaiTro vaiTro, boolean hoatDong,
                     LocalDateTime ngayTao, LocalDateTime ngayCapNhat, LocalDateTime lanDangNhapCuoi) {
         this.maTaiKhoan = maTaiKhoan;
+        this.hoTen = hoTen;
         this.email = email;
         this.tenDangNhap = tenDangNhap;
         this.matKhau = matKhau;
@@ -54,6 +57,20 @@ public class TaiKhoan {
         this.ngayTao = ngayTao;
         this.ngayCapNhat = ngayCapNhat;
         this.lanDangNhapCuoi = lanDangNhapCuoi;
+    }
+    
+    // Constructor with 5 parameters (no phone)
+    public TaiKhoan(String hoTen, String email, String tenDangNhap, String matKhau, String diaChi) {
+        this(hoTen, email, tenDangNhap, matKhau, null, diaChi);
+    }
+
+    public static void validateHoTen(String hoTen) {
+        if (hoTen == null || hoTen.trim().isEmpty()) {
+            throw ValidationException.emptyFullName();
+        }
+        if (hoTen.trim().length() < 2) {
+            throw ValidationException.fullNameTooShort();
+        }
     }
 
     public static void validateEmail(String email) {
@@ -101,19 +118,23 @@ public class TaiKhoan {
         }
     }
 
-    public static void checkInputForLogin(String email, String password) {
-        if (email == null || email.trim().isEmpty()) {
-            throw ValidationException.emptyEmail();
+    public static void checkInputForLogin(String emailOrUsernameOrPhone, String password) {
+        // Kiểm tra input không được rỗng
+        if (emailOrUsernameOrPhone == null || emailOrUsernameOrPhone.trim().isEmpty()) {
+            throw ValidationException.emptyLoginIdentifier();
         }
-        if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw ValidationException.invalidEmail();
-        }
+        
+        // Kiểm tra password
         if (password == null || password.isEmpty()) {
             throw ValidationException.emptyPassword();
         }
+        
+        // Không validate format ở đây vì có thể là email hoặc username
+        // Repository sẽ tìm kiếm theo email hoặc username
     }
 
-    public static void checkInputForRegister(String email, String tenDangNhap, String matKhau, String soDienThoai) {
+    public static void checkInputForRegister(String hoTen, String email, String tenDangNhap, String matKhau, String soDienThoai) {
+        validateHoTen(hoTen);
         validateEmail(email);
         validateTenDangNhap(tenDangNhap);
         validateMatKhau(matKhau);
@@ -137,6 +158,7 @@ public class TaiKhoan {
     public boolean kiemTraMatKhau(String matKhauNhap) {return this.matKhau.equals(matKhauNhap);}
 
     public Long getMaTaiKhoan() {return maTaiKhoan;}
+    public String getHoTen() {return hoTen;}
     public String getEmail() {return email;}
     public String getTenDangNhap() {return tenDangNhap;}
     public String getMatKhau() {return matKhau;}
@@ -148,16 +170,12 @@ public class TaiKhoan {
     public LocalDateTime getNgayCapNhat() {return ngayCapNhat;}
     public LocalDateTime getLanDangNhapCuoi() {return lanDangNhapCuoi;}
     public void setMaTaiKhoan(Long maTaiKhoan) {this.maTaiKhoan = maTaiKhoan;}
+    public void setHoTen(String hoTen) {validateHoTen(hoTen); this.hoTen = hoTen; this.ngayCapNhat = LocalDateTime.now();}
     public void setEmail(String email) {validateEmail(email); this.email = email; this.ngayCapNhat = LocalDateTime.now();}
+    public void setTenDangNhap(String tenDangNhap) {validateTenDangNhap(tenDangNhap); this.tenDangNhap = tenDangNhap; this.ngayCapNhat = LocalDateTime.now();}
     public void setSoDienThoai(String soDienThoai) {validateSoDienThoai(soDienThoai); this.soDienThoai = soDienThoai; this.ngayCapNhat = LocalDateTime.now();}
     public void setDiaChi(String diaChi) {this.diaChi = diaChi; this.ngayCapNhat = LocalDateTime.now();}
-    public void setTenDangNhap(String tenDangNhap) {validateTenDangNhap(tenDangNhap); this.tenDangNhap = tenDangNhap; this.ngayCapNhat = LocalDateTime.now();}
-    // thêm đặt vai trò
     public void setVaiTro(VaiTro vaiTro) {this.vaiTro = vaiTro; this.ngayCapNhat = LocalDateTime.now();}
-    public void setHoatDong(boolean hoatDong) {this.hoatDong = hoatDong; this.ngayCapNhat = LocalDateTime.now();}
-    public void setNgayCapNhat(LocalDateTime ngayCapNhat) {this.ngayCapNhat = ngayCapNhat;}
-    public void setMatKhau(String matKhau) {validateMatKhau(matKhau); this.matKhau = matKhau; this.ngayCapNhat = LocalDateTime.now();}
-}   //sữa thông tin người dùng
-     
-
-
+    public void setMaTK(Long maTaiKhoan) {this.maTaiKhoan = maTaiKhoan;}
+    public Long getMaNguoiDung() {return maTaiKhoan;} // Alias for compatibility
+}

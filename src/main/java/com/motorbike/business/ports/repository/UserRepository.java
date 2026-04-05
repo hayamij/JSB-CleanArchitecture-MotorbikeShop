@@ -1,9 +1,8 @@
 package com.motorbike.business.ports.repository;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.motorbike.domain.entities.TaiKhoan;
+import java.util.Optional;
+import java.util.List;
 
 public interface UserRepository {
     
@@ -11,19 +10,36 @@ public interface UserRepository {
     Optional<TaiKhoan> findByEmail(String email);
     
     
+    Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username);
+    
+    Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap);
+    
     Optional<TaiKhoan> findById(Long id);
     
     
     boolean existsByEmail(String email);
     
     
+    boolean existsByUsername(String username);
+    
+    
+    boolean existsByTenDangNhap(String tenDangNhap);
+    
+    
     TaiKhoan save(TaiKhoan taiKhoan);
     
     
     void updateLastLogin(Long userId);
-     // Thêm: lấy tất cả người dùng (dùng cho admin)
+    
+    
     List<TaiKhoan> findAll();
-
-    // Thêm: xóa người dùng theo id
-    void deleteById(Long id);
+    
+    
+    void deleteById(Long userId);
+    
+    
+    boolean existsById(Long userId);
+    
+    
+    List<TaiKhoan> searchUsers(String keyword);
 }

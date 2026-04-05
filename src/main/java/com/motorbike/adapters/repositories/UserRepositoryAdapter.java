@@ -1,16 +1,13 @@
 package com.motorbike.adapters.repositories;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
-
 import com.motorbike.business.ports.repository.UserRepository;
 import com.motorbike.domain.entities.TaiKhoan;
 import com.motorbike.domain.entities.VaiTro;
 import com.motorbike.infrastructure.persistence.jpa.entities.TaiKhoanJpaEntity;
 import com.motorbike.infrastructure.persistence.jpa.repositories.TaiKhoanJpaRepository;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class UserRepositoryAdapter implements UserRepository {
@@ -25,6 +22,25 @@ public class UserRepositoryAdapter implements UserRepository {
     public Optional<TaiKhoan> findByEmail(String email) {
         return jpaRepository.findByEmail(email)
                 .map(this::toDomain);
+    }
+    
+    @Override
+    public Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+        return jpaRepository.findByTenDangNhap(tenDangNhap)
+                .map(this::toDomain);
+    }
+    
+    @Override
+    public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+        // Try to find by username first
+        Optional<TaiKhoanJpaEntity> result = jpaRepository.findByTenDangNhap(username);
+        if (result.isPresent()) {
+            return result.map(this::toDomain);
+        }
+        
+        // Try to find by email
+        result = jpaRepository.findByEmail(username);
+        return result.map(this::toDomain);
     }
     
     @Override
@@ -46,30 +62,58 @@ public class UserRepositoryAdapter implements UserRepository {
     }
     
     @Override
+    public boolean existsByUsername(String username) {
+        return jpaRepository.existsByTenDangNhap(username);
+    }
+    
+    @Override
+    public boolean existsByTenDangNhap(String tenDangNhap) {
+        return jpaRepository.existsByTenDangNhap(tenDangNhap);
+    }
+    
+    @Override
     public void updateLastLogin(Long userId) {
         jpaRepository.findById(userId).ifPresent(user -> {
             user.setLanDangNhapCuoi(java.time.LocalDateTime.now());
             jpaRepository.save(user);
         });
     }
-    // Thêm: lấy tất cả người dùng (dùng cho admin)
-     @Override
-    public List<TaiKhoan> findAll() {
-        return jpaRepository.findAll()
-                .stream()
+    
+    @Override
+    public java.util.List<TaiKhoan> findAll() {
+        return jpaRepository.findAll().stream()
                 .map(this::toDomain)
-                .collect(Collectors.toList());
+                .collect(java.util.stream.Collectors.toList());
     }
-    // Thêm: xóa người dùng theo id
-     @Override
-    public void deleteById(Long id) {
-        jpaRepository.deleteById(id);
+    
+    @Override
+    public void deleteById(Long userId) {
+        jpaRepository.deleteById(userId);
+    }
+    
+    @Override
+    public boolean existsById(Long userId) {
+        return jpaRepository.existsById(userId);
+    }
+    
+    @Override
+    public java.util.List<TaiKhoan> searchUsers(String keyword) {
+        return jpaRepository.findAll().stream()
+                .filter(entity -> 
+                    (entity.getHoTen() != null && entity.getHoTen().toLowerCase().contains(keyword.toLowerCase())) ||
+                    entity.getEmail().toLowerCase().contains(keyword.toLowerCase()) ||
+                    entity.getTenDangNhap().toLowerCase().contains(keyword.toLowerCase()) ||
+                    (entity.getSoDienThoai() != null && entity.getSoDienThoai().contains(keyword))
+                )
+                .map(this::toDomain)
+                .collect(java.util.stream.Collectors.toList());
     }
     
     
     private TaiKhoan toDomain(TaiKhoanJpaEntity jpaEntity) {
         return new TaiKhoan(
                 jpaEntity.getMaTaiKhoan(),
+                jpaEntity.getHoTen(),
                 jpaEntity.getEmail(),
                 jpaEntity.getTenDangNhap(),
                 jpaEntity.getMatKhau(),
@@ -86,6 +130,7 @@ public class UserRepositoryAdapter implements UserRepository {
     private TaiKhoanJpaEntity toJpaEntity(TaiKhoan domain) {
         TaiKhoanJpaEntity jpa = new TaiKhoanJpaEntity();
         jpa.setMaTaiKhoan(domain.getMaTaiKhoan());
+        jpa.setHoTen(domain.getHoTen());
         jpa.setEmail(domain.getEmail());
         jpa.setTenDangNhap(domain.getTenDangNhap());
         jpa.setMatKhau(domain.getMatKhau());

@@ -2,11 +2,13 @@ package com.motorbike.business.usecase.control;
 
 import com.motorbike.business.dto.accessory.GetAllAccessoriesOutputData;
 import com.motorbike.business.dto.accessory.GetAllAccessoriesOutputData.AccessoryItem;
+import com.motorbike.business.dto.accessory.FormatAccessoriesForDisplayInputData;
 import com.motorbike.business.ports.repository.ProductRepository;
 import com.motorbike.business.usecase.input.GetAllAccessoriesInputBoundary;
+import com.motorbike.business.usecase.input.FormatAccessoriesForDisplayInputBoundary;
 import com.motorbike.business.usecase.output.GetAllAccessoriesOutputBoundary;
 import com.motorbike.domain.entities.PhuKienXeMay;
-import com.motorbike.domain.entities.SanPham;
+import com.motorbike.domain.exceptions.SystemException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,43 +17,46 @@ public class GetAllAccessoriesUseCaseControl implements GetAllAccessoriesInputBo
 
     private final GetAllAccessoriesOutputBoundary outputBoundary;
     private final ProductRepository productRepository;
+    private final FormatAccessoriesForDisplayInputBoundary formatAccessoriesUseCase;
 
+    public GetAllAccessoriesUseCaseControl(
+            GetAllAccessoriesOutputBoundary outputBoundary,
+            ProductRepository productRepository,
+            FormatAccessoriesForDisplayInputBoundary formatAccessoriesUseCase
+    ) {
+        this.outputBoundary = outputBoundary;
+        this.productRepository = productRepository;
+        this.formatAccessoriesUseCase = formatAccessoriesUseCase;
+    }
+
+    // Backward compatibility constructor
     public GetAllAccessoriesUseCaseControl(
             GetAllAccessoriesOutputBoundary outputBoundary,
             ProductRepository productRepository
     ) {
         this.outputBoundary = outputBoundary;
         this.productRepository = productRepository;
+        this.formatAccessoriesUseCase = new FormatAccessoriesForDisplayUseCaseControl(null);
     }
 
     @Override
-    public void execute(Void inputData) {
+    public void execute() {
         GetAllAccessoriesOutputData outputData = null;
         Exception errorException = null;
 
         try {
-            List<SanPham> allProducts = productRepository.findAll();
+            // Step 1: Get all accessories from repository
+            List<PhuKienXeMay> all = productRepository.findAllAccessories();
 
-            List<AccessoryItem> accessories = allProducts.stream()
-                    .filter(p -> p instanceof PhuKienXeMay)
-                    .map(p -> {
-                        PhuKienXeMay pk = (PhuKienXeMay) p;
-                        return new AccessoryItem(
-                                pk.getMaSanPham(),
-                                pk.getTenSanPham(),
-                                pk.getMoTa(),
-                                pk.getGia(),
-                                pk.getSoLuongTonKho(),
-                                pk.getHinhAnh(),
-                                pk.getLoaiPhuKien(),
-                                pk.getThuongHieu(),
-                                pk.getChatLieu(),
-                                pk.getKichThuoc()
-                        );
-                    })
-                    .collect(Collectors.toList());
+            // Step 2: UC-76 Format accessories for display
+            FormatAccessoriesForDisplayInputData formatInput = new FormatAccessoriesForDisplayInputData(all);
+            var formatResult = ((FormatAccessoriesForDisplayUseCaseControl) formatAccessoriesUseCase).formatInternal(formatInput);
+            
+            if (!formatResult.isSuccess()) {
+                throw new SystemException(formatResult.getErrorMessage(), formatResult.getErrorCode());
+            }
 
-            outputData = new GetAllAccessoriesOutputData(accessories);
+            outputData = new GetAllAccessoriesOutputData(formatResult.getAccessoryItems());
         } catch (Exception e) {
             errorException = e;
         }

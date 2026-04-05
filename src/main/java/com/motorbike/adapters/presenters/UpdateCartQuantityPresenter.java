@@ -123,7 +123,13 @@ public class UpdateCartQuantityPresenter implements UpdateCartQuantityOutputBoun
             case "PRODUCT_NOT_AVAILABLE":
                 return "Sản phẩm hiện không khả dụng";
             case "INSUFFICIENT_STOCK":
-                return "Không đủ hàng trong kho. " + originalMessage.substring(originalMessage.indexOf("Available:"));
+                // Extract available quantity from message like "Sản phẩm 'X' không đủ hàng. Còn lại: 30"
+                int conLaiIndex = originalMessage.indexOf("Còn lại:");
+                if (conLaiIndex != -1) {
+                    String availableInfo = originalMessage.substring(conLaiIndex);
+                    return "Không đủ hàng trong kho. " + availableInfo;
+                }
+                return originalMessage;
             default:
                 return originalMessage;
         }

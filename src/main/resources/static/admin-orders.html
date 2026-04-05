@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đơn hàng - Admin Panel</title>
+    <link rel="stylesheet" href="css/common.css?v=3">
+    <link rel="stylesheet" href="css/admin.css?v=3">
+</head>
+<body data-page="orders">
+    <!-- Admin Sidebar will be loaded by admin-sidebar.js -->
+
+    <!-- Main Content Area -->
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1>Quản lý Đơn hàng</h1>
+            <p>Xem và cập nhật trạng thái đơn hàng</p>
+        </div>
+
+        <div class="admin-content">
+            <div id="alertContainer"></div>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <form class="search-form" onsubmit="searchOrders(event)">
+                    <div class="form-group">
+                        <label>TÊN KHÁCH HÀNG</label>
+                        <input type="text" id="searchKeyword" placeholder="Nhập tên khách hàng...">
+                    </div>
+                    <div class="form-group">
+                        <label>TRẠNG THÁI</label>
+                        <select id="searchStatus" onchange="applyFilters()">
+                            <option value="">Tất cả</option>
+                            <option value="Chờ xác nhận">Chờ xác nhận</option>
+                            <option value="Đã xác nhận">Đã xác nhận</option>
+                            <option value="Đang giao hàng">Đang giao hàng</option>
+                            <option value="Đã giao hàng">Đã giao hàng</option>
+                            <option value="Đã hủy">Đã hủy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>PHƯƠNG THỨC TT</label>
+                        <select id="searchPaymentMethod" onchange="applyFilters()">
+                            <option value="">Tất cả</option>
+                            <option value="COD">COD</option>
+                            <option value="Chuyển khoản">Chuyển khoản</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>SẮP XẾP</label>
+                        <select id="sortOrder" onchange="applyFilters()">
+                            <option value="newest">Mới nhất</option>
+                            <option value="oldest">Cũ nhất</option>
+                            <option value="amount-high">Giá cao nhất</option>
+                            <option value="amount-low">Giá thấp nhất</option>
+                            <option value="customer-asc">Khách hàng A-Z</option>
+                            <option value="customer-desc">Khách hàng Z-A</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-search">TÌM KIẾM</button>
+                </form>
+            </div>
+
+        <!-- Orders Table -->
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>MÃ ĐH</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th>SỐ ĐIỆN THOẠI</th>
+                        <th>ĐỊA CHỈ GIAO</th>
+                        <th>TỔNG TIỀN</th>
+                        <th>SỐ MẶT HÀNG</th>
+                        <th>PTTT</th>
+                        <th>TRẠNG THÁI</th>
+                        <th>NGÀY ĐẶT</th>
+                        <th>HÀNH ĐỘNG</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 40px;">
+                            <div class="loading-spinner"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    <!-- Order Modal (for both view and update) -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="modalTitle">CHI TIẾT ĐƠN HÀNG</h2>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm" style="display: none;">
+                    <input type="hidden" id="orderId">
+                    
+                    <div class="form-group">
+                        <label>TRẠNG THÁI *</label>
+                        <select id="orderStatus" required>
+                            <option value="CHO_XAC_NHAN">Chờ xác nhận</option>
+                            <option value="DA_XAC_NHAN">Đã xác nhận</option>
+                            <option value="DA_HUY">Đã hủy</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>GHI CHÚ</label>
+                        <textarea id="orderNote" rows="3" style="width: 100%; padding: 12px; border: 2px solid var(--color-light-gray);"></textarea>
+                    </div>
+                </form>
+
+                <div id="orderDetails" style="margin-top: 20px;">
+                    <!-- Order details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn-cancel" onclick="closeOrderModal()">ĐÓNG</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-sidebar.js?v=1"></script>
+    <script src="js/common.js?v=3"></script>
+    <script src="js/admin-orders.js?v=3"></script>
+</body>
+</html>

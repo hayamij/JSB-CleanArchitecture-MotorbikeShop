@@ -1,25 +1,15 @@
 package com.motorbike.business.dto.listallorders;
 
 /**
- * Input data for listing orders (admin-only use case).
+ * Input data for listing all orders. This use-case does not accept filters,
+ * sorting or pagination — it simply requests all orders.
  */
 public class ListAllOrdersInputData {
 
-    private final boolean admin;
-
-    private ListAllOrdersInputData(boolean admin) {
-        this.admin = admin;
+    private ListAllOrdersInputData() {
     }
 
-    public static ListAllOrdersInputData forAdmin() {
-        return new ListAllOrdersInputData(true);
-    }
-
-    public static ListAllOrdersInputData forNonAdmin() {
-        return new ListAllOrdersInputData(false);
-    }
-
-    public boolean isAdmin() {
-        return admin;
+    public static ListAllOrdersInputData getAllOrders() {
+        return new ListAllOrdersInputData();
     }
 }

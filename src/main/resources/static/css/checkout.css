@@ -409,6 +409,115 @@ textarea.form-control {
     }
 }
 
+/* QR Modal Styles */
+.qr-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-modal.active {
+    display: flex;
+}
+
+.qr-modal-content {
+    background: var(--color-white, #ffffff);
+    padding: 40px;
+    border: 3px solid var(--color-black, #000000);
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.qr-modal-content h3 {
+    margin: 0 0 25px 0;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--color-black, #000000);
+}
+
+.qr-code-container {
+    margin: 25px 0;
+    padding: 20px;
+    background: var(--color-light-gray, #e0e0e0);
+    border: 2px solid var(--color-black, #000000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.qr-code-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.qr-instruction {
+    margin: 20px 0;
+    color: var(--color-gray, #666666);
+    font-size: 0.95em;
+}
+
+.qr-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.btn-qr-confirm,
+.btn-qr-cancel {
+    flex: 1;
+    padding: 14px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--color-black, #000000);
+}
+
+.btn-qr-confirm {
+    background: var(--color-black, #000000);
+    color: var(--color-white, #ffffff);
+}
+
+.btn-qr-confirm:hover {
+    background: var(--color-white, #ffffff);
+    color: var(--color-black, #000000);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-qr-cancel {
+    background: var(--color-white, #ffffff);
+    color: var(--color-black, #000000);
+}
+
+.btn-qr-cancel:hover {
+    background: var(--color-black, #000000);
+    color: var(--color-white, #ffffff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 @media (max-width: 768px) {
     .checkout-steps {
         display: none;
@@ -417,5 +526,13 @@ textarea.form-control {
     .checkout-form-section,
     .order-summary {
         padding: 25px;
+    }
+
+    .qr-modal-content {
+        padding: 30px 20px;
+    }
+
+    .qr-modal-actions {
+        flex-direction: column;
     }
 }

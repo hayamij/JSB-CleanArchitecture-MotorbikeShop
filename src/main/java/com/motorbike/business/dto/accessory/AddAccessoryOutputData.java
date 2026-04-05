@@ -1,53 +1,61 @@
 package com.motorbike.business.dto.accessory;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class AddAccessoryOutputData {
-
-    public final boolean success;
-    public final String errorCode;
-    public final String errorMessage;
-    public final AccessoryItem accessory;
-
-    public AddAccessoryOutputData(AccessoryItem accessory) {
-        this.success = true;
-        this.errorCode = null;
-        this.errorMessage = null;
-        this.accessory = accessory;
-    }
-
-    public AddAccessoryOutputData(String errorCode, String errorMessage) {
-        this.success = false;
+    private final boolean success;
+    private final String errorCode;
+    private final String errorMessage;
+    
+    private final Long maSanPham;
+    private final String tenSanPham;
+    private final String loaiPhuKien;
+    private final String thuongHieu;
+    private final String chatLieu;
+    private final String kichThuoc;
+    private final BigDecimal gia;
+    private final LocalDateTime ngayTao;
+    
+    private AddAccessoryOutputData(boolean success, String errorCode, String errorMessage,
+                                  Long maSanPham, String tenSanPham, String loaiPhuKien,
+                                  String thuongHieu, String chatLieu, String kichThuoc,
+                                  BigDecimal gia, LocalDateTime ngayTao) {
+        this.success = success;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
-        this.accessory = null;
+        this.maSanPham = maSanPham;
+        this.tenSanPham = tenSanPham;
+        this.loaiPhuKien = loaiPhuKien;
+        this.thuongHieu = thuongHieu;
+        this.chatLieu = chatLieu;
+        this.kichThuoc = kichThuoc;
+        this.gia = gia;
+        this.ngayTao = ngayTao;
     }
-
-    public static class AccessoryItem {
-        public Long id;
-        public String name;
-        public String description;
-        public BigDecimal price;
-        public int stock;
-        public String imageUrl;
-        public String type;
-        public String brand;
-        public String material;
-        public String size;
-
-        public AccessoryItem(Long id, String name, String description,
-                             BigDecimal price, int stock, String imageUrl,
-                             String type, String brand, String material, String size) {
-            this.id = id;
-            this.name = name;
-            this.description = description;
-            this.price = price;
-            this.stock = stock;
-            this.imageUrl = imageUrl;
-            this.type = type;
-            this.brand = brand;
-            this.material = material;
-            this.size = size;
-        }
+    
+    public static AddAccessoryOutputData forSuccess(Long maSanPham, String tenSanPham,
+                                                   String loaiPhuKien, String thuongHieu,
+                                                   String chatLieu, String kichThuoc,
+                                                   BigDecimal gia, LocalDateTime ngayTao) {
+        return new AddAccessoryOutputData(true, null, null, maSanPham, tenSanPham,
+                                         loaiPhuKien, thuongHieu, chatLieu, kichThuoc, gia, ngayTao);
     }
+    
+    public static AddAccessoryOutputData forError(String errorCode, String errorMessage) {
+        return new AddAccessoryOutputData(false, errorCode, errorMessage,
+                                         null, null, null, null, null, null, null, null);
+    }
+    
+    public boolean isSuccess() { return success; }
+    public String getErrorCode() { return errorCode; }
+    public String getErrorMessage() { return errorMessage; }
+    public Long getMaSanPham() { return maSanPham; }
+    public String getTenSanPham() { return tenSanPham; }
+    public String getLoaiPhuKien() { return loaiPhuKien; }
+    public String getThuongHieu() { return thuongHieu; }
+    public String getChatLieu() { return chatLieu; }
+    public String getKichThuoc() { return kichThuoc; }
+    public BigDecimal getGia() { return gia; }
+    public LocalDateTime getNgayTao() { return ngayTao; }
 }

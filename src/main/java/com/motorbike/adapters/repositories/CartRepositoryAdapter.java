@@ -36,40 +36,7 @@ public class CartRepositoryAdapter implements CartRepository {
     @Override
     @Transactional
     public GioHang save(GioHang gioHang) {
-        GioHangJpaEntity jpaEntity;
-        
-        // If cart has an ID, load the existing entity and update it
-        if (gioHang.getMaGioHang() != null) {
-            Optional<GioHangJpaEntity> existingOpt = jpaRepository.findByIdWithItems(gioHang.getMaGioHang());
-            if (existingOpt.isPresent()) {
-                jpaEntity = existingOpt.get();
-                // Update existing entity
-                jpaEntity.setMaTaiKhoan(gioHang.getMaTaiKhoan());
-                jpaEntity.setTongTien(gioHang.getTongTien());
-                
-                // Clear and re-add items (orphanRemoval will handle deletion)
-                // Force flush to delete orphans before adding new ones
-                jpaEntity.getDanhSachSanPham().clear();
-                jpaRepository.flush();
-                
-                for (ChiTietGioHang itemDomain : gioHang.getDanhSachSanPham()) {
-                    ChiTietGioHangJpaEntity itemJpa = new ChiTietGioHangJpaEntity(
-                            itemDomain.getMaSanPham(),
-                            itemDomain.getTenSanPham(),
-                            itemDomain.getGiaSanPham(),
-                            itemDomain.getSoLuong()
-                    );
-                    jpaEntity.addItem(itemJpa);
-                }
-            } else {
-                // ID exists but entity not found - create new
-                jpaEntity = toJpaEntity(gioHang);
-            }
-        } else {
-            // Create new entity (no ID means new cart)
-            jpaEntity = toJpaEntity(gioHang);
-        }
-        
+        GioHangJpaEntity jpaEntity = toJpaEntity(gioHang);
         GioHangJpaEntity saved = jpaRepository.save(jpaEntity);
         return toDomain(saved);
     }
@@ -78,6 +45,20 @@ public class CartRepositoryAdapter implements CartRepository {
     @Transactional
     public void delete(Long cartId) {
         jpaRepository.deleteById(cartId);
+    }
+    
+    @Override
+    @Transactional
+    public void deleteById(Long cartId) {
+        jpaRepository.deleteById(cartId);
+    }
+    
+    @Override
+    @Transactional
+    public void deleteAllByUserId(Long userId) {
+        jpaRepository.findByUserIdWithItems(userId).ifPresent(cart -> {
+            jpaRepository.deleteById(cart.getMaGioHang());
+        });
     }
     
     @Override
@@ -170,11 +151,18 @@ public class CartRepositoryAdapter implements CartRepository {
                     itemDomain.getGiaSanPham(),
                     itemDomain.getSoLuong()
             );
-            // NEVER set ID for new entities - let Hibernate generate it
-            // Only used for new carts, so items don't have IDs yet
+            itemJpa.setMaChiTiet(itemDomain.getMaChiTiet());
             jpa.addItem(itemJpa);
         }
         
         return jpa;
+    }
+    
+    @Override
+    public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+        // Find cart by userId and check if it contains the productId
+        return findByUserId(userId)
+                .filter(cart -> cart.getDanhSachSanPham().stream()
+                        .anyMatch(item -> item.getMaSanPham().equals(productId)));
     }
 }

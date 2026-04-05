@@ -14,16 +14,18 @@ public class GetAllAccessoriesPresenter implements GetAllAccessoriesOutputBounda
 
     @Override
     public void present(GetAllAccessoriesOutputData outputData) {
-        if (outputData.isSuccess()) {
-            viewModel.accessories = outputData.getAccessories();
-            viewModel.hasError = false;
-            viewModel.errorCode = null;
-            viewModel.errorMessage = null;
-        } else {
-            viewModel.accessories = null;
+        // reset state
+        viewModel.hasError = false;
+        viewModel.errorCode = null;
+        viewModel.errorMessage = null;
+        viewModel.accessories = null;
+
+        if (outputData.hasError) {
             viewModel.hasError = true;
-            viewModel.errorCode = outputData.getErrorCode();
-            viewModel.errorMessage = outputData.getErrorMessage();
+            viewModel.errorCode = outputData.errorCode;
+            viewModel.errorMessage = outputData.errorMessage;
+        } else {
+            viewModel.accessories = outputData.accessories;
         }
     }
 }

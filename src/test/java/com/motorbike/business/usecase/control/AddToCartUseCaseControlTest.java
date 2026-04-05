@@ -275,6 +275,19 @@ public class AddToCartUseCaseControlTest {
 		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
 			return 0;
 		}
+		
+		@Override
+		public void deleteAllByUserId(Long userId) {
+		}
+		
+		@Override
+		public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public void deleteById(Long cartId) {
+		}
 	}
 	
 	private static class MockProductRepository implements ProductRepository {
@@ -312,6 +325,40 @@ public class AddToCartUseCaseControlTest {
 		@Override
 		public java.util.List<com.motorbike.domain.entities.SanPham> findAll() {
 			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public void deleteById(Long productId) {
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> findAllAccessories() {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
 		}
 	}
 }

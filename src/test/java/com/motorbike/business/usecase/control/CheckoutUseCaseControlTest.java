@@ -1,12 +1,13 @@
 package com.motorbike.business.usecase.control;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.Test;
 
 import com.motorbike.adapters.presenters.CheckoutPresenter;
@@ -19,6 +20,7 @@ import com.motorbike.business.usecase.output.CheckoutOutputBoundary;
 import com.motorbike.domain.entities.ChiTietGioHang;
 import com.motorbike.domain.entities.DonHang;
 import com.motorbike.domain.entities.GioHang;
+import com.motorbike.domain.entities.PhuongThucThanhToan;
 import com.motorbike.domain.entities.TrangThaiDonHang;
 import com.motorbike.domain.entities.XeMay;
 
@@ -31,7 +33,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Giao trong gio hanh chinh"
+			"Giao trong gio hanh chinh",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -59,7 +62,8 @@ public class CheckoutUseCaseControlTest {
 			"Tran Thi B",
 			"0987654321",
 			"456 Side St",
-			"Goi truoc khi giao"
+			"Goi truoc khi giao",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -85,6 +89,7 @@ public class CheckoutUseCaseControlTest {
 			"Le Van C",
 			"0901234567",
 			"789 Park Ave",
+			null,
 			null
 		);
 		
@@ -131,7 +136,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -157,7 +163,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -183,7 +190,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -209,7 +217,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -235,7 +244,8 @@ public class CheckoutUseCaseControlTest {
 			"",
 			"0912345678",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -261,7 +271,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"",
 			"123 Main St",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -287,7 +298,8 @@ public class CheckoutUseCaseControlTest {
 			"Nguyen Van A",
 			"0912345678",
 			"",
-			"Note"
+			"Note",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -313,7 +325,8 @@ public class CheckoutUseCaseControlTest {
 			"A",
 			"1",
 			"X",
-			""
+			"",
+			null
 		);
 		
 		CartRepository cartRepo = new MockCartRepository();
@@ -343,6 +356,7 @@ public class CheckoutUseCaseControlTest {
 			longName,
 			longPhone,
 			longAddress,
+			null,
 			null
 		);
 		
@@ -370,6 +384,7 @@ public class CheckoutUseCaseControlTest {
 			}
 			
 			GioHang cart = new GioHang(userId);
+			cart.setMaGioHang(userId); // Set cart ID for testing
 			
 			if (userId == 999L) {
 				return Optional.of(cart);
@@ -394,7 +409,8 @@ public class CheckoutUseCaseControlTest {
 		
 		@Override
 		public Optional<GioHang> findById(Long id) {
-			return Optional.empty();
+			// For testing, treat cart ID same as user ID
+			return findByUserId(id);
 		}
 		
 		@Override
@@ -404,6 +420,19 @@ public class CheckoutUseCaseControlTest {
 		@Override
 		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
 			return 0;
+		}
+		
+		@Override
+		public void deleteAllByUserId(Long userId) {
+		}
+		
+		@Override
+		public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public void deleteById(Long cartId) {
 		}
 	}
 	
@@ -443,6 +472,40 @@ public class CheckoutUseCaseControlTest {
 		public java.util.List<com.motorbike.domain.entities.SanPham> findAll() {
 			return new java.util.ArrayList<>();
 		}
+		
+		@Override
+		public void deleteById(Long productId) {
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> findAllAccessories() {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.PhuKienXeMay> searchAccessories(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> findAllMotorbikes() {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public java.util.List<com.motorbike.domain.entities.XeMay> searchMotorbikes(String keyword) {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByTenSanPham(String tenSanPham) {
+			return Optional.empty();
+		}
+		
+		@Override
+		public Optional<com.motorbike.domain.entities.SanPham> findByMaSanPham(String maSanPham) {
+			return Optional.empty();
+		}
 	}
 	
 	private static class MockOrderRepository implements OrderRepository {
@@ -478,11 +541,6 @@ public class CheckoutUseCaseControlTest {
 		public List<DonHang> findAll() {
 			return new ArrayList<>();
 		}
-
-		@Override
-		public List<DonHang> searchForAdmin(String keyword) {
-			return new ArrayList<>();
-		}
 		
 		@Override
 		public void deleteById(Long orderId) {
@@ -491,6 +549,16 @@ public class CheckoutUseCaseControlTest {
 		@Override
 		public boolean existsById(Long orderId) {
 			return false;
+		}
+		
+		@Override
+		public List<DonHang> searchOrders(String keyword) {
+			return new ArrayList<>();
+		}
+
+		@Override
+		public java.util.List<com.motorbike.domain.entities.ProductSalesStats> getTopSellingProducts(int limit) {
+			return new java.util.ArrayList<>();
 		}
 	}
 }

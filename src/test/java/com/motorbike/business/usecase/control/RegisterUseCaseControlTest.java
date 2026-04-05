@@ -1,10 +1,10 @@
 package com.motorbike.business.usecase.control;
 
-import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 
 import com.motorbike.adapters.presenters.RegisterPresenter;
@@ -21,6 +21,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_ValidRegistration_Success() {
 		RegisterInputData inputData = new RegisterInputData(
+			"New User",
 			"newuser@test.com",
 			"newuser",
 			"password123",
@@ -46,6 +47,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_ValidRegistration_WithAddress() {
 		RegisterInputData inputData = new RegisterInputData(
+			"User Two",
 			"user2@test.com",
 			"user2",
 			"password123",
@@ -70,6 +72,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_ValidRegistration_MinimalData() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Mi",
 			"min@test.com",
 			"usr",
 			"pass12",
@@ -110,6 +113,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_EmptyEmail() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"",
 			"username",
 			"password123",
@@ -133,6 +137,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_NullEmail() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			null,
 			"username",
 			"password123",
@@ -156,6 +161,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_EmptyUsername() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"user@test.com",
 			"",
 			"password123",
@@ -179,6 +185,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_NullPassword() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"user@test.com",
 			"username",
 			null,
@@ -202,6 +209,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_PasswordMismatch() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"user@test.com",
 			"username",
 			"12345",
@@ -225,6 +233,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_EmailAlreadyExists() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"existing@test.com",
 			"username",
 			"password123",
@@ -248,6 +257,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_ShortUsername() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"user@test.com",
 			"ab",
 			"password123",
@@ -271,6 +281,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_ShortPassword() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"user@test.com",
 			"username",
 			"pass",
@@ -294,6 +305,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_InvalidPhoneFormat() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"user@test.com",
 			"username",
 			"password123",
@@ -318,6 +330,7 @@ public class RegisterUseCaseControlTest {
 	public void testExecute_EdgeCase_LongUsername() {
 		String longUsername = "a".repeat(100);
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"user@test.com",
 			longUsername,
 			"password123",
@@ -341,6 +354,7 @@ public class RegisterUseCaseControlTest {
 	@Test
 	public void testExecute_EdgeCase_ValidMinimalUsername() {
 		RegisterInputData inputData = new RegisterInputData(
+			"Test User",
 			"user@test.com",
 			"abc",
 			"password123",
@@ -364,19 +378,37 @@ public class RegisterUseCaseControlTest {
 	private static class MockUserRepository implements UserRepository {
 		private Long nextId = 1L;
 		
-		@Override
-		public Optional<TaiKhoan> findByEmail(String email) {
-			return Optional.empty();
+	@Override
+	public Optional<TaiKhoan> findByEmail(String email) {
+		if ("existing@test.com".equals(email)) {
+			TaiKhoan existingUser = new TaiKhoan("Existing User", email, "existing_user", "password", "0900000000", "Address");
+			existingUser.setMaTaiKhoan(999L);
+			return Optional.of(existingUser);
 		}
-		
-		@Override
-		public Optional<TaiKhoan> findById(Long id) {
-			return Optional.empty();
-		}
-		
-		@Override
+		return Optional.empty();
+	}
+	
+	@Override
+	public Optional<TaiKhoan> findByUsernameOrEmailOrPhone(String username) {
+		return findByEmail(username);
+	}
+
+	@Override
+	public boolean existsByTenDangNhap(String tenDangNhap) {
+		return false;
+	}
+	
+	@Override
+	public Optional<TaiKhoan> findById(Long id) {
+		return Optional.empty();
+	}		@Override
 		public boolean existsByEmail(String email) {
 			return email != null && email.equals("existing@test.com");
+		}
+		
+		@Override
+		public boolean existsByUsername(String username) {
+			return false;
 		}
 		
 		@Override
@@ -390,18 +422,33 @@ public class RegisterUseCaseControlTest {
 		@Override
 		public void updateLastLogin(Long userId) {
 		}
-		// lấy tất cả người dùng
-        @Override
-        public List<TaiKhoan> findAll() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-		// xóa
-        @Override
-        public void deleteById(Long id) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+		
+		@Override
+		public java.util.List<TaiKhoan> findAll() {
+			return new java.util.ArrayList<>();
+		}
+		
+		@Override
+		public void deleteById(Long userId) {
+		}
+		
+		@Override
+		public boolean existsById(Long userId) {
+			return false;
+		}
+		
+		@Override
+		public java.util.List<TaiKhoan> searchUsers(String keyword) {
+			return new java.util.ArrayList<>();
 	}
 	
+	@Override
+	public Optional<com.motorbike.domain.entities.TaiKhoan> findByTenDangNhap(String tenDangNhap) {
+		return Optional.empty();
+	}
+	}
+
+
 	private static class MockCartRepository implements CartRepository {
 		@Override
 		public Optional<GioHang> findByUserId(Long userId) {
@@ -428,6 +475,19 @@ public class RegisterUseCaseControlTest {
 		@Override
 		public int mergeGuestCartToUserCart(Long guestCartId, Long userCartId) {
 			return 0;
+		}
+
+		@Override
+		public Optional<GioHang> findByUserIdAndProductId(Long userId, Long productId) {
+			return Optional.empty();
+		}
+
+		@Override
+		public void deleteAllByUserId(Long userId) {
+		}
+
+		@Override
+		public void deleteById(Long cartId) {
 		}
 	}
 }

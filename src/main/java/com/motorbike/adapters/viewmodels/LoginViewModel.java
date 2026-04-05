@@ -8,6 +8,9 @@ public class LoginViewModel {
     public Long userId;
     public String email;
     public String username;
+    public String role;
+    public String phone;
+    public String address;
     public String roleDisplay;
     public String lastLoginDisplay;
     
